@@ -2,15 +2,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.ayahofday.app"
+    namespace = "com.tahsin.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ayahofday.app"
+        applicationId = "com.tahsin.app"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -51,23 +50,14 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     debugImplementation(libs.androidx.ui.tooling)
 
-    // ---- AndroidX / Lifecycle / Navigation ----
+    // ---- AndroidX / Lifecycle / Coroutines ----
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.coroutines.android)
 
-    // ---- Data layer ----
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.coil.compose)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-
-    // ---- Background work (notifikasi) ----
-    implementation(libs.androidx.work.runtime.ktx)
+    // ---- JSON parsing (mushaf asset) ----
+    implementation(libs.gson)
 }

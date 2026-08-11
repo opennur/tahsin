@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Akses internet untuk EQuran.id / Kemenag API -->
+    <!-- Mic untuk membaca Al-Quran (STT) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- STT online (SpeechRecognizer bawaan) — offline kalau paket bahasa Arab terpasang -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Notifikasi harian (WorkManager) — runtime request pada Android 13+ diimplementasikan nanti -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AyahOfTheDay">
+        android:theme="@style/Theme.TahsinQuran">
 
         <activity
             android:name=".MainActivity"
