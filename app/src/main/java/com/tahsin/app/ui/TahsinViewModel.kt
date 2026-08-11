@@ -55,6 +55,8 @@ sealed interface TahsinUiState {
         val isDownloading: Boolean = false,
         val downloadDone: Int = 0,
         val downloadTotal: Int = 0,
+        /** Bulk unduh semua surah sedang berjalan (penjaga agar tidak bertumpuk). */
+        val isDownloadingAll: Boolean = false,
         /** Popup keterangan saat unduhan audio dimulai. */
         val showDownloadNotice: Boolean = false,
     ) : TahsinUiState {
@@ -293,6 +295,11 @@ class TahsinViewModel(
      * surah yang diunduh sekaligus.
      */
     private fun startSurahDownloadIfNeeded(surah: Surah, onComplete: () -> Unit) {
+        // Saat bulk unduh semua berjalan, play langsung ke URL streaming.
+        if (currentReady()?.isDownloadingAll == true) {
+            onComplete()
+            return
+        }
         if (downloader.isSurahAudioComplete(surah)) {
             onComplete()
             return
@@ -389,6 +396,57 @@ class TahsinViewModel(
     /** Tutup popup keterangan unduhan. */
     fun dismissDownloadNotice() {
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = false) }
+    }
+
+    /**
+     * Unduh audio SEMUA surah (isi surah otomatis dimuat dari cache/equran.id).
+     * Berjalan sekuensial; progres agregat tampil di bar atas tombol.
+     */
+    fun downloadAllAudio() {
+        val s = currentReady() ?: return
+        if (s.isDownloading) return
+        viewModelScope.launch {
+            var done = 0
+            var total = 0
+            var failed = 0
+            updateReady { it.copy(
+                isDownloading = true,
+                isDownloadingAll = true,
+                downloadDone = 0,
+                downloadTotal = 0,
+                message = null,
+            ) }
+            s.surahs.forEach { meta ->
+                val surah = repository.cachedSurah(meta.number)
+                    ?: runCatching { repository.fetchSurah(meta.number) }.getOrNull()
+                if (surah == null) {
+                    failed++
+                    return@forEach
+                }
+                replaceSurah(surah)
+                if (!downloader.isSurahAudioComplete(surah)) {
+                    total += surah.ayahs.size + surah.ayahs.sumOf { it.words.size }
+                    updateReady { it.copy(downloadTotal = total) }
+                    try {
+                        downloader.downloadSurah(surah) { _, _ ->
+                            done++
+                            updateReady { it.copy(downloadDone = done) }
+                        }
+                    } catch (e: Exception) {
+                        failed++
+                    }
+                }
+            }
+            updateReady { it.copy(
+                isDownloading = false,
+                isDownloadingAll = false,
+                message = if (failed > 0) {
+                    "Unduh selesai: $failed surah gagal."
+                } else {
+                    "Semua audio berhasil diunduh ✓"
+                },
+            ) }
+        }
     }
 
     // ---- preferensi font & tema ----

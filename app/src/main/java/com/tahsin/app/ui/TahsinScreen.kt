@@ -113,6 +113,7 @@ fun TahsinScreen(
             onToggleDarkMode = viewModel::toggleDarkMode,
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onDismissDownloadNotice = viewModel::dismissDownloadNotice,
+            onDownloadAll = viewModel::downloadAllAudio,
             onOpenAudioManager = onOpenAudioManager,
             modifier = modifier,
         )
@@ -137,6 +138,7 @@ private fun TahsinContent(
     onToggleDarkMode: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onDismissDownloadNotice: () -> Unit,
+    onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -354,6 +356,7 @@ private fun TahsinContent(
                     onIncreaseFont = onIncreaseFont,
                     onSelectFont = onSelectFont,
                     onToggleDarkMode = onToggleDarkMode,
+                    onDownloadAll = onDownloadAll,
                     onOpenAudioManager = {
                         drawerOpen = false
                         onOpenAudioManager()
@@ -545,6 +548,7 @@ private fun SettingsPanel(
     onIncreaseFont: () -> Unit,
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
+    onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
     onClose: () -> Unit,
 ) {
@@ -610,6 +614,14 @@ private fun SettingsPanel(
         Spacer(modifier = Modifier.height(20.dp))
 
         SectionLabel("Penyimpanan")
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = "📥 Unduh semua audio",
+            variant = AyahButtonVariant.Primary,
+            onClick = onDownloadAll,
+            enabled = !state.isDownloading,
+            modifier = Modifier.fillMaxWidth(),
+        )
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
             text = "🎵 Kelola audio terunduh",
