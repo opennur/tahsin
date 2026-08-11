@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -266,7 +269,29 @@ private fun TahsinContent(
 
             // ---- Mushaf kontinu (gaya mushaf asli: kata tersambung RTL) ----
             // Tiap kata bisa diketuk → play kata + tooltip keterangan tajwid.
-            AyahCard(modifier = Modifier.fillMaxWidth()) {
+            // Swipe kiri/kanan → ganti ayat (RTL: kiri = berikutnya).
+            val density = LocalDensity.current
+            val swipeThresholdPx = with(density) { 80.dp.toPx() }
+            AyahCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        var total = 0f
+                        detectHorizontalDragGestures(
+                            onHorizontalDrag = { change, dragAmount ->
+                                change.consume()
+                                total += dragAmount
+                            },
+                            onDragEnd = {
+                                // RTL: geser KANAN = ayat berikutnya, geser KIRI = sebelumnya.
+                                if (total >= swipeThresholdPx) onNextAyah()
+                                else if (total <= -swipeThresholdPx) onPrevAyah()
+                                total = 0f
+                            },
+                            onDragCancel = { total = 0f },
+                        )
+                    },
+            ) {
                 var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
                 val wordOffsets = remember(words) {
                     val arr = IntArray(words.size)
