@@ -21,6 +21,24 @@ class TahsinAudioPlayer(context: Context) {
     private val cacheRoot: File = File(context.filesDir, "audio")
     private var mediaPlayer: MediaPlayer? = null
     private var openAfd: AssetFileDescriptor? = null
+    private var isPlaying = false
+
+    /** Callback status pemutaran (true = sedang memutar). Dipakai UI untuk tombol Dengar/Stop. */
+    var onPlaybackChange: ((Boolean) -> Unit)? = null
+
+    /** Hentikan audio yang sedang diputar. */
+    fun stop() {
+        releaseMedia()
+        runCatching { tts.stop() }
+        setPlaying(false)
+    }
+
+    private fun setPlaying(value: Boolean) {
+        if (isPlaying != value) {
+            isPlaying = value
+            onPlaybackChange?.invoke(value)
+        }
+    }
 
     private val tts: TextToSpeech = TextToSpeech(appContext) {
         // Bahasa Arab di-set ulang pada setiap speak()/isArabicTtsAvailable().
@@ -86,8 +104,10 @@ class TahsinAudioPlayer(context: Context) {
             releaseMedia()
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(file.absolutePath)
-                setOnPreparedListener { start() }
+                setOnPreparedListener { start(); setPlaying(true) }
+                setOnCompletionListener { setPlaying(false) }
                 setOnErrorListener { _, _, _ ->
+                    setPlaying(false)
                     onError()
                     true
                 }
@@ -104,8 +124,10 @@ class TahsinAudioPlayer(context: Context) {
             openAfd = afd
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                setOnPreparedListener { start() }
+                setOnPreparedListener { start(); setPlaying(true) }
+                setOnCompletionListener { setPlaying(false) }
                 setOnErrorListener { _, _, _ ->
+                    setPlaying(false)
                     onError()
                     true
                 }
@@ -121,8 +143,10 @@ class TahsinAudioPlayer(context: Context) {
             releaseMedia()
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(url)
-                setOnPreparedListener { start() }
+                setOnPreparedListener { start(); setPlaying(true) }
+                setOnCompletionListener { setPlaying(false) }
                 setOnErrorListener { _, _, _ ->
+                    setPlaying(false)
                     onError()
                     true
                 }

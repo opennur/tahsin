@@ -20,6 +20,7 @@ import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.util.AudioDownloader
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,12 +49,14 @@ sealed interface TahsinUiState {
         val fontScale: Float = 1f,
         val arabicFont: ArabicFont = ArabicFont.SYSTEM,
         val darkMode: Boolean = false,
-        /** Nomor surah yang menunggu konfirmasi unduh audio. */
-        val confirmDownloadSurah: Int? = null,
-        /** Sedang mengunduh audio (surah = downloadingSurah). */
+        /** Sedang memutar audio (untuk tombol Dengar/Stop). */
+        val isAudioPlaying: Boolean = false,
+        /** Sedang mengunduh audio (agregat semua surah, tampil di atas tombol). */
         val isDownloading: Boolean = false,
-        val downloadingSurah: Int? = null,
-        val downloadProgress: Pair<Int, Int>? = null,
+        val downloadDone: Int = 0,
+        val downloadTotal: Int = 0,
+        /** Popup keterangan saat unduhan audio dimulai. */
+        val showDownloadNotice: Boolean = false,
     ) : TahsinUiState {
         val surah: Surah? get() = surahs.find { it.number == surahNumber }
         val ayah: Ayah? get() = surah?.ayahs?.getOrNull(ayahIndex)
@@ -79,11 +82,19 @@ class TahsinViewModel(
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
     val uiState: StateFlow<TahsinUiState> = _uiState.asStateFlow()
 
-    /** Aksi play yang tertunda sampai unduhan audio surah selesai. */
-    private var pendingPlayAfterDownload: (() -> Unit)? = null
+    /** Unduhan aktif per surah (mendukung beberapa surah sekaligus). */
+    private val activeDownloads = java.util.concurrent.ConcurrentHashMap<Int, Job>()
+    private val activeTotals = java.util.concurrent.ConcurrentHashMap<Int, Int>()
+    private val activeDone = java.util.concurrent.ConcurrentHashMap<Int, Int>()
+
+    /** Callback play yang menunggu unduhan surah selesai. */
+    private val pendingCallbacks = mutableMapOf<Int, MutableList<() -> Unit>>()
 
     init {
         AyahColors.isDark = settings.darkMode
+        audioPlayer.onPlaybackChange = { playing ->
+            updateReady { it.copy(isAudioPlaying = playing) }
+        }
         reload()
     }
 
@@ -122,7 +133,6 @@ class TahsinViewModel(
             issues = emptyList(),
             selectedWordIndex = null,
             selectedWordRules = emptyList(),
-            confirmDownloadSurah = null,
             message = null,
         ) }
         loadSurahContent(number)
@@ -265,18 +275,64 @@ class TahsinViewModel(
         ) }
     }
 
-    // ---- audio: unduh per surah dengan konfirmasi ----
+    // ---- audio: unduh per surah (progress di footer, multi-surah) ----
 
     fun playAyah() {
         val s = currentReady() ?: return
         val surah = s.surah ?: return
         if (surah.ayahs.isEmpty() || s.ayah == null) return
         if (!downloader.isSurahAudioComplete(surah)) {
-            pendingPlayAfterDownload = { playAyahNow() }
-            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(confirmDownloadSurah = surah.number) }
+            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = true) }
+        }
+        startSurahDownloadIfNeeded(surah) { playAyahNow() }
+    }
+
+    /**
+     * Mulai unduh audio surah kalau belum lengkap (tanpa popup — progress di
+     * footer), lalu jalankan `onComplete` begitu audio siap. Mendukung beberapa
+     * surah yang diunduh sekaligus.
+     */
+    private fun startSurahDownloadIfNeeded(surah: Surah, onComplete: () -> Unit) {
+        if (downloader.isSurahAudioComplete(surah)) {
+            onComplete()
             return
         }
-        playAyahNow()
+        if (activeDownloads.containsKey(surah.number)) {
+            pendingCallbacks.getOrPut(surah.number) { mutableListOf() } += onComplete
+            return
+        }
+        val total = surah.ayahs.size + surah.ayahs.sumOf { it.words.size }
+        activeTotals[surah.number] = total
+        activeDone[surah.number] = 0
+        updateDownloadState()
+        activeDownloads[surah.number] = viewModelScope.launch {
+            try {
+                downloader.downloadSurah(surah) { done, _ ->
+                    activeDone[surah.number] = done
+                    updateDownloadState()
+                }
+            } catch (e: Exception) {
+                updateReady { it.copy(
+                    message = "Gagal mengunduh ${surah.nameLatin}: ${e.message ?: "periksa koneksi"}",
+                ) }
+            }
+            activeDownloads.remove(surah.number)
+            activeTotals.remove(surah.number)
+            activeDone.remove(surah.number)
+            updateDownloadState()
+            pendingCallbacks.remove(surah.number)?.forEach { it() }
+        }
+    }
+
+    /** Perbarui state progress agregat dari semua unduhan aktif. */
+    private fun updateDownloadState() {
+        val done = activeDone.values.sum()
+        val total = activeTotals.values.sum()
+        updateReady { it.copy(
+            isDownloading = activeDownloads.isNotEmpty(),
+            downloadDone = done,
+            downloadTotal = total,
+        ) }
     }
 
     private fun playAyahNow() {
@@ -300,11 +356,9 @@ class TahsinViewModel(
         if (ayah.words.getOrNull(idx) == null) return
         val surah = s.surah ?: return
         if (!downloader.isSurahAudioComplete(surah)) {
-            pendingPlayAfterDownload = { playWordNow(idx) }
-            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(confirmDownloadSurah = surah.number) }
-            return
+            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = true) }
         }
-        playWordNow(idx)
+        startSurahDownloadIfNeeded(surah) { playWordNow(idx) }
     }
 
     private fun playWordNow(wordIndex: Int) {
@@ -322,43 +376,19 @@ class TahsinViewModel(
         }
     }
 
-    /** Jawaban popup konfirmasi unduh audio surah. */
-    fun confirmDownloadSurah(accept: Boolean) {
+    /** Tombol Dengar/Stop: berhenti kalau sedang memutar; kalau tidak, putar ayat. */
+    fun toggleAudioPlayback() {
         val s = currentReady() ?: return
-        val number = s.confirmDownloadSurah ?: return
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(confirmDownloadSurah = null) }
-        if (!accept) {
-            pendingPlayAfterDownload = null
-            return
+        if (s.isAudioPlaying) {
+            audioPlayer.stop()
+        } else {
+            playAyah()
         }
-        val surah = s.surahs.find { it.number == number }
-        if (surah == null || surah.ayahs.isEmpty()) {
-            pendingPlayAfterDownload = null
-            showMessage("Isi surah belum dimuat — buka surahnya dulu, lalu coba lagi.")
-            return
-        }
-        viewModelScope.launch {
-            updateReady { it.copy(isDownloading = true, downloadingSurah = number, downloadProgress = null) }
-            try {
-                val stats = downloader.downloadSurah(surah) { done, total ->
-                    updateReady { it.copy(downloadProgress = done to total) }
-                }
-                updateReady { it.copy(
-                    isDownloading = false,
-                    downloadingSurah = null,
-                    downloadProgress = stats.ok to stats.total,
-                ) }
-                pendingPlayAfterDownload?.invoke()
-                pendingPlayAfterDownload = null
-            } catch (e: Exception) {
-                updateReady { it.copy(
-                    isDownloading = false,
-                    downloadingSurah = null,
-                    message = "Gagal mengunduh audio: ${e.message ?: "periksa koneksi"}",
-                ) }
-                pendingPlayAfterDownload = null
-            }
-        }
+    }
+
+    /** Tutup popup keterangan unduhan. */
+    fun dismissDownloadNotice() {
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = false) }
     }
 
     // ---- preferensi font & tema ----
