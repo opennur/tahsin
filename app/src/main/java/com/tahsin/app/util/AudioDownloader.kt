@@ -1,12 +1,17 @@
 package com.tahsin.app.util
 
 import android.content.Context
+import com.google.gson.Gson
 import com.tahsin.app.data.quran.Surah
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+
+/** HTTP 404/403 — file audio memang tidak ada di server (permanen). */
+class AudioUnavailableException(message: String) : IOException(message)
 
 /** Hasil unduhan audio. */
 data class DownloadStats(
@@ -14,74 +19,143 @@ data class DownloadStats(
     val total: Int,
 )
 
+/** Rekam file yang ternyata tidak ada di server (persisten). */
+private data class MissingAudio(
+    val ayahs: List<String> = emptyList(),
+    val words: List<String> = emptyList(),
+)
+
+/** Satu item unduhan: URL, file tujuan, dan apakah file kata (vs ayat). */
+private data class DownloadJob(
+    val url: String,
+    val file: File,
+    val isWord: Boolean,
+)
+
 /**
  * Mengunduh audio contoh ke penyimpanan internal (`filesDir/audio`) supaya
  * bisa diputar OFFLINE setelah diunduh sekali. Unduhan dilakukan PER SURAH:
  * semua MP3 ayat (Minshawy) + semua MP3 kata (quran.com) surah itu.
+ *
+ * File yang ternyata 404 di server dicatat permanen ("missing") supaya tidak
+ * diblokir selamanya dan tidak dicoba diunduh berulang-ulang.
  */
 class AudioDownloader(context: Context) {
 
     private val appContext = context.applicationContext
+    private val gson = Gson()
+    private val missingFile = File(appContext.filesDir, "audio/missing.json")
 
     /** filesDir/audio — relatif sama dengan konvensi assets/audio. */
     val audioDir: File
         get() = File(appContext.filesDir, "audio")
+
+    /** Nama file (tanpa path) yang pernah 404 di server. */
+    private val missingAyahs = mutableSetOf<String>()
+    private val missingWords = mutableSetOf<String>()
+
+    init {
+        loadMissing()
+    }
 
     fun ayahFile(surah: Int, ayah: Int): File = File(audioDir, AudioUrls.ayahKey(surah, ayah))
 
     fun wordFile(surah: Int, ayah: Int, wordIndex: Int): File =
         File(File(audioDir, "wbw"), AudioUrls.wordKey(surah, ayah, wordIndex))
 
-    /** Pastikan audio ayat ada di cache (unduh kalau belum). */
-    suspend fun ensureAyah(surah: Int, ayah: Int): File = withContext(Dispatchers.IO) {
+    fun isAyahMissing(surah: Int, ayah: Int): Boolean = AudioUrls.ayahKey(surah, ayah) in missingAyahs
+
+    fun isWordMissing(surah: Int, ayah: Int, wordIndex: Int): Boolean =
+        AudioUrls.wordKey(surah, ayah, wordIndex) in missingWords
+
+    /** Pastikan audio ayat ada di cache; null kalau file memang tidak ada di server. */
+    suspend fun ensureAyah(surah: Int, ayah: Int): File? = withContext(Dispatchers.IO) {
         val file = ayahFile(surah, ayah)
-        if (file.exists() && file.length() > 0L) file else download(AudioUrls.ayahUrl(surah, ayah), file)
+        when {
+            file.exists() && file.length() > 0L -> file
+            isAyahMissing(surah, ayah) -> null
+            else -> try {
+                download(AudioUrls.ayahUrl(surah, ayah), file)
+            } catch (e: AudioUnavailableException) {
+                recordMissingAyah(file.name)
+                null
+            }
+        }
     }
 
-    /** Pastikan audio kata ada di cache. */
-    suspend fun ensureWord(surah: Int, ayah: Int, wordIndex: Int): File = withContext(Dispatchers.IO) {
+    /** Pastikan audio kata ada di cache; null kalau file memang tidak ada di server. */
+    suspend fun ensureWord(surah: Int, ayah: Int, wordIndex: Int): File? = withContext(Dispatchers.IO) {
         val file = wordFile(surah, ayah, wordIndex)
-        if (file.exists() && file.length() > 0L) file else download(AudioUrls.wordUrl(surah, ayah, wordIndex), file)
+        when {
+            file.exists() && file.length() > 0L -> file
+            isWordMissing(surah, ayah, wordIndex) -> null
+            else -> try {
+                download(AudioUrls.wordUrl(surah, ayah, wordIndex), file)
+            } catch (e: AudioUnavailableException) {
+                recordMissingWord(file.name)
+                null
+            }
+        }
     }
 
-    /** Semua audio surah (ayat + kata) sudah ada di cache? */
+    /** Semua audio surah (ayat + kata) sudah ada di cache / memang tidak tersedia? */
     fun isSurahAudioComplete(surah: Surah): Boolean {
         if (surah.ayahs.isEmpty()) return false
         surah.ayahs.forEach { ayah ->
-            val af = ayahFile(surah.number, ayah.number)
-            if (!(af.exists() && af.length() > 0L)) return false
+            if (!isAyahMissing(surah.number, ayah.number)) {
+                val af = ayahFile(surah.number, ayah.number)
+                if (!(af.exists() && af.length() > 0L)) return false
+            }
             ayah.words.forEachIndexed { wi, _ ->
-                val wf = wordFile(surah.number, ayah.number, wi)
-                if (!(wf.exists() && wf.length() > 0L)) return false
+                if (!isWordMissing(surah.number, ayah.number, wi)) {
+                    val wf = wordFile(surah.number, ayah.number, wi)
+                    if (!(wf.exists() && wf.length() > 0L)) return false
+                }
             }
         }
         return true
     }
 
     /**
-     * Unduh SEMUA audio satu surah (per ayat + per kata).
-     * File yang sudah ada dilewati; kegagalan per-file tidak menggagalkan sisanya.
+     * Unduh SEMUA audio satu surah (per ayat + per kata). File yang sudah ada
+     * atau tercatat missing dilewati; kegagalan per-file (termasuk 404, yang
+     * dicatat permanen) tidak menggagalkan sisanya.
      */
     suspend fun downloadSurah(
         surah: Surah,
         onProgress: (done: Int, total: Int) -> Unit,
     ): DownloadStats = withContext(Dispatchers.IO) {
-        val jobs = mutableListOf<Pair<String, File>>()
+        val jobs = mutableListOf<DownloadJob>()
         surah.ayahs.forEach { ayah ->
-            jobs += AudioUrls.ayahUrl(surah.number, ayah.number) to ayahFile(surah.number, ayah.number)
+            if (!isAyahMissing(surah.number, ayah.number)) {
+                jobs += DownloadJob(AudioUrls.ayahUrl(surah.number, ayah.number), ayahFile(surah.number, ayah.number), false)
+            }
             ayah.words.forEachIndexed { wi, _ ->
-                jobs += AudioUrls.wordUrl(surah.number, ayah.number, wi) to wordFile(surah.number, ayah.number, wi)
+                if (!isWordMissing(surah.number, ayah.number, wi)) {
+                    jobs += DownloadJob(
+                        AudioUrls.wordUrl(surah.number, ayah.number, wi),
+                        wordFile(surah.number, ayah.number, wi),
+                        true,
+                    )
+                }
             }
         }
 
         var done = 0
         var ok = 0
         val total = jobs.size
-        jobs.forEach { (url, file) ->
-            if (file.exists() && file.length() > 0L) {
+        jobs.forEach { job ->
+            if (job.file.exists() && job.file.length() > 0L) {
                 ok++
-            } else if (runCatching { download(url, file) }.isSuccess) {
-                ok++
+            } else {
+                try {
+                    download(job.url, job.file)
+                    ok++
+                } catch (e: AudioUnavailableException) {
+                    if (job.isWord) recordMissingWord(job.file.name) else recordMissingAyah(job.file.name)
+                } catch (e: Exception) {
+                    // error transien (timeout dll.) — biar dicoba lagi di kesempatan lain
+                }
             }
             done++
             onProgress(done, total)
@@ -101,6 +175,10 @@ class AudioDownloader(context: Context) {
         val totalWords: Int?,
         /** Total ukuran file terunduh (bytes). */
         val sizeBytes: Long,
+        /** Jumlah audio ayat yang memang tidak tersedia di server. */
+        val missingAyahs: Int = 0,
+        /** Jumlah audio kata yang memang tidak tersedia di server. */
+        val missingWords: Int = 0,
     )
 
     /** Nomor surah-surah yang punya minimal satu file audio terunduh. */
@@ -143,7 +221,10 @@ class AudioDownloader(context: Context) {
                     sizeBytes += f.length()
                 }
         }
-        return SurahAudioInfo(number, ayahFiles, ayahCount, wordFiles, totalWords, sizeBytes)
+        val num3 = number.toString().padStart(3, '0')
+        val missingA = missingAyahs.count { it.length == 7 && it.startsWith(num3) }
+        val missingW = missingWords.count { it.startsWith(num3 + "_") }
+        return SurahAudioInfo(number, ayahFiles, ayahCount, wordFiles, totalWords, sizeBytes, missingA, missingW)
     }
 
     /** Hapus semua audio satu surah (file ayat + kata). */
@@ -169,6 +250,8 @@ class AudioDownloader(context: Context) {
         }
     }
 
+    // ---- internal ----
+
     private fun download(url: String, out: File): File {
         out.parentFile?.mkdirs()
         val conn = URL(url).openConnection() as HttpURLConnection
@@ -177,7 +260,11 @@ class AudioDownloader(context: Context) {
         conn.instanceFollowRedirects = true
         try {
             conn.connect()
-            check(conn.responseCode == HttpURLConnection.HTTP_OK) { "HTTP ${conn.responseCode}" }
+            val code = conn.responseCode
+            if (code == HttpURLConnection.HTTP_NOT_FOUND || code == 403) {
+                throw AudioUnavailableException("HTTP $code")
+            }
+            check(code == HttpURLConnection.HTTP_OK) { "HTTP $code" }
             conn.inputStream.use { input ->
                 out.outputStream().use { output -> input.copyTo(output) }
             }
@@ -185,5 +272,29 @@ class AudioDownloader(context: Context) {
             conn.disconnect()
         }
         return out
+    }
+
+    private fun recordMissingAyah(fileName: String) {
+        if (missingAyahs.add(fileName)) saveMissing()
+    }
+
+    private fun recordMissingWord(fileName: String) {
+        if (missingWords.add(fileName)) saveMissing()
+    }
+
+    private fun loadMissing() {
+        runCatching {
+            if (!missingFile.exists()) return@runCatching
+            val data = gson.fromJson(missingFile.readText(), MissingAudio::class.java) ?: return@runCatching
+            missingAyahs += data.ayahs
+            missingWords += data.words
+        }
+    }
+
+    private fun saveMissing() {
+        runCatching {
+            missingFile.parentFile?.mkdirs()
+            missingFile.writeText(gson.toJson(MissingAudio(missingAyahs.toList(), missingWords.toList())))
+        }
     }
 }

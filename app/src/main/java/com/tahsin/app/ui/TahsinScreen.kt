@@ -128,6 +128,7 @@ fun TahsinScreen(
             onToggleFlowMode = viewModel::toggleFlowMode,
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onDismissDownloadNotice = viewModel::dismissDownloadNotice,
+            onSetBackgroundAllowed = viewModel::setBackgroundDownloadAllowed,
             onDownloadAll = viewModel::downloadAllAudio,
             onOpenAudioManager = onOpenAudioManager,
             modifier = modifier,
@@ -151,6 +152,7 @@ private fun TahsinContent(
     onToggleFlowMode: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onDismissDownloadNotice: () -> Unit,
+    onSetBackgroundAllowed: (Boolean) -> Unit,
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
     modifier: Modifier = Modifier,
@@ -498,6 +500,10 @@ private fun TahsinContent(
         if (state.showDownloadNotice) {
             DownloadNoticeDialog(onDismiss = onDismissDownloadNotice)
         }
+        // ---- Prompt izin unduhan latar belakang (sekali) ----
+        if (state.showBackgroundPrompt) {
+            BackgroundPromptDialog(onSetBackgroundAllowed = onSetBackgroundAllowed)
+        }
     }
 }
 
@@ -744,6 +750,51 @@ private fun DownloadNoticeDialog(onDismiss: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.weight(1f))
                 AyahButton(text = "Mengerti", variant = AyahButtonVariant.Primary, onClick = onDismiss)
+            }
+        }
+    }
+}
+
+/** Prompt (sekali) untuk mengizinkan unduhan berjalan di latar belakang. */
+@Composable
+private fun BackgroundPromptDialog(onSetBackgroundAllowed: (Boolean) -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier
+                .width(300.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(16.dp))
+                .background(AyahColors.Surface)
+                .padding(20.dp),
+        ) {
+            AyahText("Unduhan latar belakang?", style = AyahTypography.Heading2)
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahText(
+                "Izinkan unduhan terus berjalan saat layar mati / aplikasi di " +
+                    "latar belakang? Unduhan besar (mis. Al-Baqarah ≈ 440 MB) " +
+                    "bisa gagal kalau tidak.",
+                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Column {
+                AyahButton(
+                    text = "Izinkan",
+                    variant = AyahButtonVariant.Primary,
+                    onClick = { onSetBackgroundAllowed(true) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                AyahButton(
+                    text = "Tidak, cukup saat aplikasi terbuka",
+                    variant = AyahButtonVariant.Outline,
+                    onClick = { onSetBackgroundAllowed(false) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         }
     }

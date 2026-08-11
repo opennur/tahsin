@@ -22,6 +22,18 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean("flow_mode", false)
         set(value) = prefs.edit().putBoolean("flow_mode", value).apply()
 
+    /**
+     * Izin pengguna untuk unduhan latar belakang (foreground service).
+     * null = belum pernah ditanya; true/false = keputusan tersimpan.
+     */
+    var backgroundDownloadAllowed: Boolean?
+        get() = if (prefs.contains("bg_download")) prefs.getBoolean("bg_download", false) else null
+        set(value) {
+            val e = prefs.edit()
+            if (value == null) e.remove("bg_download") else e.putBoolean("bg_download", value)
+            e.apply()
+        }
+
     /** Surah & ayat terakhir yang dibuka (di-restore saat startup). */
     var surahNumber: Int
         get() = prefs.getInt("surah_number", 1)

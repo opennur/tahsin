@@ -22,10 +22,14 @@ data class AudioManagerItem(
     val wordFiles: Int,
     val totalWords: Int?,
     val sizeBytes: Long,
+    /** Audio yang memang tidak tersedia di server (dianggap lengkap). */
+    val missingWords: Int = 0,
+    val missingAyahs: Int = 0,
 ) {
-    /** Semua audio surah ini sudah lengkap terunduh? */
+    /** Semua audio surah ini sudah lengkap terunduh / memang tidak tersedia? */
     val isComplete: Boolean
-        get() = ayahFiles >= ayahCount && (totalWords == null || wordFiles >= totalWords)
+        get() = (ayahFiles + missingAyahs) >= ayahCount &&
+            (totalWords == null || (wordFiles + missingWords) >= totalWords)
 }
 
 /** State layar manajemen audio. */
@@ -73,6 +77,8 @@ class AudioManagerViewModel(
                     wordFiles = info.wordFiles,
                     totalWords = info.totalWords,
                     sizeBytes = info.sizeBytes,
+                    missingWords = info.missingWords,
+                    missingAyahs = info.missingAyahs,
                 )
             }
             .sortedBy { it.number }

@@ -148,8 +148,11 @@ private fun AudioItemCard(
                     "${item.number}. ${item.nameLatin}",
                     style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
                 )
+                val missingNote = if (item.missingWords > 0 || item.missingAyahs > 0) {
+                    " • ${item.missingWords + item.missingAyahs} audio tak tersedia di server"
+                } else ""
                 AyahText(
-                    "Ayat: ${item.ayahFiles}/${item.ayahCount} • Kata: ${item.wordFiles}/${item.totalWords ?: "?"} • ${formatSize(item.sizeBytes)}",
+                    "Ayat: ${item.ayahFiles}/${item.ayahCount} • Kata: ${item.wordFiles}/${item.totalWords ?: "?"} • ${formatSize(item.sizeBytes)}$missingNote",
                     style = AyahTypography.Caption,
                 )
                 Spacer(modifier = Modifier.height(2.dp))

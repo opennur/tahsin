@@ -20,6 +20,7 @@ import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.ArabicFont
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.util.AudioDownloader
+import com.tahsin.app.util.DownloadService
 import com.tahsin.app.util.FontStore
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
@@ -70,6 +71,8 @@ sealed interface TahsinUiState {
         val isDownloadingAll: Boolean = false,
         /** Popup keterangan saat unduhan audio dimulai. */
         val showDownloadNotice: Boolean = false,
+        /** Prompt izin unduhan latar belakang (belum pernah ditanya). */
+        val showBackgroundPrompt: Boolean = false,
     ) : TahsinUiState {
         val surah: Surah? get() = surahs.find { it.number == surahNumber }
         val ayah: Ayah? get() = surah?.ayahs?.getOrNull(ayahIndex)
@@ -85,6 +88,7 @@ data class ReadingIssue(
 )
 
 class TahsinViewModel(
+    private val app: Context,
     private val repository: QuranRepository,
     private val speech: ArabicSpeechRecognizer,
     private val audioPlayer: TahsinAudioPlayer,
@@ -466,6 +470,7 @@ class TahsinViewModel(
             onComplete()
             return
         }
+        maybePromptBackground()
         if (activeDownloads.containsKey(surah.number)) {
             pendingCallbacks.getOrPut(surah.number) { mutableListOf() } += onComplete
             return
@@ -497,18 +502,56 @@ class TahsinViewModel(
     private fun updateDownloadState() {
         val done = activeDone.values.sum()
         val total = activeTotals.values.sum()
+        val downloading = activeDownloads.isNotEmpty()
         updateReady { it.copy(
-            isDownloading = activeDownloads.isNotEmpty(),
+            isDownloading = downloading,
             downloadDone = done,
             downloadTotal = total,
         ) }
+        // Sinkronkan foreground service (life-keeping) kalau diizinkan user.
+        if (settings.backgroundDownloadAllowed == true) {
+            if (downloading) {
+                if (!DownloadService.isRunning()) runCatching { DownloadService.start(app) }
+                DownloadService.updateProgress(done, total)
+            } else if (DownloadService.isRunning()) {
+                runCatching { DownloadService.stop(app) }
+            }
+        }
+    }
+
+    // ---- unduhan latar belakang (foreground service) ----
+
+    /** Tanya dulu (sekali) atau langsung nyalakan service sesuai keputusan tersimpan. */
+    private fun maybePromptBackground() {
+        when (settings.backgroundDownloadAllowed) {
+            null -> _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showBackgroundPrompt = true) }
+            true -> ensureBackgroundService()
+            false -> Unit
+        }
+    }
+
+    private fun ensureBackgroundService() {
+        if (DownloadService.isRunning()) return
+        runCatching { DownloadService.start(app) }
+    }
+
+    /** Jawaban prompt izin unduhan latar belakang. */
+    fun setBackgroundDownloadAllowed(allowed: Boolean) {
+        settings.backgroundDownloadAllowed = allowed
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showBackgroundPrompt = false) }
+        if (allowed) ensureBackgroundService()
     }
 
     private fun playAyahNow() {
         val s = currentReady() ?: return
         val ayah = s.ayah ?: return
         viewModelScope.launch {
-            runCatching { downloader.ensureAyah(s.surahNumber, ayah.number) }
+            val file = runCatching { downloader.ensureAyah(s.surahNumber, ayah.number) }.getOrNull()
+            if (file == null && downloader.isAyahMissing(s.surahNumber, ayah.number)) {
+                // Audio ayat memang tidak tersedia — langsung TTS tanpa coba URL.
+                audioPlayer.speak(ayah.text)
+                return@launch
+            }
             audioPlayer.playAyah(s.surahNumber, ayah.number, ayah.text) {
                 audioPlayer.speak(ayah.text)
                 if (!audioPlayer.isArabicTtsAvailable()) {
@@ -535,7 +578,12 @@ class TahsinViewModel(
         val ayah = s.ayah ?: return
         val word = ayah.words.getOrNull(wordIndex) ?: return
         viewModelScope.launch {
-            runCatching { downloader.ensureWord(s.surahNumber, ayah.number, wordIndex) }
+            val file = runCatching { downloader.ensureWord(s.surahNumber, ayah.number, wordIndex) }.getOrNull()
+            if (file == null && downloader.isWordMissing(s.surahNumber, ayah.number, wordIndex)) {
+                // Audio kata memang tidak tersedia — langsung TTS tanpa coba URL.
+                audioPlayer.speak(word)
+                return@launch
+            }
             audioPlayer.playWord(s.surahNumber, ayah.number, wordIndex, word) {
                 audioPlayer.speak(word)
                 if (!audioPlayer.isArabicTtsAvailable()) {
@@ -567,6 +615,7 @@ class TahsinViewModel(
     fun downloadAllAudio() {
         val s = currentReady() ?: return
         if (s.isDownloading) return
+        maybePromptBackground()
         viewModelScope.launch {
             var done = 0
             var total = 0
@@ -593,6 +642,9 @@ class TahsinViewModel(
                         downloader.downloadSurah(surah) { _, _ ->
                             done++
                             updateReady { it.copy(downloadDone = done) }
+                            if (settings.backgroundDownloadAllowed == true) {
+                                DownloadService.updateProgress(done, total)
+                            }
                         }
                     } catch (e: Exception) {
                         failed++
@@ -608,6 +660,9 @@ class TahsinViewModel(
                     "Semua audio berhasil diunduh ✓"
                 },
             ) }
+            if (settings.backgroundDownloadAllowed == true && DownloadService.isRunning()) {
+                runCatching { DownloadService.stop(app) }
+            }
         }
     }
 
@@ -653,6 +708,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
     initializer {
         val app = context.applicationContext
         TahsinViewModel(
+            app = app,
             repository = QuranRepository(app),
             speech = ArabicSpeechRecognizer(app),
             audioPlayer = TahsinAudioPlayer(app),
