@@ -1,6 +1,8 @@
 package com.tahsin.app.ui
 
 import android.content.Context
+import android.media.AudioManager
+import android.media.ToneGenerator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -262,6 +264,7 @@ class TahsinViewModel(
             override fun onResult(text: String) {
                 onTranscript(text, words)
                 maybeAutoAdvance()
+                maybePlayErrorTone()
             }
             override fun onError(message: String) {
                 autoAdvanceHandled = true
@@ -302,6 +305,7 @@ class TahsinViewModel(
         val perfect = aligned.size == words.size && aligned.all { it.status == WordStatus.CORRECT }
         if (!perfect) return
         autoAdvanceHandled = true
+        playSuccessTone()
         val fromSurah = s.surahNumber
         val fromAyah = s.ayahIndex
         viewModelScope.launch {
@@ -343,6 +347,49 @@ class TahsinViewModel(
             return
         }
         startListeningSession(ayah.words)
+    }
+
+    // ---- umpan suara muroja'ah (bisa muroja'ah tanpa melihat layar) ----
+
+    private var toneGen: ToneGenerator? = null
+
+    private fun toneGenerator(): ToneGenerator? {
+        if (toneGen == null) {
+            toneGen = try {
+                ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
+            } catch (e: Exception) {
+                null
+            }
+        }
+        return toneGen
+    }
+
+    /** Beep pendek nanjak — semua kata ayat sudah benar. */
+    private fun playSuccessTone() {
+        try {
+            toneGenerator()?.startTone(ToneGenerator.TONE_PROP_ACK, 180)
+        } catch (_: Exception) {
+        }
+    }
+
+    /** Beep gagal — ada kata yang tidak cocok / terlewat. */
+    private fun playErrorTone() {
+        try {
+            toneGenerator()?.startTone(ToneGenerator.TONE_PROP_NACK, 300)
+        } catch (_: Exception) {
+        }
+    }
+
+    /** Saat hasil final: kalau mode flow nyala dan ada yang salah, kasih beep. */
+    private fun maybePlayErrorTone() {
+        if (autoAdvanceHandled) return // sudah sukses — beep sukses sudah diputar
+        val s = currentReady() ?: return
+        if (!s.flowMode) return
+        val aligned = s.alignedWords
+        val hasError = aligned.any {
+            it.status == WordStatus.MISMATCH || it.status == WordStatus.SKIPPED
+        }
+        if (hasError) playErrorTone()
     }
 
     private fun onTranscript(text: String, words: List<String>) {
@@ -626,6 +673,8 @@ class TahsinViewModel(
     override fun onCleared() {
         speech.destroy()
         audioPlayer.release()
+        toneGen?.release()
+        toneGen = null
         super.onCleared()
     }
 }
