@@ -109,6 +109,7 @@ fun TahsinScreen(modifier: Modifier = Modifier) {
             onDecreaseFont = viewModel::decreaseFont,
             onSelectFont = viewModel::selectFont,
             onToggleDarkMode = viewModel::toggleDarkMode,
+            onDownloadAll = viewModel::downloadAllAudio,
             modifier = modifier,
         )
     }
@@ -131,6 +132,7 @@ private fun TahsinContent(
     onDecreaseFont: () -> Unit,
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
+    onDownloadAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -333,6 +335,7 @@ private fun TahsinContent(
                     onIncreaseFont = onIncreaseFont,
                     onSelectFont = onSelectFont,
                     onToggleDarkMode = onToggleDarkMode,
+                    onDownloadAll = onDownloadAll,
                     onClose = { drawerOpen = false },
                 )
             }
@@ -515,6 +518,7 @@ private fun SettingsPanel(
     onIncreaseFont: () -> Unit,
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
+    onDownloadAll: () -> Unit,
     onClose: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -575,6 +579,28 @@ private fun SettingsPanel(
             onClick = onToggleDarkMode,
             modifier = Modifier.fillMaxWidth(),
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel("Audio offline")
+        Spacer(modifier = Modifier.height(8.dp))
+        val progress = state.downloadProgress
+        when {
+            state.isDownloading -> AyahText(
+                "Mengunduh audio… ${progress?.first ?: 0}/${progress?.second ?: "?"}",
+                style = AyahTypography.Body2.copy(color = AyahColors.Primary),
+            )
+            progress != null && progress.second > 0 && progress.first == progress.second -> AyahText(
+                "✓ ${progress.second} audio siap offline.",
+                style = AyahTypography.Body2.copy(color = AyahColors.Success),
+            )
+            else -> AyahButton(
+                text = "📥 Unduh semua audio",
+                variant = AyahButtonVariant.Primary,
+                onClick = onDownloadAll,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
 
         Spacer(modifier = Modifier.height(28.dp))
 

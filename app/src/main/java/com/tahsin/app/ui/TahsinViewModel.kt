@@ -3,6 +3,7 @@ package com.tahsin.app.ui
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tahsin.app.data.quran.Ayah
@@ -16,12 +17,14 @@ import com.tahsin.app.stt.TranscriptAligner
 import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.ArabicFont
 import com.tahsin.app.theme.AyahColors
+import com.tahsin.app.util.AudioDownloader
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /** State layar utama Tahsin. */
 sealed interface TahsinUiState {
@@ -43,6 +46,8 @@ sealed interface TahsinUiState {
         val fontScale: Float = 1f,
         val arabicFont: ArabicFont = ArabicFont.SYSTEM,
         val darkMode: Boolean = false,
+        val isDownloading: Boolean = false,
+        val downloadProgress: Pair<Int, Int>? = null,
     ) : TahsinUiState {
         val surah: Surah? get() = surahs.find { it.number == surahNumber }
         val ayah: Ayah? get() = surah?.ayahs?.getOrNull(ayahIndex)
@@ -62,6 +67,7 @@ class TahsinViewModel(
     private val speech: ArabicSpeechRecognizer,
     private val audioPlayer: TahsinAudioPlayer,
     private val settings: SettingsStore,
+    private val downloader: AudioDownloader,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
@@ -209,18 +215,22 @@ class TahsinViewModel(
         val ayah = s.ayah ?: return
         val idx = s.selectedWordIndex ?: return
         val word = ayah.words.getOrNull(idx) ?: return
-        audioPlayer.playWord(
-            surahNumber = s.surahNumber,
-            ayahNumber = ayah.number,
-            wordIndex = idx,
-            word = word,
-        ) {
-            audioPlayer.speak(word)
-            if (!audioPlayer.isArabicTtsAvailable()) {
-                showMessage(
-                    "Audio kata belum tersedia. Untuk offline, jalankan " +
-                        "tools/download_minshawi.sh lalu build ulang.",
-                )
+        viewModelScope.launch {
+            // Unduh kata ini dulu (kalau belum ada) supaya bisa offline.
+            runCatching { downloader.ensureWord(s.surahNumber, ayah.number, idx) }
+            audioPlayer.playWord(
+                surahNumber = s.surahNumber,
+                ayahNumber = ayah.number,
+                wordIndex = idx,
+                word = word,
+            ) {
+                audioPlayer.speak(word)
+                if (!audioPlayer.isArabicTtsAvailable()) {
+                    showMessage(
+                        "Audio kata belum tersedia. Cek koneksi lalu coba lagi, " +
+                            "atau unduh semua audio di Pengaturan.",
+                    )
+                }
             }
         }
     }
@@ -234,20 +244,57 @@ class TahsinViewModel(
     fun playAyah() {
         val s = currentReady() ?: return
         val ayah = s.ayah ?: return
-        audioPlayer.playAyah(
-            surahNumber = s.surahNumber,
-            ayahNumber = ayah.number,
-            audioUrl = ayah.audioUrl,
-            text = ayah.text,
-        ) {
-            audioPlayer.speak(ayah.text)
-            if (!audioPlayer.isArabicTtsAvailable()) {
-                showMessage(
-                    "Audio belum tersedia. Untuk mode offline, jalankan " +
-                        "tools/download_minshawi.sh lalu build ulang.",
-                )
+        viewModelScope.launch {
+            // Unduh audio ayat ini dulu (kalau belum ada) supaya bisa offline.
+            runCatching { downloader.ensureAyah(s.surahNumber, ayah.number) }
+            audioPlayer.playAyah(
+                surahNumber = s.surahNumber,
+                ayahNumber = ayah.number,
+                audioUrl = ayah.audioUrl,
+                text = ayah.text,
+            ) {
+                audioPlayer.speak(ayah.text)
+                if (!audioPlayer.isArabicTtsAvailable()) {
+                    showMessage(
+                        "Audio belum tersedia. Cek koneksi lalu coba lagi, " +
+                            "atau unduh semua audio di Pengaturan.",
+                    )
+                }
             }
         }
+    }
+
+    /** Unduh semua audio (per ayat + per kata) dari dalam aplikasi. */
+    fun downloadAllAudio() {
+        val s = currentReady() ?: return
+        if (s.isDownloading) return
+        viewModelScope.launch {
+            updateReady { it.copy(
+                isDownloading = true,
+                downloadProgress = null,
+                message = null,
+            ) }
+            try {
+                val stats = downloader.downloadAll(s.surahs) { done, total ->
+                    updateReady { it.copy(downloadProgress = done to total) }
+                }
+                updateReady { it.copy(
+                    isDownloading = false,
+                    downloadProgress = stats.ok to stats.total,
+                ) }
+            } catch (e: Exception) {
+                updateReady { it.copy(
+                    isDownloading = false,
+                    message = "Gagal mengunduh audio: ${e.message ?: "periksa koneksi"}",
+                ) }
+            }
+        }
+    }
+
+    /** Update state hanya jika sudah Ready — aman dipanggil dari dalam lambda apa pun. */
+    private fun updateReady(transform: (TahsinUiState.Ready) -> TahsinUiState.Ready) {
+        val current = _uiState.value as? TahsinUiState.Ready ?: return
+        _uiState.value = transform(current)
     }
 
     // ---- preferensi font & tema ----
@@ -308,6 +355,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             speech = ArabicSpeechRecognizer(app),
             audioPlayer = TahsinAudioPlayer(app),
             settings = SettingsStore(app),
+            downloader = AudioDownloader(app),
         )
     }
 }
