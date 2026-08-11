@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Ayah of the Day: Deep Dive</string>
+
+    <!-- Bottom navigation -->
+    <string name="tab_home">Home</string>
+    <string name="tab_tafsir">Tafsir</string>
+    <string name="tab_reflection">Reflection</string>
+    <string name="tab_bookmarks">Bookmarks</string>
+</resources>

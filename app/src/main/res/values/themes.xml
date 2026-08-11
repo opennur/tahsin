@@ -1,0 +1,10 @@
+<resources>
+    <!-- Tema framework tanpa Material/AppCompat — cocok dengan ComponentActivity + Compose.
+         Warna mengikuti custom design system (hangat &amp; islami). -->
+    <style name="Theme.AyahOfTheDay" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+    </style>
+</resources>

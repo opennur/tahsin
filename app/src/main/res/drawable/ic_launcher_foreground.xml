@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikon launcher: buku terbuka (putih) + bintang emas, dalam safe zone adaptive icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Buku terbuka -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,38 C48,32 38,30 31,31 C27,31.5 24,33 22,35 L22,68 C24,66 27,65 31,65 C38,64 48,66 54,72 C60,66 70,64 77,65 C81,65 84,66 86,68 L86,35 C84,33 81,31.5 77,31 C70,30 60,32 54,38 Z" />
+    <!-- Punggung buku -->
+    <path
+        android:fillColor="#2D7D6B"
+        android:pathData="M52.5,38.5 L52.5,72 L55.5,72 L55.5,38.5 Z" />
+    <!-- Bintang emas -->
+    <path
+        android:fillColor="#C49A6C"
+        android:pathData="M78,46 L79.2,49.4 L82.8,49.5 L80,51.8 L81,55.2 L78,53 L75,55.2 L76,51.8 L73.2,49.5 L76.8,49.4 Z" />
+</vector>

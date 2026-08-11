@@ -1,0 +1,21 @@
+<resources>
+    <!-- Brand -->
+    <color name="primary">#2D7D6B</color>
+    <color name="primary_light">#4CAF8C</color>
+    <color name="secondary">#C49A6C</color>
+
+    <!-- Background & surface -->
+    <color name="background">#F7F3EE</color>
+    <color name="surface">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#5A5A5A</color>
+
+    <!-- Status -->
+    <color name="error">#D32F2F</color>
+    <color name="success">#388E3C</color>
+
+    <!-- Launcher -->
+    <color name="launcher_background">#2D7D6B</color>
+</resources>
