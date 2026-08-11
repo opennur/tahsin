@@ -1,36 +1,98 @@
 package com.tahsin.app.theme
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
 /**
  * Palet warna kustom "Tahsin Quran" — hangat dan islami, tanpa Material 3.
  *
- * Pasangan warna teks/latar dirancang dengan kontras >= 4.5:1 (WCAG AA)
- * agar nyaman dibaca semua usia.
+ * Mendukung mode terang & gelap: ubah `isDark` (state Compose), semua
+ * komponen yang membaca `AyahColors.*` otomatis ikut recompose.
+ *
+ * Pasangan warna teks/latar dirancang dengan kontras >= 4.5:1 (WCAG AA).
  */
 object AyahColors {
+
+    /** Mode gelap — diubah lewat toggle di aplikasi (persisted di SettingsStore). */
+    var isDark by mutableStateOf(false)
+
+    private val Light = Palette(
+        Primary = Color(0xFF2D7D6B),
+        PrimaryLight = Color(0xFF4CAF8C),
+        Secondary = Color(0xFFC49A6C),
+        Background = Color(0xFFF7F3EE),
+        Surface = Color(0xFFFFFFFF),
+        Divider = Color(0xFFE5DED5),
+        TextPrimary = Color(0xFF1A1A1A),
+        TextSecondary = Color(0xFF5A5A5A),
+        Error = Color(0xFFD32F2F),
+        Success = Color(0xFF388E3C),
+        Reading = Color(0xFFE8C47A),
+        OnPrimary = Color(0xFFFFFFFF),
+        OnSecondary = Color(0xFF1A1A1A),
+        OnReading = Color(0xFF1A1A1A),
+    )
+
+    private val Dark = Palette(
+        Primary = Color(0xFF4CAF8C),
+        PrimaryLight = Color(0xFF66C9A5),
+        Secondary = Color(0xFFD0A675),
+        Background = Color(0xFF141412),
+        Surface = Color(0xFF1F1F1C),
+        Divider = Color(0xFF35352F),
+        TextPrimary = Color(0xFFECEAE4),
+        TextSecondary = Color(0xFFA8A59B),
+        Error = Color(0xFFEF5350),
+        Success = Color(0xFF66BB6A),
+        Reading = Color(0xFFC89B5A),
+        OnPrimary = Color(0xFF10201A),
+        OnSecondary = Color(0xFF1A1A1A),
+        OnReading = Color(0xFF1A1A1A),
+    )
+
     // Brand
-    val Primary = Color(0xFF2D7D6B)       // hijau Islami menenangkan
-    val PrimaryLight = Color(0xFF4CAF8C)
-    val Secondary = Color(0xFFC49A6C)     // emas/beige hangat
+    val Primary get() = palette().Primary
+    val PrimaryLight get() = palette().PrimaryLight
+    val Secondary get() = palette().Secondary
 
     // Background & surface
-    val Background = Color(0xFFF7F3EE)    // putih hangat, tidak silau
-    val Surface = Color(0xFFFFFFFF)
-    val Divider = Color(0xFFE5DED5)
+    val Background get() = palette().Background
+    val Surface get() = palette().Surface
+    val Divider get() = palette().Divider
 
     // Text
-    val TextPrimary = Color(0xFF1A1A1A)
-    val TextSecondary = Color(0xFF5A5A5A)
+    val TextPrimary get() = palette().TextPrimary
+    val TextSecondary get() = palette().TextSecondary
 
     // Status — dipakai untuk highlight bacaan
-    val Error = Color(0xFFD32F2F)         // salah / mismatch
-    val Success = Color(0xFF388E3C)       // benar
-    val Reading = Color(0xFFE8C47A)       // sedang dibaca (kuning lembut)
+    val Error get() = palette().Error
+    val Success get() = palette().Success
+    val Reading get() = palette().Reading
 
     // Teks di atas warna brand
-    val OnPrimary = Color(0xFFFFFFFF)
-    // Teks gelap dipakai di atas Secondary (gold) karena kontras putih < 4.5:1.
-    val OnSecondary = Color(0xFF1A1A1A)
-    val OnReading = Color(0xFF1A1A1A)
+    val OnPrimary get() = palette().OnPrimary
+    val OnSecondary get() = palette().OnSecondary
+    val OnReading get() = palette().OnReading
+
+    private fun palette(): Palette = if (isDark) Dark else Light
 }
+
+/** Palet internal (terang/gelap). */
+private data class Palette(
+    val Primary: Color,
+    val PrimaryLight: Color,
+    val Secondary: Color,
+    val Background: Color,
+    val Surface: Color,
+    val Divider: Color,
+    val TextPrimary: Color,
+    val TextSecondary: Color,
+    val Error: Color,
+    val Success: Color,
+    val Reading: Color,
+    val OnPrimary: Color,
+    val OnSecondary: Color,
+    val OnReading: Color,
+)

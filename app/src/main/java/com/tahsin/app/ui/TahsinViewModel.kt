@@ -14,6 +14,9 @@ import com.tahsin.app.stt.ArabicSpeechRecognizer
 import com.tahsin.app.stt.AlignedWord
 import com.tahsin.app.stt.TranscriptAligner
 import com.tahsin.app.stt.WordStatus
+import com.tahsin.app.theme.ArabicFont
+import com.tahsin.app.theme.AyahColors
+import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +40,9 @@ sealed interface TahsinUiState {
         val selectedWordIndex: Int? = null,
         val selectedWordRules: List<TajwidRule> = emptyList(),
         val message: String? = null,
+        val fontScale: Float = 1f,
+        val arabicFont: ArabicFont = ArabicFont.SYSTEM,
+        val darkMode: Boolean = false,
     ) : TahsinUiState {
         val surah: Surah? get() = surahs.find { it.number == surahNumber }
         val ayah: Ayah? get() = surah?.ayahs?.getOrNull(ayahIndex)
@@ -55,19 +61,29 @@ class TahsinViewModel(
     private val repository: QuranRepository,
     private val speech: ArabicSpeechRecognizer,
     private val audioPlayer: TahsinAudioPlayer,
+    private val settings: SettingsStore,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
     val uiState: StateFlow<TahsinUiState> = _uiState.asStateFlow()
 
     init {
+        // Terapkan preferensi (dark mode global) lalu muat mushaf.
+        AyahColors.isDark = settings.darkMode
         reload()
     }
 
     fun reload() {
         _uiState.value = TahsinUiState.Loading
         _uiState.value = try {
-            TahsinUiState.Ready(surahs = repository.surahs())
+            TahsinUiState.Ready(
+                surahs = repository.surahs(),
+                fontScale = settings.fontScale,
+                arabicFont = runCatching {
+                    ArabicFont.valueOf(settings.fontName)
+                }.getOrDefault(ArabicFont.SYSTEM),
+                darkMode = settings.darkMode,
+            )
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
         }
@@ -234,6 +250,33 @@ class TahsinViewModel(
         }
     }
 
+    // ---- preferensi font & tema ----
+
+    fun increaseFont() = stepFont(+1)
+
+    fun decreaseFont() = stepFont(-1)
+
+    private fun stepFont(direction: Int) {
+        val s = currentReady() ?: return
+        val index = FONT_SCALES.indexOf(s.fontScale).coerceAtLeast(0)
+        val next = FONT_SCALES.getOrNull(index + direction) ?: return
+        settings.fontScale = next
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(fontScale = next) }
+    }
+
+    fun selectFont(font: ArabicFont) {
+        settings.fontName = font.name
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(arabicFont = font) }
+    }
+
+    fun toggleDarkMode() {
+        val s = currentReady() ?: return
+        val next = !s.darkMode
+        AyahColors.isDark = next
+        settings.darkMode = next
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(darkMode = next) }
+    }
+
     // ---- pesan ----
 
     fun showMessage(msg: String) {
@@ -253,6 +296,9 @@ class TahsinViewModel(
     }
 }
 
+/** Tingkatan ukuran font Arab yang bisa dipilih. */
+private val FONT_SCALES = listOf(1f, 1.15f, 1.3f, 1.5f)
+
 /** Factory manual DI (tanpa Hilt). */
 fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
     initializer {
@@ -261,6 +307,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             repository = QuranRepository(app),
             speech = ArabicSpeechRecognizer(app),
             audioPlayer = TahsinAudioPlayer(app),
+            settings = SettingsStore(app),
         )
     }
 }

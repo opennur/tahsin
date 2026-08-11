@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,13 +28,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -42,6 +48,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tahsin.app.stt.WordStatus
+import com.tahsin.app.theme.ArabicFont
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTypography
 import com.tahsin.app.ui.components.AyahButton
@@ -98,6 +105,10 @@ fun TahsinScreen(modifier: Modifier = Modifier) {
             onPlaySelectedWord = viewModel::playSelectedWord,
             onPlayAyah = viewModel::playAyah,
             onDismissMessage = viewModel::clearMessage,
+            onIncreaseFont = viewModel::increaseFont,
+            onDecreaseFont = viewModel::decreaseFont,
+            onSelectFont = viewModel::selectFont,
+            onToggleDarkMode = viewModel::toggleDarkMode,
             modifier = modifier,
         )
     }
@@ -116,6 +127,10 @@ private fun TahsinContent(
     onPlaySelectedWord: () -> Unit,
     onPlayAyah: () -> Unit,
     onDismissMessage: () -> Unit,
+    onIncreaseFont: () -> Unit,
+    onDecreaseFont: () -> Unit,
+    onSelectFont: (ArabicFont) -> Unit,
+    onToggleDarkMode: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -123,7 +138,10 @@ private fun TahsinContent(
     val statusByIndex = state.alignedWords.associateBy { it.index }
     val ayahCount = state.surah?.ayahs?.size ?: 0
 
-    Column(modifier = modifier.fillMaxSize()) {
+    var drawerOpen by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
+        Column(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -132,8 +150,19 @@ private fun TahsinContent(
         ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ---- Header + legenda ----
-        AyahText("Tahsin Quran", style = AyahTypography.Heading1)
+        // ---- Header + tombol hamburger (buka drawer pengaturan) ----
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AyahText(
+                "Tahsin Quran",
+                style = AyahTypography.Heading1,
+                modifier = Modifier.weight(1f),
+            )
+            AyahButton(
+                text = "☰",
+                variant = AyahButtonVariant.Outline,
+                onClick = { drawerOpen = true },
+            )
+        }
         Spacer(modifier = Modifier.height(4.dp))
         AyahText(
             "Baca ayat ke mikrofon — setiap kata dinilai real-time.",
@@ -166,7 +195,8 @@ private fun TahsinContent(
         // ---- Navigasi ayat ----
         if (ayah != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AyahButton(text = "‹", variant = AyahButtonVariant.Outline, onClick = onPrevAyah)
+                // Dalam arah baca Arab: tombol KIRI = lanjut ke ayat berikutnya.
+                AyahButton(text = "‹", variant = AyahButtonVariant.Outline, onClick = onNextAyah)
                 Spacer(modifier = Modifier.width(12.dp))
                 SimpleDropdown(
                     selectedLabel = "Ayat ${ayah.number} / $ayahCount",
@@ -176,7 +206,7 @@ private fun TahsinContent(
                     modifier = Modifier.weight(1f),
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                AyahButton(text = "›", variant = AyahButtonVariant.Outline, onClick = onNextAyah)
+                AyahButton(text = "›", variant = AyahButtonVariant.Outline, onClick = onPrevAyah)
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -193,6 +223,8 @@ private fun TahsinContent(
                                 status = statusByIndex[index]?.status,
                                 selected = state.selectedWordIndex == index,
                                 onClick = { onSelectWord(index) },
+                                fontScale = state.fontScale,
+                                fontFamily = state.arabicFont.family,
                             )
                         }
                     }
@@ -218,6 +250,8 @@ private fun TahsinContent(
                 rules = state.selectedWordRules,
                 onPlay = onPlaySelectedWord,
                 onDismiss = { onSelectWord(-1) },
+                fontScale = state.fontScale,
+                fontFamily = state.arabicFont.family,
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -230,7 +264,11 @@ private fun TahsinContent(
             )
             Spacer(modifier = Modifier.height(8.dp))
             state.issues.forEach { issue ->
-                IssueCard(issue = issue)
+                IssueCard(
+                    issue = issue,
+                    fontScale = state.fontScale,
+                    fontFamily = state.arabicFont.family,
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
             Spacer(modifier = Modifier.height(4.dp))
@@ -245,28 +283,57 @@ private fun TahsinContent(
         }
 
             Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // ---- Bar bawah TETAP: mic + dengar ayat (tidak ikut scroll) ----
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(AyahColors.Background)
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    MicButton(listening = state.listening, onClick = onMicClick)
+                    Spacer(modifier = Modifier.width(14.dp))
+                    AyahText(
+                        if (state.listening) "Membaca… tekan ⏹ untuk berhenti"
+                        else "Tekan 🎙️ lalu bacalah ayat ini",
+                        style = AyahTypography.Caption,
+                        modifier = Modifier.weight(1f),
+                    )
+                    AyahButton(
+                        text = "▶ Dengar Ayat",
+                        variant = AyahButtonVariant.Secondary,
+                        onClick = onPlayAyah,
+                    )
+                }
+            }
         }
 
-        // ---- Bar bawah TETAP: mic + dengar ayat (tidak ikut scroll) ----
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(AyahColors.Background)
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                MicButton(listening = state.listening, onClick = onMicClick)
-                Spacer(modifier = Modifier.width(14.dp))
-                AyahText(
-                    if (state.listening) "Membaca… tekan ⏹ untuk berhenti"
-                    else "Tekan 🎙️ lalu bacalah ayat ini",
-                    style = AyahTypography.Caption,
-                    modifier = Modifier.weight(1f),
-                )
-                AyahButton(
-                    text = "▶ Dengar Ayat",
-                    variant = AyahButtonVariant.Secondary,
-                    onClick = onPlayAyah,
+        // ---- Drawer kanan: pengaturan (ukuran font, jenis font, tema) ----
+        if (drawerOpen) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.45f))
+                    .clickable { drawerOpen = false },
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+                    .width(300.dp)
+                    .shadow(8.dp, RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+                    .background(AyahColors.Surface)
+                    .padding(20.dp),
+            ) {
+                SettingsPanel(
+                    state = state,
+                    onDecreaseFont = onDecreaseFont,
+                    onIncreaseFont = onIncreaseFont,
+                    onSelectFont = onSelectFont,
+                    onToggleDarkMode = onToggleDarkMode,
+                    onClose = { drawerOpen = false },
                 )
             }
         }
@@ -296,6 +363,8 @@ private fun WordChip(
     status: WordStatus?,
     selected: Boolean,
     onClick: () -> Unit,
+    fontScale: Float,
+    fontFamily: FontFamily,
 ) {
     val (bg, fg) = when (status) {
         WordStatus.CORRECT -> AyahColors.Success to Color.White
@@ -324,7 +393,8 @@ private fun WordChip(
             word,
             style = AyahTypography.ArabicWord.copy(
                 color = fg,
-                fontSize = 18.sp,
+                fontSize = (18 * fontScale).sp,
+                fontFamily = fontFamily,
             ),
         )
     }
@@ -336,10 +406,19 @@ private fun SelectedWordPanel(
     rules: List<com.tahsin.app.data.tajwid.TajwidRule>,
     onPlay: () -> Unit,
     onDismiss: () -> Unit,
+    fontScale: Float,
+    fontFamily: FontFamily,
 ) {
     AyahCard(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AyahText(word, style = AyahTypography.Arabic, modifier = Modifier.weight(1f))
+            AyahText(
+                word,
+                style = AyahTypography.Arabic.copy(
+                    fontSize = (26 * fontScale).sp,
+                    fontFamily = fontFamily,
+                ),
+                modifier = Modifier.weight(1f),
+            )
             AyahButton(text = "▶ Kata", variant = AyahButtonVariant.Secondary, onClick = onPlay)
             Spacer(modifier = Modifier.width(8.dp))
             AyahButton(text = "✕", variant = AyahButtonVariant.Outline, onClick = onDismiss)
@@ -367,14 +446,21 @@ private fun SelectedWordPanel(
 }
 
 @Composable
-private fun IssueCard(issue: ReadingIssue) {
+private fun IssueCard(
+    issue: ReadingIssue,
+    fontScale: Float,
+    fontFamily: FontFamily,
+) {
     AyahCard(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText("🔴", style = TextStyle(fontSize = 18.sp))
             Spacer(modifier = Modifier.width(8.dp))
             AyahText(
                 issue.word,
-                style = AyahTypography.ArabicWord.copy(fontSize = 20.sp),
+                style = AyahTypography.ArabicWord.copy(
+                    fontSize = (20 * fontScale).sp,
+                    fontFamily = fontFamily,
+                ),
                 modifier = Modifier.weight(1f),
             )
         }
@@ -418,4 +504,102 @@ private fun MicButton(listening: Boolean, onClick: () -> Unit) {
             style = TextStyle(fontSize = 34.sp, color = Color.White),
         )
     }
+}
+
+// ============================================================ Drawer pengaturan
+
+@Composable
+private fun SettingsPanel(
+    state: TahsinUiState.Ready,
+    onDecreaseFont: () -> Unit,
+    onIncreaseFont: () -> Unit,
+    onSelectFont: (ArabicFont) -> Unit,
+    onToggleDarkMode: () -> Unit,
+    onClose: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AyahText(
+                "Pengaturan",
+                style = AyahTypography.Heading2,
+                modifier = Modifier.weight(1f),
+            )
+            AyahButton(text = "✕", variant = AyahButtonVariant.Outline, onClick = onClose)
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel("Ukuran teks Arab")
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AyahButton(
+                text = "A−",
+                variant = AyahButtonVariant.Outline,
+                onClick = onDecreaseFont,
+                enabled = state.fontScale > 1.01f,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahText(
+                "${(state.fontScale * 100).toInt()}%",
+                style = AyahTypography.Caption,
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahButton(
+                text = "A+",
+                variant = AyahButtonVariant.Outline,
+                onClick = onIncreaseFont,
+                enabled = state.fontScale < 1.49f,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel("Jenis font")
+        Spacer(modifier = Modifier.height(8.dp))
+        SimpleDropdown(
+            selectedLabel = state.arabicFont.label,
+            options = ArabicFont.entries.map { f ->
+                DropdownOption(f.label, { onSelectFont(f) })
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel("Tema")
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = if (state.darkMode) "☀️ Mode Terang" else "🌙 Mode Gelap",
+            variant = if (state.darkMode) AyahButtonVariant.Secondary else AyahButtonVariant.Primary,
+            onClick = onToggleDarkMode,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        AyahText(
+            "Jenis font mushaf (Amiri Quran, Scheherazade New) bisa " +
+                "ditambahkan lewat res/font pada versi berikutnya.",
+            style = AyahTypography.Caption,
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        AyahText(
+            "Ketuk di luar drawer untuk menutup.",
+            style = AyahTypography.Caption,
+        )
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    AyahText(
+        text,
+        style = AyahTypography.Body2.copy(
+            color = AyahColors.Primary,
+            fontWeight = FontWeight.SemiBold,
+        ),
+    )
 }
