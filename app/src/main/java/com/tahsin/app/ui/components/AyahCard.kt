@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahShapes
@@ -32,8 +31,7 @@ fun AyahCard(
 ) {
     val shape = AyahShapes.Card
     var cardModifier = modifier
-        .clip(shape)
-        .background(AyahColors.Surface)
+        .background(AyahColors.Surface, shape)
         .border(1.dp, AyahColors.Hairline, shape)
 
     when {

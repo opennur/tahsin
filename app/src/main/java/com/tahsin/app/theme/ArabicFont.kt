@@ -1,20 +1,36 @@
 package com.tahsin.app.theme
 
-import androidx.compose.ui.text.font.FontFamily
-
 /**
  * Pilihan jenis font untuk teks Arab mushaf.
  *
- * Saat ini memakai font sistem Android (Noto Naskh Arabic via fallback).
- * TODO: bundle font mushaf sungguhan (mis. Amiri Quran / Scheherazade New,
- * keduanya gratis) ke `res/font/` lalu daftarkan di sini dengan
- * `FontFamily(Font(R.font.amiri_quran))`.
+ * - UTSMANI: gaya khat Utsmani (default). Font nyata diunduh otomatis dari
+ *   Google Fonts (Amiri, lisensi OFL) ke filesDir/fonts; sebelum ada, memakai
+ *   font sistem (Noto Naskh Arabic — gaya Utsmani).
+ * - INDOPAK: gaya mushaf Indopak. Belum ada sumber otomatis yang terverifikasi;
+ *   taruh TTF di filesDir/fonts/indopak.ttf untuk mengaktifkannya (fallback ke
+ *   font sistem selama file belum ada).
+ * - ANDROID: font sistem perangkat.
  */
 enum class ArabicFont(
     val label: String,
-    val family: FontFamily,
+    /** Nama file di filesDir/fonts (null = selalu font sistem). */
+    val fileName: String?,
+    /** URL unduhan font (null = tidak ada sumber otomatis). */
+    val downloadUrl: String?,
 ) {
-    SYSTEM("Font bawaan", FontFamily.Default),
-    SERIF("Serif", FontFamily.Serif),
-    MONOSPACE("Monospace", FontFamily.Monospace),
+    UTSMANI(
+        label = "Utsmani (default)",
+        fileName = "uthmani.ttf",
+        downloadUrl = "https://raw.githubusercontent.com/google/fonts/main/ofl/amiri/Amiri-Regular.ttf",
+    ),
+    INDOPAK(
+        label = "Indopak",
+        fileName = "indopak.ttf",
+        downloadUrl = null,
+    ),
+    ANDROID(
+        label = "Android",
+        fileName = null,
+        downloadUrl = null,
+    ),
 }

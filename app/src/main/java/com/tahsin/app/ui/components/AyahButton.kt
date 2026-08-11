@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -26,6 +25,8 @@ enum class AyahButtonVariant {
     Outline,
     /** Tanpa latar & tanpa garis — aksi sekunder/ikon halus. */
     Ghost,
+    /** Merah — aksi berbahaya/menghentikan (mis. Stop). */
+    Danger,
 }
 
 enum class AyahButtonSize {
@@ -79,14 +80,21 @@ fun AyahButton(
             contentColor = AyahColors.TextSecondary
             border = null
         }
+        AyahButtonVariant.Danger -> {
+            containerColor = AyahColors.Error
+            contentColor = Color.White
+            border = null
+        }
     }
 
     Box(
         modifier = modifier
             .defaultMinSize(minHeight = minHeight)
-            .clip(AyahShapes.Button)
-            .then(if (border != null) Modifier.border(border) else Modifier)
-            .background(if (enabled) containerColor else containerColor.copy(alpha = 0.3f))
+            .background(
+                color = if (enabled) containerColor else containerColor.copy(alpha = 0.3f),
+                shape = AyahShapes.Button,
+            )
+            .then(if (border != null) Modifier.border(border, AyahShapes.Button) else Modifier)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = hPadding, vertical = vPadding),
         contentAlignment = Alignment.Center,

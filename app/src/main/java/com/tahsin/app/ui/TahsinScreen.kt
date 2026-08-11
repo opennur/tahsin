@@ -168,8 +168,8 @@ private fun TahsinContent(
                 modifier = Modifier.weight(1f),
             )
             AyahButton(
-                text = "☰",
-                variant = AyahButtonVariant.Ghost,
+                text = "⚙",
+                variant = AyahButtonVariant.Outline,
                 size = AyahButtonSize.Small,
                 onClick = { drawerOpen = true },
             )
@@ -252,7 +252,7 @@ private fun TahsinContent(
                                 selected = state.selectedWordIndex == index,
                                 onClick = { onSelectWord(index) },
                                 fontScale = state.fontScale,
-                                fontFamily = state.arabicFont.family,
+                                fontFamily = state.arabicFontFamily,
                             )
                         }
                     }
@@ -279,7 +279,7 @@ private fun TahsinContent(
                 onPlay = onPlaySelectedWord,
                 onDismiss = { onSelectWord(-1) },
                 fontScale = state.fontScale,
-                fontFamily = state.arabicFont.family,
+                fontFamily = state.arabicFontFamily,
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -295,7 +295,7 @@ private fun TahsinContent(
                 IssueCard(
                     issue = issue,
                     fontScale = state.fontScale,
-                    fontFamily = state.arabicFont.family,
+                    fontFamily = state.arabicFontFamily,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -338,7 +338,7 @@ private fun TahsinContent(
                     )
                     AyahButton(
                         text = if (state.isAudioPlaying) "⏹ Stop" else "▶ Dengar",
-                        variant = if (state.isAudioPlaying) AyahButtonVariant.Primary else AyahButtonVariant.Secondary,
+                        variant = if (state.isAudioPlaying) AyahButtonVariant.Danger else AyahButtonVariant.Secondary,
                         onClick = onToggleAudioPlayback,
                     )
                 }
@@ -393,9 +393,11 @@ private fun LegendDot(color: Color, label: String) {
         Box(
             modifier = Modifier
                 .size(10.dp)
-                .clip(CircleShape)
-                .background(color)
-                .then(if (color == AyahColors.Surface) Modifier.border(1.dp, AyahColors.Divider) else Modifier),
+                .background(color, CircleShape)
+                .then(
+                    if (color == AyahColors.Surface) Modifier.border(1.dp, AyahColors.Divider, CircleShape)
+                    else Modifier,
+                ),
         )
         Spacer(modifier = Modifier.width(4.dp))
         AyahText(label, style = AyahTypography.Caption)
@@ -411,6 +413,7 @@ private fun WordChip(
     fontScale: Float,
     fontFamily: FontFamily,
 ) {
+    val shape = RoundedCornerShape(10.dp)
     val (bg, fg) = when (status) {
         WordStatus.CORRECT -> AyahColors.Success to Color.White
         WordStatus.MISMATCH -> AyahColors.Error to Color.White
@@ -421,14 +424,13 @@ private fun WordChip(
     }
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(bg)
+            .background(bg, shape)
             .then(
-                if (status == null) Modifier.border(1.dp, AyahColors.Divider)
+                if (status == null) Modifier.border(1.dp, AyahColors.Divider, shape)
                 else Modifier,
             )
             .then(
-                if (selected) Modifier.border(2.dp, AyahColors.Primary)
+                if (selected) Modifier.border(2.dp, AyahColors.Primary, shape)
                 else Modifier,
             )
             .clickable(onClick = onClick)
@@ -540,8 +542,7 @@ private fun MicButton(listening: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(56.dp)
-            .clip(CircleShape)
-            .background(base)
+            .background(base, CircleShape)
             .border(4.dp, base.copy(alpha = 0.15f), CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,

@@ -14,7 +14,7 @@ class SettingsStore(context: Context) {
         set(value) = prefs.edit().putFloat("font_scale", value).apply()
 
     var fontName: String
-        get() = prefs.getString("font_name", ArabicFont.SYSTEM.name) ?: ArabicFont.SYSTEM.name
+        get() = prefs.getString("font_name", ArabicFont.UTSMANI.name) ?: ArabicFont.UTSMANI.name
         set(value) = prefs.edit().putString("font_name", value).apply()
 
     var darkMode: Boolean

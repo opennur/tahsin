@@ -18,8 +18,10 @@ import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.ArabicFont
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.util.AudioDownloader
+import com.tahsin.app.util.FontStore
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
+import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,7 +49,9 @@ sealed interface TahsinUiState {
         val selectedWordRules: List<TajwidRule> = emptyList(),
         val message: String? = null,
         val fontScale: Float = 1f,
-        val arabicFont: ArabicFont = ArabicFont.SYSTEM,
+        val arabicFont: ArabicFont = ArabicFont.UTSMANI,
+        /** FontFamily efektif (font file kalau ada, fallback sistem). */
+        val arabicFontFamily: FontFamily = FontFamily.Default,
         val darkMode: Boolean = false,
         /** Sedang memutar audio (untuk tombol Dengar/Stop). */
         val isAudioPlaying: Boolean = false,
@@ -79,6 +83,7 @@ class TahsinViewModel(
     private val audioPlayer: TahsinAudioPlayer,
     private val settings: SettingsStore,
     private val downloader: AudioDownloader,
+    private val fontStore: FontStore,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
@@ -111,11 +116,22 @@ class TahsinViewModel(
                 fontScale = settings.fontScale,
                 arabicFont = runCatching {
                     ArabicFont.valueOf(settings.fontName)
-                }.getOrDefault(ArabicFont.SYSTEM),
+                }.getOrDefault(ArabicFont.UTSMANI),
+                arabicFontFamily = fontStore.loadFamily(
+                    runCatching { ArabicFont.valueOf(settings.fontName) }.getOrDefault(ArabicFont.UTSMANI),
+                ),
                 darkMode = settings.darkMode,
             )
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
+        }
+        // Unduh font default (Utsmani/Amiri) otomatis kalau file belum ada.
+        val activeFont = runCatching { ArabicFont.valueOf(settings.fontName) }.getOrDefault(ArabicFont.UTSMANI)
+        if (activeFont.downloadUrl != null && !fontStore.fileExists(activeFont)) {
+            viewModelScope.launch {
+                runCatching { fontStore.ensureFont(activeFont) }
+                updateReady { it.copy(arabicFontFamily = fontStore.loadFamily(activeFont)) }
+            }
         }
         // Muat isi surah terakhir yang dibuka (default: Al-Fatihah ayat 1).
         (currentReady())?.let { loadSurahContent(it.surahNumber) }
@@ -465,7 +481,17 @@ class TahsinViewModel(
 
     fun selectFont(font: ArabicFont) {
         settings.fontName = font.name
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(arabicFont = font) }
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+            arabicFont = font,
+            arabicFontFamily = fontStore.loadFamily(font),
+        ) }
+        // Unduh font otomatis kalau ada sumbernya dan file belum ada.
+        if (font.downloadUrl != null && !fontStore.fileExists(font)) {
+            viewModelScope.launch {
+                runCatching { fontStore.ensureFont(font) }
+                updateReady { it.copy(arabicFontFamily = fontStore.loadFamily(font)) }
+            }
+        }
     }
 
     fun toggleDarkMode() {
@@ -514,6 +540,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             audioPlayer = TahsinAudioPlayer(app),
             settings = SettingsStore(app),
             downloader = AudioDownloader(app),
+            fontStore = FontStore(app),
         )
     }
 }

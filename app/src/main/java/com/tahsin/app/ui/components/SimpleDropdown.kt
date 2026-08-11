@@ -78,8 +78,7 @@ fun SimpleDropdown(
                     modifier = Modifier
                         .width(280.dp)
                         .shadow(4.dp, RoundedCornerShape(12.dp))
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(AyahColors.Surface)
+                        .background(AyahColors.Surface, RoundedCornerShape(12.dp))
                         .border(1.dp, AyahColors.Hairline, RoundedCornerShape(12.dp)),
                 ) {
                     LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
