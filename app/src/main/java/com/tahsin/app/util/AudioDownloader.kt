@@ -8,70 +8,69 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
-/** Hasil unduhan massal audio. */
+/** Hasil unduhan audio. */
 data class DownloadStats(
     val ok: Int,
     val total: Int,
 )
 
 /**
- * Mengunduh audio contoh ke penyimpanan internal aplikasi (`filesDir/audio`)
- * supaya bisa diputar OFFLINE setelah diunduh sekali:
- * - per AYAT: Minshawy Murattal dari everyayah.com
- * - per KATA: word-by-word dari qurancdn.com
- *
- * Nama file sama dengan konvensi `assets/audio`, sehingga `TahsinAudioPlayer`
- * memeriksa cache (filesDir) terlebih dahulu, lalu asset bundle, lalu URL.
+ * Mengunduh audio contoh ke penyimpanan internal (`filesDir/audio`) supaya
+ * bisa diputar OFFLINE setelah diunduh sekali. Unduhan dilakukan PER SURAH:
+ * semua MP3 ayat (Minshawy) + semua MP3 kata (quran.com) surah itu.
  */
 class AudioDownloader(context: Context) {
 
     private val appContext = context.applicationContext
 
-    /** Direktori cache: filesDir/audio (relatif sama dengan assets/audio). */
+    /** filesDir/audio — relatif sama dengan konvensi assets/audio. */
     val audioDir: File
         get() = File(appContext.filesDir, "audio")
 
-    private fun key3(n: Int): String = n.toString().padStart(3, '0')
-
-    fun ayahFile(surah: Int, ayah: Int): File =
-        File(audioDir, "${key3(surah)}${key3(ayah)}.mp3")
+    fun ayahFile(surah: Int, ayah: Int): File = File(audioDir, AudioUrls.ayahKey(surah, ayah))
 
     fun wordFile(surah: Int, ayah: Int, wordIndex: Int): File =
-        File(File(audioDir, "wbw"), "${key3(surah)}_${key3(ayah)}_${key3(wordIndex + 1)}.mp3")
+        File(File(audioDir, "wbw"), AudioUrls.wordKey(surah, ayah, wordIndex))
 
-    private fun ayahUrl(surah: Int, ayah: Int): String =
-        "https://everyayah.com/data/Minshawy_Murattal_128kbps/${key3(surah)}${key3(ayah)}.mp3"
-
-    private fun wordUrl(surah: Int, ayah: Int, wordIndex: Int): String =
-        "https://audio.qurancdn.com/wbw/${key3(surah)}_${key3(ayah)}_${key3(wordIndex + 1)}.mp3"
-
-    /** Pastikan audio ayat ada di cache (unduh kalau belum). Melempar exception kalau gagal. */
+    /** Pastikan audio ayat ada di cache (unduh kalau belum). */
     suspend fun ensureAyah(surah: Int, ayah: Int): File = withContext(Dispatchers.IO) {
         val file = ayahFile(surah, ayah)
-        if (file.exists() && file.length() > 0L) file else download(ayahUrl(surah, ayah), file)
+        if (file.exists() && file.length() > 0L) file else download(AudioUrls.ayahUrl(surah, ayah), file)
     }
 
-    /** Pastikan audio kata ada di cache. Melempar exception kalau gagal. */
+    /** Pastikan audio kata ada di cache. */
     suspend fun ensureWord(surah: Int, ayah: Int, wordIndex: Int): File = withContext(Dispatchers.IO) {
         val file = wordFile(surah, ayah, wordIndex)
-        if (file.exists() && file.length() > 0L) file else download(wordUrl(surah, ayah, wordIndex), file)
+        if (file.exists() && file.length() > 0L) file else download(AudioUrls.wordUrl(surah, ayah, wordIndex), file)
+    }
+
+    /** Semua audio surah (ayat + kata) sudah ada di cache? */
+    fun isSurahAudioComplete(surah: Surah): Boolean {
+        if (surah.ayahs.isEmpty()) return false
+        surah.ayahs.forEach { ayah ->
+            val af = ayahFile(surah.number, ayah.number)
+            if (!(af.exists() && af.length() > 0L)) return false
+            ayah.words.forEachIndexed { wi, _ ->
+                val wf = wordFile(surah.number, ayah.number, wi)
+                if (!(wf.exists() && wf.length() > 0L)) return false
+            }
+        }
+        return true
     }
 
     /**
-     * Unduh SEMUA audio (per ayat + per kata) untuk mushaf yang diberikan.
+     * Unduh SEMUA audio satu surah (per ayat + per kata).
      * File yang sudah ada dilewati; kegagalan per-file tidak menggagalkan sisanya.
      */
-    suspend fun downloadAll(
-        surahs: List<Surah>,
+    suspend fun downloadSurah(
+        surah: Surah,
         onProgress: (done: Int, total: Int) -> Unit,
     ): DownloadStats = withContext(Dispatchers.IO) {
         val jobs = mutableListOf<Pair<String, File>>()
-        surahs.forEach { surah ->
-            surah.ayahs.forEach { ayah ->
-                jobs += ayahUrl(surah.number, ayah.number) to ayahFile(surah.number, ayah.number)
-                ayah.words.forEachIndexed { wi, _ ->
-                    jobs += wordUrl(surah.number, ayah.number, wi) to wordFile(surah.number, ayah.number, wi)
-                }
+        surah.ayahs.forEach { ayah ->
+            jobs += AudioUrls.ayahUrl(surah.number, ayah.number) to ayahFile(surah.number, ayah.number)
+            ayah.words.forEachIndexed { wi, _ ->
+                jobs += AudioUrls.wordUrl(surah.number, ayah.number, wi) to wordFile(surah.number, ayah.number, wi)
             }
         }
 

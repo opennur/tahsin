@@ -109,7 +109,7 @@ fun TahsinScreen(modifier: Modifier = Modifier) {
             onDecreaseFont = viewModel::decreaseFont,
             onSelectFont = viewModel::selectFont,
             onToggleDarkMode = viewModel::toggleDarkMode,
-            onDownloadAll = viewModel::downloadAllAudio,
+            onConfirmDownload = viewModel::confirmDownloadSurah,
             modifier = modifier,
         )
     }
@@ -132,7 +132,7 @@ private fun TahsinContent(
     onDecreaseFont: () -> Unit,
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
-    onDownloadAll: () -> Unit,
+    onConfirmDownload: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -195,7 +195,14 @@ private fun TahsinContent(
         Spacer(modifier = Modifier.height(12.dp))
 
         // ---- Navigasi ayat ----
-        if (ayah != null) {
+        if (state.loadingSurah) {
+            AyahCard(modifier = Modifier.fillMaxWidth()) {
+                AyahText(
+                    "Memuat surah…",
+                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                )
+            }
+        } else if (ayah != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Dalam arah baca Arab: tombol KIRI = lanjut ke ayat berikutnya.
                 AyahButton(text = "‹", variant = AyahButtonVariant.Outline, onClick = onNextAyah)
@@ -335,10 +342,31 @@ private fun TahsinContent(
                     onIncreaseFont = onIncreaseFont,
                     onSelectFont = onSelectFont,
                     onToggleDarkMode = onToggleDarkMode,
-                    onDownloadAll = onDownloadAll,
                     onClose = { drawerOpen = false },
                 )
             }
+        }
+
+        // ---- Dialog konfirmasi unduh audio surah ----
+        state.confirmDownloadSurah?.let { number ->
+            val surah = state.surahs.find { it.number == number }
+            ConfirmDownloadDialog(
+                surahLabel = surah?.let { "${it.number}. ${it.nameLatin} (${it.ayahCount} ayat)" }
+                    ?: "surah $number",
+                onConfirm = { onConfirmDownload(true) },
+                onCancel = { onConfirmDownload(false) },
+            )
+        }
+
+        // ---- Dialog progress unduh ----
+        if (state.isDownloading) {
+            DownloadProgressDialog(
+                surahLabel = state.downloadingSurah
+                    ?.let { n -> state.surahs.find { it.number == n }?.nameLatin }
+                    .orEmpty(),
+                done = state.downloadProgress?.first ?: 0,
+                total = state.downloadProgress?.second ?: 0,
+            )
         }
     }
 }
@@ -518,7 +546,6 @@ private fun SettingsPanel(
     onIncreaseFont: () -> Unit,
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
-    onDownloadAll: () -> Unit,
     onClose: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -580,28 +607,6 @@ private fun SettingsPanel(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        SectionLabel("Audio offline")
-        Spacer(modifier = Modifier.height(8.dp))
-        val progress = state.downloadProgress
-        when {
-            state.isDownloading -> AyahText(
-                "Mengunduh audio… ${progress?.first ?: 0}/${progress?.second ?: "?"}",
-                style = AyahTypography.Body2.copy(color = AyahColors.Primary),
-            )
-            progress != null && progress.second > 0 && progress.first == progress.second -> AyahText(
-                "✓ ${progress.second} audio siap offline.",
-                style = AyahTypography.Body2.copy(color = AyahColors.Success),
-            )
-            else -> AyahButton(
-                text = "📥 Unduh semua audio",
-                variant = AyahButtonVariant.Primary,
-                onClick = onDownloadAll,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-
         Spacer(modifier = Modifier.height(28.dp))
 
         AyahText(
@@ -628,4 +633,108 @@ private fun SectionLabel(text: String) {
             fontWeight = FontWeight.SemiBold,
         ),
     )
+}
+
+// ============================================================ Dialog
+
+/** Lapisan scrim + konten dialog di tengah layar. */
+@Composable
+private fun DialogScrim(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        content()
+    }
+}
+
+/** Popup konfirmasi unduh audio satu surah. */
+@Composable
+private fun ConfirmDownloadDialog(
+    surahLabel: String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    DialogScrim {
+        Column(
+            modifier = Modifier
+                .width(300.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(16.dp))
+                .background(AyahColors.Surface)
+                .padding(20.dp),
+        ) {
+            AyahText("Unduh audio surah ini?", style = AyahTypography.Heading2)
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahText(
+                "Audio Minshawy (per ayat) + audio kata-kata untuk $surahLabel " +
+                    "akan diunduh ke penyimpanan aplikasi supaya bisa diputar offline.",
+                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.weight(1f))
+                AyahButton(text = "Batal", variant = AyahButtonVariant.Outline, onClick = onCancel)
+                Spacer(modifier = Modifier.width(12.dp))
+                AyahButton(text = "📥 Unduh", variant = AyahButtonVariant.Primary, onClick = onConfirm)
+            }
+        }
+    }
+}
+
+/** Dialog progress unduh audio satu surah. */
+@Composable
+private fun DownloadProgressDialog(
+    surahLabel: String,
+    done: Int,
+    total: Int,
+) {
+    DialogScrim {
+        Column(
+            modifier = Modifier
+                .width(300.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(16.dp))
+                .background(AyahColors.Surface)
+                .padding(20.dp),
+        ) {
+            AyahText("Mengunduh audio…", style = AyahTypography.Heading2)
+            Spacer(modifier = Modifier.height(4.dp))
+            if (surahLabel.isNotBlank()) {
+                AyahText(surahLabel, style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            ProgressBar(fraction = if (total > 0) done.toFloat() / total else 0f)
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahText(
+                "$done / $total",
+                style = AyahTypography.Caption,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+/** Progress bar kustom sederhana (tanpa Material 3). */
+@Composable
+private fun ProgressBar(
+    fraction: Float,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(10.dp)
+            .clip(RoundedCornerShape(5.dp))
+            .background(AyahColors.Divider),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                .fillMaxHeight()
+                .background(AyahColors.Primary),
+        )
+    }
 }

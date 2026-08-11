@@ -12,7 +12,7 @@ import java.util.Locale
  * 1. Cache internal `filesDir/audio/...` (hasil unduh dari dalam aplikasi
  *    via `AudioDownloader` — offline setelah diunduh sekali).
  * 2. MP3 di-bundle di `assets/audio/...` (hasil tools/download_minshawi.sh).
- * 3. MP3 qari online (audioUrl dari mushaf.json).
+ * 3. MP3 qari online (URL dihitung dari nomor surah/ayat).
  * 4. TextToSpeech Arab perangkat (kualitas dasar, bukan murattal).
  */
 class TahsinAudioPlayer(context: Context) {
@@ -30,22 +30,17 @@ class TahsinAudioPlayer(context: Context) {
     fun playAyah(
         surahNumber: Int,
         ayahNumber: Int,
-        audioUrl: String?,
         text: String,
         onFallback: () -> Unit = {},
     ) {
-        val key = surahNumber.toString().padStart(3, '0') +
-            ayahNumber.toString().padStart(3, '0') + ".mp3"
+        val key = AudioUrls.ayahKey(surahNumber, ayahNumber)
         val cached = File(cacheRoot, key)
         if (cached.exists() && cached.length() > 0L && playFromFile(cached, onFallback)) return
 
         val afd = runCatching { appContext.assets.openFd("audio/$key") }.getOrNull()
         if (afd != null && playFromAfd(afd, onFallback)) return
 
-        val url = audioUrl
-        if (!url.isNullOrBlank()) {
-            if (playFromUrl(url, onFallback)) return
-        }
+        if (playFromUrl(AudioUrls.ayahUrl(surahNumber, ayahNumber), onFallback)) return
 
         onFallback()
     }
@@ -58,16 +53,14 @@ class TahsinAudioPlayer(context: Context) {
         word: String,
         onFallback: () -> Unit = {},
     ) {
-        val key = surahNumber.toString().padStart(3, '0') + "_" +
-            ayahNumber.toString().padStart(3, '0') + "_" +
-            (wordIndex + 1).toString().padStart(3, '0') + ".mp3"
+        val key = AudioUrls.wordKey(surahNumber, ayahNumber, wordIndex)
         val cached = File(File(cacheRoot, "wbw"), key)
         if (cached.exists() && cached.length() > 0L && playFromFile(cached, onFallback)) return
 
         val afd = runCatching { appContext.assets.openFd("audio/wbw/$key") }.getOrNull()
         if (afd != null && playFromAfd(afd, onFallback)) return
 
-        if (playFromUrl("https://audio.qurancdn.com/wbw/$key", onFallback)) return
+        if (playFromUrl(AudioUrls.wordUrl(surahNumber, ayahNumber, wordIndex), onFallback)) return
         onFallback()
     }
 

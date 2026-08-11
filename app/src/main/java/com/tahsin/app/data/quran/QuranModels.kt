@@ -2,16 +2,15 @@ package com.tahsin.app.data.quran
 
 import com.tahsin.app.util.ArabicNormalizer
 
-/** Seluruh mushaf yang di-bundle di assets (subset surah). */
-data class Mushaf(
-    val surahs: List<Surah> = emptyList(),
-)
-
-/** Satu surah lengkap. */
+/**
+ * Satu surah: metadata selalu tersedia (dari `surah-list.json`),
+ * `ayahs` diisi saat isi surah diunduh/di-cache (equran.id).
+ */
 data class Surah(
     val number: Int,
     val nameArabic: String,
     val nameLatin: String,
+    val ayahCount: Int = 0,
     val ayahs: List<Ayah> = emptyList(),
 )
 
@@ -19,7 +18,6 @@ data class Surah(
 data class Ayah(
     val number: Int,
     val text: String,
-    val audioUrl: String? = null,
 ) {
     /** Kata-kata ayat (token yang mengandung huruf Arab; penanda waqaf dibuang). */
     val words: List<String>

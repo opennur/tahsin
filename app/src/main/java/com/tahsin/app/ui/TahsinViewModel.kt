@@ -36,6 +36,8 @@ sealed interface TahsinUiState {
         val surahs: List<Surah> = emptyList(),
         val surahNumber: Int = 1,
         val ayahIndex: Int = 0,
+        /** Isi surah sedang dimuat (diunduh dari equran.id). */
+        val loadingSurah: Boolean = false,
         val listening: Boolean = false,
         val transcript: String = "",
         val alignedWords: List<AlignedWord> = emptyList(),
@@ -46,7 +48,11 @@ sealed interface TahsinUiState {
         val fontScale: Float = 1f,
         val arabicFont: ArabicFont = ArabicFont.SYSTEM,
         val darkMode: Boolean = false,
+        /** Nomor surah yang menunggu konfirmasi unduh audio. */
+        val confirmDownloadSurah: Int? = null,
+        /** Sedang mengunduh audio (surah = downloadingSurah). */
         val isDownloading: Boolean = false,
+        val downloadingSurah: Int? = null,
         val downloadProgress: Pair<Int, Int>? = null,
     ) : TahsinUiState {
         val surah: Surah? get() = surahs.find { it.number == surahNumber }
@@ -73,8 +79,10 @@ class TahsinViewModel(
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
     val uiState: StateFlow<TahsinUiState> = _uiState.asStateFlow()
 
+    /** Aksi play yang tertunda sampai unduhan audio surah selesai. */
+    private var pendingPlayAfterDownload: (() -> Unit)? = null
+
     init {
-        // Terapkan preferensi (dark mode global) lalu muat mushaf.
         AyahColors.isDark = settings.darkMode
         reload()
     }
@@ -83,7 +91,7 @@ class TahsinViewModel(
         _uiState.value = TahsinUiState.Loading
         _uiState.value = try {
             TahsinUiState.Ready(
-                surahs = repository.surahs(),
+                surahs = repository.surahList(),
                 fontScale = settings.fontScale,
                 arabicFont = runCatching {
                     ArabicFont.valueOf(settings.fontName)
@@ -101,12 +109,41 @@ class TahsinViewModel(
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             surahNumber = number,
             ayahIndex = 0,
+            loadingSurah = true,
             transcript = "",
             alignedWords = emptyList(),
             issues = emptyList(),
             selectedWordIndex = null,
             selectedWordRules = emptyList(),
+            confirmDownloadSurah = null,
             message = null,
+        ) }
+        loadSurahContent(number)
+    }
+
+    /** Muat isi surah: cache dulu, kalau belum ada unduh dari equran.id. */
+    private fun loadSurahContent(number: Int) {
+        viewModelScope.launch {
+            val cached = repository.cachedSurah(number)
+            if (cached != null) {
+                replaceSurah(cached)
+                return@launch
+            }
+            try {
+                replaceSurah(repository.fetchSurah(number))
+            } catch (e: Exception) {
+                updateReady { it.copy(
+                    loadingSurah = false,
+                    message = "Gagal memuat surah $number: ${e.message ?: "periksa koneksi"}",
+                ) }
+            }
+        }
+    }
+
+    private fun replaceSurah(surah: Surah) {
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+            loadingSurah = false,
+            surahs = it.surahs.map { s -> if (s.number == surah.number) surah else s },
         ) }
     }
 
@@ -119,6 +156,12 @@ class TahsinViewModel(
     fun prevAyah() {
         val s = currentReady() ?: return
         if (s.ayahIndex > 0) updateAyah(s.ayahIndex - 1)
+    }
+
+    fun selectAyah(index: Int) {
+        val s = currentReady() ?: return
+        val max = (s.surah?.ayahs?.size ?: 1) - 1
+        if (index in 0..max) updateAyah(index)
     }
 
     private fun updateAyah(index: Int) {
@@ -210,91 +253,100 @@ class TahsinViewModel(
         ) }
     }
 
+    // ---- audio: unduh per surah dengan konfirmasi ----
+
+    fun playAyah() {
+        val s = currentReady() ?: return
+        val surah = s.surah ?: return
+        if (surah.ayahs.isEmpty() || s.ayah == null) return
+        if (!downloader.isSurahAudioComplete(surah)) {
+            pendingPlayAfterDownload = { playAyahNow() }
+            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(confirmDownloadSurah = surah.number) }
+            return
+        }
+        playAyahNow()
+    }
+
+    private fun playAyahNow() {
+        val s = currentReady() ?: return
+        val ayah = s.ayah ?: return
+        viewModelScope.launch {
+            runCatching { downloader.ensureAyah(s.surahNumber, ayah.number) }
+            audioPlayer.playAyah(s.surahNumber, ayah.number, ayah.text) {
+                audioPlayer.speak(ayah.text)
+                if (!audioPlayer.isArabicTtsAvailable()) {
+                    showMessage("Audio belum tersedia. Cek koneksi lalu coba lagi.")
+                }
+            }
+        }
+    }
+
     fun playSelectedWord() {
         val s = currentReady() ?: return
         val ayah = s.ayah ?: return
         val idx = s.selectedWordIndex ?: return
-        val word = ayah.words.getOrNull(idx) ?: return
-        viewModelScope.launch {
-            // Unduh kata ini dulu (kalau belum ada) supaya bisa offline.
-            runCatching { downloader.ensureWord(s.surahNumber, ayah.number, idx) }
-            audioPlayer.playWord(
-                surahNumber = s.surahNumber,
-                ayahNumber = ayah.number,
-                wordIndex = idx,
-                word = word,
-            ) {
-                audioPlayer.speak(word)
-                if (!audioPlayer.isArabicTtsAvailable()) {
-                    showMessage(
-                        "Audio kata belum tersedia. Cek koneksi lalu coba lagi, " +
-                            "atau unduh semua audio di Pengaturan.",
-                    )
-                }
-            }
+        if (ayah.words.getOrNull(idx) == null) return
+        val surah = s.surah ?: return
+        if (!downloader.isSurahAudioComplete(surah)) {
+            pendingPlayAfterDownload = { playWordNow(idx) }
+            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(confirmDownloadSurah = surah.number) }
+            return
         }
+        playWordNow(idx)
     }
 
-    fun selectAyah(index: Int) {
-        val s = currentReady() ?: return
-        val max = (s.surah?.ayahs?.size ?: 1) - 1
-        if (index in 0..max) updateAyah(index)
-    }
-
-    fun playAyah() {
+    private fun playWordNow(wordIndex: Int) {
         val s = currentReady() ?: return
         val ayah = s.ayah ?: return
+        val word = ayah.words.getOrNull(wordIndex) ?: return
         viewModelScope.launch {
-            // Unduh audio ayat ini dulu (kalau belum ada) supaya bisa offline.
-            runCatching { downloader.ensureAyah(s.surahNumber, ayah.number) }
-            audioPlayer.playAyah(
-                surahNumber = s.surahNumber,
-                ayahNumber = ayah.number,
-                audioUrl = ayah.audioUrl,
-                text = ayah.text,
-            ) {
-                audioPlayer.speak(ayah.text)
+            runCatching { downloader.ensureWord(s.surahNumber, ayah.number, wordIndex) }
+            audioPlayer.playWord(s.surahNumber, ayah.number, wordIndex, word) {
+                audioPlayer.speak(word)
                 if (!audioPlayer.isArabicTtsAvailable()) {
-                    showMessage(
-                        "Audio belum tersedia. Cek koneksi lalu coba lagi, " +
-                            "atau unduh semua audio di Pengaturan.",
-                    )
+                    showMessage("Audio kata belum tersedia. Cek koneksi lalu coba lagi.")
                 }
             }
         }
     }
 
-    /** Unduh semua audio (per ayat + per kata) dari dalam aplikasi. */
-    fun downloadAllAudio() {
+    /** Jawaban popup konfirmasi unduh audio surah. */
+    fun confirmDownloadSurah(accept: Boolean) {
         val s = currentReady() ?: return
-        if (s.isDownloading) return
+        val number = s.confirmDownloadSurah ?: return
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(confirmDownloadSurah = null) }
+        if (!accept) {
+            pendingPlayAfterDownload = null
+            return
+        }
+        val surah = s.surahs.find { it.number == number }
+        if (surah == null || surah.ayahs.isEmpty()) {
+            pendingPlayAfterDownload = null
+            showMessage("Isi surah belum dimuat — buka surahnya dulu, lalu coba lagi.")
+            return
+        }
         viewModelScope.launch {
-            updateReady { it.copy(
-                isDownloading = true,
-                downloadProgress = null,
-                message = null,
-            ) }
+            updateReady { it.copy(isDownloading = true, downloadingSurah = number, downloadProgress = null) }
             try {
-                val stats = downloader.downloadAll(s.surahs) { done, total ->
+                val stats = downloader.downloadSurah(surah) { done, total ->
                     updateReady { it.copy(downloadProgress = done to total) }
                 }
                 updateReady { it.copy(
                     isDownloading = false,
+                    downloadingSurah = null,
                     downloadProgress = stats.ok to stats.total,
                 ) }
+                pendingPlayAfterDownload?.invoke()
+                pendingPlayAfterDownload = null
             } catch (e: Exception) {
                 updateReady { it.copy(
                     isDownloading = false,
+                    downloadingSurah = null,
                     message = "Gagal mengunduh audio: ${e.message ?: "periksa koneksi"}",
                 ) }
+                pendingPlayAfterDownload = null
             }
         }
-    }
-
-    /** Update state hanya jika sudah Ready — aman dipanggil dari dalam lambda apa pun. */
-    private fun updateReady(transform: (TahsinUiState.Ready) -> TahsinUiState.Ready) {
-        val current = _uiState.value as? TahsinUiState.Ready ?: return
-        _uiState.value = transform(current)
     }
 
     // ---- preferensi font & tema ----
@@ -324,7 +376,7 @@ class TahsinViewModel(
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(darkMode = next) }
     }
 
-    // ---- pesan ----
+    // ---- pesan & helper ----
 
     fun showMessage(msg: String) {
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(message = msg) }
@@ -335,6 +387,12 @@ class TahsinViewModel(
     }
 
     private fun currentReady(): TahsinUiState.Ready? = _uiState.value as? TahsinUiState.Ready
+
+    /** Update state hanya jika sudah Ready — aman dipanggil dari dalam lambda apa pun. */
+    private fun updateReady(transform: (TahsinUiState.Ready) -> TahsinUiState.Ready) {
+        val current = _uiState.value as? TahsinUiState.Ready ?: return
+        _uiState.value = transform(current)
+    }
 
     override fun onCleared() {
         speech.destroy()
