@@ -53,6 +53,8 @@ sealed interface TahsinUiState {
         /** FontFamily efektif (font file kalau ada, fallback sistem). */
         val arabicFontFamily: FontFamily = FontFamily.Default,
         val darkMode: Boolean = false,
+        /** Pewarnaan huruf tajwid di mushaf (gaya mushaf tajwid). */
+        val tajwidColor: Boolean = true,
         /** Sedang memutar audio (untuk tombol Dengar/Stop). */
         val isAudioPlaying: Boolean = false,
         /** Sedang mengunduh audio (agregat semua surah, tampil di atas tombol). */
@@ -121,6 +123,7 @@ class TahsinViewModel(
                     runCatching { ArabicFont.valueOf(settings.fontName) }.getOrDefault(ArabicFont.UTSMANI),
                 ),
                 darkMode = settings.darkMode,
+                tajwidColor = settings.tajwidColor,
             )
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
@@ -291,6 +294,13 @@ class TahsinViewModel(
             selectedWordIndex = index,
             selectedWordRules = rulesFor(index, words),
         ) }
+    }
+
+    fun toggleTajwidColor() {
+        val s = currentReady() ?: return
+        val next = !s.tajwidColor
+        settings.tajwidColor = next
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(tajwidColor = next) }
     }
 
     // ---- audio: unduh per surah (progress di footer, multi-surah) ----

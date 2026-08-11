@@ -82,6 +82,15 @@ object AyahColors {
     val Success get() = palette().Success
     val Reading get() = palette().Reading
 
+    // Warna huruf mushaf (tajwid) — gaya mushaf tajwid berwarna
+    val TajwidMad get() = if (isDark) Color(0xFFEF5350) else Color(0xFFC62828)          // merah: mad
+    val TajwidGhunnah get() = if (isDark) Color(0xFF66BB6A) else Color(0xFF2E7D32)     // hijau: ghunnah
+    val TajwidQalqalah get() = if (isDark) Color(0xFF64B5F6) else Color(0xFF1565C0)    // biru: qalqalah
+    val TajwidIkhfa get() = if (isDark) Color(0xFF90A4AE) else Color(0xFF546E7A)       // abu-abu: ikhfa
+    val TajwidIqlab get() = if (isDark) Color(0xFFBA68C8) else Color(0xFF6A1B9A)       // ungu: iqlab
+    val TajwidIdgham get() = if (isDark) Color(0xFFFFA726) else Color(0xFFE65100)      // oranye: idgham
+    val TajwidLamJalalah get() = if (isDark) Color(0xFF4DB6AC) else Color(0xFF00695C)  // teal: lam jalalah
+
     // Teks di atas warna brand
     val OnPrimary get() = palette().OnPrimary
     val OnSecondary get() = palette().OnSecondary

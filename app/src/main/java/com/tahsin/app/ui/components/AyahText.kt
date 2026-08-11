@@ -4,6 +4,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 
@@ -24,6 +25,24 @@ fun AyahText(
         text = text,
         modifier = modifier,
         style = if (color != null) style.copy(color = color) else style,
+        maxLines = maxLines,
+        overflow = overflow,
+    )
+}
+
+/** Overload untuk teks dengan span warna (mis. pewarnaan huruf tajwid). */
+@Composable
+fun AyahText(
+    text: AnnotatedString,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
+) {
+    BasicText(
+        text = text,
+        modifier = modifier,
+        style = style,
         maxLines = maxLines,
         overflow = overflow,
     )

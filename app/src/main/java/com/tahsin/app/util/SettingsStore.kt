@@ -21,6 +21,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean("dark_mode", false)
         set(value) = prefs.edit().putBoolean("dark_mode", value).apply()
 
+    /** Pewarnaan huruf tajwid di mushaf (default nyala). */
+    var tajwidColor: Boolean
+        get() = prefs.getBoolean("tajwid_color", true)
+        set(value) = prefs.edit().putBoolean("tajwid_color", value).apply()
+
     /** Surah & ayat terakhir yang dibuka (di-restore saat startup). */
     var surahNumber: Int
         get() = prefs.getInt("surah_number", 1)
