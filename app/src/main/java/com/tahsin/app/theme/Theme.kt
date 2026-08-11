@@ -14,11 +14,12 @@ import androidx.compose.ui.unit.dp
  */
 val LocalAyahColors = staticCompositionLocalOf { AyahColors }
 
-/** Shape kustom design system. */
+/** Shape kustom design system — sudut lembut & ramping. */
 object AyahShapes {
-    val Button = RoundedCornerShape(12.dp)
-    val Card = RoundedCornerShape(16.dp)
-    val Modal = RoundedCornerShape(20.dp)
+    val Button = RoundedCornerShape(10.dp)
+    val Card = RoundedCornerShape(14.dp)
+    val Modal = RoundedCornerShape(18.dp)
+    val Field = RoundedCornerShape(10.dp)
 }
 
 @Composable

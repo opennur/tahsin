@@ -8,50 +8,49 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.sp
 
 /**
- * Tipografi kustom (tanpa Material 3).
+ * Tipografi kustom (tanpa Material 3) — ringkas & modern.
  *
  * PENTING: semua style memakai `get()` — warna dibaca saat komposisi, bukan
- * saat inisialisasi object. Ini yang membuat dark mode bisa mengubah warna
- * teks secara real-time (AyahColors.* adalah state Compose).
+ * saat inisialisasi object (supaya dark mode bisa mengubah warna teks).
  *
  * Semua ukuran memakai sp agar mengikuti skala font sistem (accessibility).
  */
 object AyahTypography {
-    /** 28sp Bold */
+    /** 24sp Bold — judul layar */
     val Heading1: TextStyle
         get() = TextStyle(
-            fontSize = 28.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            lineHeight = 34.sp,
+            lineHeight = 30.sp,
             color = AyahColors.TextPrimary,
         )
 
-    /** 22sp Semibold */
+    /** 19sp Semibold — judul seksi / panel */
     val Heading2: TextStyle
         get() = TextStyle(
-            fontSize = 22.sp,
+            fontSize = 19.sp,
             fontWeight = FontWeight.SemiBold,
-            lineHeight = 28.sp,
+            lineHeight = 25.sp,
             color = AyahColors.TextPrimary,
         )
 
-    /** 16sp Regular, line height 1.5x */
+    /** 15sp Regular — teks utama */
     val Body1: TextStyle
         get() = TextStyle(
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
+            fontSize = 15.sp,
+            lineHeight = 22.sp,
             color = AyahColors.TextPrimary,
         )
 
-    /** 14sp Regular */
+    /** 14sp Regular — teks sekunder */
     val Body2: TextStyle
         get() = TextStyle(
             fontSize = 14.sp,
-            lineHeight = 21.sp,
+            lineHeight = 20.sp,
             color = AyahColors.TextPrimary,
         )
 
-    /** 12sp Regular */
+    /** 12sp Regular — keterangan kecil */
     val Caption: TextStyle
         get() = TextStyle(
             fontSize = 12.sp,
@@ -59,23 +58,32 @@ object AyahTypography {
             color = AyahColors.TextSecondary,
         )
 
+    /** 11sp Medium, letter-spacing — label seksi (gaya overline) */
+    val Overline: TextStyle
+        get() = TextStyle(
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 1.1.sp,
+            color = AyahColors.TextSecondary,
+        )
+
     /** Teks Arab — RTL, rata kanan, besar agar mudah dibaca */
     val Arabic: TextStyle
         get() = TextStyle(
-            fontSize = 26.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Medium,
-            lineHeight = 46.sp,
+            lineHeight = 40.sp,
             textAlign = TextAlign.End,
             textDirection = TextDirection.Rtl,
             color = AyahColors.TextPrimary,
         )
 
-    /** Kata Arab dalam chip mushaf — lebih kecil dari ayat utuh */
+    /** Kata Arab dalam chip mushaf */
     val ArabicWord: TextStyle
         get() = TextStyle(
-            fontSize = 22.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            lineHeight = 34.sp,
+            lineHeight = 30.sp,
             textAlign = TextAlign.Center,
             textDirection = TextDirection.Rtl,
             color = AyahColors.TextPrimary,
@@ -84,9 +92,9 @@ object AyahTypography {
     /** Tombol (warna ditetapkan oleh varian tombol) */
     val Button: TextStyle
         get() = TextStyle(
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.2.sp,
+            letterSpacing = 0.3.sp,
         )
 
     /** Transliterasi miring */
@@ -94,7 +102,7 @@ object AyahTypography {
         get() = TextStyle(
             fontSize = 14.sp,
             fontStyle = FontStyle.Italic,
-            lineHeight = 21.sp,
+            lineHeight = 20.sp,
             color = AyahColors.TextSecondary,
         )
 }

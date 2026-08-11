@@ -52,6 +52,7 @@ import com.tahsin.app.theme.ArabicFont
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTypography
 import com.tahsin.app.ui.components.AyahButton
+import com.tahsin.app.ui.components.AyahButtonSize
 import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahCard
 import com.tahsin.app.ui.components.AyahErrorView
@@ -168,7 +169,8 @@ private fun TahsinContent(
             )
             AyahButton(
                 text = "☰",
-                variant = AyahButtonVariant.Outline,
+                variant = AyahButtonVariant.Ghost,
+                size = AyahButtonSize.Small,
                 onClick = { drawerOpen = true },
             )
         }
@@ -212,8 +214,13 @@ private fun TahsinContent(
         } else if (ayah != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Dalam arah baca Arab: tombol KIRI = lanjut ke ayat berikutnya.
-                AyahButton(text = "‹", variant = AyahButtonVariant.Outline, onClick = onNextAyah)
-                Spacer(modifier = Modifier.width(12.dp))
+                AyahButton(
+                    text = "‹",
+                    variant = AyahButtonVariant.Outline,
+                    size = AyahButtonSize.Small,
+                    onClick = onNextAyah,
+                )
+                Spacer(modifier = Modifier.width(10.dp))
                 SimpleDropdown(
                     selectedLabel = "Ayat ${ayah.number} / $ayahCount",
                     options = (1..ayahCount).map { n ->
@@ -221,8 +228,13 @@ private fun TahsinContent(
                     },
                     modifier = Modifier.weight(1f),
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                AyahButton(text = "›", variant = AyahButtonVariant.Outline, onClick = onPrevAyah)
+                Spacer(modifier = Modifier.width(10.dp))
+                AyahButton(
+                    text = "›",
+                    variant = AyahButtonVariant.Outline,
+                    size = AyahButtonSize.Small,
+                    onClick = onPrevAyah,
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -313,7 +325,7 @@ private fun TahsinContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(AyahColors.Background)
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     MicButton(listening = state.listening, onClick = onMicClick)
@@ -524,17 +536,19 @@ private fun IssueCard(
 
 @Composable
 private fun MicButton(listening: Boolean, onClick: () -> Unit) {
+    val base = if (listening) AyahColors.Error else AyahColors.Primary
     Box(
         modifier = Modifier
-            .size(76.dp)
+            .size(56.dp)
             .clip(CircleShape)
-            .background(if (listening) AyahColors.Error else AyahColors.Primary)
+            .background(base)
+            .border(4.dp, base.copy(alpha = 0.15f), CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         AyahText(
             if (listening) "⏹" else "🎙️",
-            style = TextStyle(fontSize = 34.sp, color = Color.White),
+            style = TextStyle(fontSize = 24.sp, color = Color.White),
         )
     }
 }
@@ -616,7 +630,7 @@ private fun SettingsPanel(
         SectionLabel("Penyimpanan")
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = "📥 Unduh semua audio",
+            text = "Unduh semua audio",
             variant = AyahButtonVariant.Primary,
             onClick = onDownloadAll,
             enabled = !state.isDownloading,
@@ -624,7 +638,7 @@ private fun SettingsPanel(
         )
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = "🎵 Kelola audio terunduh",
+            text = "Kelola audio terunduh",
             variant = AyahButtonVariant.Outline,
             onClick = onOpenAudioManager,
             modifier = Modifier.fillMaxWidth(),
@@ -651,7 +665,7 @@ private fun SettingsPanel(
 private fun SectionLabel(text: String) {
     AyahText(
         text,
-        style = AyahTypography.Body2.copy(
+        style = AyahTypography.Overline.copy(
             color = AyahColors.Primary,
             fontWeight = FontWeight.SemiBold,
         ),

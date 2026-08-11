@@ -2,6 +2,7 @@ package com.tahsin.app.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.tahsin.app.theme.AyahColors
+import com.tahsin.app.theme.AyahShapes
 import com.tahsin.app.theme.AyahTypography
 
 /** Satu opsi dropdown kustom (tanpa Material 3). */
@@ -51,10 +53,10 @@ fun SimpleDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .onSizeChanged { triggerHeight = it.height }
-                .clip(RoundedCornerShape(12.dp))
-                .background(AyahColors.Surface)
+                .clip(AyahShapes.Field)
+                .background(AyahColors.SurfaceVariant)
                 .clickable { expanded = !expanded }
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             contentAlignment = Alignment.CenterStart,
         ) {
             AyahText(
@@ -77,7 +79,8 @@ fun SimpleDropdown(
                         .width(280.dp)
                         .shadow(4.dp, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
-                        .background(AyahColors.Surface),
+                        .background(AyahColors.Surface)
+                        .border(1.dp, AyahColors.Hairline, RoundedCornerShape(12.dp)),
                 ) {
                     LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
                         items(options, key = { it.label }) { option ->
@@ -88,7 +91,7 @@ fun SimpleDropdown(
                                         expanded = false
                                         option.onClick()
                                     }
-                                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
                             ) {
                                 AyahText(option.label, style = AyahTypography.Body2)
                             }
