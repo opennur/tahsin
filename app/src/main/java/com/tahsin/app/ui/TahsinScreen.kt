@@ -66,7 +66,10 @@ import com.tahsin.app.ui.components.SimpleDropdown
  * daftar kesalahan + hukum tajwid, dan audio contoh.
  */
 @Composable
-fun TahsinScreen(modifier: Modifier = Modifier) {
+fun TahsinScreen(
+    onOpenAudioManager: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     val viewModel: TahsinViewModel = viewModel(factory = tahsinViewModelFactory(context))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -110,6 +113,7 @@ fun TahsinScreen(modifier: Modifier = Modifier) {
             onSelectFont = viewModel::selectFont,
             onToggleDarkMode = viewModel::toggleDarkMode,
             onConfirmDownload = viewModel::confirmDownloadSurah,
+            onOpenAudioManager = onOpenAudioManager,
             modifier = modifier,
         )
     }
@@ -133,6 +137,7 @@ private fun TahsinContent(
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
     onConfirmDownload: (Boolean) -> Unit,
+    onOpenAudioManager: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -182,10 +187,10 @@ private fun TahsinContent(
 
         // ---- Pilih surah (dropdown, bukan tab) ----
         SimpleDropdown(
-            selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
+            selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin} (${it.ayahCount} ayat)" } ?: "-",
             options = state.surahs.map { s ->
                 DropdownOption(
-                    "${s.number}. ${s.nameLatin} (${s.ayahs.size} ayat)",
+                    "${s.number}. ${s.nameLatin} (${s.ayahCount} ayat)",
                     { onSelectSurah(s.number) },
                 )
             },
@@ -342,6 +347,10 @@ private fun TahsinContent(
                     onIncreaseFont = onIncreaseFont,
                     onSelectFont = onSelectFont,
                     onToggleDarkMode = onToggleDarkMode,
+                    onOpenAudioManager = {
+                        drawerOpen = false
+                        onOpenAudioManager()
+                    },
                     onClose = { drawerOpen = false },
                 )
             }
@@ -546,6 +555,7 @@ private fun SettingsPanel(
     onIncreaseFont: () -> Unit,
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
+    onOpenAudioManager: () -> Unit,
     onClose: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -604,6 +614,17 @@ private fun SettingsPanel(
             text = if (state.darkMode) "☀️ Mode Terang" else "🌙 Mode Gelap",
             variant = if (state.darkMode) AyahButtonVariant.Secondary else AyahButtonVariant.Primary,
             onClick = onToggleDarkMode,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel("Penyimpanan")
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = "🎵 Kelola audio terunduh",
+            variant = AyahButtonVariant.Outline,
+            onClick = onOpenAudioManager,
             modifier = Modifier.fillMaxWidth(),
         )
 

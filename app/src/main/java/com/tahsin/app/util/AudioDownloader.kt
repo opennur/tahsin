@@ -89,6 +89,74 @@ class AudioDownloader(context: Context) {
         DownloadStats(ok, total)
     }
 
+    // ---- manajemen audio terunduh ----
+
+    /** Info audio yang sudah terunduh untuk satu surah. */
+    data class SurahAudioInfo(
+        val number: Int,
+        val ayahFiles: Int,
+        val ayahCount: Int,
+        val wordFiles: Int,
+        /** Total kata yang diharapkan; null kalau isi surah belum di-cache. */
+        val totalWords: Int?,
+    )
+
+    /** Nomor surah-surah yang punya minimal satu file audio terunduh. */
+    fun downloadedSurahNumbers(): List<Int> {
+        val numbers = sortedSetOf<Int>()
+        val dir = audioDir
+        if (dir.exists()) {
+            dir.listFiles { f -> f.isFile && f.extension == "mp3" && f.name.length == 7 }
+                ?.forEach { f -> numbers += f.name.take(3).toIntOrNull() ?: return@forEach }
+        }
+        val wbw = File(dir, "wbw")
+        if (wbw.exists()) {
+            wbw.listFiles { f -> f.isFile && f.extension == "mp3" }
+                ?.forEach { f ->
+                    val parts = f.name.split("_")
+                    if (parts.size == 3) numbers += parts[0].toIntOrNull() ?: return@forEach
+                }
+        }
+        return numbers.toList()
+    }
+
+    /** Hitung file audio terunduh untuk satu surah. */
+    fun surahAudioInfo(number: Int, ayahCount: Int, totalWords: Int?): SurahAudioInfo {
+        val ayahFiles = (1..ayahCount).count { n ->
+            val f = ayahFile(number, n)
+            f.exists() && f.length() > 0L
+        }
+        val prefix = number.toString().padStart(3, '0') + "_"
+        val wbwDir = File(audioDir, "wbw")
+        val wordFiles = if (wbwDir.exists()) {
+            wbwDir.listFiles { f -> f.isFile && f.name.startsWith(prefix) && f.extension == "mp3" }?.size ?: 0
+        } else 0
+        return SurahAudioInfo(number, ayahFiles, ayahCount, wordFiles, totalWords)
+    }
+
+    /** Hapus semua audio satu surah (file ayat + kata). */
+    fun deleteSurahAudio(number: Int) {
+        val prefix = number.toString().padStart(3, '0')
+        val dir = audioDir
+        if (dir.exists()) {
+            dir.listFiles { f ->
+                f.isFile && f.extension == "mp3" && f.name.length == 7 && f.name.startsWith(prefix)
+            }?.forEach { it.delete() }
+        }
+        val wbw = File(dir, "wbw")
+        if (wbw.exists()) {
+            wbw.listFiles { f -> f.isFile && f.name.startsWith(prefix + "_") }?.forEach { it.delete() }
+        }
+    }
+
+    /** Hapus SEMUA audio terunduh. */
+    fun deleteAllAudio() {
+        val dir = audioDir
+        if (dir.exists()) {
+            dir.listFiles()?.forEach { it.deleteRecursively() }
+        }
+    }
+
     private fun download(url: String, out: File): File {
         out.parentFile?.mkdirs()
         val conn = URL(url).openConnection() as HttpURLConnection
