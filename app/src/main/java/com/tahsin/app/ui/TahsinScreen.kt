@@ -9,10 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -26,6 +23,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -38,18 +36,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -61,8 +57,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tahsin.app.data.tajwid.RuleCategory
 import com.tahsin.app.data.tajwid.TajwidColorizer
 import com.tahsin.app.data.tajwid.TajwidEngine
-import com.tahsin.app.data.tajwid.TajwidRule
 import com.tahsin.app.data.tajwid.TajwidSpan
+import com.tahsin.app.stt.AlignedWord
 import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTypography
@@ -136,7 +132,6 @@ fun TahsinScreen(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TahsinContent(
     state: TahsinUiState.Ready,
@@ -269,33 +264,101 @@ private fun TahsinContent(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // ---- Mushaf: kata per kata dengan highlight (susunan RTL) ----
+            // ---- Mushaf kontinu (gaya mushaf asli: kata tersambung RTL) ----
+            // Tiap kata bisa diketuk → play kata + tooltip keterangan tajwid.
             AyahCard(modifier = Modifier.fillMaxWidth()) {
-                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                    val density = LocalDensity.current
-                    val maxWordPx = with(density) { (maxWidth - 24.dp).toPx() }
+                var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
+                val wordOffsets = remember(words) {
+                    val arr = IntArray(words.size)
+                    var pos = 0
+                    words.forEachIndexed { i, w ->
+                        arr[i] = pos
+                        pos += w.length + 1 // kata + spasi
+                    }
+                    arr
+                }
+                val annotated = remember(words, spansByWord, statusByIndex, state.selectedWordIndex, state.tajwidColor) {
+                    buildAyahAnnotated(
+                        words = words,
+                        spansByWord = spansByWord,
+                        statusByIndex = statusByIndex,
+                        selectedIndex = state.selectedWordIndex,
+                        tajwidColor = state.tajwidColor,
+                    )
+                }
+                Box(modifier = Modifier.fillMaxWidth()) {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ClickableText(
+                            text = annotated,
+                            onClick = { offset ->
+                                val idx = wordIndexAt(offset, wordOffsets)
+                                if (idx in words.indices) {
+                                    onSelectWord(if (idx == state.selectedWordIndex) -1 else idx)
+                                }
+                            },
+                            onTextLayout = { textLayout = it },
+                            style = AyahTypography.ArabicWord.copy(
+                                color = AyahColors.TextPrimary,
+                                fontSize = (20 * state.fontScale).sp,
+                                lineHeight = (20 * state.fontScale * 2.4f).sp,
+                                textAlign = TextAlign.Start,
+                                fontFamily = state.arabicFontFamily,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    // Tooltip mengambang di bawah kata yang dipilih.
+                    val sel = state.selectedWordIndex
+                    val layout = textLayout
+                    if (sel != null && layout != null && sel < words.size) {
+                        val rect = layout.getBoundingBox(wordOffsets[sel])
+                        Popup(
+                            alignment = Alignment.TopStart,
+                            offset = IntOffset(rect.left.roundToInt(), rect.bottom.roundToInt() + 6),
+                            onDismissRequest = { onSelectWord(-1) },
                         ) {
-                            words.forEachIndexed { index, word ->
-                                val selected = state.selectedWordIndex == index
-                                // Tooltip (overlay) saat dipilih — struktur ayat tidak berubah.
-                                WordChipWithTooltip(
-                                    word = word,
-                                    status = statusByIndex[index]?.status,
-                                    selected = selected,
-                                    onClick = { onSelectWord(if (selected) -1 else index) },
-                                    fontScale = state.fontScale,
-                                    fontFamily = state.arabicFontFamily,
-                                    tajwidColor = state.tajwidColor,
-                                    spans = spansByWord[index],
-                                    maxWordWidthPx = maxWordPx,
-                                    rules = state.selectedWordRules,
-                                    onPlayWord = onPlaySelectedWord,
-                                    onDismiss = { onSelectWord(-1) },
-                                )
+                            Box(
+                                modifier = Modifier
+                                    .widthIn(min = 220.dp, max = 320.dp)
+                                    .shadow(8.dp, RoundedCornerShape(12.dp))
+                                    .background(AyahColors.Surface, RoundedCornerShape(12.dp))
+                                    .border(1.dp, AyahColors.Hairline, RoundedCornerShape(12.dp))
+                                    .padding(12.dp),
+                            ) {
+                                Column {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        AyahText(
+                                            words[sel],
+                                            style = AyahTypography.Arabic.copy(
+                                                fontSize = 20.sp,
+                                                fontFamily = state.arabicFontFamily,
+                                            ),
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        AyahButton(
+                                            text = "▶ Kata",
+                                            variant = AyahButtonVariant.Secondary,
+                                            size = AyahButtonSize.Small,
+                                            onClick = onPlaySelectedWord,
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    val rules = state.selectedWordRules
+                                    if (rules.isEmpty()) {
+                                        AyahText(
+                                            "Tidak ada aturan tajwid khusus pada kata ini.",
+                                            style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                                        )
+                                    } else {
+                                        rules.forEach { r ->
+                                            AyahText(
+                                                "• ${r.name} — ${r.explanation}",
+                                                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -429,144 +492,6 @@ private fun LegendDot(color: Color, label: String) {
         )
         Spacer(modifier = Modifier.width(4.dp))
         AyahText(label, style = AyahTypography.Caption)
-    }
-}
-
-/** Tooltip mengambang untuk kata yang dipilih: play + keterangan tajwid. */
-@Composable
-private fun WordChipWithTooltip(
-    word: String,
-    status: WordStatus?,
-    selected: Boolean,
-    onClick: () -> Unit,
-    fontScale: Float,
-    fontFamily: FontFamily,
-    tajwidColor: Boolean,
-    spans: List<TajwidSpan>,
-    maxWordWidthPx: Float,
-    rules: List<TajwidRule>,
-    onPlayWord: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    var chipHeightPx by remember { mutableStateOf(0) }
-    Box(
-        modifier = Modifier.onSizeChanged { chipHeightPx = it.height },
-    ) {
-        WordChip(
-            word = word,
-            status = status,
-            selected = selected,
-            onClick = onClick,
-            fontScale = fontScale,
-            fontFamily = fontFamily,
-            tajwidColor = tajwidColor,
-            spans = spans,
-            maxWordWidthPx = maxWordWidthPx,
-        )
-        if (selected) {
-            Popup(
-                alignment = Alignment.TopCenter,
-                offset = IntOffset(0, chipHeightPx + 6),
-                onDismissRequest = onDismiss,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .widthIn(min = 220.dp, max = 320.dp)
-                        .shadow(8.dp, RoundedCornerShape(12.dp))
-                        .background(AyahColors.Surface, RoundedCornerShape(12.dp))
-                        .border(1.dp, AyahColors.Hairline, RoundedCornerShape(12.dp))
-                        .padding(12.dp),
-                ) {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            AyahText(
-                                word,
-                                style = AyahTypography.Arabic.copy(
-                                    fontSize = 20.sp,
-                                    fontFamily = fontFamily,
-                                ),
-                                modifier = Modifier.weight(1f),
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            AyahButton(
-                                text = "▶ Kata",
-                                variant = AyahButtonVariant.Secondary,
-                                size = AyahButtonSize.Small,
-                                onClick = onPlayWord,
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(6.dp))
-                        if (rules.isEmpty()) {
-                            AyahText(
-                                "Tidak ada aturan tajwid khusus pada kata ini.",
-                                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                            )
-                        } else {
-                            rules.forEach { r ->
-                                AyahText(
-                                    "• ${r.name} — ${r.explanation}",
-                                    style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WordChip(
-    word: String,
-    status: WordStatus?,
-    selected: Boolean,
-    onClick: () -> Unit,
-    fontScale: Float,
-    fontFamily: FontFamily,
-    tajwidColor: Boolean,
-    spans: List<TajwidSpan>,
-    maxWordWidthPx: Float,
-) {
-    val shape = RoundedCornerShape(10.dp)
-    val (bg, fg) = when (status) {
-        WordStatus.CORRECT -> AyahColors.Success to Color.White
-        WordStatus.MISMATCH -> AyahColors.Error to Color.White
-        WordStatus.READING -> AyahColors.Reading to AyahColors.OnReading
-        WordStatus.SKIPPED -> AyahColors.Error.copy(alpha = 0.18f) to AyahColors.TextSecondary
-        WordStatus.NOT_REACHED -> AyahColors.Surface to AyahColors.TextPrimary
-        null -> AyahColors.Surface to AyahColors.TextPrimary
-    }
-    Box(
-        modifier = Modifier
-            .background(bg, shape)
-            .then(
-                if (status == null) Modifier.border(1.dp, AyahColors.Divider, shape)
-                else Modifier,
-            )
-            .then(
-                if (selected) Modifier.border(2.dp, AyahColors.Primary, shape)
-                else Modifier,
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-    ) {
-        // Pada chip berwarna penuh (benar/salah/dibaca/terlewat) warna tajwid
-        // dimatikan agar tetap terbaca; pada chip netral ditampilkan.
-        val plainBg = status == null || status == WordStatus.NOT_REACHED
-        val visibleSpans = if (tajwidColor && plainBg) spans else emptyList()
-        val baseStyle = AyahTypography.ArabicWord.copy(
-            color = fg,
-            fontSize = (18 * fontScale).sp,
-            fontFamily = fontFamily,
-        )
-        val style = fitArabicStyle(word, visibleSpans, baseStyle, maxWordWidthPx)
-        AyahText(
-            tajwidAnnotated(word, visibleSpans),
-            style = style,
-            maxLines = 1,
-            overflow = TextOverflow.Clip,
-        )
     }
 }
 
@@ -835,48 +760,51 @@ private fun tajwidColorFor(category: RuleCategory): Color? = when (category) {
     else -> null
 }
 
-/** Teks Arab dengan span warna tajwid (hanya huruf yang kena hukum). */
-private fun tajwidAnnotated(word: String, spans: List<TajwidSpan>): AnnotatedString {
-    if (spans.isEmpty()) return AnnotatedString(word)
-    return buildAnnotatedString {
-        append(word)
-        for (sp in spans) {
-            val color = tajwidColorFor(sp.category) ?: continue
-            addStyle(SpanStyle(color = color), sp.start, sp.end.coerceAtMost(word.length))
-        }
+/**
+ * Indeks kata yang mengandung offset karakter pada teks mushaf kontinu.
+ * (spasi jatuh ke kata sebelumnya — ketukan di dekat kata tetap memilih kata itu)
+ */
+private fun wordIndexAt(offset: Int, wordOffsets: IntArray): Int {
+    var result = -1
+    for (i in wordOffsets.indices) {
+        if (offset >= wordOffsets[i]) result = i else break
     }
+    return result
 }
 
 /**
- * Auto-fit teks Arab: ukur lebar kata pada ukuran dasar; kalau melebihi
- * `maxWidthPx`, kecilkan font secara proporsional supaya SELURUH kata selalu
- * muat satu baris (huruf tidak pernah putus ke baris bawah / terpotong).
+ * Bangun teks mushaf satu ayat (AnnotatedString): kata tersambung dengan
+ * spasi, warna huruf tajwid per huruf, latar status bacaan per kata,
+ * dan highlight kata yang dipilih.
  */
-@Composable
-private fun fitArabicStyle(
-    text: String,
-    spans: List<TajwidSpan>,
-    baseStyle: TextStyle,
-    maxWidthPx: Float,
-): TextStyle {
-    val textMeasurer = rememberTextMeasurer()
-    val annotated = remember(text, spans) { tajwidAnnotated(text, spans) }
-    val baseSizeSp = baseStyle.fontSize.value
-    val fontFamily = baseStyle.fontFamily
-    return remember(text, spans, baseSizeSp, fontFamily, maxWidthPx) {
-        val maxW = maxWidthPx.roundToInt().coerceAtLeast(1)
-        // Ukur TANPA batas lebar agar mendapat lebar intrinsik satu baris —
-        // kalau diukur dengan maxWidth, teks panjang wrap dan hasilnya selalu
-        // <= maxW, sehingga auto-fit tidak pernah jalan (sumber bug kepotong).
-        val layout = textMeasurer.measure(annotated, baseStyle)
-        if (layout.size.width <= maxW) {
-            baseStyle
-        } else {
-            val scale = maxW.toFloat() / layout.size.width
-            val fittedSp = baseSizeSp * scale
-            baseStyle.copy(
-                fontSize = if (fittedSp >= 10f) fittedSp.sp else 10.sp,
-            )
+private fun buildAyahAnnotated(
+    words: List<String>,
+    spansByWord: List<List<TajwidSpan>>,
+    statusByIndex: Map<Int, AlignedWord>,
+    selectedIndex: Int?,
+    tajwidColor: Boolean,
+): AnnotatedString = buildAnnotatedString {
+    words.forEachIndexed { index, word ->
+        val start = length
+        append(word)
+        val end = length
+        if (index < words.size - 1) append(' ')
+        if (tajwidColor) {
+            for (sp in spansByWord.getOrNull(index).orEmpty()) {
+                val color = tajwidColorFor(sp.category) ?: continue
+                addStyle(SpanStyle(color = color), start + sp.start, start + sp.end.coerceAtMost(word.length))
+            }
+        }
+        val bg = when (statusByIndex[index]?.status) {
+            WordStatus.CORRECT -> AyahColors.Success.copy(alpha = 0.22f)
+            WordStatus.MISMATCH -> AyahColors.Error.copy(alpha = 0.22f)
+            WordStatus.READING -> AyahColors.Reading.copy(alpha = 0.5f)
+            WordStatus.SKIPPED -> AyahColors.Error.copy(alpha = 0.12f)
+            else -> null
+        }
+        if (bg != null) addStyle(SpanStyle(background = bg), start, end)
+        if (selectedIndex == index) {
+            addStyle(SpanStyle(background = AyahColors.PrimarySoft), start, end)
         }
     }
 }
