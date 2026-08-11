@@ -51,7 +51,7 @@ sealed interface TahsinUiState {
         val selectedWordIndex: Int? = null,
         val selectedWordRules: List<TajwidRule> = emptyList(),
         val message: String? = null,
-        val fontScale: Float = 1f,
+        val fontScale: Float = 1.5f,
         val arabicFont: ArabicFont = ArabicFont.UTSMANI,
         /** FontFamily efektif (font file kalau ada, fallback sistem). */
         val arabicFontFamily: FontFamily = FontFamily.Default,
@@ -125,13 +125,9 @@ class TahsinViewModel(
                 surahNumber = settings.surahNumber,
                 ayahIndex = settings.ayahIndex,
                 loadingSurah = true,
-                fontScale = settings.fontScale,
-                arabicFont = runCatching {
-                    ArabicFont.valueOf(settings.fontName)
-                }.getOrDefault(ArabicFont.UTSMANI),
-                arabicFontFamily = fontStore.loadFamily(
-                    runCatching { ArabicFont.valueOf(settings.fontName) }.getOrDefault(ArabicFont.UTSMANI),
-                ),
+                fontScale = 1.5f,
+                arabicFont = ArabicFont.UTSMANI,
+                arabicFontFamily = fontStore.loadFamily(ArabicFont.UTSMANI),
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
                 flowMode = settings.flowMode,
@@ -140,7 +136,7 @@ class TahsinViewModel(
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
         }
         // Unduh font default (Utsmani/Amiri) otomatis kalau file belum ada.
-        val activeFont = runCatching { ArabicFont.valueOf(settings.fontName) }.getOrDefault(ArabicFont.UTSMANI)
+        val activeFont = ArabicFont.UTSMANI
         if (activeFont.downloadUrl != null && !fontStore.fileExists(activeFont)) {
             viewModelScope.launch {
                 runCatching { fontStore.ensureFont(activeFont) }
@@ -617,33 +613,6 @@ class TahsinViewModel(
 
     // ---- preferensi font & tema ----
 
-    fun increaseFont() = stepFont(+1)
-
-    fun decreaseFont() = stepFont(-1)
-
-    private fun stepFont(direction: Int) {
-        val s = currentReady() ?: return
-        val index = FONT_SCALES.indexOf(s.fontScale).coerceAtLeast(0)
-        val next = FONT_SCALES.getOrNull(index + direction) ?: return
-        settings.fontScale = next
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(fontScale = next) }
-    }
-
-    fun selectFont(font: ArabicFont) {
-        settings.fontName = font.name
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
-            arabicFont = font,
-            arabicFontFamily = fontStore.loadFamily(font),
-        ) }
-        // Unduh font otomatis kalau ada sumbernya dan file belum ada.
-        if (font.downloadUrl != null && !fontStore.fileExists(font)) {
-            viewModelScope.launch {
-                runCatching { fontStore.ensureFont(font) }
-                updateReady { it.copy(arabicFontFamily = fontStore.loadFamily(font)) }
-            }
-        }
-    }
-
     fun toggleDarkMode() {
         val s = currentReady() ?: return
         val next = !s.darkMode
@@ -678,9 +647,6 @@ class TahsinViewModel(
         super.onCleared()
     }
 }
-
-/** Tingkatan ukuran font Arab yang bisa dipilih. */
-private val FONT_SCALES = listOf(1f, 1.15f, 1.3f, 1.5f)
 
 /** Factory manual DI (tanpa Hilt). */
 fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
