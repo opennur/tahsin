@@ -10,6 +10,7 @@ import com.tahsin.app.util.AudioDownloader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 /** Satu baris pada layar manajemen audio. */
 data class AudioManagerItem(
@@ -20,6 +21,7 @@ data class AudioManagerItem(
     val ayahCount: Int,
     val wordFiles: Int,
     val totalWords: Int?,
+    val sizeBytes: Long,
 ) {
     /** Semua audio surah ini sudah lengkap terunduh? */
     val isComplete: Boolean
@@ -30,6 +32,11 @@ data class AudioManagerItem(
 data class AudioManagerState(
     val items: List<AudioManagerItem> = emptyList(),
     val totalDownloaded: Int = 0,
+    val totalSizeBytes: Long = 0L,
+    /** Surah yang menunggu konfirmasi hapus. */
+    val pendingDelete: Int? = null,
+    /** Konfirmasi hapus semua. */
+    val pendingDeleteAll: Boolean = false,
 )
 
 /**
@@ -65,21 +72,38 @@ class AudioManagerViewModel(
                     ayahCount = info.ayahCount,
                     wordFiles = info.wordFiles,
                     totalWords = info.totalWords,
+                    sizeBytes = info.sizeBytes,
                 )
             }
             .sortedBy { it.number }
         _state.value = AudioManagerState(
             items = items,
             totalDownloaded = items.sumOf { it.ayahFiles + it.wordFiles },
+            totalSizeBytes = items.sumOf { it.sizeBytes },
         )
     }
 
-    fun deleteSurah(number: Int) {
+    fun requestDelete(number: Int) {
+        _state.update { it.copy(pendingDelete = number, pendingDeleteAll = false) }
+    }
+
+    fun requestDeleteAll() {
+        _state.update { it.copy(pendingDelete = null, pendingDeleteAll = true) }
+    }
+
+    fun cancelDelete() {
+        _state.update { it.copy(pendingDelete = null, pendingDeleteAll = false) }
+    }
+
+    fun confirmDelete() {
+        val number = _state.value.pendingDelete ?: return
+        _state.update { it.copy(pendingDelete = null) }
         downloader.deleteSurahAudio(number)
         refresh()
     }
 
-    fun deleteAll() {
+    fun confirmDeleteAll() {
+        _state.update { it.copy(pendingDeleteAll = false) }
         downloader.deleteAllAudio()
         refresh()
     }

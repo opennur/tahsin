@@ -20,4 +20,13 @@ class SettingsStore(context: Context) {
     var darkMode: Boolean
         get() = prefs.getBoolean("dark_mode", false)
         set(value) = prefs.edit().putBoolean("dark_mode", value).apply()
+
+    /** Surah & ayat terakhir yang dibuka (di-restore saat startup). */
+    var surahNumber: Int
+        get() = prefs.getInt("surah_number", 1)
+        set(value) = prefs.edit().putInt("surah_number", value).apply()
+
+    var ayahIndex: Int
+        get() = prefs.getInt("ayah_index", 0)
+        set(value) = prefs.edit().putInt("ayah_index", value).apply()
 }

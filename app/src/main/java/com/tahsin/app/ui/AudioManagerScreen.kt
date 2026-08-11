@@ -1,7 +1,7 @@
 package com.tahsin.app.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +11,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,10 +32,12 @@ import com.tahsin.app.ui.components.AyahButton
 import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahCard
 import com.tahsin.app.ui.components.AyahText
+import java.util.Locale
 
 /**
  * Layar manajemen audio terunduh: lihat surah mana saja yang sudah punya
- * audio (per ayat + per kata), seberapa lengkap, dan hapus per surah.
+ * audio (per ayat + per kata), ukurannya, dan hapus per surah (dengan
+ * konfirmasi).
  */
 @Composable
 fun AudioManagerScreen(
@@ -42,7 +49,7 @@ fun AudioManagerScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     // Refresh setiap kali layar dibuka (mungkin ada unduhan baru dari TahsinScreen).
-    androidx.compose.runtime.LaunchedEffect(Unit) { viewModel.refresh() }
+    LaunchedEffect(Unit) { viewModel.refresh() }
 
     Column(
         modifier = modifier
@@ -66,7 +73,7 @@ fun AudioManagerScreen(
                 AyahButton(
                     text = "🗑 Semua",
                     variant = AyahButtonVariant.Outline,
-                    onClick = viewModel::deleteAll,
+                    onClick = viewModel::requestDeleteAll,
                 )
             }
         }
@@ -88,20 +95,44 @@ fun AudioManagerScreen(
             }
         } else {
             AyahText(
-                "Total: ${state.totalDownloaded} file",
+                "Total: ${state.totalDownloaded} file • ${formatSize(state.totalSizeBytes)}",
                 style = AyahTypography.Caption,
             )
             Spacer(modifier = Modifier.height(8.dp))
             state.items.forEach { item ->
                 AudioItemCard(
                     item = item,
-                    onDelete = { viewModel.deleteSurah(item.number) },
+                    onDelete = { viewModel.requestDelete(item.number) },
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+
+    // ---- Dialog konfirmasi hapus per surah ----
+    val pending = state.pendingDelete
+    if (pending != null) {
+        val item = state.items.find { it.number == pending }
+        DeleteConfirmDialog(
+            title = "Hapus audio ${item?.let { "${it.number}. ${it.nameLatin}" } ?: "surah $pending"}?",
+            message = "File audio surah ini (ayat + kata) akan dihapus dari penyimpanan" +
+                (item?.let { " (${formatSize(it.sizeBytes)})" } ?: "") + ".",
+            onConfirm = viewModel::confirmDelete,
+            onCancel = viewModel::cancelDelete,
+        )
+    }
+
+    // ---- Dialog konfirmasi hapus semua ----
+    if (state.pendingDeleteAll) {
+        DeleteConfirmDialog(
+            title = "Hapus semua audio?",
+            message = "Semua audio terunduh (${formatSize(state.totalSizeBytes)}) " +
+                "akan dihapus dari penyimpanan.",
+            onConfirm = viewModel::confirmDeleteAll,
+            onCancel = viewModel::cancelDelete,
+        )
     }
 }
 
@@ -118,7 +149,7 @@ private fun AudioItemCard(
                     style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
                 )
                 AyahText(
-                    "Ayat: ${item.ayahFiles}/${item.ayahCount} • Kata: ${item.wordFiles}/${item.totalWords ?: "?"}",
+                    "Ayat: ${item.ayahFiles}/${item.ayahCount} • Kata: ${item.wordFiles}/${item.totalWords ?: "?"} • ${formatSize(item.sizeBytes)}",
                     style = AyahTypography.Caption,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
@@ -138,3 +169,50 @@ private fun AudioItemCard(
         }
     }
 }
+
+/** Dialog konfirmasi hapus audio. */
+@Composable
+private fun DeleteConfirmDialog(
+    title: String,
+    message: String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier
+                .width(300.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(16.dp))
+                .background(AyahColors.Surface)
+                .padding(20.dp),
+        ) {
+            AyahText(title, style = AyahTypography.Heading2)
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahText(
+                message,
+                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.weight(1f))
+                AyahButton(text = "Batal", variant = AyahButtonVariant.Outline, onClick = onCancel)
+                Spacer(modifier = Modifier.width(12.dp))
+                AyahButton(text = "🗑 Hapus", variant = AyahButtonVariant.Primary, onClick = onConfirm)
+            }
+        }
+    }
+}
+
+/** Format ukuran: MB kalau >= 1 MB, selain itu KB. */
+private fun formatSize(bytes: Long): String =
+    if (bytes >= 1_048_576L) {
+        String.format(Locale.US, "%.2f MB", bytes / 1_048_576.0)
+    } else {
+        String.format(Locale.US, "%.0f KB", bytes / 1024.0)
+    }

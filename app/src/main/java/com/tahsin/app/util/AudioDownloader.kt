@@ -99,6 +99,8 @@ class AudioDownloader(context: Context) {
         val wordFiles: Int,
         /** Total kata yang diharapkan; null kalau isi surah belum di-cache. */
         val totalWords: Int?,
+        /** Total ukuran file terunduh (bytes). */
+        val sizeBytes: Long,
     )
 
     /** Nomor surah-surah yang punya minimal satu file audio terunduh. */
@@ -120,18 +122,28 @@ class AudioDownloader(context: Context) {
         return numbers.toList()
     }
 
-    /** Hitung file audio terunduh untuk satu surah. */
+    /** Hitung file audio terunduh + ukurannya untuk satu surah. */
     fun surahAudioInfo(number: Int, ayahCount: Int, totalWords: Int?): SurahAudioInfo {
-        val ayahFiles = (1..ayahCount).count { n ->
+        var ayahFiles = 0
+        var sizeBytes = 0L
+        for (n in 1..ayahCount) {
             val f = ayahFile(number, n)
-            f.exists() && f.length() > 0L
+            if (f.exists() && f.length() > 0L) {
+                ayahFiles++
+                sizeBytes += f.length()
+            }
         }
         val prefix = number.toString().padStart(3, '0') + "_"
         val wbwDir = File(audioDir, "wbw")
-        val wordFiles = if (wbwDir.exists()) {
-            wbwDir.listFiles { f -> f.isFile && f.name.startsWith(prefix) && f.extension == "mp3" }?.size ?: 0
-        } else 0
-        return SurahAudioInfo(number, ayahFiles, ayahCount, wordFiles, totalWords)
+        var wordFiles = 0
+        if (wbwDir.exists()) {
+            wbwDir.listFiles { f -> f.isFile && f.name.startsWith(prefix) && f.extension == "mp3" }
+                ?.forEach { f ->
+                    wordFiles++
+                    sizeBytes += f.length()
+                }
+        }
+        return SurahAudioInfo(number, ayahFiles, ayahCount, wordFiles, totalWords, sizeBytes)
     }
 
     /** Hapus semua audio satu surah (file ayat + kata). */

@@ -92,6 +92,9 @@ class TahsinViewModel(
         _uiState.value = try {
             TahsinUiState.Ready(
                 surahs = repository.surahList(),
+                surahNumber = settings.surahNumber,
+                ayahIndex = settings.ayahIndex,
+                loadingSurah = true,
                 fontScale = settings.fontScale,
                 arabicFont = runCatching {
                     ArabicFont.valueOf(settings.fontName)
@@ -101,11 +104,15 @@ class TahsinViewModel(
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
         }
+        // Muat isi surah terakhir yang dibuka (default: Al-Fatihah ayat 1).
+        (currentReady())?.let { loadSurahContent(it.surahNumber) }
     }
 
     // ---- navigasi surah/ayat ----
 
     fun selectSurah(number: Int) {
+        settings.surahNumber = number
+        settings.ayahIndex = 0
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             surahNumber = number,
             ayahIndex = 0,
@@ -141,9 +148,13 @@ class TahsinViewModel(
     }
 
     private fun replaceSurah(surah: Surah) {
+        val s = currentReady() ?: return
+        val index = s.ayahIndex.coerceIn(0, (surah.ayahs.size - 1).coerceAtLeast(0))
+        if (index != s.ayahIndex) settings.ayahIndex = index
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             loadingSurah = false,
-            surahs = it.surahs.map { s -> if (s.number == surah.number) surah else s },
+            surahs = it.surahs.map { x -> if (x.number == surah.number) surah else x },
+            ayahIndex = index,
         ) }
     }
 
@@ -165,6 +176,7 @@ class TahsinViewModel(
     }
 
     private fun updateAyah(index: Int) {
+        settings.ayahIndex = index
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             ayahIndex = index,
             transcript = "",
