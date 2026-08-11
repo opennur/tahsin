@@ -26,6 +26,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean("tajwid_color", true)
         set(value) = prefs.edit().putBoolean("tajwid_color", value).apply()
 
+    /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya (default mati). */
+    var flowMode: Boolean
+        get() = prefs.getBoolean("flow_mode", false)
+        set(value) = prefs.edit().putBoolean("flow_mode", value).apply()
+
     /** Surah & ayat terakhir yang dibuka (di-restore saat startup). */
     var surahNumber: Int
         get() = prefs.getInt("surah_number", 1)

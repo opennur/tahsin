@@ -120,6 +120,7 @@ fun TahsinScreen(
             onSelectFont = viewModel::selectFont,
             onToggleDarkMode = viewModel::toggleDarkMode,
             onToggleTajwidColor = viewModel::toggleTajwidColor,
+            onToggleFlowMode = viewModel::toggleFlowMode,
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onDismissDownloadNotice = viewModel::dismissDownloadNotice,
             onDownloadAll = viewModel::downloadAllAudio,
@@ -146,6 +147,7 @@ private fun TahsinContent(
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
     onToggleTajwidColor: () -> Unit,
+    onToggleFlowMode: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onDismissDownloadNotice: () -> Unit,
     onDownloadAll: () -> Unit,
@@ -391,6 +393,7 @@ private fun TahsinContent(
                     onSelectFont = onSelectFont,
                     onToggleDarkMode = onToggleDarkMode,
                     onToggleTajwidColor = onToggleTajwidColor,
+                    onToggleFlowMode = onToggleFlowMode,
                     onDownloadAll = onDownloadAll,
                     onOpenAudioManager = {
                         drawerOpen = false
@@ -600,6 +603,7 @@ private fun SettingsPanel(
     onSelectFont: (ArabicFont) -> Unit,
     onToggleDarkMode: () -> Unit,
     onToggleTajwidColor: () -> Unit,
+    onToggleFlowMode: () -> Unit,
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
     onClose: () -> Unit,
@@ -672,6 +676,23 @@ private fun SettingsPanel(
             variant = if (state.tajwidColor) AyahButtonVariant.Secondary else AyahButtonVariant.Outline,
             onClick = onToggleTajwidColor,
             modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel("Muroja'ah")
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = if (state.flowMode) "🔁 Mode Flow: Nyala" else "🔁 Mode Flow: Mati",
+            variant = if (state.flowMode) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
+            onClick = onToggleFlowMode,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        AyahText(
+            if (state.flowMode) "Lanjut otomatis ke ayat berikutnya saat semua kata benar."
+            else "Lanjut otomatis antar-ayat untuk muroja'ah.",
+            style = AyahTypography.Caption,
         )
 
         Spacer(modifier = Modifier.height(20.dp))

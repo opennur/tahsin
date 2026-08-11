@@ -23,6 +23,7 @@ import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,6 +56,8 @@ sealed interface TahsinUiState {
         val darkMode: Boolean = false,
         /** Pewarnaan huruf tajwid di mushaf (gaya mushaf tajwid). */
         val tajwidColor: Boolean = true,
+        /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya saat selesai benar. */
+        val flowMode: Boolean = false,
         /** Sedang memutar audio (untuk tombol Dengar/Stop). */
         val isAudioPlaying: Boolean = false,
         /** Sedang mengunduh audio (agregat semua surah, tampil di atas tombol). */
@@ -99,6 +102,11 @@ class TahsinViewModel(
     /** Callback play yang menunggu unduhan surah selesai. */
     private val pendingCallbacks = mutableMapOf<Int, MutableList<() -> Unit>>()
 
+    /** Cegah auto-advance ganda dalam satu sesi baca (di-reset tiap mulai dengar). */
+    private var autoAdvanceHandled = false
+    /** Auto-dengar tertunda sampai konten surah termuat (lintas surah). */
+    private var pendingAutoListen = false
+
     init {
         AyahColors.isDark = settings.darkMode
         audioPlayer.onPlaybackChange = { playing ->
@@ -124,6 +132,7 @@ class TahsinViewModel(
                 ),
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
+                flowMode = settings.flowMode,
             )
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
@@ -143,6 +152,7 @@ class TahsinViewModel(
     // ---- navigasi surah/ayat ----
 
     fun selectSurah(number: Int) {
+        pendingAutoListen = false // navigasi manual membatalkan auto-dengar tertunda
         settings.surahNumber = number
         settings.ayahIndex = 0
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
@@ -187,6 +197,11 @@ class TahsinViewModel(
             surahs = it.surahs.map { x -> if (x.number == surah.number) surah else x },
             ayahIndex = index,
         ) }
+        // Mode flow lintas surah: mulai dengar begitu konten siap.
+        if (pendingAutoListen) {
+            pendingAutoListen = false
+            startListeningForCurrentAyah()
+        }
     }
 
     fun nextAyah() {
@@ -227,8 +242,14 @@ class TahsinViewModel(
             speech.stop()
             return
         }
-        val ayah = s.ayah ?: return
-        val words = ayah.words
+        pendingAutoListen = false // inisiatif manual membatalkan auto-dengar tertunda
+        val words = s.ayah?.words.orEmpty()
+        if (words.isEmpty()) return
+        startListeningSession(words)
+    }
+
+    private fun startListeningSession(words: List<String>) {
+        autoAdvanceHandled = false
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             listening = true,
             transcript = "",
@@ -238,8 +259,12 @@ class TahsinViewModel(
         ) }
         speech.start(object : ArabicSpeechRecognizer.Listener {
             override fun onPartial(text: String) = onTranscript(text, words)
-            override fun onResult(text: String) = onTranscript(text, words)
+            override fun onResult(text: String) {
+                onTranscript(text, words)
+                maybeAutoAdvance()
+            }
             override fun onError(message: String) {
+                autoAdvanceHandled = true
                 _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
                     listening = false,
                     message = message,
@@ -250,6 +275,74 @@ class TahsinViewModel(
                 _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(listening = listening) }
             }
         })
+    }
+
+    // ---- mode flow (muroja'ah): lanjut otomatis kalau satu ayat selesai benar ----
+
+    /** Aktifkan/nonaktifkan mode flow. */
+    fun toggleFlowMode() {
+        val s = currentReady() ?: return
+        val next = !s.flowMode
+        settings.flowMode = next
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(flowMode = next) }
+    }
+
+    /**
+     * Dipanggil saat hasil final STT tiba. Kalau mode flow nyala dan SELURUH
+     * kata terbaca benar (tidak ada yang terlewat/salah), jadwalkan pindah ke
+     * ayat berikutnya lalu lanjut mendengar (muroja'ah berkelanjutan).
+     */
+    private fun maybeAutoAdvance() {
+        if (autoAdvanceHandled) return
+        val s = currentReady() ?: return
+        if (!s.flowMode) return
+        val words = s.ayah?.words.orEmpty()
+        val aligned = s.alignedWords
+        if (words.isEmpty() || aligned.isEmpty()) return
+        val perfect = aligned.size == words.size && aligned.all { it.status == WordStatus.CORRECT }
+        if (!perfect) return
+        autoAdvanceHandled = true
+        val fromSurah = s.surahNumber
+        val fromAyah = s.ayahIndex
+        viewModelScope.launch {
+            delay(1200)
+            val st = currentReady() ?: return@launch
+            if (!st.flowMode) return@launch
+            if (st.listening) return@launch          // user sudah mulai baca lagi — jangan ganggu
+            if (st.surahNumber != fromSurah || st.ayahIndex != fromAyah) return@launch
+            advanceToNext()
+        }
+    }
+
+    private fun advanceToNext() {
+        val s = currentReady() ?: return
+        val surah = s.surah ?: return
+        if (s.ayahIndex < surah.ayahs.size - 1) {
+            updateAyah(s.ayahIndex + 1)
+            updateReady { it.copy(message = "✅ Ayat selesai — lanjut ke ayat berikutnya") }
+            startListeningForCurrentAyah()
+            return
+        }
+        val idx = s.surahs.indexOfFirst { it.number == surah.number }
+        val nextNumber = s.surahs.getOrNull(idx + 1)?.number
+        if (nextNumber != null) {
+            updateReady { it.copy(message = "✅ Surah selesai — lanjut ke surah berikutnya") }
+            selectSurah(nextNumber)
+            pendingAutoListen = true
+            return
+        }
+        updateReady { it.copy(message = "🎉 Selesai muroja'ah — seluruh Al-Qur'an dibaca benar!") }
+    }
+
+    /** Mulai mendengar ayat yang sedang aktif; tunda dulu kalau konten belum siap. */
+    private fun startListeningForCurrentAyah() {
+        val s = currentReady() ?: return
+        val ayah = s.ayah ?: return
+        if (s.loadingSurah || ayah.words.isEmpty()) {
+            pendingAutoListen = true
+            return
+        }
+        startListeningSession(ayah.words)
     }
 
     private fun onTranscript(text: String, words: List<String>) {
