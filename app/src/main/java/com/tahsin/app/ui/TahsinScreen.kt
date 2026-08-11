@@ -182,7 +182,7 @@ private fun TahsinContent(
         // ---- Header + tombol hamburger (buka drawer pengaturan) ----
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText(
-                "Tahsin Quran",
+                "Tahsin Qur'an",
                 style = AyahTypography.Heading1,
                 modifier = Modifier.weight(1f),
             )
@@ -195,7 +195,7 @@ private fun TahsinContent(
         }
         Spacer(modifier = Modifier.height(4.dp))
         AyahText(
-            "Baca ayat ke mikrofon — setiap kata dinilai real-time.",
+            "Baca ayat ke mikrofon.\nSetiap kata dicek langsung.",
             style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -354,7 +354,7 @@ private fun TahsinContent(
                     Spacer(modifier = Modifier.width(14.dp))
                     AyahText(
                         if (state.listening) "Membaca… tekan ⏹ untuk berhenti"
-                        else "Tekan 🎙️ lalu bacalah ayat",
+                        else "Tekan 🎙️\nlalu bacalah",
                         style = AyahTypography.Caption,
                         modifier = Modifier.weight(1f),
                     )
@@ -698,7 +698,7 @@ private fun SettingsPanel(
         Spacer(modifier = Modifier.weight(1f))
 
         AyahText(
-            "Ketuk di luar drawer untuk menutup.",
+            "Ketuk di luar panel untuk menutup.",
             style = AyahTypography.Caption,
         )
 
