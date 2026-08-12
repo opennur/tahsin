@@ -139,6 +139,11 @@ keyPassword=rahasia
   (+ `FOREGROUND_SERVICE_DATA_SYNC`) — unduhan latar belakang saat layar mati,
   setelah user mengizinkan lewat prompt.
 
+## Lisensi
+
+Proyek ini didistribusikan di bawah **GNU General Public License v3.0** —
+lihat [LICENSE](LICENSE) untuk teks lengkap.
+
 ---
 
 Dibuat dengan ❤️ oleh Lutfian Dwi Cahyono.
