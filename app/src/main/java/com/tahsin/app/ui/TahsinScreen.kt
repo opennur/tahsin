@@ -129,6 +129,7 @@ fun TahsinScreen(
             onPlaySelectedWord = viewModel::playSelectedWord,
             onStopSelectedWord = viewModel::stopWordPlayback,
             onDismissMessage = viewModel::clearMessage,
+            onDismissSwipeHint = viewModel::dismissSwipeHint,
             onToggleDarkMode = viewModel::toggleDarkMode,
             onSetLanguage = viewModel::setLanguage,
             onToggleTajwidColor = viewModel::toggleTajwidColor,
@@ -155,6 +156,7 @@ private fun TahsinContent(
     onPlaySelectedWord: () -> Unit,
     onStopSelectedWord: () -> Unit,
     onDismissMessage: () -> Unit,
+    onDismissSwipeHint: () -> Unit,
     onToggleDarkMode: () -> Unit,
     onSetLanguage: (AppLanguage) -> Unit,
     onToggleTajwidColor: () -> Unit,
@@ -190,6 +192,43 @@ private fun TahsinContent(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
+                .pointerInput(Unit) {
+                    // SWIPE di SELURUH latar konten (background) untuk ganti ayat.
+                    // Event yang sudah dikonsumsi (mushaf/scroll/dropdown) diabaikan
+                    // supaya tidak dobel pindah & tidak mengganggu interaksi lain.
+                    val swipeThreshold = 80.dp.toPx()
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        var totalX = 0f
+                        var totalY = 0f
+                        var swiping = false
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                            if (!change.pressed) break
+                            if (event.changes.any { it.isConsumed }) {
+                                totalX = 0f
+                                totalY = 0f
+                                swiping = false
+                            } else {
+                                totalX += change.position.x - change.previousPosition.x
+                                totalY += change.position.y - change.previousPosition.y
+                            }
+                            if (!swiping &&
+                                kotlin.math.abs(totalX) > swipeThreshold &&
+                                kotlin.math.abs(totalX) > kotlin.math.abs(totalY)
+                            ) {
+                                swiping = true
+                            }
+                            if (swiping) change.consume()
+                        }
+                        if (swiping) {
+                            // RTL: geser kanan = ayat berikutnya, kiri = sebelumnya.
+                            if (totalX >= swipeThreshold) onNextAyah()
+                            else if (totalX <= -swipeThreshold) onPrevAyah()
+                        }
+                    }
+                }
                 .padding(horizontal = 20.dp),
         ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -271,11 +310,22 @@ private fun TahsinContent(
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            AyahText(
-                strings.swipeHint,
-                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                modifier = Modifier.fillMaxWidth(),
-            )
+            // Petunjuk geser — bisa ditutup permanen lewat tombol ✕.
+            if (state.showSwipeHint) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AyahText(
+                        strings.swipeHint,
+                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                        modifier = Modifier.weight(1f),
+                    )
+                    AyahButton(
+                        text = "✕",
+                        variant = AyahButtonVariant.Ghost,
+                        size = AyahButtonSize.Small,
+                        onClick = onDismissSwipeHint,
+                    )
+                }
+            }
         } else {
             // Sedang memuat / belum ada ayat — dropdown surah tetap tersedia.
             SimpleDropdown(
@@ -306,47 +356,11 @@ private fun TahsinContent(
             val density = LocalDensity.current
             val swipeThresholdPx = with(density) { 80.dp.toPx() }
             val tapSlopPx = with(density) { 12.dp.toPx() }
-            // Area swipe diperluas: mushaf + terjemahan + ruang kosong di bawahnya.
-            // Column (bukan Box) supaya terjemahan tetap DI BAWAH mushaf.
+            // Mushaf + terjemahan + transkrip + kesalahan (layout berurutan).
+            // Gesture swipe kini ada di level scroll Column (mencakup background),
+            // jadi wrapper ini cukup untuk tata letak saja.
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .pointerInput(Unit) {
-                        // SWIPE untuk area terjemahan & ruang kosong. Area mushaf
-                        // punya gesture sendiri; event yang sudah dikonsumsi
-                        // (mushaf/scroll) diabaikan supaya tidak dobel pindah.
-                        awaitEachGesture {
-                            val down = awaitFirstDown()
-                            var totalX = 0f
-                            var totalY = 0f
-                            var swiping = false
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                                if (!change.pressed) break
-                                if (event.changes.any { it.isConsumed }) {
-                                    totalX = 0f
-                                    totalY = 0f
-                                    swiping = false
-                                } else {
-                                    totalX += change.position.x - change.previousPosition.x
-                                    totalY += change.position.y - change.previousPosition.y
-                                }
-                                if (!swiping &&
-                                    kotlin.math.abs(totalX) > swipeThresholdPx &&
-                                    kotlin.math.abs(totalX) > kotlin.math.abs(totalY)
-                                ) {
-                                    swiping = true
-                                }
-                                if (swiping) change.consume()
-                            }
-                            if (swiping) {
-                                // RTL: geser kanan = ayat berikutnya, kiri = sebelumnya.
-                                if (totalX >= swipeThresholdPx) onNextAyah()
-                                else if (totalX <= -swipeThresholdPx) onPrevAyah()
-                            }
-                        }
-                    },
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 AyahCard(modifier = Modifier.fillMaxWidth()) {
                 var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
@@ -498,9 +512,7 @@ private fun TahsinContent(
                     )
                 }
                 // Ruang kosong di bawah terjemahan — tetap bisa di-swipe.
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-        }
+                Spacer(modifier = Modifier.height(24.dp))
 
         // ---- Transkrip real-time ----
         if (state.listening) {
@@ -538,6 +550,10 @@ private fun TahsinContent(
                 AyahText(msg, style = AyahTypography.Body2, color = AyahColors.Error)
             }
             Spacer(modifier = Modifier.height(12.dp))
+        }
+
+            // Penutup area swipe: mushaf → terjemahan → kosong → kesalahan.
+            }
         }
 
             Spacer(modifier = Modifier.height(16.dp))

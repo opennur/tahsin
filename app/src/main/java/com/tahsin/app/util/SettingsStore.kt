@@ -12,6 +12,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean("dark_mode", false)
         set(value) = prefs.edit().putBoolean("dark_mode", value).apply()
 
+    /** Petunjuk geser sudah ditutup user (jangan tampil lagi). */
+    var swipeHintDismissed: Boolean
+        get() = prefs.getBoolean("swipe_hint_dismissed", false)
+        set(value) = prefs.edit().putBoolean("swipe_hint_dismissed", value).apply()
+
     /** Pewarnaan huruf tajwid di mushaf (default nyala). */
     var tajwidColor: Boolean
         get() = prefs.getBoolean("tajwid_color", true)

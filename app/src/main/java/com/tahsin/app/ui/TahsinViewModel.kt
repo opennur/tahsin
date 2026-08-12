@@ -75,6 +75,8 @@ sealed interface TahsinUiState {
         val isAudioPlaying: Boolean = false,
         /** Audio kata sedang diputar (tombol Stop di tooltip kata). */
         val isWordPlaying: Boolean = false,
+        /** Petunjuk geser masih tampil (belum ditutup user). */
+        val showSwipeHint: Boolean = true,
         /** Sedang mengunduh audio (agregat semua surah, tampil di atas tombol). */
         val isDownloading: Boolean = false,
         val downloadDone: Int = 0,
@@ -153,6 +155,7 @@ class TahsinViewModel(
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
                 flowMode = settings.flowMode,
+                showSwipeHint = !settings.swipeHintDismissed,
             )
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
@@ -167,6 +170,12 @@ class TahsinViewModel(
         }
         // Muat isi surah terakhir yang dibuka (default: Al-Fatihah ayat 1).
         (currentReady())?.let { loadSurahContent(it.surahNumber) }
+    }
+
+    /** Tutup petunjuk geser (persisten — tidak muncul lagi setelah restart). */
+    fun dismissSwipeHint() {
+        settings.swipeHintDismissed = true
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showSwipeHint = false) }
     }
 
     // ---- navigasi surah/ayat ----
