@@ -4,11 +4,16 @@ import android.content.Context
 import com.google.gson.Gson
 import com.tahsin.app.data.quran.Surah
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.atomic.AtomicInteger
 
 /** HTTP 404/403 — file audio memang tidak ada di server (permanen). */
 class AudioUnavailableException(message: String) : IOException(message)
@@ -32,6 +37,9 @@ private data class DownloadJob(
     val isWord: Boolean,
 )
 
+/** Jumlah koneksi unduhan paralel per surah. */
+private const val PARALLELISM = 6
+
 /**
  * Mengunduh audio contoh ke penyimpanan internal (`filesDir/audio`) supaya
  * bisa diputar OFFLINE setelah diunduh sekali. Unduhan dilakukan PER SURAH:
@@ -53,6 +61,7 @@ class AudioDownloader(context: Context) {
     /** Nama file (tanpa path) yang pernah 404 di server. */
     private val missingAyahs = mutableSetOf<String>()
     private val missingWords = mutableSetOf<String>()
+    private val missingLock = Any()
 
     init {
         loadMissing()
@@ -120,6 +129,9 @@ class AudioDownloader(context: Context) {
      * Unduh SEMUA audio satu surah (per ayat + per kata). File yang sudah ada
      * atau tercatat missing dilewati; kegagalan per-file (termasuk 404, yang
      * dicatat permanen) tidak menggagalkan sisanya.
+     *
+     * Diunduh PARALEL ([PARALLELISM] koneksi sekaligus) — jauh lebih cepat
+     * daripada sekuensial untuk surah besar seperti Al-Baqarah (6000+ file).
      */
     suspend fun downloadSurah(
         surah: Surah,
@@ -141,26 +153,43 @@ class AudioDownloader(context: Context) {
             }
         }
 
-        var done = 0
-        var ok = 0
         val total = jobs.size
-        jobs.forEach { job ->
-            if (job.file.exists() && job.file.length() > 0L) {
-                ok++
-            } else {
-                try {
-                    download(job.url, job.file)
-                    ok++
-                } catch (e: AudioUnavailableException) {
-                    if (job.isWord) recordMissingWord(job.file.name) else recordMissingAyah(job.file.name)
-                } catch (e: Exception) {
-                    // error transien (timeout dll.) — biar dicoba lagi di kesempatan lain
+        val done = AtomicInteger(0)
+        val ok = AtomicInteger(0)
+        val progressLock = Any()
+        val semaphore = Semaphore(PARALLELISM)
+        coroutineScope {
+            jobs.forEach { job ->
+                launch(Dispatchers.IO) {
+                    // runCatching: exception apa pun dalam satu koneksi TIDAK
+                    // boleh menggagalkan coroutine (exception tak tertangkap
+                    // dalam coroutine = crash aplikasi).
+                    runCatching {
+                        semaphore.withPermit { processDownload(job, ok) }
+                        synchronized(progressLock) {
+                            val d = done.incrementAndGet()
+                            onProgress(d, total)
+                        }
+                    }
                 }
             }
-            done++
-            onProgress(done, total)
         }
-        DownloadStats(ok, total)
+        DownloadStats(ok.get(), total)
+    }
+
+    private fun processDownload(job: DownloadJob, ok: AtomicInteger) {
+        if (job.file.exists() && job.file.length() > 0L) {
+            ok.incrementAndGet()
+            return
+        }
+        try {
+            download(job.url, job.file)
+            ok.incrementAndGet()
+        } catch (e: AudioUnavailableException) {
+            if (job.isWord) recordMissingWord(job.file.name) else recordMissingAyah(job.file.name)
+        } catch (e: Exception) {
+            // error transien (timeout dll.) — biar dicoba lagi di kesempatan lain
+        }
     }
 
     // ---- manajemen audio terunduh ----
@@ -275,11 +304,15 @@ class AudioDownloader(context: Context) {
     }
 
     private fun recordMissingAyah(fileName: String) {
-        if (missingAyahs.add(fileName)) saveMissing()
+        synchronized(missingLock) {
+            if (missingAyahs.add(fileName)) saveMissing()
+        }
     }
 
     private fun recordMissingWord(fileName: String) {
-        if (missingWords.add(fileName)) saveMissing()
+        synchronized(missingLock) {
+            if (missingWords.add(fileName)) saveMissing()
+        }
     }
 
     private fun loadMissing() {

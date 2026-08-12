@@ -8,10 +8,15 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tahsin.app.data.quran.QuranRepository
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.AudioDownloader
+import com.tahsin.app.util.DownloadProgress
 import com.tahsin.app.util.SettingsStore
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 
 /** Satu baris pada layar manajemen audio. */
@@ -45,6 +50,8 @@ data class AudioManagerState(
     val pendingDelete: Int? = null,
     /** Konfirmasi hapus semua. */
     val pendingDeleteAll: Boolean = false,
+    /** Sedang memuat daftar audio (listFiles di thread IO). */
+    val isLoading: Boolean = true,
 )
 
 /**
@@ -62,37 +69,56 @@ class AudioManagerViewModel(
 
     init {
         refresh()
+        // Selama masih ada unduhan aktif, daftar audio otomatis di-refresh
+        // agar item yang baru selesai langsung muncul (max 1x/1,5 dtk).
+        viewModelScope.launch {
+            var lastRefresh = 0L
+            DownloadProgress.state.collectLatest {
+                if (it.isDownloading) {
+                    val now = System.currentTimeMillis()
+                    if (now - lastRefresh >= 1500) {
+                        lastRefresh = now
+                        refresh()
+                    }
+                }
+            }
+        }
     }
 
     fun refresh() {
-        val surahs = repository.surahList()
-        val downloaded = downloader.downloadedSurahNumbers().toSet()
-        val items = surahs
-            .filter { it.number in downloaded }
-            .map { surah ->
-                val cached = repository.cachedSurahPlain(surah.number)
-                val totalWords = cached?.ayahs?.sumOf { it.words.size }
-                val info = downloader.surahAudioInfo(surah.number, surah.ayahCount, totalWords)
-                AudioManagerItem(
-                    number = surah.number,
-                    nameLatin = surah.nameLatin,
-                    nameArabic = surah.nameArabic,
-                    ayahFiles = info.ayahFiles,
-                    ayahCount = info.ayahCount,
-                    wordFiles = info.wordFiles,
-                    totalWords = info.totalWords,
-                    sizeBytes = info.sizeBytes,
-                    missingWords = info.missingWords,
-                    missingAyahs = info.missingAyahs,
-                )
-            }
-            .sortedBy { it.number }
-        _state.value = AudioManagerState(
-            items = items,
-            totalDownloaded = items.sumOf { it.ayahFiles + it.wordFiles },
-            totalSizeBytes = items.sumOf { it.sizeBytes },
-            language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID,
-        )
+        // ListFiles/stat di folder audio bisa lambat (ribuan file) — jangan di thread utama.
+        _state.update { it.copy(isLoading = true) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val surahs = repository.surahList()
+            val downloaded = downloader.downloadedSurahNumbers().toSet()
+            val items = surahs
+                .filter { it.number in downloaded }
+                .map { surah ->
+                    val cached = repository.cachedSurahPlain(surah.number)
+                    val totalWords = cached?.ayahs?.sumOf { it.words.size }
+                    val info = downloader.surahAudioInfo(surah.number, surah.ayahCount, totalWords)
+                    AudioManagerItem(
+                        number = surah.number,
+                        nameLatin = surah.nameLatin,
+                        nameArabic = surah.nameArabic,
+                        ayahFiles = info.ayahFiles,
+                        ayahCount = info.ayahCount,
+                        wordFiles = info.wordFiles,
+                        totalWords = info.totalWords,
+                        sizeBytes = info.sizeBytes,
+                        missingWords = info.missingWords,
+                        missingAyahs = info.missingAyahs,
+                    )
+                }
+                .sortedBy { it.number }
+            _state.value = AudioManagerState(
+                items = items,
+                totalDownloaded = items.sumOf { it.ayahFiles + it.wordFiles },
+                totalSizeBytes = items.sumOf { it.sizeBytes },
+                language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID,
+                isLoading = false,
+            )
+        }
     }
 
     fun requestDelete(number: Int) {

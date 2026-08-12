@@ -77,6 +77,7 @@ data class Strings(
     val audioAyat: String,
     val audioKata: String,
     val audioNoDownload: String,
+    val audioLoading: String,
 )
 
 object AppStrings {
@@ -157,6 +158,7 @@ object AppStrings {
         audioAyat = "Ayat",
         audioKata = "Kata",
         audioNoDownload = "Belum ada audio terunduh. Buka surah dan tekan Dengar untuk mengunduh.",
+        audioLoading = "Memuat audio…",
     )
 
     val English = Strings(
@@ -231,5 +233,6 @@ object AppStrings {
         audioAyat = "Ayah",
         audioKata = "Word",
         audioNoDownload = "No audio downloaded yet. Open a surah and tap Listen to download.",
+        audioLoading = "Loading audio…",
     )
 }

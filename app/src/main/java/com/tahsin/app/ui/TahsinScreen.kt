@@ -50,6 +50,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTypography
 import com.tahsin.app.util.AppLanguage
+import com.tahsin.app.util.DownloadProgress
 import com.tahsin.app.util.next
 import com.tahsin.app.ui.components.AyahButton
 import com.tahsin.app.ui.components.AyahButtonSize
@@ -745,6 +747,8 @@ private fun DownloadFooter(
     strings: Strings,
 ) {
     if (!isDownloading) return
+    // Surah yang sedang diunduh (dari status global unduhan).
+    val dl by DownloadProgress.state.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -753,8 +757,14 @@ private fun DownloadFooter(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText(
-                strings.downloadingLabel,
+                if (dl.currentSurahName != null) {
+                    "${strings.downloadingLabel} ${dl.currentSurahName}"
+                } else {
+                    strings.downloadingLabel
+                },
                 style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
             AyahText(

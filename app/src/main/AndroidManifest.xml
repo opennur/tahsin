@@ -7,6 +7,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Notifikasi progres unduhan (foreground service) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Wake lock: unduhan tetap jalan saat layar mati -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Foreground service (wajib Android 14+ / targetSdk 34) + tipe dataSync -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:allowBackup="true"

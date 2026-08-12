@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 
 /**
@@ -52,6 +53,11 @@ class DownloadService : Service() {
     override fun onCreate() {
         super.onCreate()
         createChannel()
+        // Wake lock: cegah CPU/radio tidur saat layar mati supaya unduhan tidak macet.
+        wakeLock = (getSystemService(PowerManager::class.java)).newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "tahsin:download",
+        ).apply { acquire(30 * 60 * 1000L) }
         instance = this
         startForegroundCompat(lastDone, lastTotal, lastLabel)
     }
@@ -71,11 +77,15 @@ class DownloadService : Service() {
     }
 
     override fun onDestroy() {
+        runCatching { wakeLock?.release() }
+        wakeLock = null
         instance = null
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private fun createChannel() {
         val nm = getSystemService(NotificationManager::class.java)

@@ -22,11 +22,13 @@ import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.ui.AppStrings
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.AudioDownloader
+import com.tahsin.app.util.DownloadProgress
 import com.tahsin.app.util.DownloadService
 import com.tahsin.app.util.FontStore
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import androidx.compose.ui.text.font.FontFamily
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -483,11 +485,20 @@ class TahsinViewModel(
         val total = surah.ayahs.size + surah.ayahs.sumOf { it.words.size }
         activeTotals[surah.number] = total
         activeDone[surah.number] = 0
+        // Status global untuk manajer audio.
+        DownloadProgress.update { it.copy(
+            isDownloading = true,
+            currentSurahNumber = surah.number,
+            currentSurahName = surah.nameLatin,
+            surahDone = 0,
+            surahTotal = total,
+        ) }
         updateDownloadState()
         activeDownloads[surah.number] = viewModelScope.launch {
             try {
                 downloader.downloadSurah(surah) { done, _ ->
                     activeDone[surah.number] = done
+                    DownloadProgress.update { it.copy(surahDone = done) }
                     updateDownloadState()
                 }
             } catch (e: Exception) {
@@ -498,6 +509,7 @@ class TahsinViewModel(
             activeDownloads.remove(surah.number)
             activeTotals.remove(surah.number)
             activeDone.remove(surah.number)
+            if (activeDownloads.isEmpty()) DownloadProgress.reset()
             updateDownloadState()
             pendingCallbacks.remove(surah.number)?.forEach { it() }
         }
@@ -613,10 +625,7 @@ class TahsinViewModel(
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = false) }
     }
 
-    /**
-     * Unduh audio SEMUA surah (isi surah otomatis dimuat dari cache/equran.id).
-     * Berjalan sekuensial; progres agregat tampil di bar atas tombol.
-     */
+    /** Unduh audio SEMUA surah (isi surah dimuat dari cache/equran.id). */
     fun downloadAllAudio() {
         val s = currentReady() ?: return
         if (s.isDownloading) return
@@ -632,30 +641,37 @@ class TahsinViewModel(
                 downloadTotal = 0,
                 message = null,
             ) }
-            s.surahs.forEach { meta ->
-                val surah = repository.cachedSurahPlain(meta.number)
+            val surahs = s.surahs.mapNotNull { meta ->
+                repository.cachedSurahPlain(meta.number)
                     ?: runCatching { repository.fetchSurah(meta.number, currentLanguage()) }.getOrNull()
-                if (surah == null) {
-                    failed++
-                    return@forEach
-                }
-                replaceSurah(surah)
-                if (!downloader.isSurahAudioComplete(surah)) {
-                    total += surah.ayahs.size + surah.ayahs.sumOf { it.words.size }
-                    updateReady { it.copy(downloadTotal = total) }
-                    try {
-                        downloader.downloadSurah(surah) { _, _ ->
+            }
+            if (settings.backgroundDownloadAllowed == true) ensureBackgroundService()
+            surahs.forEach { surah ->
+                runCatching {
+                    replaceSurah(surah)
+                    if (!downloader.isSurahAudioComplete(surah)) {
+                        total += surah.ayahs.size + surah.ayahs.sumOf { it.words.size }
+                        updateReady { it.copy(downloadTotal = total) }
+                        // Status untuk manajer audio: surah mana yang sedang diunduh.
+                        DownloadProgress.update { it.copy(
+                            isDownloading = true,
+                            currentSurahNumber = surah.number,
+                            currentSurahName = surah.nameLatin,
+                            surahDone = 0,
+                            surahTotal = surah.ayahs.size + surah.ayahs.sumOf { it.words.size },
+                        ) }
+                        downloader.downloadSurah(surah) { d, t ->
                             done++
                             updateReady { it.copy(downloadDone = done) }
+                            DownloadProgress.update { it.copy(surahDone = d, surahTotal = t) }
                             if (settings.backgroundDownloadAllowed == true) {
                                 DownloadService.updateProgress(done, total)
                             }
                         }
-                    } catch (e: Exception) {
-                        failed++
                     }
-                }
+                }.onFailure { failed++ }
             }
+            DownloadProgress.reset()
             updateReady { it.copy(
                 isDownloading = false,
                 isDownloadingAll = false,

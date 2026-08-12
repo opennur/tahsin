@@ -1,5 +1,11 @@
 package com.tahsin.app.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +38,8 @@ import com.tahsin.app.ui.components.AyahButton
 import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahCard
 import com.tahsin.app.ui.components.AyahText
+import com.tahsin.app.util.AppLanguage
+import com.tahsin.app.util.DownloadProgress
 import java.util.Locale
 
 /**
@@ -39,6 +47,34 @@ import java.util.Locale
  * audio (per ayat + per kata), ukurannya, dan hapus per surah (dengan
  * konfirmasi).
  */
+/** Progress bar tak tentu (animasi isi-ulang) untuk status "Memuat…". */
+@Composable
+private fun IndeterminateBar() {
+    val transition = rememberInfiniteTransition(label = "loading")
+    val fraction by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1100, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "fraction",
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(6.dp)
+            .background(AyahColors.SurfaceVariant, RoundedCornerShape(3.dp)),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(fraction)
+                .height(6.dp)
+                .background(AyahColors.Primary, RoundedCornerShape(3.dp)),
+        )
+    }
+}
+
 @Composable
 fun AudioManagerScreen(
     onBack: () -> Unit,
@@ -86,12 +122,64 @@ fun AudioManagerScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (state.items.isEmpty()) {
+        // ---- Progres unduhan aktif (mulai dari layar utama / download semua) ----
+        val dl by DownloadProgress.state.collectAsStateWithLifecycle()
+        if (dl.isDownloading) {
             AyahCard(modifier = Modifier.fillMaxWidth()) {
-                AyahText(
-                    strings.audioNoDownload,
-                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
-                )
+                Column {
+                    AyahText(
+                        strings.downloadingLabel,
+                        style = AyahTypography.Body2.copy(fontWeight = FontWeight.SemiBold),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    AyahText(
+                        "${dl.currentSurahName ?: "…"} — ${dl.surahDone}/${dl.surahTotal} " +
+                            if (state.language == AppLanguage.ID) "berkas" else "files",
+                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val fraction = if (dl.surahTotal > 0) {
+                        (dl.surahDone.toFloat() / dl.surahTotal).coerceIn(0f, 1f)
+                    } else {
+                        0f
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .background(AyahColors.SurfaceVariant, RoundedCornerShape(3.dp)),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(fraction)
+                                .height(6.dp)
+                                .background(AyahColors.Primary, RoundedCornerShape(3.dp)),
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (state.items.isEmpty()) {
+            if (state.isLoading || dl.isDownloading) {
+                AyahCard(modifier = Modifier.fillMaxWidth()) {
+                    Column {
+                        AyahText(
+                            strings.audioLoading,
+                            style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        IndeterminateBar()
+                    }
+                }
+            } else {
+                AyahCard(modifier = Modifier.fillMaxWidth()) {
+                    AyahText(
+                        strings.audioNoDownload,
+                        style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                    )
+                }
             }
         } else {
             AyahText(
