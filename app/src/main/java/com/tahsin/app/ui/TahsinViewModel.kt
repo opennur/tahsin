@@ -31,6 +31,7 @@ import com.tahsin.app.util.FontStore
 import com.tahsin.app.util.AyahStats
 import com.tahsin.app.util.PlaySource
 import com.tahsin.app.util.ReadingStatsStore
+import com.tahsin.app.util.Reciter
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import androidx.compose.ui.text.font.FontFamily
@@ -74,6 +75,10 @@ sealed interface TahsinUiState {
         val tajwidColor: Boolean = true,
         /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya saat selesai benar. */
         val flowMode: Boolean = false,
+        /** Qari' (perawi) audio ayat aktif. */
+        val reciter: Reciter = Reciter.MINSHAWY,
+        /** Kecepatan pemutaran audio (0.5×–1.25×). */
+        val audioSpeed: Float = 1.0f,
         /** Notifikasi harian "Ayah of the Day" (toggle di drawer). */
         val ayahOfDayEnabled: Boolean = true,
         /** Sedang memutar audio (untuk tombol Dengar/Stop). */
@@ -174,6 +179,8 @@ class TahsinViewModel(
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
                 flowMode = settings.flowMode,
+                reciter = settings.reciter,
+                audioSpeed = settings.audioSpeed,
                 ayahOfDayEnabled = settings.ayahOfDayEnabled,
                 showSwipeHint = !settings.swipeHintDismissed,
             )
@@ -392,6 +399,21 @@ class TahsinViewModel(
         val next = !s.flowMode
         settings.flowMode = next
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(flowMode = next) }
+    }
+
+    // ---- qari' & kecepatan audio ----
+
+    /** Ganti qari' (perawi) audio ayat; berlaku untuk unduhan & pemutaran berikutnya. */
+    fun setReciter(reciter: Reciter) {
+        settings.reciterSlug = reciter.slug
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(reciter = reciter) }
+    }
+
+    /** Ganti kecepatan pemutaran; langsung berlaku kalau sedang memutar. */
+    fun setAudioSpeed(speed: Float) {
+        settings.audioSpeed = speed
+        audioPlayer.applySpeed(speed)
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(audioSpeed = settings.audioSpeed) }
     }
 
     /**
@@ -926,9 +948,9 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             app = app,
             repository = QuranRepository(app),
             speech = ArabicSpeechRecognizer(app),
-            audioPlayer = TahsinAudioPlayer(app),
+            audioPlayer = TahsinAudioPlayer(app, SettingsStore(app)),
             settings = SettingsStore(app),
-            downloader = AudioDownloader(app),
+            downloader = AudioDownloader(app, SettingsStore(app)),
             fontStore = FontStore(app),
             statsStore = ReadingStatsStore(app),
         )

@@ -3,6 +3,7 @@ package com.tahsin.app.util
 import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
+import android.media.PlaybackParams
 import android.speech.tts.TextToSpeech
 import java.io.File
 import java.util.Locale
@@ -12,13 +13,16 @@ enum class PlaySource { AYAH, WORD, NONE }
 
 /**
  * Pemutar audio contoh bacaan, urutan prioritas:
- * 1. Cache internal `filesDir/audio/...` (hasil unduh dari dalam aplikasi
- *    via `AudioDownloader` — offline setelah diunduh sekali).
- * 2. MP3 di-bundle di `assets/audio/...` (hasil tools/download_minshawi.sh).
- * 3. MP3 qari online (URL dihitung dari nomor surah/ayat).
+ * 1. Cache internal `filesDir/audio/<qari'>/...` (hasil unduh dari dalam
+ *    aplikasi via `AudioDownloader` — offline setelah diunduh sekali).
+ * 2. MP3 Minshawy di-bundle di `assets/audio/...` (hanya untuk qari' default).
+ * 3. MP3 qari' online (URL dihitung dari qari' aktif + nomor surah/ayat).
  * 4. TextToSpeech Arab perangkat (kualitas dasar, bukan murattal).
+ *
+ * Kecepatan pemutaran (0.5×–1.25×) dibaca dari [SettingsStore] setiap kali
+ * mulai memutar, dan bisa diubah langsung saat sedang memutar ([applySpeed]).
  */
-class TahsinAudioPlayer(context: Context) {
+class TahsinAudioPlayer(context: Context, private val settings: SettingsStore) {
 
     private val appContext = context.applicationContext
     private val cacheRoot: File = File(context.filesDir, "audio")
@@ -52,7 +56,7 @@ class TahsinAudioPlayer(context: Context) {
         // Bahasa Arab di-set ulang pada setiap speak()/isArabicTtsAvailable().
     }
 
-    /** Mainkan ayat: cache → asset → URL → fallback (mis. TTS). */
+    /** Mainkan ayat: cache → asset (Minshawy) → URL qari' → fallback (mis. TTS). */
     fun playAyah(
         surahNumber: Int,
         ayahNumber: Int,
@@ -60,14 +64,18 @@ class TahsinAudioPlayer(context: Context) {
         onFallback: () -> Unit = {},
     ) {
         source = PlaySource.AYAH
+        val reciter = settings.reciter
         val key = AudioUrls.ayahKey(surahNumber, ayahNumber)
-        val cached = File(cacheRoot, key)
+        val cached = File(File(cacheRoot, reciter.slug), key)
         if (cached.exists() && cached.length() > 0L && playFromFile(cached, onFallback)) return
 
-        val afd = runCatching { appContext.assets.openFd("audio/$key") }.getOrNull()
-        if (afd != null && playFromAfd(afd, onFallback)) return
+        // Asset bawaan hanya untuk qari' default (Minshawy).
+        if (reciter == Reciter.MINSHAWY) {
+            val afd = runCatching { appContext.assets.openFd("audio/$key") }.getOrNull()
+            if (afd != null && playFromAfd(afd, onFallback)) return
+        }
 
-        if (playFromUrl(AudioUrls.ayahUrl(surahNumber, ayahNumber), onFallback)) return
+        if (playFromUrl(AudioUrls.ayahUrl(surahNumber, ayahNumber, reciter), onFallback)) return
 
         onFallback()
     }
@@ -92,12 +100,23 @@ class TahsinAudioPlayer(context: Context) {
         onFallback()
     }
 
+    /**
+     * Terapkan kecepatan pemutaran SEKARANG (saat sedang memutar) tanpa
+     * menghentikan media; juga dipakai untuk pemutaran berikutnya.
+     */
+    fun applySpeed(speed: Float) {
+        runCatching {
+            mediaPlayer?.playbackParams = PlaybackParams().setSpeed(AudioSpeeds.clamp(speed))
+        }
+    }
+
     /** Ucapkan kata/teks Arab lewat TTS perangkat (fallback terakhir). */
     fun speak(text: String) {
         val result = tts.setLanguage(Locale("ar"))
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             return
         }
+        tts.setSpeechRate(settings.audioSpeed)
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "tahsin")
     }
 
@@ -114,7 +133,7 @@ class TahsinAudioPlayer(context: Context) {
             releaseMedia()
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(file.absolutePath)
-                setOnPreparedListener { start(); setPlaying(true) }
+                setOnPreparedListener { startWithSpeed(); setPlaying(true) }
                 setOnCompletionListener { setPlaying(false) }
                 setOnErrorListener { _, _, _ ->
                     setPlaying(false)
@@ -134,7 +153,7 @@ class TahsinAudioPlayer(context: Context) {
             openAfd = afd
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                setOnPreparedListener { start(); setPlaying(true) }
+                setOnPreparedListener { startWithSpeed(); setPlaying(true) }
                 setOnCompletionListener { setPlaying(false) }
                 setOnErrorListener { _, _, _ ->
                     setPlaying(false)
@@ -153,7 +172,7 @@ class TahsinAudioPlayer(context: Context) {
             releaseMedia()
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(url)
-                setOnPreparedListener { start(); setPlaying(true) }
+                setOnPreparedListener { startWithSpeed(); setPlaying(true) }
                 setOnCompletionListener { setPlaying(false) }
                 setOnErrorListener { _, _, _ ->
                     setPlaying(false)
@@ -164,6 +183,14 @@ class TahsinAudioPlayer(context: Context) {
             }
             true
         }.getOrDefault(false)
+    }
+
+    /** Mulai dengan kecepatan aktif (dibaca dari settings saat itu juga). */
+    private fun startWithSpeed() {
+        runCatching {
+            mediaPlayer?.playbackParams = PlaybackParams().setSpeed(settings.audioSpeed)
+        }
+        runCatching { mediaPlayer?.start() }
     }
 
     private fun releaseMedia() {

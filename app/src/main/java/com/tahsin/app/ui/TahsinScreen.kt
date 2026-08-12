@@ -73,7 +73,9 @@ import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTypography
 import com.tahsin.app.util.AppLanguage
+import com.tahsin.app.util.AudioSpeeds
 import com.tahsin.app.util.DownloadProgress
+import com.tahsin.app.util.Reciter
 import com.tahsin.app.util.next
 import com.tahsin.app.ui.components.AyahButton
 import com.tahsin.app.ui.components.AyahButtonSize
@@ -175,6 +177,8 @@ fun TahsinScreen(
             onOpenAudioManager = onOpenAudioManager,
             onOpenStats = onOpenStats,
             onOpenSearch = onOpenSearch,
+            onSetReciter = viewModel::setReciter,
+            onSetSpeed = viewModel::setAudioSpeed,
             modifier = modifier,
         )
     }
@@ -197,6 +201,8 @@ private fun TahsinContent(
     onSetLanguage: (AppLanguage) -> Unit,
     onToggleTajwidColor: () -> Unit,
     onToggleFlowMode: () -> Unit,
+    onSetReciter: (Reciter) -> Unit,
+    onSetSpeed: (Float) -> Unit,
     onToggleAyahOfDay: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onDismissDownloadNotice: () -> Unit,
@@ -672,6 +678,8 @@ private fun TahsinContent(
                     state = state,
                     onToggleTajwidColor = onToggleTajwidColor,
                     onToggleFlowMode = onToggleFlowMode,
+                    onSetReciter = onSetReciter,
+                    onSetSpeed = onSetSpeed,
                     onToggleAyahOfDay = onToggleAyahOfDay,
                     onDownloadAll = onDownloadAll,
                     onOpenAudioManager = {
@@ -787,6 +795,8 @@ private fun SettingsPanel(
     state: TahsinUiState.Ready,
     onToggleTajwidColor: () -> Unit,
     onToggleFlowMode: () -> Unit,
+    onSetReciter: (Reciter) -> Unit,
+    onSetSpeed: (Float) -> Unit,
     onToggleAyahOfDay: () -> Unit,
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
@@ -806,6 +816,13 @@ private fun SettingsPanel(
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Isi pengaturan di-scroll (aman di layar pendek); footer tetap di bawah.
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(top = 20.dp, bottom = 8.dp),
+        ) {
         SectionLabel(strings.sectionTajwid)
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
@@ -845,6 +862,36 @@ private fun SettingsPanel(
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        SectionLabel(strings.sectionReciter)
+        Spacer(modifier = Modifier.height(8.dp))
+        SimpleDropdown(
+            selectedLabel = state.reciter.label,
+            options = Reciter.entries.map { r -> DropdownOption(r.label) { onSetReciter(r) } },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel(strings.sectionSpeed)
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            AudioSpeeds.options.forEach { speed ->
+                AyahButton(
+                    text = AudioSpeeds.format(speed),
+                    variant = if (state.audioSpeed == speed) {
+                        AyahButtonVariant.Primary
+                    } else {
+                        AyahButtonVariant.Outline
+                    },
+                    size = AyahButtonSize.Small,
+                    onClick = { onSetSpeed(speed) },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         SectionLabel(strings.sectionDaily)
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
@@ -873,9 +920,8 @@ private fun SettingsPanel(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
-
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(12.dp))
+        }
 
         AyahText(
             strings.closeDrawerHint,

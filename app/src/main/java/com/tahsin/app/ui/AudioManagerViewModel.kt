@@ -49,6 +49,8 @@ data class AudioManagerState(
     val totalSizeBytes: Long = 0L,
     /** Bahasa aktif untuk teks UI. */
     val language: AppLanguage = AppLanguage.ID,
+    /** Qari' yang sedang ditampilkan (folder audio per qari'). */
+    val reciterLabel: String = "",
     /** Surah yang menunggu konfirmasi hapus. */
     val pendingDelete: Int? = null,
     /** Konfirmasi hapus semua. */
@@ -66,7 +68,7 @@ data class AudioManagerState(
  * tidak baru dihapus) — buka layar lagi jadi instan tanpa listFiles ulang.
  */
 class AudioManagerViewModel(
-    app: Context,
+    private val app: Context,
     private val repository: QuranRepository,
     private val downloader: AudioDownloader,
     private val settings: SettingsStore,
@@ -74,7 +76,10 @@ class AudioManagerViewModel(
 
     private val gson = Gson()
     private val itemsType = object : TypeToken<List<AudioManagerItem>>() {}.type
-    private val cacheFile = File(app.applicationContext.filesDir, "audio-manager-cache.json")
+
+    /** Cache per qari' (folder audio per qari' berbeda → daftar berbeda). */
+    private val cacheFile: File
+        get() = File(app.applicationContext.filesDir, "audio-manager-cache-${settings.reciter.slug}.json")
 
     /** true = cache tidak boleh dipakai (ada perubahan file audio). */
     @Volatile
@@ -139,6 +144,7 @@ class AudioManagerViewModel(
         totalDownloaded = items.sumOf { it.ayahFiles + it.wordFiles },
         totalSizeBytes = items.sumOf { it.sizeBytes },
         language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID,
+        reciterLabel = settings.reciter.label,
         isLoading = false,
     )
 
@@ -213,7 +219,7 @@ fun audioManagerViewModelFactory(context: Context): ViewModelProvider.Factory = 
         AudioManagerViewModel(
             app = app,
             repository = QuranRepository(app),
-            downloader = AudioDownloader(app),
+            downloader = AudioDownloader(app, SettingsStore(app)),
             settings = SettingsStore(app),
         )
     }

@@ -43,10 +43,14 @@ continuous muraja'ah without looking at the screen.
 - 🔍 **Word panel**: tap a word in the mushaf → tajwid rule + explanation + play
   the word audio; the button becomes **⏹ Stop** while the word is playing
   (separate from the "Listen to ayah" button — race-free).
-- 🔊 **Sample audio**: Minshawy Murattal per ayah + per-word audio (qurancdn wbw),
-  downloaded in-app per surah / **all surahs** (no estimate), with a **footer
-  progress bar** + the name of the surah currently downloading; background
-  downloads (foreground service) after the user grants permission.
+- 🔊 **Sample audio**: **choose a reciter** (⚙ drawer): Minshawy, Husary,
+  Husary Muallim, Abdul Basit, Alafasy, As-Sudais, Hudhaify (everyayah.com —
+  ayah audio is stored per reciter in `filesDir/audio/<reciter>/`) + per-word
+  audio (qurancdn wbw); **playback speed 0.5×–1.25×** for slow practice
+  (applies live while playing). Downloaded in-app per surah / **all surahs**
+  (no estimate), with a **footer progress bar** + the name of the surah
+  currently downloading; background downloads (foreground service) after the
+  user grants permission.
 - 📂 **Downloaded-audio management**: size per surah, delete per surah / delete
   all (with confirmation), **live progress card** while a download is running,
   and a **list cache** — reopening the screen is instant with no re-scan.
@@ -104,6 +108,7 @@ app/src/main/java/com/tahsin/app/
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (per-ayah reading history, JSON filesDir),
 │                   #   AyahSearch (normalized Arabic + translation search),
+│                   #   Reciter (everyayah reciters + 0.5×–1.25× audio speed),
 │                   #   AyahOfTheDayManager (daily ayah selection + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
@@ -197,7 +202,7 @@ keyPassword=secret
 |---|---|---|
 | Arabic text + Indonesian translation | [equran.id API](https://equran.id/apidev) | Used non-commercially |
 | English translation (Saheeh Int'l) | [quran.com API v4](https://api.quran.com) | Used non-commercially |
-| Ayah audio (Minshawy Murattal) | [everyayah.com](https://everyayah.com) | Publicly available |
+| Ayah audio (multiple reciters: Minshawy, Husary, Alafasy, etc.) | [everyayah.com](https://everyayah.com) | Publicly available |
 | Per-word audio (wbw) | audio.qurancdn.com | Publicly available |
 | Amiri font (Uthmani) | [Google Fonts](https://fonts.google.com/specimen/Amiri) | SIL OFL 1.1 |
 

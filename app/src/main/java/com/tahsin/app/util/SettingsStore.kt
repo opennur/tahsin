@@ -57,4 +57,18 @@ class SettingsStore(context: Context) {
     var ayahOfDayEnabled: Boolean
         get() = prefs.getBoolean("ayah_of_day_enabled", true)
         set(value) = prefs.edit().putBoolean("ayah_of_day_enabled", value).apply()
+
+    /** Qari' (perawi) audio ayat aktif (default Minshawy Murattal). */
+    var reciterSlug: String
+        get() = prefs.getString("reciter_slug", Reciter.MINSHAWY.slug) ?: Reciter.MINSHAWY.slug
+        set(value) = prefs.edit().putString("reciter_slug", value).apply()
+
+    /** Qari' aktif sebagai [Reciter] (fallback Minshawy kalau slug tak dikenal). */
+    val reciter: Reciter
+        get() = Reciter.fromSlug(reciterSlug)
+
+    /** Kecepatan pemutaran audio (0.5×–1.25×; default 1.0×). */
+    var audioSpeed: Float
+        get() = AudioSpeeds.clamp(prefs.getFloat("audio_speed", 1.0f))
+        set(value) = prefs.edit().putFloat("audio_speed", AudioSpeeds.clamp(value)).apply()
 }

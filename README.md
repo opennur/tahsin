@@ -43,10 +43,14 @@ tanpa melihat layar.
 - 🔍 **Panel kata**: ketuk kata di mushaf → hukum tajwid + penjelasan + putar
   audio kata; tombolnya berubah jadi **⏹ Stop** saat kata sedang diputar
   (terpisah dari tombol Dengar ayat — bebas race).
-- 🔊 **Audio contoh**: Minshawy Murattal per ayat + audio per kata (qurancdn wbw),
-  diunduh in-app per surah / **semua surah** (tanpa estimasi), dengan **progress
-  bar di footer** + nama surah yang sedang diunduh; unduhan latar belakang
-  (foreground service) setelah user mengizinkan.
+- 🔊 **Audio contoh**: **pilih qari'** (drawer ⚙): Minshawy, Husary, Husary
+  Muallim, Abdul Basit, Alafasy, As-Sudais, Hudhaify (everyayah.com — audio
+  ayat tersimpan per qari' di `filesDir/audio/<qari'>/`) + audio per kata
+  (qurancdn wbw); **kecepatan pemutaran 0.5×–1.25×** untuk latihan pelan-pelan
+  (berlaku langsung saat sedang memutar). Diunduh in-app per surah / **semua
+  surah** (tanpa estimasi), dengan **progress bar di footer** + nama surah yang
+  sedang diunduh; unduhan latar belakang (foreground service) setelah user
+  mengizinkan.
 - 📂 **Manajemen audio terunduh**: ukuran per surah, hapus per surah / hapus
   semua (dengan konfirmasi), **kartu progres live** saat ada unduhan berjalan,
   dan **cache daftar** — membuka layar lagi instan tanpa pemindaian ulang.
@@ -103,6 +107,7 @@ app/src/main/java/com/tahsin/app/
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
 │                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
+│                   #   Reciter (qari' everyayah + kecepatan audio 0.5×–1.25×),
 │                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
@@ -196,7 +201,7 @@ keyPassword=rahasia
 |---|---|---|
 | Teks Arab + terjemahan Indonesia | [equran.id API](https://equran.id/apidev) | Digunakan non-komersial |
 | Terjemahan Inggris (Saheeh Int'l) | [quran.com API v4](https://api.quran.com) | Digunakan non-komersial |
-| Audio ayat (Minshawy Murattal) | [everyayah.com](https://everyayah.com) | Tersedia untuk umum |
+| Audio ayat (banyak qari': Minshawy, Husary, Alafasy, dll.) | [everyayah.com](https://everyayah.com) | Tersedia untuk umum |
 | Audio per kata (wbw) | audio.qurancdn.com | Tersedia untuk umum |
 | Font Amiri (Utsmani) | [Google Fonts](https://fonts.google.com/specimen/Amiri) | SIL OFL 1.1 |
 

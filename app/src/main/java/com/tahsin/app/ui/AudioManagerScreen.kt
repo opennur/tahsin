@@ -157,6 +157,13 @@ fun AudioManagerScreen(
             strings.audioManagerSubtitle,
             style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
+        if (state.reciterLabel.isNotBlank()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            AyahText(
+                "${strings.audioReciterLabel}: ${state.reciterLabel}",
+                style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+            )
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
 

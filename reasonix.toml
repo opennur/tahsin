@@ -1,21 +1,6 @@
 [permissions]
 allow = [
-    # --- BUILD ---
-    "Bash=./gradlew assembleDebug --no-daemon 2>&1 | tail -12",
-    "Bash=./gradlew assembleRelease --no-daemon 2>&1 | tail -12",
-    "Bash=./gradlew clean --no-daemon 2>&1 | tail -8",
-
-    # --- TEST ---
-    "Bash=./gradlew testDebugUnitTest --no-daemon 2>&1 | tail -12",
-
-    # --- CHECK & LINT ---
-    "Bash=./gradlew lint --no-daemon 2>&1 | tail -12",
-
-    # --- UTILITY ---
-    "Bash=git status 2>&1 | tail -8",
-    "Bash=ls -la 2>&1 | tail -10",
-
-    # --- REASONIX BUILT-IN ---
+    "Bash=./gradlew (assemble|test|clean|lint|build|check|install).*",
     "review",
     "apply",
     "status",
