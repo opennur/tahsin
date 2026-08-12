@@ -237,25 +237,18 @@ private fun TahsinContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ---- Pilih surah: nama di kiri, dropdown di kanan (satu baris) ----
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            AyahText(
-                state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
-                style = AyahTypography.Heading2,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            SimpleDropdown(
-                selectedLabel = "${strings.changeSurah} ▾",
-                options = state.surahs.map { s ->
-                    DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
-                },
-            )
-        }
+        // ---- Pilih surah (dropdown; label = nama surah yang tampil) ----
+        SimpleDropdown(
+            selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
+            options = state.surahs.map { s ->
+                DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
+
+        // ---- Muat konten surah / mushaf ----
 
         // ---- Navigasi ayat ----
         if (state.loadingSurah) {
@@ -464,9 +457,14 @@ private fun TahsinContent(
             Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // ---- Navigasi ayat (di bawah, jangkauan jempol; tanpa perlu gesture) ----
+            // ---- Navigasi ayat (di bawah, jangkauan jempol) ----
             if (ayah != null && !state.loadingSurah) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     // Dalam arah baca Arab: tombol KIRI = lanjut ke ayat berikutnya.
                     AyahButton(
                         text = "‹",
@@ -490,13 +488,15 @@ private fun TahsinContent(
                         onClick = onPrevAyah,
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 AyahText(
                     strings.swipeHint,
                     style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
             }
 
             // ---- Progress unduh audio (di ATAS tombol mic & dengar) ----

@@ -39,7 +39,6 @@ data class Strings(
     val downloadAll: String,
     val manageAudio: String,
     val closeDrawerHint: String,
-    val changeSurah: String,
     val swipeHint: String,
     val credit: String,
     val downloadNoticeTitle: String,
@@ -91,7 +90,7 @@ object AppStrings {
 
     val Indonesian = Strings(
         appTitle = "Tahsin Qur'an",
-        subtitle = "Baca ayat ke mikrofon.\nsetiap kata dicek langsung",
+        subtitle = "Setiap kata dicek langsung.",
         legendCorrect = "benar",
         legendWrong = "salah",
         legendReading = "dibaca",
@@ -122,7 +121,6 @@ object AppStrings {
         downloadAll = "📥 Unduh semua audio",
         manageAudio = "🎵 Kelola audio terunduh",
         closeDrawerHint = "Ketuk di luar drawer untuk menutup.",
-        changeSurah = "Ganti surah",
         swipeHint = "Atau geser mushaf ke kiri/kanan untuk ganti ayat",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Mengunduh audio…",
@@ -167,7 +165,7 @@ object AppStrings {
 
     val English = Strings(
         appTitle = "Tahsin Qur'an",
-        subtitle = "Read the ayah to the mic.\nevery word is checked live",
+        subtitle = "Every word is checked live.",
         legendCorrect = "correct",
         legendWrong = "wrong",
         legendReading = "reading",
@@ -198,7 +196,6 @@ object AppStrings {
         downloadAll = "📥 Download all audio",
         manageAudio = "🎵 Manage downloaded audio",
         closeDrawerHint = "Tap outside the drawer to close.",
-        changeSurah = "Change surah",
         swipeHint = "Or swipe the mushaf left/right to change ayah",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Downloading audio…",
