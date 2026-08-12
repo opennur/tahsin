@@ -237,26 +237,22 @@ private fun TahsinContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ---- Pilih surah (dropdown; label = nama surah yang tampil) ----
-        SimpleDropdown(
-            selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
-            options = state.surahs.map { s ->
-                DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // ---- Navigasi ayat (di bawah dropdown surah) ----
+        // ---- Navigasi satu baris: [prev] [surah ▾] [ayat ▾] [next] ----
         if (ayah != null && !state.loadingSurah) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Dalam arah baca Arab: tombol KIRI = lanjut ke ayat berikutnya.
                 AyahButton(
                     text = "‹",
                     variant = AyahButtonVariant.Outline,
                     size = AyahButtonSize.Small,
                     onClick = onNextAyah,
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                SimpleDropdown(
+                    selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
+                    options = state.surahs.map { s ->
+                        DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
+                    },
+                    modifier = Modifier.weight(2f),
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 SimpleDropdown(
@@ -278,6 +274,15 @@ private fun TahsinContent(
             AyahText(
                 strings.swipeHint,
                 style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            // Sedang memuat / belum ada ayat — dropdown surah tetap tersedia.
+            SimpleDropdown(
+                selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
+                options = state.surahs.map { s ->
+                    DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

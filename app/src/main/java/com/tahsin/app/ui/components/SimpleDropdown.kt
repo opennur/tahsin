@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -65,6 +66,8 @@ fun SimpleDropdown(
                     color = AyahColors.Primary,
                     fontWeight = FontWeight.SemiBold,
                 ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 

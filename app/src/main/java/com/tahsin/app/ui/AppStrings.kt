@@ -121,7 +121,7 @@ object AppStrings {
         downloadAll = "📥 Unduh semua audio",
         manageAudio = "🎵 Kelola audio terunduh",
         closeDrawerHint = "Ketuk di luar drawer untuk menutup.",
-        swipeHint = "Atau geser mushaf ke kiri/kanan untuk ganti ayat",
+        swipeHint = "Geser mushaf ke kiri/kanan untuk ganti ayat",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Mengunduh audio…",
         downloadNoticeBody = "Audio surah ini belum diunduh. Unduhan dimulai otomatis — " +
@@ -196,7 +196,7 @@ object AppStrings {
         downloadAll = "📥 Download all audio",
         manageAudio = "🎵 Manage downloaded audio",
         closeDrawerHint = "Tap outside the drawer to close.",
-        swipeHint = "Or swipe the mushaf left/right to change ayah",
+        swipeHint = "Swipe the mushaf left/right to change ayah",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Downloading audio…",
         downloadNoticeBody = "This surah's audio is not downloaded yet. The download starts " +
