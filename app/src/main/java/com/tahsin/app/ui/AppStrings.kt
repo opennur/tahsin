@@ -39,6 +39,8 @@ data class Strings(
     val downloadAll: String,
     val manageAudio: String,
     val closeDrawerHint: String,
+    val changeSurah: String,
+    val swipeHint: String,
     val credit: String,
     val downloadNoticeTitle: String,
     val downloadNoticeBody: String,
@@ -120,6 +122,8 @@ object AppStrings {
         downloadAll = "📥 Unduh semua audio",
         manageAudio = "🎵 Kelola audio terunduh",
         closeDrawerHint = "Ketuk di luar drawer untuk menutup.",
+        changeSurah = "Ganti surah",
+        swipeHint = "Atau geser mushaf ke kiri/kanan untuk ganti ayat",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Mengunduh audio…",
         downloadNoticeBody = "Audio surah ini belum diunduh. Unduhan dimulai otomatis — " +
@@ -194,6 +198,8 @@ object AppStrings {
         downloadAll = "📥 Download all audio",
         manageAudio = "🎵 Manage downloaded audio",
         closeDrawerHint = "Tap outside the drawer to close.",
+        changeSurah = "Change surah",
+        swipeHint = "Or swipe the mushaf left/right to change ayah",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Downloading audio…",
         downloadNoticeBody = "This surah's audio is not downloaded yet. The download starts " +

@@ -3,6 +3,9 @@ package com.tahsin.app.ui
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -25,6 +28,7 @@ import com.tahsin.app.util.AudioDownloader
 import com.tahsin.app.util.DownloadProgress
 import com.tahsin.app.util.DownloadService
 import com.tahsin.app.util.FontStore
+import com.tahsin.app.util.PlaySource
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import androidx.compose.ui.text.font.FontFamily
@@ -67,7 +71,10 @@ sealed interface TahsinUiState {
         /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya saat selesai benar. */
         val flowMode: Boolean = false,
         /** Sedang memutar audio (untuk tombol Dengar/Stop). */
+        /** Audio ayat sedang diputar (tombol Dengar/Stop di footer). */
         val isAudioPlaying: Boolean = false,
+        /** Audio kata sedang diputar (tombol Stop di tooltip kata). */
+        val isWordPlaying: Boolean = false,
         /** Sedang mengunduh audio (agregat semua surah, tampil di atas tombol). */
         val isDownloading: Boolean = false,
         val downloadDone: Int = 0,
@@ -121,7 +128,12 @@ class TahsinViewModel(
     init {
         AyahColors.isDark = settings.darkMode
         audioPlayer.onPlaybackChange = { playing ->
-            updateReady { it.copy(isAudioPlaying = playing) }
+            // Sumber pemutaran (AYAH/WORD) ditentukan PLAYER — bukan flag lokal,
+            // jadi tidak ada race saat Dengar & Kata ditekan bersamaan.
+            updateReady { it.copy(
+                isAudioPlaying = playing && audioPlayer.source == PlaySource.AYAH,
+                isWordPlaying = playing && audioPlayer.source == PlaySource.WORD,
+            ) }
         }
         reload()
     }
@@ -379,24 +391,52 @@ class TahsinViewModel(
         }
     }
 
-    /** Beep gagal — ada kata yang tidak cocok / terlewat. */
-    private fun playErrorTone() {
-        try {
-            toneGenerator()?.startTone(ToneGenerator.TONE_PROP_NACK, 300)
-        } catch (_: Exception) {
+    /**
+     * Umpan gagal yang JELAS: dua nada NACK berurutan + getar — biar terasa
+     * walau tidak melihat layar.
+     */
+    private fun playErrorFeedback() {
+        val gen = toneGenerator()
+        if (gen != null) {
+            try {
+                gen.startTone(ToneGenerator.TONE_PROP_NACK, 260)
+            } catch (_: Exception) {
+            }
+        }
+        vibrateError()
+        viewModelScope.launch {
+            delay(340)
+            try {
+                toneGenerator()?.startTone(ToneGenerator.TONE_PROP_NACK, 260)
+            } catch (_: Exception) {
+            }
         }
     }
 
-    /** Saat hasil final: kalau mode flow nyala dan ada yang salah, kasih beep. */
+    /** Getar singkat dua kali (pola buzz-buzz) untuk indikasi gagal. */
+    private fun vibrateError() {
+        runCatching {
+            val vib = app.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator ?: return
+            if (!vib.hasVibrator()) return
+            val pattern = longArrayOf(0, 160, 80, 160)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vib.vibrate(VibrationEffect.createWaveform(pattern, -1))
+            } else {
+                @Suppress("DEPRECATION")
+                vib.vibrate(pattern, -1)
+            }
+        }
+    }
+
+    /** Saat hasil final: kalau ada kata yang salah, kasih umpan gagal (bunyi + getar). */
     private fun maybePlayErrorTone() {
         if (autoAdvanceHandled) return // sudah sukses — beep sukses sudah diputar
         val s = currentReady() ?: return
-        if (!s.flowMode) return
         val aligned = s.alignedWords
         val hasError = aligned.any {
             it.status == WordStatus.MISMATCH || it.status == WordStatus.SKIPPED
         }
-        if (hasError) playErrorTone()
+        if (hasError) playErrorFeedback()
     }
 
     private fun onTranscript(text: String, words: List<String>) {
@@ -562,6 +602,8 @@ class TahsinViewModel(
     private fun playAyahNow() {
         val s = currentReady() ?: return
         val ayah = s.ayah ?: return
+        // Mulai putar ayat = batalkan status pemutaran kata yang tertunda.
+        updateReady { it.copy(isWordPlaying = false) }
         viewModelScope.launch {
             val file = runCatching { downloader.ensureAyah(s.surahNumber, ayah.number) }.getOrNull()
             if (file == null && downloader.isAyahMissing(s.surahNumber, ayah.number)) {
@@ -594,20 +636,29 @@ class TahsinViewModel(
         val s = currentReady() ?: return
         val ayah = s.ayah ?: return
         val word = ayah.words.getOrNull(wordIndex) ?: return
+        updateReady { it.copy(isWordPlaying = true) }
         viewModelScope.launch {
             val file = runCatching { downloader.ensureWord(s.surahNumber, ayah.number, wordIndex) }.getOrNull()
             if (file == null && downloader.isWordMissing(s.surahNumber, ayah.number, wordIndex)) {
                 // Audio kata memang tidak tersedia — langsung TTS tanpa coba URL.
+                updateReady { it.copy(isWordPlaying = false) }
                 audioPlayer.speak(word)
                 return@launch
             }
             audioPlayer.playWord(s.surahNumber, ayah.number, wordIndex, word) {
+                // Fallback (TTS) — tidak ada status pemutaran media.
+                updateReady { it.copy(isWordPlaying = false) }
                 audioPlayer.speak(word)
                 if (!audioPlayer.isArabicTtsAvailable()) {
                     showMessage(AppStrings.of(currentLanguage()).msgWordUnavailable)
                 }
             }
         }
+    }
+
+    /** Tombol Stop di tooltip kata: hentikan pemutaran kata. */
+    fun stopWordPlayback() {
+        audioPlayer.stop()
     }
 
     /** Tombol Dengar/Stop: berhenti kalau sedang memutar; kalau tidak, putar ayat. */

@@ -3,6 +3,8 @@
 
     <!-- Mic untuk membaca Al-Quran (STT) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Getar saat ada kesalahan pengucapan (umpan muroja'ah) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     <!-- STT online (SpeechRecognizer bawaan) — offline kalau paket bahasa Arab terpasang -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Notifikasi progres unduhan (foreground service) -->

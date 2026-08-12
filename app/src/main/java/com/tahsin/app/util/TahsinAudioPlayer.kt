@@ -7,6 +7,9 @@ import android.speech.tts.TextToSpeech
 import java.io.File
 import java.util.Locale
 
+/** Sumber pemutaran saat ini — penentu tombol Dengar (ayat) vs tombol kata. */
+enum class PlaySource { AYAH, WORD, NONE }
+
 /**
  * Pemutar audio contoh bacaan, urutan prioritas:
  * 1. Cache internal `filesDir/audio/...` (hasil unduh dari dalam aplikasi
@@ -23,6 +26,10 @@ class TahsinAudioPlayer(context: Context) {
     private var openAfd: AssetFileDescriptor? = null
     private var isPlaying = false
 
+    /** Sumber pemutaran aktif — diset sebelum memulai media (sumber kebenaran UI). */
+    var source: PlaySource = PlaySource.NONE
+        private set
+
     /** Callback status pemutaran (true = sedang memutar). Dipakai UI untuk tombol Dengar/Stop. */
     var onPlaybackChange: ((Boolean) -> Unit)? = null
 
@@ -30,6 +37,7 @@ class TahsinAudioPlayer(context: Context) {
     fun stop() {
         releaseMedia()
         runCatching { tts.stop() }
+        source = PlaySource.NONE
         setPlaying(false)
     }
 
@@ -51,6 +59,7 @@ class TahsinAudioPlayer(context: Context) {
         text: String,
         onFallback: () -> Unit = {},
     ) {
+        source = PlaySource.AYAH
         val key = AudioUrls.ayahKey(surahNumber, ayahNumber)
         val cached = File(cacheRoot, key)
         if (cached.exists() && cached.length() > 0L && playFromFile(cached, onFallback)) return
@@ -71,6 +80,7 @@ class TahsinAudioPlayer(context: Context) {
         word: String,
         onFallback: () -> Unit = {},
     ) {
+        source = PlaySource.WORD
         val key = AudioUrls.wordKey(surahNumber, ayahNumber, wordIndex)
         val cached = File(File(cacheRoot, "wbw"), key)
         if (cached.exists() && cached.length() > 0L && playFromFile(cached, onFallback)) return
@@ -157,6 +167,10 @@ class TahsinAudioPlayer(context: Context) {
     }
 
     private fun releaseMedia() {
+        // Pemutaran lama yang DIBAYANG oleh pemutaran baru harus dilaporkan
+        // berhenti (release() saja tidak memicu onCompletion) — kalau tidak,
+        // UI bisa "stuck" (tombol Stop tidak muncul).
+        if (isPlaying) setPlaying(false)
         runCatching { mediaPlayer?.release() }
         mediaPlayer = null
         runCatching { openAfd?.close() }

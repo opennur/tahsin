@@ -57,6 +57,7 @@ perlu diunduh di dalam aplikasi). Jalankan sekali di Termux sebelum build:
 ```bash
 python3 tools/fetch_quran_data.py            # unduh 114 surah (Arab+ID & EN)
 python3 tools/fetch_quran_data.py --force    # kalau mau unduh ulang semua
+bash tools/fetch_font.sh                     # bundle font khat Utsmani (Amiri/OFL)
 ```
 
 Hasilnya ditulis ke `app/src/main/assets/quran/data/`:

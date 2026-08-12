@@ -127,6 +127,7 @@ fun TahsinScreen(
                 if (granted) viewModel.toggleMic() else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             },
             onPlaySelectedWord = viewModel::playSelectedWord,
+            onStopSelectedWord = viewModel::stopWordPlayback,
             onDismissMessage = viewModel::clearMessage,
             onToggleDarkMode = viewModel::toggleDarkMode,
             onSetLanguage = viewModel::setLanguage,
@@ -152,6 +153,7 @@ private fun TahsinContent(
     onSelectWord: (Int) -> Unit,
     onMicClick: () -> Unit,
     onPlaySelectedWord: () -> Unit,
+    onStopSelectedWord: () -> Unit,
     onDismissMessage: () -> Unit,
     onToggleDarkMode: () -> Unit,
     onSetLanguage: (AppLanguage) -> Unit,
@@ -235,17 +237,23 @@ private fun TahsinContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ---- Pilih surah (dropdown, bukan tab) ----
-        SimpleDropdown(
-            selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin} (${it.ayahCount} ${strings.ayahWord})" } ?: "-",
-            options = state.surahs.map { s ->
-                DropdownOption(
-                    "${s.number}. ${s.nameLatin} (${s.ayahCount} ${strings.ayahWord})",
-                    { onSelectSurah(s.number) },
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
+        // ---- Pilih surah: nama di kiri, dropdown di kanan (satu baris) ----
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AyahText(
+                state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
+                style = AyahTypography.Heading2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            SimpleDropdown(
+                selectedLabel = "${strings.changeSurah} ▾",
+                options = state.surahs.map { s ->
+                    DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
+                },
+            )
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -258,32 +266,6 @@ private fun TahsinContent(
                 )
             }
         } else if (ayah != null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Dalam arah baca Arab: tombol KIRI = lanjut ke ayat berikutnya.
-                AyahButton(
-                    text = "‹",
-                    variant = AyahButtonVariant.Outline,
-                    size = AyahButtonSize.Small,
-                    onClick = onNextAyah,
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                SimpleDropdown(
-                    selectedLabel = "${strings.ayahLabel} ${ayah.number} / $ayahCount",
-                    options = (1..ayahCount).map { n ->
-                        DropdownOption("${strings.ayahLabel} $n", { onSelectAyah(n - 1) })
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                AyahButton(
-                    text = "›",
-                    variant = AyahButtonVariant.Outline,
-                    size = AyahButtonSize.Small,
-                    onClick = onPrevAyah,
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
             // ---- Mushaf kontinu (gaya mushaf asli: kata tersambung RTL) ----
             // Satu gesture menangani TAP (pilih kata → tooltip) dan SWIPE
             // (ganti ayat) sekaligus — tanpa konflik arena gesture.
@@ -397,10 +379,14 @@ private fun TahsinContent(
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         AyahButton(
-                                            text = strings.playWord,
-                                            variant = AyahButtonVariant.Secondary,
+                                            text = if (state.isWordPlaying) strings.stop else strings.playWord,
+                                            variant = if (state.isWordPlaying) {
+                                                AyahButtonVariant.Danger
+                                            } else {
+                                                AyahButtonVariant.Secondary
+                                            },
                                             size = AyahButtonSize.Small,
-                                            onClick = onPlaySelectedWord,
+                                            onClick = if (state.isWordPlaying) onStopSelectedWord else onPlaySelectedWord,
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(6.dp))
@@ -476,6 +462,41 @@ private fun TahsinContent(
         }
 
             Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // ---- Navigasi ayat (di bawah, jangkauan jempol; tanpa perlu gesture) ----
+            if (ayah != null && !state.loadingSurah) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Dalam arah baca Arab: tombol KIRI = lanjut ke ayat berikutnya.
+                    AyahButton(
+                        text = "‹",
+                        variant = AyahButtonVariant.Outline,
+                        size = AyahButtonSize.Small,
+                        onClick = onNextAyah,
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    SimpleDropdown(
+                        selectedLabel = "${strings.ayahLabel} ${ayah.number} / $ayahCount",
+                        options = (1..ayahCount).map { n ->
+                            DropdownOption("${strings.ayahLabel} $n", { onSelectAyah(n - 1) })
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    AyahButton(
+                        text = "›",
+                        variant = AyahButtonVariant.Outline,
+                        size = AyahButtonSize.Small,
+                        onClick = onPrevAyah,
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                AyahText(
+                    strings.swipeHint,
+                    style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(modifier = Modifier.height(4.dp))
             }
 
             // ---- Progress unduh audio (di ATAS tombol mic & dengar) ----

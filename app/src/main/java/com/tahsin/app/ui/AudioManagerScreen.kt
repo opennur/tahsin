@@ -6,7 +6,9 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,6 +54,33 @@ import java.util.Locale
  * audio (per ayat + per kata), ukurannya, dan hapus per surah (dengan
  * konfirmasi).
  */
+/** Spinner kustom (tanpa Material 3): busur berputar. */
+@Composable
+private fun LoadingSpinner(modifier: Modifier = Modifier) {
+    val transition = rememberInfiniteTransition(label = "spin")
+    val angle by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "angle",
+    )
+    Canvas(modifier = modifier.size(18.dp)) {
+        val stroke = 2.dp.toPx()
+        drawArc(
+            color = AyahColors.Primary,
+            startAngle = angle,
+            sweepAngle = 100f,
+            useCenter = false,
+            topLeft = Offset(stroke / 2, stroke / 2),
+            size = Size(size.width - stroke, size.height - stroke),
+            style = Stroke(width = stroke, cap = StrokeCap.Round),
+        )
+    }
+}
+
 /** Progress bar tak tentu (animasi isi-ulang) untuk status "Memuat…". */
 @Composable
 private fun IndeterminateBar() {
@@ -194,6 +228,22 @@ fun AudioManagerScreen(
                     onDelete = { viewModel.requestDelete(item.number) },
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+            }
+            // Masih ada surah yang sedang dimuat → spinner di bawah item terakhir.
+            if (state.isLoading) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    LoadingSpinner()
+                    Spacer(modifier = Modifier.width(8.dp))
+                    AyahText(
+                        strings.audioLoading,
+                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                    )
+                }
             }
         }
 

@@ -11,30 +11,41 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Font mushaf runtime: file TTF di `filesDir/fonts/` (diunduh in-app atau
- * disediakan user). Kalau file belum ada, memakai font sistem.
+ * Font mushaf: prioritas sumber —
+ * 1. `assets/fonts/<file>` (di-bundle ke APK via tools/fetch_font.sh → offline).
+ * 2. `filesDir/fonts/<file>` (diunduh in-app / disediakan user).
+ * 3. Font sistem perangkat.
  */
 class FontStore(context: Context) {
 
-    private val fontsDir = File(context.applicationContext.filesDir, "fonts")
+    private val context = context.applicationContext
+    private val fontsDir = File(context.filesDir, "fonts")
+
+    private fun assetExists(name: String): Boolean =
+        runCatching { context.assets.open("fonts/$name").close(); true }.getOrDefault(false)
 
     fun fileExists(font: ArabicFont): Boolean {
         val name = font.fileName ?: return true
+        if (assetExists(name)) return true
         val f = File(fontsDir, name)
         return f.exists() && f.length() > 0L
     }
 
-    /** FontFamily untuk pilihan font; fallback ke sistem kalau file belum ada. */
+    /** FontFamily untuk pilihan font; bundle aset → filesDir → sistem. */
     fun loadFamily(font: ArabicFont): FontFamily {
         val name = font.fileName ?: return FontFamily.Default
+        if (assetExists(name)) {
+            return FontFamily(Font("fonts/$name", context.assets))
+        }
         val f = File(fontsDir, name)
         return if (f.exists() && f.length() > 0L) FontFamily(Font(f)) else FontFamily.Default
     }
 
-    /** Unduh font kalau belum ada (melempar exception kalau gagal). */
+    /** Unduh font kalau file di filesDir belum ada (aset bundle sudah cukup). */
     suspend fun ensureFont(font: ArabicFont) = withContext(Dispatchers.IO) {
         val name = font.fileName ?: return@withContext
         val url = font.downloadUrl ?: return@withContext
+        if (assetExists(name)) return@withContext
         val file = File(fontsDir, name)
         if (file.exists() && file.length() > 0L) return@withContext
         fontsDir.mkdirs()
