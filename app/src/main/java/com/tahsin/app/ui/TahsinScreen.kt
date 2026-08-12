@@ -100,6 +100,8 @@ fun TahsinScreen(
     onOpenStats: () -> Unit = {},
     /** Buka layar pencarian ayat (tombol 🔍 di header). */
     onOpenSearch: () -> Unit = {},
+    /** Buka layar kuis tajwid (drawer pengaturan). */
+    onOpenQuiz: () -> Unit = {},
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     target: OpenTarget? = null,
     modifier: Modifier = Modifier,
@@ -177,6 +179,7 @@ fun TahsinScreen(
             onOpenAudioManager = onOpenAudioManager,
             onOpenStats = onOpenStats,
             onOpenSearch = onOpenSearch,
+            onOpenQuiz = onOpenQuiz,
             onSetReciter = viewModel::setReciter,
             onSetSpeed = viewModel::setAudioSpeed,
             modifier = modifier,
@@ -211,6 +214,7 @@ private fun TahsinContent(
     onOpenAudioManager: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenSearch: () -> Unit,
+    onOpenQuiz: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -690,6 +694,10 @@ private fun TahsinContent(
                         drawerOpen = false
                         onOpenStats()
                     },
+                    onOpenQuiz = {
+                        drawerOpen = false
+                        onOpenQuiz()
+                    },
                     onClose = { drawerOpen = false },
                 )
             }
@@ -801,6 +809,7 @@ private fun SettingsPanel(
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
     onOpenStats: () -> Unit,
+    onOpenQuiz: () -> Unit,
     onClose: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -889,6 +898,17 @@ private fun SettingsPanel(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel(strings.quizTitle)
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = strings.quizTitle,
+            variant = AyahButtonVariant.Outline,
+            onClick = onOpenQuiz,
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 

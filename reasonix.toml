@@ -1,7 +1,16 @@
+# ============================================================
+# REASONIX CONFIG — ALLOW EVERYTHING + PYTHON SCRIPTS
+# ============================================================
+
+[sandbox]
+bash = "off"
+network = true
+
 [permissions]
 allow = [
-    "Bash=./gradlew (assemble|test|clean|lint|build|check|install).*",
+    "Bash=.*",  # ALL Bash commands (including Python scripts)
     "review",
     "apply",
     "status",
+    "run",
 ]

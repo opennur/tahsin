@@ -111,6 +111,16 @@ data class Strings(
     val searchSearching: String,
     val searchNoResults: String,
     val searchResultsCount: String,
+    // Kuis tajwid
+    val quizTitle: String,
+    val quizScore: String,
+    val quizQuestion: String,
+    val quizNext: String,
+    val quizCorrect: String,
+    val quizWrong: String,
+    val quizRuleLabel: String,
+    val quizLoading: String,
+    val quizNoData: String,
 )
 
 object AppStrings {
@@ -223,6 +233,15 @@ object AppStrings {
         searchSearching = "Mencari…",
         searchNoResults = "Tidak ada ayat yang cocok.",
         searchResultsCount = "%d hasil",
+        quizTitle = "📝 Kuis Tajwid",
+        quizScore = "Skor: %d/%d",
+        quizQuestion = "Hukum apa pada kata ini?",
+        quizNext = "Soal berikutnya →",
+        quizCorrect = "✓ Benar!",
+        quizWrong = "✗ Belum tepat.",
+        quizRuleLabel = "Hukum",
+        quizLoading = "Menyiapkan soal…",
+        quizNoData = "Gagal menyiapkan soal. Coba lagi.",
     )
 
     val English = Strings(
@@ -329,5 +348,14 @@ object AppStrings {
         searchSearching = "Searching…",
         searchNoResults = "No matching ayahs.",
         searchResultsCount = "%d results",
+        quizTitle = "📝 Tajweed Quiz",
+        quizScore = "Score: %d/%d",
+        quizQuestion = "What rule applies to this word?",
+        quizNext = "Next question →",
+        quizCorrect = "✓ Correct!",
+        quizWrong = "✗ Not quite.",
+        quizRuleLabel = "Rule",
+        quizLoading = "Preparing question…",
+        quizNoData = "Failed to prepare a question. Try again.",
     )
 }

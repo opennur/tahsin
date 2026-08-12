@@ -28,6 +28,13 @@ tanpa melihat layar.
 - 🎨 **Warna tajwid** (nyala default, bisa dimatikan di drawer): mad (merah),
   ghunnah (hijau), qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye),
   lam jalalah (teal).
+- 🧠 **Mesin tajwid lengkap + kuis**: selain mad wajib/jaiz & lam jalalah yang
+  sudah ada, engine kini mendeteksi **tafkhim/tarqiq** (huruf isti'la & ra'),
+  **mad badal/iwad/aridh lis-sukun**, dan **tanda waqaf mushaf** (مـ wajib,
+  لا jangan berhenti, ج boleh, صلي/قلي lebih utama, ∴ berpasangan) — muncul di
+  panel kata & daftar kesalahan. **📝 Kuis Tajwid** (drawer ⚙) menebak "hukum
+  apa pada kata ini?" dari kata acak di seluruh mushaf (4 pilihan ganda, skor,
+  penjelasan) — belajar, bukan cuma pewarnaan.
 - 🔁 **Mode Flow (muroja'ah)**: kalau satu ayat selesai benar, otomatis lanjut ke
   ayat berikutnya + mikrofon menyala lagi; **bunyi gagal ganda + getar** saat ada
   kesalahan, beep sukses saat ayat tuntas — bisa muroja'ah tanpa lihat layar.
@@ -98,10 +105,12 @@ Satu ayat yang sama untuk semua pengguna sepanjang hari, berganti otomatis besok
 app/src/main/java/com/tahsin/app/
 ├── data/quran/     # model Surah/Ayah + repository (aset bundle → cache → equran.id)
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
+│                   #   + TajwidQuiz (kuis "hukum apa pada kata ini?")
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
 │                   #   StatsScreen + StatsViewModel (statistik & riwayat),
-│                   #   SearchScreen + SearchViewModel (pencarian ayat)
+│                   #   SearchScreen + SearchViewModel (pencarian ayat),
+│                   #   TajwidQuizScreen + VM (kuis hukum tajwid)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + alarm harian/notifikasi
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,

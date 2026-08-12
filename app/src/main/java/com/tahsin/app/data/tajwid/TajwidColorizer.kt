@@ -20,7 +20,10 @@ data class TajwidSpan(
 object TajwidColorizer {
 
     /** Kategori yang tidak diwarnai (dibaca biasa / tidak punya warna khas). */
-    private val UNCOLORED = setOf(RuleCategory.IZHAR, RuleCategory.SUKUN, RuleCategory.SHADDAH)
+    private val UNCOLORED = setOf(
+        RuleCategory.IZHAR, RuleCategory.SUKUN, RuleCategory.SHADDAH,
+        RuleCategory.TAFKHIM, RuleCategory.TARQIQ, RuleCategory.WAQAF,
+    )
 
     /**
      * Bangun span warna untuk satu kata. Satu huruf hanya boleh satu warna

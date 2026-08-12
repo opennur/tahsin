@@ -5,6 +5,10 @@ import com.tahsin.app.util.ArabicNormalizer
 /** Kategori hukum tajwid. */
 enum class RuleCategory {
     MAD, GHUNNAH, IDGHAM, IKHFA, IQLAB, QALQALAH, LAM_JALALAH, IZHAR, SUKUN, SHADDAH,
+    /** Huruf dibaca tebal / tipis (isti'la & ra'). */
+    TAFKHIM, TARQIQ,
+    /** Tanda waqaf di mushaf (berhenti / terus). */
+    WAQAF,
 }
 
 /** Satu hukum tajwid yang terdeteksi pada sebuah kata. */
@@ -38,10 +42,13 @@ object TajwidEngine {
     private const val SHADDAH = '\u0651'
     private const val SUKUN = '\u0652'
     private const val DAGGER_ALIF = '\u0670'
+    private const val FATHA_TANWIN = '\u064B'
     private val TANWIN = setOf('\u064B', '\u064C', '\u064D')
     private val VOWELS = setOf(FATHA, DAMMA, KASRA, SHADDAH, SUKUN) + TANWIN
     /** Harakat yang "menempel di huruf" (sukun tidak termasuk — sukun = mad boleh). */
     private val VOWEL_ON_LETTER = setOf(FATHA, DAMMA, KASRA, SHADDAH) + TANWIN
+    /** Harakat pengucap huruf (untuk tafkhim/tarqiq ra') — sukun & tasydid dilewati. */
+    private val VOWEL_MARKS = setOf(FATHA, DAMMA, KASRA) + TANWIN
 
     // Kelompok huruf
     private val IDGHAM_BIGHUNNAH = "ينمو".toSet()
@@ -49,7 +56,44 @@ object TajwidEngine {
     private val IKHFA_LETTERS = "تثجدذزسشصضطظفقك".toSet()
     private val QALQALAH_LETTERS = "قطبجد".toSet()
     private val IZHAR_LETTERS = "ءهعحغخ".toSet()
-    private val HAMZA_FORMS = "أإآء".toSet()
+    /** Hamza dalam semua bentuknya (termasuk berkursi و/ي). */
+    private val HAMZA_FORMS = "أإآءئؤ".toSet()
+    /** Huruf isti'la (tebal) — خ ص ض ط ظ غ ق. */
+    private val ISTILA_LETTERS = "خصضغطقظ".toSet()
+
+    /** Tanda waqaf mushaf Madinah (char → nama, penjelasan ID, penjelasan EN). */
+    private val WAQAF_INFO = mapOf(
+        '\u06D8' to Triple(
+            "Waqaf Lazim",
+            "Wajib berhenti di sini (مـ).",
+            "Obligatory stop here (مـ).",
+        ),
+        '\u06D9' to Triple(
+            "Waqaf Laa",
+            "Jangan berhenti (لا) — lanjutkan bacaan.",
+            "Do not stop here (لا) — keep reading.",
+        ),
+        '\u06DA' to Triple(
+            "Waqaf Jaiz",
+            "Boleh berhenti atau lanjut (ج).",
+            "May stop or continue (ج).",
+        ),
+        '\u06D6' to Triple(
+            "Waqaf Wasl Aula",
+            "Lanjut lebih utama (صلي); berhenti dibolehkan.",
+            "Continuing is better (صلي); stopping is allowed.",
+        ),
+        '\u06D7' to Triple(
+            "Waqaf Waqaf Aula",
+            "Berhenti lebih utama (قلي); lanjut dibolehkan.",
+            "Stopping is better (قلي); continuing is allowed.",
+        ),
+        '\u06DB' to Triple(
+            "Waqaf Mu'anaqah",
+            "Dua tanda berpasangan: boleh berhenti di salah satunya (∴).",
+            "Paired signs: may stop at either one (∴).",
+        ),
+    )
 
     /**
      * Analisis satu kata; `prevWord`/`nextWord` (teks Arab ber-tashkeel) memberi
@@ -183,8 +227,91 @@ object TajwidEngine {
                 )
             }
 
+            // 6) Tafkhim / Tarqiq — huruf isti'la selalu tebal; ra' ikut harakatnya
+            if (c in ISTILA_LETTERS) {
+                rules += rule(
+                    RuleCategory.TAFKHIM, "Tafkhim (Huruf Isti'la)", i,
+                    "Huruf isti'la ($c) dibaca tebal (tafkhim).",
+                    "The isti'la letter ($c) is read thick (tafkhim).",
+                )
+            } else if (c == 'ر') {
+                when (vowelOnLetter(word, i)) {
+                    KASRA -> rules += rule(
+                        RuleCategory.TARQIQ, "Tarqiq (Ra')", i,
+                        "Ra' berharakat kasrah dibaca tipis (tarqiq).",
+                        "Ra' with kasrah is read thin (tarqiq).",
+                    )
+                    FATHA, DAMMA -> rules += rule(
+                        RuleCategory.TAFKHIM, "Tafkhim (Ra')", i,
+                        "Ra' berharakat fathah/dammah dibaca tebal (tafkhim).",
+                        "Ra' with fathah/dammah is read thick (tafkhim).",
+                    )
+                    // ra' sukun: ikut aturan ra' sukunah — tipis hanya kalau kasra
+                    // sebelumnya ASLI (bukan di huruf isti'la) dan tidak diikuti
+                    // huruf isti'la ber-fathah/dammah (yang menebalkan, mis. مِرْصَاد).
+                    else -> {
+                        val prevLetter = letterBefore(word, i)
+                        val prevVowel = findVowelBefore(word, i)
+                        val heavyAfter = nextLetter != null &&
+                            nextLetter in ISTILA_LETTERS &&
+                            (vowelOnLetter(word, j) == FATHA || vowelOnLetter(word, j) == DAMMA)
+                        val kasraThin = prevVowel == KASRA && prevLetter !in ISTILA_LETTERS
+                        if (heavyAfter || !kasraThin) {
+                            rules += rule(
+                                RuleCategory.TAFKHIM, "Tafkhim (Ra')", i,
+                                "Ra' sukun dibaca tebal (tafkhim).",
+                                "Ra' sakin is read thick (tafkhim).",
+                            )
+                        } else {
+                            rules += rule(
+                                RuleCategory.TARQIQ, "Tarqiq (Ra')", i,
+                                "Ra' sukun setelah kasrah asli dibaca tipis (tarqiq).",
+                                "Ra' sakin after a genuine kasrah is read thin (tarqiq).",
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 7) Mad Badal — hamzah bertemu alif mad (آ)
+            if (c == 'آ') {
+                rules += rule(
+                    RuleCategory.MAD, "Mad Badal", i,
+                    "Hamzah bertemu alif mad (آ): dibaca panjang 2 harakat.",
+                    "Hamzah followed by a mad alif (آ): read long for 2 counts.",
+                )
+            }
+
+            // 8) Akhir kata saat berhenti (waqaf): mad iwad & mad aridh lis-sukun.
+            //    Hanya berlaku di AKHIR AYAT (nextWord == null) — saat berhenti,
+            //    bukan di tengah ayat yang lanjut terus.
+            if (nextWord == null && isLastLetter(word, i)) {
+                if (mark == FATHA_TANWIN) {
+                    rules += rule(
+                        RuleCategory.MAD, "Mad Iwad", i,
+                        "Tanwin fathah di akhir ayat: saat berhenti dibaca panjang 2 harakat (seperti alif).",
+                        "Tanwin fathah at the end of a verse: when stopping, read long for 2 counts (like an alif).",
+                    )
+                } else if (isMadLetter && mark != SUKUN) {
+                    rules += rule(
+                        RuleCategory.MAD, "Mad Aridh Lis-Sukun", i,
+                        "Mad thabi'i di akhir ayat: saat berhenti boleh dibaca 2, 4, atau 6 harakat.",
+                        "Natural mad at the end of a verse: when stopping, may be read 2, 4, or 6 counts.",
+                    )
+                }
+            }
+
             i++
         }
+
+        // 9) Tanda waqaf di kata ini (berhenti / terus) — dari mushaf; bisa
+        //    menempel di AKHIR kata (اِلَيْهِۗ) atau di AWAL kata berikut (ۚفَاذْهَبَا).
+        val signIndex = word.indexOfFirst { it in WAQAF_INFO }
+        if (signIndex >= 0) {
+            val (name, explanation, explanationEn) = WAQAF_INFO.getValue(word[signIndex])
+            rules += rule(RuleCategory.WAQAF, name, signIndex, explanation, explanationEn)
+        }
+
         return rules.sortedBy { it.letterIndex }
     }
 
@@ -209,6 +336,34 @@ object TajwidEngine {
     private fun hasVowelAfter(word: String, idx: Int): Boolean {
         val after = word.getOrNull(idx + 1) ?: return false
         return after in VOWEL_ON_LETTER
+    }
+
+    /** Harakat pengucap huruf di `idx` (lewati tasydid/sukun; fatha/damma/kasra/tanwin). */
+    private fun vowelOnLetter(word: String, idx: Int): Char? {
+        var k = idx + 1
+        while (k < word.length && !ArabicNormalizer.isLetter(word[k])) {
+            val ch = word[k]
+            if (ch in VOWEL_MARKS) return ch
+            k++
+        }
+        return null
+    }
+
+    /** Huruf SEBELUM posisi `idx` (lewati tanda); null kalau tidak ada. */
+    private fun letterBefore(word: String, idx: Int): Char? {
+        var k = idx - 1
+        while (k >= 0 && !ArabicNormalizer.isLetter(word[k])) k--
+        return if (k >= 0) word[k] else null
+    }
+
+    /** Apakah tidak ada huruf lain SETELAH posisi `idx` (kata berakhir di sini). */
+    private fun isLastLetter(word: String, idx: Int): Boolean {
+        var k = idx + 1
+        while (k < word.length) {
+            if (ArabicNormalizer.isLetter(word[k])) return false
+            k++
+        }
+        return true
     }
 
     /** Kata ini bentuk "الله" (setelah normalisasi huruf dasar). */

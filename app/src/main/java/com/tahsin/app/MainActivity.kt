@@ -15,6 +15,7 @@ import com.tahsin.app.ui.OpenTarget
 import com.tahsin.app.ui.SearchScreen
 import com.tahsin.app.ui.StatsScreen
 import com.tahsin.app.ui.TahsinScreen
+import com.tahsin.app.ui.TajwidQuizScreen
 import com.tahsin.app.widget.AyahOfTheDayAlarm
 
 class MainActivity : ComponentActivity() {
@@ -49,6 +50,7 @@ class MainActivity : ComponentActivity() {
                 var showAudioManager by remember { mutableStateOf(false) }
                 var showStats by remember { mutableStateOf(false) }
                 var showSearch by remember { mutableStateOf(false) }
+                var showQuiz by remember { mutableStateOf(false) }
                 when {
                     showAudioManager -> AudioManagerScreen(onBack = { showAudioManager = false })
                     showStats -> StatsScreen(
@@ -65,10 +67,12 @@ class MainActivity : ComponentActivity() {
                             showSearch = false
                         },
                     )
+                    showQuiz -> TajwidQuizScreen(onBack = { showQuiz = false })
                     else -> TahsinScreen(
                         onOpenAudioManager = { showAudioManager = true },
                         onOpenStats = { showStats = true },
                         onOpenSearch = { showSearch = true },
+                        onOpenQuiz = { showQuiz = true },
                         target = pendingOpenTarget ?: target,
                     )
                 }

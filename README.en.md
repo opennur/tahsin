@@ -26,6 +26,13 @@ continuous muraja'ah without looking at the screen.
 - 🎨 **Tajwid colors** (on by default, toggleable in the drawer): mad (red),
   ghunnah (green), qalqalah (blue), ikhfa' (gray), iqlab (purple), idgham (orange),
   lam jalalah (teal).
+- 🧠 **Full tajwid engine + quiz**: on top of the existing mad wajib/jaiz and
+  lam jalalah, the engine now detects **tafkhim/tarqiq** (isti'la letters & ra'),
+  **mad badal/iwad/aridh lis-sukun**, and **mushaf waqaf signs** (مـ obligatory,
+  لا don't stop, ج optional, صلي/قلي prefer continuing/stopping, ∴ paired) — shown
+  in the word panel & error list. **📝 Tajweed Quiz** (⚙ drawer) asks "what rule
+  applies to this word?" from random words across the whole mushaf (4 multiple
+  choice options, score, explanation) — for learning, not just coloring.
 - 🔁 **Flow Mode (muraja'ah)**: when an ayah is fully correct, it automatically
   advances to the next ayah and re-enables the mic; **double error sound + vibration**
   on mistakes, success beep when an ayah is completed — practice without looking
@@ -99,10 +106,12 @@ The same ayah for every user throughout the day, automatically changing tomorrow
 app/src/main/java/com/tahsin/app/
 ├── data/quran/     # Surah/Ayah models + repository (asset bundle → cache → equran.id)
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (color spans)
+│                   #   + TajwidQuiz ("what rule applies to this word?" quiz)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
 │                   #   StatsScreen + StatsViewModel (statistics & history),
-│                   #   SearchScreen + SearchViewModel (ayah search)
+│                   #   SearchScreen + SearchViewModel (ayah search),
+│                   #   TajwidQuizScreen + VM (tajweed rule quiz)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + daily alarm/notification
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
