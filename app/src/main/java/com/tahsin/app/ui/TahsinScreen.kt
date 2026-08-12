@@ -256,7 +256,7 @@ private fun TahsinContent(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 SimpleDropdown(
-                    selectedLabel = "${strings.ayahLabel} ${ayah.number} / $ayahCount",
+                    selectedLabel = "(${ayah.number})",
                     options = (1..ayahCount).map { n ->
                         DropdownOption("${strings.ayahLabel} $n", { onSelectAyah(n - 1) })
                     },
