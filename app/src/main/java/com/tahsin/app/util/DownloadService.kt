@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
@@ -52,12 +53,21 @@ class DownloadService : Service() {
         super.onCreate()
         createChannel()
         instance = this
-        startForeground(NOTIFICATION_ID, buildNotification(lastDone, lastTotal, lastLabel))
+        startForegroundCompat(lastDone, lastTotal, lastLabel)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOTIFICATION_ID, buildNotification(lastDone, lastTotal, lastLabel))
+        startForegroundCompat(lastDone, lastTotal, lastLabel)
         return START_NOT_STICKY
+    }
+
+    /** startForeground 3-arg (wajib di Android 14+/targetSdk 34). */
+    private fun startForegroundCompat(done: Int, total: Int, label: String) {
+        if (android.os.Build.VERSION.SDK_INT >= 29) {
+            startForeground(NOTIFICATION_ID, buildNotification(done, total, label), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            startForeground(NOTIFICATION_ID, buildNotification(done, total, label))
+        }
     }
 
     override fun onDestroy() {

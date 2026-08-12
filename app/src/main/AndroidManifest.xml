@@ -27,7 +27,8 @@
         <!-- Menjaga unduhan tetap berjalan saat layar mati / app di background -->
         <service
             android:name=".util.DownloadService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>
