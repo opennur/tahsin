@@ -13,7 +13,8 @@ melihat layar.
 
 ## Fitur
 
-- 📖 **Mushaf kata-per-kata** (susunan RTL) — semua 114 surah dari equran.id.
+- 📖 **Mushaf kata-per-kata** (susunan RTL) — semua 114 surah, **offline bawaan**
+  (di-bundle ke APK; lihat "Konten offline bawaan" di bawah).
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
 - 🎨 **Warna tajwid** (nyala default, bisa dimatikan): mad (merah), ghunnah (hijau),
@@ -33,7 +34,9 @@ melihat layar.
 - **Kotlin + Jetpack Compose** — **tanpa Material 3** (custom design system di `theme/`).
 - compileSdk 34, targetSdk 34, minSdk 26 · AGP 8.4.0 · Kotlin 2.0.20 · Gradle 8.6 · Java 17.
 - Tanpa Room/Hilt/Retrofit/Navigation — DI manual (`ViewModel` + factory), Gson untuk JSON.
-- **Offline-first**: konten surah & audio di-cache ke `filesDir/` setelah diunduh.
+- **Offline-first**: konten surah & terjemahan bisa **di-bundle langsung ke APK**
+  (script `tools/fetch_quran_data.py`) — siap pakai tanpa internet; audio tetap
+  diunduh in-app dan di-cache ke `filesDir/`.
 
 ```
 app/src/main/java/com/tahsin/app/
@@ -44,6 +47,26 @@ app/src/main/java/com/tahsin/app/
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer, FontStore, SettingsStore
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
+
+## Konten offline bawaan (bundle ke APK)
+
+Mushaf, terjemahan Indonesia, dan terjemahan Inggris **bisa ikut di-bundle ke APK**
+sehingga aplikasi langsung siap dipakai tanpa internet (hanya audio yang tetap
+perlu diunduh di dalam aplikasi). Jalankan sekali di Termux sebelum build:
+
+```bash
+python3 tools/fetch_quran_data.py            # unduh 114 surah (Arab+ID & EN)
+python3 tools/fetch_quran_data.py --force    # kalau mau unduh ulang semua
+```
+
+Hasilnya ditulis ke `app/src/main/assets/quran/data/`:
+
+- `surah-<n>.json` — respons mentah equran.id (Arab + terjemahan Indonesia)
+- `trans-en-<n>.json` — terjemahan Inggris (quran.com, Saheeh International,
+  tag HTML & footnote `<sup>` sudah dibersihkan)
+
+Tanpa script ini aplikasi tetap berfungsi seperti sebelumnya (unduh on-demand +
+cache), hanya saja butuh internet saat pertama kali membuka surah.
 
 ## Build (Termux)
 

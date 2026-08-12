@@ -648,7 +648,6 @@ class TahsinViewModel(
             if (settings.backgroundDownloadAllowed == true) ensureBackgroundService()
             surahs.forEach { surah ->
                 runCatching {
-                    replaceSurah(surah)
                     if (!downloader.isSurahAudioComplete(surah)) {
                         total += surah.ayahs.size + surah.ayahs.sumOf { it.words.size }
                         updateReady { it.copy(downloadTotal = total) }

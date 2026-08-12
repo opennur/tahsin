@@ -13,9 +13,11 @@ import java.net.URL
 /**
  * Sumber data mushaf:
  * - Daftar 114 surah: `assets/quran/surah-list.json` (offline).
- * - Isi ayat per surah: diunduh dari equran.id (`v2/surat/{nomor}`) saat surah
- *   pertama kali dibuka, lalu di-cache di `filesDir/quran/surah-<n>.json`
- *   sehingga offline untuk kunjungan berikutnya.
+ * - Isi ayat + terjemahan ID: `assets/quran/data/surah-<n>.json` (hasil
+ *   `tools/fetch_quran_data.py`, di-bundle ke APK → offline siap pakai).
+ * - Terjemahan EN: `assets/quran/data/trans-en-<n>.json` (bundle sama).
+ * - Fallback: kalau aset belum ada (script belum dijalankan), diunduh dari
+ *   equran.id / quran.com lalu di-cache di `filesDir/quran/`.
  */
 class QuranRepository(context: Context) {
 
@@ -41,8 +43,23 @@ class QuranRepository(context: Context) {
         }
     }
 
-    /** Surah yang sudah pernah diunduh (teks saja, tanpa terjemahan bahasa lain). */
+    /** Isi surah (mentah equran.id) dari bundle aset, kalau ada. */
+    private fun assetSurahRaw(number: Int): String? =
+        runCatching {
+            appContext.assets.open("quran/data/surah-$number.json")
+                .bufferedReader().use { it.readText() }
+        }.getOrNull()
+
+    /** Terjemahan EN (mentah, format TranslationListJson) dari bundle aset. */
+    private fun assetEnRaw(number: Int): String? =
+        runCatching {
+            appContext.assets.open("quran/data/trans-en-$number.json")
+                .bufferedReader().use { it.readText() }
+        }.getOrNull()
+
+    /** Surah yang sudah tersedia (bundle aset / cache) — teks saja. */
     fun cachedSurahPlain(number: Int): Surah? {
+        assetSurahRaw(number)?.let { return runCatching { parseSurah(it) }.getOrNull() }
         val file = File(quranDir, "surah-$number.json")
         if (!file.exists()) return null
         return runCatching { parseSurah(file.readText()) }.getOrNull()
@@ -54,10 +71,10 @@ class QuranRepository(context: Context) {
      * Null kalau isi surah belum pernah diunduh.
      */
     suspend fun cachedSurah(number: Int, lang: AppLanguage): Surah? = withContext(Dispatchers.IO) {
-        val file = File(quranDir, "surah-$number.json")
-        if (!file.exists()) return@withContext null
+        val raw = assetSurahRaw(number)
+            ?: runCatching { File(quranDir, "surah-$number.json").readText() }.getOrNull()
+            ?: return@withContext null
         runCatching {
-            val raw = file.readText()
             val surah = parseSurah(raw)
             surah.withTranslation(translationFor(number, lang, raw, surah.ayahs.size))
         }.getOrNull()
@@ -65,15 +82,14 @@ class QuranRepository(context: Context) {
 
     /** Unduh surah (equran.id) + terjemahan bahasa aktif, lalu simpan ke cache. */
     suspend fun fetchSurah(number: Int, lang: AppLanguage): Surah = withContext(Dispatchers.IO) {
-        val file = File(quranDir, "surah-$number.json")
-        val raw: String = if (file.exists()) {
-            file.readText()
-        } else {
-            val text = httpGet("https://equran.id/api/v2/surat/$number")
-            file.parentFile?.mkdirs()
-            file.writeText(text)
-            text
-        }
+        val raw = assetSurahRaw(number)
+            ?: runCatching { File(quranDir, "surah-$number.json").readText() }.getOrNull()
+            ?: httpGet("https://equran.id/api/v2/surat/$number").also { text ->
+                File(quranDir, "surah-$number.json").apply {
+                    parentFile?.mkdirs()
+                    writeText(text)
+                }
+            }
         val surah = parseSurah(raw)
         surah.withTranslation(translationFor(number, lang, raw, surah.ayahs.size))
     }
@@ -120,9 +136,10 @@ class QuranRepository(context: Context) {
             return dto.data?.ayat?.map { it.teksIndonesia } ?: emptyList()
         }
         val file = File(quranDir, "trans-en-$number.json")
-        if (file.exists()) {
+        val rawEn = assetEnRaw(number) ?: runCatching { file.readText() }.getOrNull()
+        if (rawEn != null) {
             val cached = runCatching {
-                gson.fromJson(file.readText(), TranslationListJson::class.java)?.translations?.map { stripHtml(it.text) }
+                gson.fromJson(rawEn, TranslationListJson::class.java)?.translations?.map { stripHtml(it.text) }
             }.getOrNull()
             if (cached != null && cached.size == ayahCount) return cached
         }
