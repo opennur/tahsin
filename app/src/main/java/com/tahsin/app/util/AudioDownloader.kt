@@ -53,18 +53,23 @@ private const val PARALLELISM = 6
  * per qari' (`missing-<slug>.json`), kata global (`missing-words.json`);
  * `missing.json` lama (format awal, Minshawy) dimigrasi otomatis.
  */
-class AudioDownloader(context: Context, private val settings: SettingsStore) {
+class AudioDownloader internal constructor(
+    /** Akar folder audio: `filesDir/audio` (bisa di-inject untuk tes). */
+    private val audioDir: File,
+    /** Penyedia slug qari' aktif — dibaca LAZY tiap operasi (bisa ganti runtime). */
+    private val slugProvider: () -> String,
+) {
 
-    private val appContext = context.applicationContext
+    constructor(context: Context, settings: SettingsStore) : this(
+        File(context.applicationContext.filesDir, "audio"),
+        { settings.reciter.slug },
+    )
+
     private val gson = Gson()
-
-    /** filesDir/audio — relatif sama dengan konvensi assets/audio. */
-    val audioDir: File
-        get() = File(appContext.filesDir, "audio")
 
     /** Folder audio ayat qari' aktif: filesDir/audio/<slug>/. */
     private val reciterDir: File
-        get() = File(audioDir, settings.reciter.slug)
+        get() = File(audioDir, slugProvider())
 
     /** Registry missing: nama file (tanpa path) yang pernah 404 di server. */
     private val missingAyahsBySlug = mutableMapOf<String, MutableSet<String>>()
@@ -84,7 +89,7 @@ class AudioDownloader(context: Context, private val settings: SettingsStore) {
         File(File(audioDir, "wbw"), AudioUrls.wordKey(surah, ayah, wordIndex))
 
     fun isAyahMissing(surah: Int, ayah: Int): Boolean =
-        AudioUrls.ayahKey(surah, ayah) in missingAyahsFor(settings.reciter.slug)
+        AudioUrls.ayahKey(surah, ayah) in missingAyahsFor(slugProvider())
 
     fun isWordMissing(surah: Int, ayah: Int, wordIndex: Int): Boolean =
         AudioUrls.wordKey(surah, ayah, wordIndex) in missingWords
@@ -93,7 +98,7 @@ class AudioDownloader(context: Context, private val settings: SettingsStore) {
     suspend fun ensureAyah(surah: Int, ayah: Int): File? = withContext(Dispatchers.IO) {
         // Snapshot slug SEKALI per operasi: URL, path, cek & catat missing harus
         // konsisten walau qari' diganti di tengah unduhan (race window).
-        val slug = settings.reciter.slug
+        val slug = slugProvider()
         val key = AudioUrls.ayahKey(surah, ayah)
         val file = File(File(audioDir, slug), key)
         when {
@@ -154,7 +159,7 @@ class AudioDownloader(context: Context, private val settings: SettingsStore) {
         onProgress: (done: Int, total: Int) -> Unit,
     ): DownloadStats = withContext(Dispatchers.IO) {
         // Snapshot slug SEKALI per operasi (lihat catatan di ensureAyah).
-        val slug = settings.reciter.slug
+        val slug = slugProvider()
         val reciter = Reciter.fromSlug(slug)
         val slugDir = File(audioDir, slug)
         val jobs = mutableListOf<DownloadJob>()
@@ -276,7 +281,7 @@ class AudioDownloader(context: Context, private val settings: SettingsStore) {
                 }
         }
         val num3 = number.toString().padStart(3, '0')
-        val missingA = missingAyahsFor(settings.reciter.slug).count { it.startsWith(num3) }
+        val missingA = missingAyahsFor(slugProvider()).count { it.startsWith(num3) }
         val missingW = missingWords.count { it.startsWith(num3 + "_") }
         return SurahAudioInfo(number, ayahFiles, ayahCount, wordFiles, totalWords, sizeBytes, missingA, missingW)
     }

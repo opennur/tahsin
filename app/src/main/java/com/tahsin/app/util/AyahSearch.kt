@@ -44,7 +44,7 @@ object AyahSearch {
      */
     fun search(index: List<SearchableAyah>, query: String, limit: Int = DEFAULT_LIMIT): List<SearchableAyah> {
         val q = query.trim()
-        if (q.isEmpty()) return emptyList()
+        if (q.isEmpty() || limit <= 0) return emptyList()
         return index.asSequence()
             .filter { matches(it.arabic, it.translationId, it.translationEn, q) }
             .sortedWith(compareBy<SearchableAyah> { it.surahNumber }.thenBy { it.ayahNumber })

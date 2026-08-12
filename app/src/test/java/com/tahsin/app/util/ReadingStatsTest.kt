@@ -3,6 +3,7 @@ package com.tahsin.app.util
 import com.tahsin.app.stt.AlignedWord
 import com.tahsin.app.stt.WordStatus
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -199,5 +200,51 @@ class ReadingStatsTest {
         val aligned = listOf(AlignedWord(0, "", WordStatus.SKIPPED))
         val stats = ReadingStats.merge(1, 1, null, aligned, emptyList(), now = 1L)
         assertEquals(WordError(0, "…", 1), stats.wordErrors.single())
+    }
+
+    @Test
+    fun `kata yang belum terbaca (NOT_REACHED) tidak dihitung sebagai kesalahan`() {
+        val aligned = listOf(
+            word(0, "a", WordStatus.NOT_REACHED),
+            word(1, "b", WordStatus.CORRECT, "b"),
+            word(2, "c", WordStatus.READING, "c"),
+        )
+        val stats = ReadingStats.merge(1, 1, null, aligned, listOf("a", "b", "c"), now = 1L)
+        assertTrue(stats.wordErrors.isEmpty())
+        assertEquals(33, stats.lastScore) // hanya b yang benar
+    }
+
+    @Test
+    fun `avgScore nol sebelum ada percobaan`() {
+        assertEquals(0, AyahStats(1, 1).avgScore)
+        assertEquals(0, AyahStats(1, 1, attempts = 0, scoreSum = 0).avgScore)
+    }
+
+    @Test
+    fun `label kata dipertahankan walau percobaan berikutnya kosong`() {
+        var stats = ReadingStats.merge(1, 1, null, listOf(
+            word(0, "rahman", WordStatus.MISMATCH, "rahmaan"),
+        ), listOf("rahman"), now = 1L)
+
+        // Percobaan kedua: kata yang sama salah tapi label acuan kosong.
+        stats = ReadingStats.merge(1, 1, stats, listOf(
+            AlignedWord(0, "", WordStatus.SKIPPED),
+        ), listOf("rahman"), now = 2L)
+
+        assertEquals(WordError(0, "rahman", 2), stats.wordErrors.single())
+    }
+
+    @Test
+    fun `merge tidak mengubah data lama (immutable)`() {
+        val first = ReadingStats.merge(1, 1, null, listOf(
+            word(0, "a", WordStatus.MISMATCH, "x"),
+        ), listOf("a"), now = 1L)
+        val second = ReadingStats.merge(1, 1, first, listOf(
+            word(0, "a", WordStatus.CORRECT, "a"),
+        ), listOf("a"), now = 2L)
+
+        assertEquals(1, first.attempts)
+        assertEquals(2, second.attempts)
+        assertEquals(1, first.wordErrors.single().errorCount)
     }
 }

@@ -18,15 +18,18 @@ object QuranParser {
     private val gson = Gson()
 
     /** Daftar 114 surah (metadata saja, `ayahs` kosong). */
+    // JSON rusak/kosong (mis. aset korup) → daftar kosong, bukan crash.
     fun parseSurahList(json: String): List<Surah> {
-        val parsed = gson.fromJson(json, SurahListJson::class.java)
-        return parsed.surahs.map { it.toSurah() }
+        val parsed = runCatching { gson.fromJson(json, SurahListJson::class.java) }.getOrNull()
+            ?: return emptyList()
+        return parsed.surahs.orEmpty().map { it.toSurah() }
     }
 
     /** Respons equran.id (mentah) → [Surah] (teks Arab saja). */
     @Throws(IOException::class)
     fun parseSurah(raw: String): Surah {
-        val response = gson.fromJson(raw, SurahResponse::class.java)
+        val response = runCatching { gson.fromJson(raw, SurahResponse::class.java) }.getOrNull()
+            ?: throw IOException("Respons API tidak valid.")
         return response.data?.toSurah() ?: throw IOException("Respons API kosong.")
     }
 
@@ -48,7 +51,7 @@ object QuranParser {
     fun parseEnTranslations(json: String): List<String> {
         val parsed = runCatching { gson.fromJson(json, TranslationListJson::class.java) }.getOrNull()
             ?: return emptyList()
-        return parsed.translations.map { stripHtml(it.text) }
+        return parsed.translations.orEmpty().map { stripHtml(it.text) }
     }
 
     /**
@@ -59,7 +62,7 @@ object QuranParser {
     fun buildEnCacheJson(json: String): String? {
         val parsed = runCatching { gson.fromJson(json, TranslationListJson::class.java) }.getOrNull()
             ?: return null
-        val cleaned = parsed.translations.map { it.copy(text = stripHtml(it.text)) }
+        val cleaned = parsed.translations.orEmpty().map { it.copy(text = stripHtml(it.text)) }
         return gson.toJson(TranslationListJson(cleaned))
     }
 
@@ -100,7 +103,7 @@ object QuranParser {
             nameArabic = nama,
             nameLatin = namaLatin,
             ayahCount = jumlahAyat,
-            ayahs = ayat.map { Ayah(it.nomorAyat, it.teksArab) },
+            ayahs = (ayat ?: emptyList()).map { Ayah(it.nomorAyat, it.teksArab) },
         )
     }
 

@@ -17,9 +17,12 @@ import java.io.File
  * membuat hasil baru tidak terlihat). Penulisan atomik (tulis temp → rename)
  * supaya pembaca yang berjalan paralel tidak melihat file setengah jadi.
  */
-class ReadingStatsStore(context: Context) {
+class ReadingStatsStore internal constructor(private val file: File) {
 
-    private val file = File(context.applicationContext.filesDir, "reading-stats.json")
+    constructor(context: Context) : this(
+        File(context.applicationContext.filesDir, "reading-stats.json"),
+    )
+
     private val gson = Gson()
     private val listType = object : TypeToken<List<AyahStats>>() {}.type
 

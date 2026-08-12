@@ -123,4 +123,50 @@ class AyahSearchTest {
         val index = listOf(ayah(id = "rahmat"))
         assertTrue(AyahSearch.search(index, "").isEmpty())
     }
+
+    @Test
+    fun `search limit nol atau negatif - daftar kosong (tidak crash)`() {
+        val index = listOf(ayah(id = "rahmat"))
+        assertTrue(AyahSearch.search(index, "rahmat", limit = 0).isEmpty())
+        assertTrue(AyahSearch.search(index, "rahmat", limit = -1).isEmpty())
+        assertTrue(AyahSearch.search(index, "rahmat", limit = -100).isEmpty())
+    }
+
+    @Test
+    fun `search membuang spasi di sekitar query`() {
+        val index = listOf(ayah(id = "rahmat", surah = 1, no = 1))
+        assertEquals(1, AyahSearch.search(index, "  rahmat  ").size)
+        assertEquals(1, AyahSearch.search(index, "\trahmat\n").size)
+    }
+
+    @Test
+    fun `query Arab ber-harakat dinormalisasi sebelum dicocokkan`() {
+        val a = ayah(arabic = "الرَّحْمَٰنِ")
+        assertTrue(AyahSearch.matches(a.arabic, a.translationId, a.translationEn, "الرَّحْمَٰنِ"))
+        assertTrue(AyahSearch.matches(a.arabic, a.translationId, a.translationEn, "الرحمن"))
+    }
+
+    @Test
+    fun `search - ayat yang cocok di Arab dan terjemahan hanya muncul sekali`() {
+        val index = listOf(ayah(arabic = "رَحْمَة", id = "rahmat", surah = 1, no = 1))
+        val results = AyahSearch.search(index, "rahmat")
+        assertEquals(1, results.size)
+        assertEquals(1 to 1, results.single().surahNumber to results.single().ayahNumber)
+    }
+
+    @Test
+    fun `search - hasil diurutkan surah lalu ayat`() {
+        val index = listOf(
+            ayah(id = "rahmat", surah = 2, no = 1),
+            ayah(id = "rahmat", surah = 1, no = 5),
+            ayah(id = "rahmat", surah = 1, no = 1),
+            ayah(id = "rahmat", surah = 2, no = 2),
+        )
+        val results = AyahSearch.search(index, "rahmat")
+        assertEquals(4, results.size)
+        assertEquals(
+            listOf(1 to 1, 1 to 5, 2 to 1, 2 to 2),
+            results.map { it.surahNumber to it.ayahNumber },
+        )
+    }
 }

@@ -74,4 +74,55 @@ class TajwidQuizTest {
         assertEquals(a.targetRule.name, b.targetRule.name)
         assertEquals(a.options, b.options)
     }
+
+    @Test
+    fun `kata dengan hanya hukum membosankan tetap menghasilkan soal`() {
+        // بَلَّدَ = ب(0) َ(1) ل(2) ّ(3) َ(4) د(5) َ(6) — hanya tasydid (kategori
+        // boring; tanpa huruf isti'la/qalqalah/mad). Ditulis dengan \u escapes
+        // agar urutan tanda tidak diubah urutan kanonik NFC.
+        val q = TajwidQuiz.pickWord(listOf("\u0628\u064E\u0644\u0651\u064E\u062F\u064E"), Random(0))
+        assertNotNull(q)
+        assertEquals("Tasydid", q!!.targetRule.name)
+        assertEquals(4, q.options.size)
+        assertTrue(q.options.contains("Tasydid"))
+    }
+
+    @Test
+    fun `pengecoh tidak memuat aturan yang dikecualikan`() {
+        val exclude = listOf("Mad Thabi'i", "Iqlab", "Qalqalah")
+        val random = Random(5)
+        repeat(10) {
+            val options = TajwidQuiz.buildOptions("Mad Wajib Muttasil", random, exclude)
+            assertEquals(4, options.size)
+            assertEquals(4, options.toSet().size)
+            assertTrue(options.contains("Mad Wajib Muttasil"))
+            assertFalse(options.any { it in exclude })
+        }
+    }
+
+    @Test
+    fun `soal selalu memakai kata dari daftar yang diberikan`() {
+        val words = listOf("بِسْمِ", "اللَّهِ", "الرَّحْمَٰنِ")
+        repeat(10) {
+            val q = TajwidQuiz.pickWord(words, Random(it)) ?: return@repeat
+            assertTrue("kata di luar daftar: ${q.word}", q.word in words)
+        }
+    }
+
+    @Test
+    fun `opsi soal tidak pernah berisi jawaban ganda yang bisa dibela`() {
+        // Untuk setiap kata ber-hukum: opsi ≠ nama aturan lain yang benar pada kata itu.
+        val words = listOf("\u0625\u0646\u0651\u064E\u0627", "مِنْ", "قَالَ", "\u0627\u0644\u0644\u0651\u064E\u0647\u064F")
+        repeat(20) {
+            val q = TajwidQuiz.pickWord(words, Random(it)) ?: return@repeat
+            val allRuleNames = TajwidEngine.analyzeWord(q.word, q.prevWord, q.nextWord)
+                .map { it.name }
+                .toSet()
+            q.options.forEach { opt ->
+                if (opt != q.targetRule.name) {
+                    assertFalse("pengecoh $opt juga benar pada kata ini", opt in allRuleNames)
+                }
+            }
+        }
+    }
 }

@@ -131,6 +131,23 @@ class TajwidEngineTest {
     }
 
     @Test
+    fun `mad di dalam kata tidak dianggap munfasil walau kata berikut ber-hamza`() {
+        // Regresi: قَالَ ber-hamza berikutnya. Alif mad (index 2) BUKAN huruf
+        // terakhir kata (masih ada ل) — mad jaiz munfasil hanya berlaku untuk
+        // mad di AKHIR kata yang bertemu hamza di awal kata berikut.
+        val rules = TajwidEngine.analyzeWord("قَالَ", nextWord = "أَنْعَمْتَ")
+        assertTrue("harus Mad Thabi'i", rules.any { it.name == "Mad Thabi'i" })
+        assertTrue("false positive munfasil!", rules.none { it.name == "Mad Jaiz Munfasil" })
+    }
+
+    @Test
+    fun `mad akhir kata bertemu hamza awal kata berikut walau ada tanda waqaf di depan`() {
+        // "فِي ۚأَنْعَمْتَ" — tanda waqaf di awal kata berikut TIDAK menghalangi deteksi.
+        val rules = TajwidEngine.analyzeWord("فِي", nextWord = "\u06DA\u0623\u064E\u0646\u0652\u0639\u064E\u0645\u0652\u062A\u064E")
+        assertTrue(rules.any { it.name == "Mad Jaiz Munfasil" })
+    }
+
+    @Test
     fun `alif khanjariah - Mad Thabi'i`() {
         val rules = TajwidEngine.analyzeWord("\u0645\u0670") // مٰ
         assertEquals(listOf(RuleCategory.MAD), rules.map { it.category })
@@ -320,5 +337,94 @@ class TajwidEngineTest {
         // ي (mad akhir) bertemu ئ (hamza berkursi) di awal kata berikut
         val rules = TajwidEngine.analyzeWord("فِي", nextWord = "\u0626\u064E\u0646")
         assertTrue(rules.any { it.name == "Mad Jaiz Munfasil" })
+    }
+
+    // ---- Tanwin + hukum lintas kata ----
+
+    @Test
+    fun `tanwin bertemu ba - Iqlab`() {
+        val rules = TajwidEngine.analyzeWord("سَمِيعٌ", nextWord = "بَصِيرٌ")
+        assertTrue(rules.any { it.name == "Iqlab" })
+        // Tanwin di-anchor ke huruf yang memikulnya (ع di index 5; ٌ di index 6).
+        assertEquals(5, rules.first { it.name == "Iqlab" }.letterIndex)
+    }
+
+    @Test
+    fun `tanwin bertemu ra - Idgham Bilaghunnah`() {
+        val rules = TajwidEngine.analyzeWord("غَفُورٌ", nextWord = "رَحِيمٌ")
+        assertTrue(rules.any { it.name == "Idgham Bilaghunnah" })
+    }
+
+    @Test
+    fun `tanwin bertemu kaf - Ikhfa Haqiqi`() {
+        val rules = TajwidEngine.analyzeWord("عَلِيمٌ", nextWord = "كُلِّ")
+        assertTrue(rules.any { it.name == "Ikhfa' Haqiqi" })
+    }
+
+    // ---- Mad tambahan ----
+
+    @Test
+    fun `mad wajib muttasil dengan ya mad`() {
+        // جِيءَ = ج(0) ِ(1) ي(2) ْ(3) ء(4) َ(5) — ya mad bertemu hamza dalam satu kata.
+        val rules = TajwidEngine.analyzeWord("\u062C\u0650\u064A\u0652\u0621\u064E")
+        assertTrue(rules.any { it.name == "Mad Wajib Muttasil" })
+    }
+
+    @Test
+    fun `mad jaiz munfasil dengan wau mad`() {
+        // قُو bertemu kata ber-awal hamza (أَ...) → jaiz munfasil.
+        val rules = TajwidEngine.analyzeWord("\u0642\u064F\u0648", nextWord = "\u0623\u064E\u0641\u0652\u0644\u064E\u062D\u064E")
+        assertTrue(rules.any { it.name == "Mad Jaiz Munfasil" })
+    }
+
+    // ---- Waqaf ----
+
+    @Test
+    fun `tanda waqaf muanaqah - boleh berhenti di salah satu tanda`() {
+        val rules = TajwidEngine.analyzeWord("\u0627\u0644\u0635\u064E\u0641\u0651\u06DB") // الصَّفّۛ
+        assertTrue(rules.any { it.name == "Waqaf Mu'anaqah" })
+    }
+
+    @Test
+    fun `tanda waqaf menghasilkan penjelasan bahasa Indonesia dan Inggris`() {
+        val rules = TajwidEngine.analyzeWord("\u0642\u064F\u0644\u0652\u06D8") // قُلْۘ
+        val waqaf = rules.first { it.category == RuleCategory.WAQAF }
+        assertTrue(waqaf.explanation.isNotBlank())
+        assertTrue(waqaf.explanationEn.isNotBlank())
+    }
+
+    // ---- Invariant hasil engine ----
+
+    @Test
+    fun `setiap aturan punya nama dan penjelasan yang terisi`() {
+        val words = listOf("قَالَ", "إِنَّا", "الرَّحْمَٰنِ", "مِنْ", "\u0642\u064F\u0644\u0652\u06D8")
+        for (w in words) {
+            for (r in TajwidEngine.analyzeWord(w)) {
+                assertTrue("nama kosong di $w", r.name.isNotBlank())
+                assertTrue("penjelasan kosong di $w", r.explanation.isNotBlank())
+                assertTrue("penjelasan EN kosong di $w", r.explanationEn.isNotBlank())
+                assertTrue("index di luar kata $w", r.letterIndex in 0 until w.length)
+            }
+        }
+    }
+
+    @Test
+    fun `kata tanpa huruf - tidak crash`() {
+        assertTrue(TajwidEngine.analyzeWord("").isEmpty())
+        // Hanya tanda waqaf → tetap menghasilkan aturan waqaf (bukan crash).
+        val rules = TajwidEngine.analyzeWord("\u06DA\u06D8")
+        assertEquals(1, rules.size)
+        assertEquals(RuleCategory.WAQAF, rules.single().category)
+        assertEquals("Waqaf Jaiz", rules.single().name)
+    }
+
+    @Test
+    fun `hasil konsisten untuk kata yang sama (deterministik)`() {
+        repeat(3) {
+            assertEquals(
+                TajwidEngine.analyzeWord("الرَّحْمَٰنِ", "بِسْمِ", "الرَّحِيمِ"),
+                TajwidEngine.analyzeWord("الرَّحْمَٰنِ", "بِسْمِ", "الرَّحِيمِ"),
+            )
+        }
     }
 }

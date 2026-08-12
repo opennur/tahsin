@@ -61,9 +61,47 @@ class TranscriptAlignerTest {
 
     @Test
     fun `kemiripan parsial - READING`() {
+        // sim("ab","abcd") = 1 - 2/4 = 0.5 → di antara READING (0.35) dan MATCH (0.6).
         val result = TranscriptAligner.align("ab", listOf("abcd"))
         assertEquals(WordStatus.READING, result.single().status)
         assertEquals("ab", result.single().spokenWord)
+    }
+
+    @Test
+    fun `transkrip kosong dan acuan kosong - hasil kosong`() {
+        assertTrue(TranscriptAligner.align("", emptyList()).isEmpty())
+    }
+
+    @Test
+    fun `kata yang cocok dengan kata acuan kedua - kata pertama SKIPPED (greedy)`() {
+        // "b" hanya cocok dengan acuan kedua; greedy memakai b untuk acuan
+        // pertama (MISMATCH) sehingga acuan kedua tak tercapai → SKIPPED.
+        val result = TranscriptAligner.align("b", listOf("a", "b"))
+        assertEquals(
+            listOf(WordStatus.MISMATCH, WordStatus.SKIPPED),
+            result.map { it.status },
+        )
+    }
+
+    @Test
+    fun `similarity - satu huruf vs tiga huruf = 0`() {
+        assertEquals(0.0, TranscriptAligner.similarity("a", "xyz"), 0.0001)
+    }
+
+    @Test
+    fun `similarity - huruf sama dengan urutan beda`() {
+        assertEquals(1.0 - 2.0 / 3.0, TranscriptAligner.similarity("abc", "acb"), 0.0001)
+    }
+
+    @Test
+    fun `align - kata ekstra di tengah membuat acuan berikutnya SKIPPED`() {
+        // "a x b": x tidak cocok dengan b; greedy melompati acuan b (SKIPPED)
+        // daripada mengonsumsi x — kata ekstra tidak menggeser yang sudah cocok.
+        val result = TranscriptAligner.align("a x b", listOf("a", "b"))
+        assertEquals(
+            listOf(WordStatus.CORRECT, WordStatus.SKIPPED),
+            result.map { it.status },
+        )
     }
 
     @Test

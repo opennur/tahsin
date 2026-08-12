@@ -49,4 +49,49 @@ class ArabicNormalizerTest {
         assertEquals(emptyList<String>(), ArabicNormalizer.splitWords("   "))
         assertEquals(listOf("بسم"), ArabicNormalizer.splitWords("  بسم  "))
     }
+
+    @Test
+    fun `splitWords membuang token yang hanya tatweel`() {
+        assertEquals(emptyList<String>(), ArabicNormalizer.splitWords("ـــ"))
+        // Tatweel di dalam kata ikut dipertahankan (token utuh ber-tashkeel).
+        assertEquals(listOf("صَلّـ"), ArabicNormalizer.splitWords("صَلّـ"))
+    }
+
+    @Test
+    fun `normalize - string kosong tetap kosong`() {
+        assertEquals("", ArabicNormalizer.normalize(""))
+        assertEquals("", ArabicNormalizer.normalize("   "))
+        assertEquals("", ArabicNormalizer.normalize("\u064B\u0651\u06D8")) // hanya tanda
+    }
+
+    @Test
+    fun `normalize - hamza berkursi tidak dilipat (hanya pencarian yang melipat)`() {
+        // ArabicNormalizer (dipakai STT) membuang hamza "ء" tapi MEMPERTAHANKAN
+        // hamza berkursi ؤ/ئ — pelipatan itu khusus AyahSearch.searchNormalize.
+        assertEquals("مؤمن", ArabicNormalizer.normalize("مُؤْمِنَ"))
+    }
+
+    @Test
+    fun `normalize - semua bentuk hamza menjadi alif atau dibuang`() {
+        assertEquals("ا", ArabicNormalizer.normalize("أ"))
+        assertEquals("ا", ArabicNormalizer.normalize("إ"))
+        assertEquals("ا", ArabicNormalizer.normalize("آ"))
+        assertEquals("ا", ArabicNormalizer.normalize("\u0671")) // wasla ٱ
+        assertEquals("", ArabicNormalizer.normalize("ء"))
+    }
+
+    @Test
+    fun `stripMarks membuang tanda mushaf extended`() {
+        // U+08D6 (ࣖ) termasuk rentang tanda mushaf extended yang ikut dibuang.
+        assertEquals("بسم", ArabicNormalizer.stripMarks("بِسْمِ\u08D6"))
+        assertEquals("قل", ArabicNormalizer.stripMarks("قُلْ\u06D8")) // tanda waqaf
+    }
+
+    @Test
+    fun `isLetter - huruf dasar dan hamza benar`() {
+        val letters = "ابتثجحخدذرزسشصضطظعغفقكلمنهويئةءأآإى"
+        letters.forEach { assertTrue("harus huruf: $it", ArabicNormalizer.isLetter(it)) }
+        val nonLetters = "َُِّْٰ \t\n\u06DD\u0671"
+        nonLetters.forEach { assertFalse("bukan huruf: $it", ArabicNormalizer.isLetter(it)) }
+    }
 }

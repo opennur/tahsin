@@ -185,12 +185,15 @@ object TajwidEngine {
                     "Fatha diikuti alif khanjariah: dibaca panjang 2 harakat.",
                     "Fatha followed by a dagger alif: read long for 2 counts.")
             } else if (isMadLetter) {
+                // Huruf pertama kata berikut (lewati tanda waqaf yang menempel,
+                // mis. ۚ di awal kata) untuk deteksi mad jaiz munfasil.
+                val nextWordFirstLetter = nextWord?.firstOrNull { ArabicNormalizer.isLetter(it) }
                 val hamzaAfter = nextLetter != null && nextLetter in HAMZA_FORMS
                 if (hamzaAfter) {
                     rules += rule(RuleCategory.MAD, "Mad Wajib Muttasil", i,
                         "Mad bertemu hamza dalam satu kata: dibaca panjang 4–5 harakat (wajib).",
                         "Mad meets a hamzah in the same word: read long 4–5 counts (obligatory).")
-                } else if (nextWord?.firstOrNull() in HAMZA_FORMS) {
+                } else if (isLastLetter(word, i) && nextWordFirstLetter in HAMZA_FORMS) {
                     rules += rule(RuleCategory.MAD, "Mad Jaiz Munfasil", i,
                         "Mad di akhir kata bertemu hamza di awal kata berikutnya: boleh dibaca 2 atau 4–5 harakat.",
                         "Mad at the end of a word meets a hamzah at the start of the next word: may be read 2 or 4–5 counts.")
