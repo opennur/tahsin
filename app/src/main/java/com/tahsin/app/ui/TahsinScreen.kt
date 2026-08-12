@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -283,39 +283,12 @@ private fun TahsinContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ---- Mushaf kontinu (gaya mushaf asli: kata tersambung RTL) ----
-            // Tiap kata bisa diketuk → play kata + tooltip keterangan tajwid.
-            // Swipe kiri/kanan → ganti ayat. Pointer hanya diklaim SETELAH
-            // melewati ambang swipe, supaya tap kata tetap berfungsi normal.
+            // Satu gesture menangani TAP (pilih kata → tooltip) dan SWIPE
+            // (ganti ayat) sekaligus — tanpa konflik arena gesture.
             val density = LocalDensity.current
             val swipeThresholdPx = with(density) { 80.dp.toPx() }
-            AyahCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .pointerInput(Unit) {
-                        awaitEachGesture {
-                            val down = awaitFirstDown()
-                            var totalX = 0f
-                            var claimed = false
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                                if (change.pressed) {
-                                    val dx = change.position.x - change.previousPosition.x
-                                    totalX += dx
-                                    if (!claimed && kotlin.math.abs(totalX) > swipeThresholdPx) {
-                                        claimed = true
-                                    }
-                                    if (claimed) change.consume()
-                                } else {
-                                    break
-                                }
-                            }
-                            // Semua jari terangkat — putuskan arah (RTL: kanan = next).
-                            if (totalX >= swipeThresholdPx) onNextAyah()
-                            else if (totalX <= -swipeThresholdPx) onPrevAyah()
-                        }
-                    },
-            ) {
+            val tapSlopPx = with(density) { 12.dp.toPx() }
+            AyahCard(modifier = Modifier.fillMaxWidth()) {
                 var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
                 val wordOffsets = remember(words) {
                     val arr = IntArray(words.size)
@@ -335,16 +308,52 @@ private fun TahsinContent(
                         tajwidColor = state.tajwidColor,
                     )
                 }
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        ClickableText(
-                            text = annotated,
-                            onClick = { offset ->
-                                val idx = wordIndexAt(offset, wordOffsets)
-                                if (idx in words.indices) {
-                                    onSelectWord(if (idx == state.selectedWordIndex) -1 else idx)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .pointerInput(state.selectedWordIndex) {
+                            awaitEachGesture {
+                                val down = awaitFirstDown()
+                                var lastPos = down.position
+                                var totalX = 0f
+                                var totalY = 0f
+                                var swiping = false
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                                    if (!change.pressed) break
+                                    lastPos = change.position
+                                    totalX += change.position.x - change.previousPosition.x
+                                    totalY += change.position.y - change.previousPosition.y
+                                    if (!swiping &&
+                                        kotlin.math.abs(totalX) > swipeThresholdPx &&
+                                        kotlin.math.abs(totalX) > kotlin.math.abs(totalY)
+                                    ) {
+                                        swiping = true
+                                    }
+                                    if (swiping) change.consume()
                                 }
-                            },
+                                if (swiping) {
+                                    // RTL: geser kanan = ayat berikutnya, kiri = sebelumnya.
+                                    if (totalX >= swipeThresholdPx) onNextAyah()
+                                    else if (totalX <= -swipeThresholdPx) onPrevAyah()
+                                } else if (kotlin.math.abs(totalX) < tapSlopPx && kotlin.math.abs(totalY) < tapSlopPx) {
+                                    // Tap: pilih kata di bawah jari (teks dimulai di (0,0) Box).
+                                    val layout = textLayout
+                                    if (layout != null) {
+                                        val charOffset = layout.getOffsetForPosition(lastPos)
+                                        val idx = wordIndexAt(charOffset, wordOffsets)
+                                        if (idx in words.indices) {
+                                            onSelectWord(if (idx == state.selectedWordIndex) -1 else idx)
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                ) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                        BasicText(
+                            text = annotated,
                             onTextLayout = { textLayout = it },
                             style = AyahTypography.ArabicWord.copy(
                                 color = AyahColors.TextPrimary,
@@ -401,8 +410,9 @@ private fun TahsinContent(
                                         )
                                     } else {
                                         rules.forEach { r ->
+                                            val exp = if (state.language == AppLanguage.EN) r.explanationEn else r.explanation
                                             AyahText(
-                                                "• ${r.name} — ${r.explanation}",
+                                                "• ${r.name} — $exp",
                                                 style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
                                             )
                                         }

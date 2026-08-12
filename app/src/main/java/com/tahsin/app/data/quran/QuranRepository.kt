@@ -122,20 +122,29 @@ class QuranRepository(context: Context) {
         val file = File(quranDir, "trans-en-$number.json")
         if (file.exists()) {
             val cached = runCatching {
-                gson.fromJson(file.readText(), TranslationListJson::class.java)?.translations?.map { it.text }
+                gson.fromJson(file.readText(), TranslationListJson::class.java)?.translations?.map { stripHtml(it.text) }
             }.getOrNull()
             if (cached != null && cached.size == ayahCount) return cached
         }
         val json = httpGet("https://api.quran.com/api/v4/quran/translations/20?chapter_number=$number")
         val parsed = gson.fromJson(json, TranslationListJson::class.java) ?: return emptyList()
-        val texts = parsed.translations.map { stripHtml(it.text) }
+        // Simpan versi SUDAH dibersihkan agar cache tidak menyimpan tag HTML.
+        val cleaned = parsed.translations.map { it.copy(text = stripHtml(it.text)) }
+        val texts = cleaned.map { it.text }
         file.parentFile?.mkdirs()
-        file.writeText(gson.toJson(TranslationListJson(parsed.translations)))
+        file.writeText(gson.toJson(TranslationListJson(cleaned)))
         return texts
     }
 
-    /** Buang tag HTML (mis. `<sup foot_note=...>1</sup>` dari quran.com). */
-    private fun stripHtml(s: String): String = s.replace(Regex("<[^>]*>"), "").trim()
+    /**
+     * Buang tag HTML dari quran.com, termasuk footnote `<sup ...>N</sup>`
+     * (tag + nomornya), lalu rapikan spasi.
+     */
+    private fun stripHtml(s: String): String =
+        s.replace(Regex("(?i)<sup[^>]*>.*?</sup>"), "")   // footnote utuh (tag + nomor)
+            .replace(Regex("<[^>]*>"), "")                 // tag lain
+            .replace(Regex("\\s+"), " ")
+            .trim()
 
     // ---- DTO (JSON) ----
 
