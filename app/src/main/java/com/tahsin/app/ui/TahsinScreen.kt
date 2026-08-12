@@ -96,6 +96,8 @@ fun TahsinScreen(
     onOpenAudioManager: () -> Unit = {},
     /** Buka layar statistik & riwayat kesalahan (dari drawer pengaturan). */
     onOpenStats: () -> Unit = {},
+    /** Buka layar pencarian ayat (tombol 🔍 di header). */
+    onOpenSearch: () -> Unit = {},
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     target: OpenTarget? = null,
     modifier: Modifier = Modifier,
@@ -172,6 +174,7 @@ fun TahsinScreen(
             onDownloadAll = viewModel::downloadAllAudio,
             onOpenAudioManager = onOpenAudioManager,
             onOpenStats = onOpenStats,
+            onOpenSearch = onOpenSearch,
             modifier = modifier,
         )
     }
@@ -201,6 +204,7 @@ private fun TahsinContent(
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
     onOpenStats: () -> Unit,
+    onOpenSearch: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -276,6 +280,13 @@ private fun TahsinContent(
                 style = AyahTypography.Heading1,
                 modifier = Modifier.weight(1f),
             )
+            AyahButton(
+                text = "🔍",
+                variant = AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                onClick = onOpenSearch,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             AyahButton(
                 text = if (state.darkMode) "☀️" else "🌙",
                 variant = AyahButtonVariant.Outline,

@@ -36,6 +36,10 @@ tanpa melihat layar.
   ditutup permanen lewat tombol ✕.
 - 🧭 **Navigasi satu baris**: `[‹ next] [surah ▾] [Ayat (n) ▾] [› prev]` — label
   surah/ayat ter-truncate otomatis (ellipsis) supaya selalu muat satu layar.
+- 🔍 **Pencarian ayat** (tombol 🔍 di header): cari **kata Arab** (harakat &
+  varian hamza/ya/ta marbuta dinormalisasi otomatis) atau **kata kunci
+  terjemahan ID/EN** di seluruh 114 surah — offline dari bundle. Ketuk hasil
+  → langsung buka ayat itu; ketikan di-debounce, indeks dibangun sekali.
 - 🔍 **Panel kata**: ketuk kata di mushaf → hukum tajwid + penjelasan + putar
   audio kata; tombolnya berubah jadi **⏹ Stop** saat kata sedang diputar
   (terpisah dari tombol Dengar ayat — bebas race).
@@ -92,11 +96,13 @@ app/src/main/java/com/tahsin/app/
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
-│                   #   StatsScreen + StatsViewModel (statistik & riwayat)
+│                   #   StatsScreen + StatsViewModel (statistik & riwayat),
+│                   #   SearchScreen + SearchViewModel (pencarian ayat)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + alarm harian/notifikasi
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
+│                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
 │                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```

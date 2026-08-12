@@ -2,6 +2,7 @@ package com.tahsin.app.data.quran
 
 import android.content.Context
 import com.tahsin.app.util.AppLanguage
+import com.tahsin.app.util.SearchableAyah
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -90,6 +91,39 @@ class QuranRepository(context: Context) {
             }
         val surah = QuranParser.parseSurah(raw)
         surah.withTranslation(translationFor(number, lang, raw, surah.ayahs.size))
+    }
+
+    /**
+     * Indeks pencarian seluruh mushaf: teks Arab + terjemahan ID & EN untuk
+     * setiap ayat, dibangun dari bundle aset (offline). Surah yang kontennya
+     * belum tersedia dilewati tanpa crash. Dipanggil sekali lalu di-cache di
+     * pemanggil (SearchViewModel) — 114 file JSON, jadi jangan per-keystroke.
+     */
+    suspend fun searchIndex(): List<SearchableAyah> = withContext(Dispatchers.IO) {
+        surahList().mapNotNull { meta ->
+            val n = meta.number
+            val raw = assetSurahRaw(n)
+                ?: runCatching { File(quranDir, "surah-$n.json").readText() }.getOrNull()
+                ?: return@mapNotNull null
+            runCatching {
+                val surah = QuranParser.parseSurah(raw)
+                val idTr = QuranParser.parseIdTranslations(raw)
+                val enRaw = assetEnRaw(n)
+                    ?: runCatching { File(quranDir, "trans-en-$n.json").readText() }.getOrNull()
+                val enTr = enRaw
+                    ?.let { runCatching { QuranParser.parseEnTranslations(it) }.getOrNull() }
+                    .orEmpty()
+                surah.ayahs.mapIndexed { i, a ->
+                    SearchableAyah(
+                        surahNumber = n,
+                        ayahNumber = a.number,
+                        arabic = a.text,
+                        translationId = idTr.getOrNull(i).orEmpty(),
+                        translationEn = enTr.getOrNull(i).orEmpty(),
+                    )
+                }
+            }.getOrNull().orEmpty()
+        }.flatten()
     }
 
     private fun httpGet(url: String): String {

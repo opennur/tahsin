@@ -35,6 +35,11 @@ continuous muraja'ah without looking at the screen.
   permanently with the ✕ button.
 - 🧭 **Single-line navigation**: `[‹ next] [surah ▾] [Ayah (n) ▾] [› prev]` —
   surah/ayah labels auto-truncate (ellipsis) so it always fits on one screen.
+- 🔍 **Ayah search** (🔍 button in the header): search by **Arabic word**
+  (diacritics and hamza/ya/ta-marbuta variants are normalized automatically)
+  or by **ID/EN translation keyword** across all 114 surahs — offline from the
+  bundle. Tap a result to jump straight to that ayah; typing is debounced and
+  the index is built once.
 - 🔍 **Word panel**: tap a word in the mushaf → tajwid rule + explanation + play
   the word audio; the button becomes **⏹ Stop** while the word is playing
   (separate from the "Listen to ayah" button — race-free).
@@ -92,11 +97,13 @@ app/src/main/java/com/tahsin/app/
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (color spans)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
-│                   #   StatsScreen + StatsViewModel (statistics & history)
+│                   #   StatsScreen + StatsViewModel (statistics & history),
+│                   #   SearchScreen + SearchViewModel (ayah search)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + daily alarm/notification
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (per-ayah reading history, JSON filesDir),
+│                   #   AyahSearch (normalized Arabic + translation search),
 │                   #   AyahOfTheDayManager (daily ayah selection + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```

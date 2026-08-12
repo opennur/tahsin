@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import com.tahsin.app.theme.AyahTheme
 import com.tahsin.app.ui.AudioManagerScreen
 import com.tahsin.app.ui.OpenTarget
+import com.tahsin.app.ui.SearchScreen
 import com.tahsin.app.ui.StatsScreen
 import com.tahsin.app.ui.TahsinScreen
 import com.tahsin.app.widget.AyahOfTheDayAlarm
@@ -30,9 +31,9 @@ class MainActivity : ComponentActivity() {
     /** Counter pengiriman target: naik tiap deep link valid → key LaunchedEffect unik. */
     private var targetDelivery = 0L
 
-    /** Target buka ayat dari layar statistik (ketuk kata sering salah) — dikonsumsi
+    /** Target buka ayat dari layar sekunder (statistik/pencarian) — dikonsumsi
      * saat deep link widget/notifikasi baru datang (onNewIntent). */
-    private var statsTarget by mutableStateOf<OpenTarget?>(null)
+    private var pendingOpenTarget by mutableStateOf<OpenTarget?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,19 +48,28 @@ class MainActivity : ComponentActivity() {
             AyahTheme {
                 var showAudioManager by remember { mutableStateOf(false) }
                 var showStats by remember { mutableStateOf(false) }
+                var showSearch by remember { mutableStateOf(false) }
                 when {
                     showAudioManager -> AudioManagerScreen(onBack = { showAudioManager = false })
                     showStats -> StatsScreen(
                         onBack = { showStats = false },
                         onOpenAyah = { s, a ->
-                            statsTarget = OpenTarget(s, a, targetDelivery++)
+                            pendingOpenTarget = OpenTarget(s, a, targetDelivery++)
                             showStats = false
+                        },
+                    )
+                    showSearch -> SearchScreen(
+                        onBack = { showSearch = false },
+                        onOpenAyah = { s, a ->
+                            pendingOpenTarget = OpenTarget(s, a, targetDelivery++)
+                            showSearch = false
                         },
                     )
                     else -> TahsinScreen(
                         onOpenAudioManager = { showAudioManager = true },
                         onOpenStats = { showStats = true },
-                        target = statsTarget ?: target,
+                        onOpenSearch = { showSearch = true },
+                        target = pendingOpenTarget ?: target,
                     )
                 }
             }
@@ -69,9 +79,9 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        // Deep link baru (widget/notifikasi) menang atas target statistik lama
+        // Deep link baru (widget/notifikasi) menang atas target layar sekunder
         // yang belum sempat dipakai — biar ketukan widget tidak diabaikan.
-        statsTarget = null
+        pendingOpenTarget = null
         target = readTarget(intent)
     }
 

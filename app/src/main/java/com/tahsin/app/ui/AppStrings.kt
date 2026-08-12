@@ -100,6 +100,14 @@ data class Strings(
     val statsInline: String,
     val statsEmptySurah: String,
     val statsLoading: String,
+    // Pencarian ayat
+    val searchTitle: String,
+    val searchHint: String,
+    val searchNoQuery: String,
+    val searchIndexing: String,
+    val searchSearching: String,
+    val searchNoResults: String,
+    val searchResultsCount: String,
 )
 
 object AppStrings {
@@ -202,6 +210,13 @@ object AppStrings {
         statsInline = "📊 %d× dicoba · skor terbaik %d%%",
         statsEmptySurah = "Belum ada kata yang sering salah di surah ini. 👍",
         statsLoading = "Memuat statistik…",
+        searchTitle = "🔍 Cari Ayat",
+        searchHint = "Kata Arab / kata kunci terjemahan (ID/EN)…",
+        searchNoQuery = "Ketik kata kunci untuk mencari ayat di seluruh Al-Qur'an.",
+        searchIndexing = "Menyiapkan indeks pencarian…",
+        searchSearching = "Mencari…",
+        searchNoResults = "Tidak ada ayat yang cocok.",
+        searchResultsCount = "%d hasil",
     )
 
     val English = Strings(
@@ -298,5 +313,12 @@ object AppStrings {
         statsInline = "📊 %d× attempted · best score %d%%",
         statsEmptySurah = "No frequently wrong words in this surah yet. 👍",
         statsLoading = "Loading statistics…",
+        searchTitle = "🔍 Search Ayah",
+        searchHint = "Arabic word / translation keyword (ID/EN)…",
+        searchNoQuery = "Type a keyword to search ayahs across the whole Qur'an.",
+        searchIndexing = "Preparing search index…",
+        searchSearching = "Searching…",
+        searchNoResults = "No matching ayahs.",
+        searchResultsCount = "%d results",
     )
 }

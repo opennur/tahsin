@@ -1,2 +1,22 @@
 [permissions]
-allow = ["Bash=./gradlew assembleDebug --no-daemon 2>&1 | tail -12", "review", "Bash=./gradlew testDebugUnitTest assembleDebug --no-daemon 2>&1 | tail -8", "Bash=./gradlew testDebugUnitTest assembleDebug --no-daemon 2>&1 | tail -6"]
+allow = [
+    # --- BUILD ---
+    "Bash=./gradlew assembleDebug --no-daemon 2>&1 | tail -12",
+    "Bash=./gradlew assembleRelease --no-daemon 2>&1 | tail -12",
+    "Bash=./gradlew clean --no-daemon 2>&1 | tail -8",
+
+    # --- TEST ---
+    "Bash=./gradlew testDebugUnitTest --no-daemon 2>&1 | tail -12",
+
+    # --- CHECK & LINT ---
+    "Bash=./gradlew lint --no-daemon 2>&1 | tail -12",
+
+    # --- UTILITY ---
+    "Bash=git status 2>&1 | tail -8",
+    "Bash=ls -la 2>&1 | tail -10",
+
+    # --- REASONIX BUILT-IN ---
+    "review",
+    "apply",
+    "status",
+]
