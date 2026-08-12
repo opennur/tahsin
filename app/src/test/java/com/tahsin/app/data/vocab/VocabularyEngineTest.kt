@@ -13,11 +13,11 @@ import org.junit.Test
 class VocabularyEngineTest {
 
     private val entries = listOf(
-        VocabEntry("من", "مِنْ", "min", "dari", "from", 2763, example(2, 4, 8)),
-        VocabEntry("الله", "اللّٰهِ", "allāh", "Allah", "Allah", 2156, example(1, 1, 2)),
-        VocabEntry("ان", "اِنَّ", "inna", "sesungguhnya", "indeed", 1605, example(2, 6, 1)),
-        VocabEntry("في", "فِيْ", "fī", "di dalam", "in", 1101, example(2, 10, 1)),
-        VocabEntry("ما", "مَا", "mā", "apa; yang; tidak", "what; that; not", 903, example(2, 17, 8)),
+        VocabEntry("من", "مِنْ", "min", "dari", "from", 2763, example = example(2, 4, 8)),
+        VocabEntry("الله", "اللّٰهِ", "allāh", "Allah", "Allah", 2156, example = example(1, 1, 2)),
+        VocabEntry("ان", "اِنَّ", "inna", "sesungguhnya", "indeed", 1605, example = example(2, 6, 1)),
+        VocabEntry("في", "فِيْ", "fī", "di dalam", "in", 1101, example = example(2, 10, 1)),
+        VocabEntry("ما", "مَا", "mā", "apa; yang; tidak", "what; that; not", 903, example = example(2, 17, 8)),
     )
     private val now = 1_000_000L
 
@@ -83,6 +83,22 @@ class VocabularyEngineTest {
         val session = VocabularyEngine.selectSession(entries, cards, now, newLimit = 1, dueLimit = 1)
         // due paling tua ("ان") + 1 kata baru terfrequent ("من").
         assertEquals(listOf("ان", "من"), session.map { it.key })
+    }
+
+    @Test
+    fun `selectSession - kata baru beragam akar (satu anggota per akar)`() {
+        val rooted = listOf(
+            VocabEntry("قال", "قَالَ", "qāla", "dia berkata", "he said", 411, root = "قول"),
+            VocabEntry("قالوا", "قَالُوْا", "qālū", "mereka berkata", "they said", 250, root = "قول"),
+            VocabEntry("كتب", "كِتَابٌ", "kitāb", "kitab", "book", 66, root = "كتب"),
+            VocabEntry("خلق", "خَلَقَ", "khalaqa", "Dia menciptakan", "He created", 83, root = "خلق"),
+            VocabEntry("علم", "عِلْمَ", "'ilm", "ilmu", "knowledge", 70, root = "علم"),
+        )
+        val session = VocabularyEngine.selectSession(rooted, emptyMap(), now, newLimit = 4, dueLimit = 0)
+        val keys = session.map { it.key }
+        // قال & قالوا satu akar (قول) → hanya قال yang masuk; akar lain ikut.
+        assertEquals(listOf("قال", "كتب", "خلق", "علم"), keys)
+        assertEquals(4, session.map { it.root }.distinct().size)
     }
 
     // ---- Kuis ----

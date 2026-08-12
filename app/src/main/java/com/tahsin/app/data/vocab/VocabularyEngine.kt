@@ -94,6 +94,10 @@ object VocabularyEngine {
     /**
      * Pilih sesi belajar: kartu jatuh tempo (tertua dulu, maks [dueLimit]),
      * lalu kata baru (urutan frekuensi, maks [newLimit]).
+     *
+     * Kata BARU dibuat beragam akar: maksimal satu anggota per akar per sesi
+     * (dan akar yang sudah muncul di kartu jatuh tempo dilewati) — biar satu
+     * sesi tidak berisi 3 bentuk kata dari akar yang sama.
      */
     fun selectSession(
         entries: List<VocabEntry>,
@@ -109,8 +113,17 @@ object VocabularyEngine {
         ).take(dueLimit)
 
         val dueKeys = due.mapTo(mutableSetOf()) { it.key }
-        val fresh = entries.filter { entry -> entry.key !in cards && entry.key !in dueKeys }
-            .take(newLimit)
+        // Akar yang sudah muncul (kartu due) tidak diulang sebagai kata baru.
+        val seenRoots = due.mapTo(mutableSetOf()) { it.root.ifBlank { it.key } }
+        val fresh = entries.filter { entry ->
+            entry.key !in cards && entry.key !in dueKeys
+        }.filter { entry ->
+            val root = entry.root.ifBlank { entry.key }
+            if (root in seenRoots) false else {
+                seenRoots.add(root)
+                true
+            }
+        }.take(newLimit)
         return due + fresh
     }
 

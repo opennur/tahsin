@@ -10,9 +10,11 @@ class VocabularyParserTest {
     private val sample = """
         {"entries":[
           {"key":"من","word":"مِنْ","translit":"min","meaningId":"dari","meaningEn":"from","freq":2763,
+           "root":"من","rootMeaningId":"dari","rootMeaningEn":"from",
            "example":{"surah":2,"ayah":4,"word":8,"ayahArab":"بِسْمِ اللَّهِ","ayahLatin":"Bismillāh","ayahId":"Dengan nama Allah","ayahEn":"In the name of Allah"}},
-          {"key":"الله","word":"اللّٰهِ","translit":"allāh","meaningId":"Allah","meaningEn":"Allah","freq":2156,
-           "example":{"surah":1,"ayah":1,"word":2,"ayahArab":"بِسْمِ اللَّهِ","ayahLatin":"Bismillāh","ayahId":"Dengan nama Allah","ayahEn":"In the name of Allah"}}
+          {"key":"قال","word":"قَالَ","translit":"qāla","meaningId":"dia berkata","meaningEn":"he said","freq":411,
+           "root":"قول","rootMeaningId":"berkata; ucapan","rootMeaningEn":"to say; speech",
+           "example":{"surah":2,"ayah":30,"word":2,"ayahArab":"قَالَ رَبُّكَ","ayahLatin":"Qāla rabbuka","ayahId":"Tuhanmu berfirman","ayahEn":"Your Lord said"}}
         ]}
     """.trimIndent()
 
@@ -33,6 +35,19 @@ class VocabularyParserTest {
         assertEquals("بِسْمِ اللَّهِ", first.example.ayahArab)
         assertEquals("Dengan nama Allah", first.example.ayahId)
         assertEquals("In the name of Allah", first.example.ayahEn)
+    }
+
+    @Test
+    fun `parse - field akar kata terbaca`() {
+        val entries = VocabularyParser.parse(sample)
+        val qala = entries[1]
+        assertEquals("قول", qala.root)
+        assertEquals("berkata; ucapan", qala.rootMeaningId)
+        assertEquals("to say; speech", qala.rootMeaningEn)
+        // Kata tanpa field akar → default kosong (tidak crash).
+        val missing = VocabularyParser.parse("""{"entries":[{"key":"من","meaningId":"dari"}]}""")
+        assertEquals("", missing[0].root)
+        assertEquals("", missing[0].rootMeaningId)
     }
 
     @Test

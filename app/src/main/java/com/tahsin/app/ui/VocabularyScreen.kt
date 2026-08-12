@@ -249,6 +249,18 @@ private fun CardsSection(
                 if (state.language == AppLanguage.EN) entry.meaningEn else entry.meaningId,
                 style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
             )
+            if (entry.root.isNotBlank() && entry.root != entry.key) {
+                Spacer(modifier = Modifier.height(8.dp))
+                AyahText(
+                    "${strings.vocabRoot}: ${entry.root}" +
+                        if (state.language == AppLanguage.EN) " — ${entry.rootMeaningEn}"
+                        else " — ${entry.rootMeaningId}",
+                    style = AyahTypography.Body2.copy(
+                        color = AyahColors.Primary,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                )
+            }
             if (ex.surah > 0) {
                 Spacer(modifier = Modifier.height(12.dp))
                 AyahText(

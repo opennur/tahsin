@@ -29,7 +29,7 @@ import os
 import re
 
 # Jumlah entri terbanyak yang dikeluarkan ke vocab.json (urutan frekuensi).
-TOP_N = 400
+TOP_N = 600
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 QURAN_DIR = os.path.join(ROOT, "app", "src", "main", "assets", "quran", "data")

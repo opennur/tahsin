@@ -12,6 +12,11 @@ data class VocabEntry(
     val meaningId: String,
     val meaningEn: String,
     val freq: Int,
+    /** Akar kata (keluarga) — lihat `tools/vocab_roots.py`. */
+    val root: String = "",
+    /** Arti konsep akar (ID/EN) — override atau turunan anggota terfrequent. */
+    val rootMeaningId: String = "",
+    val rootMeaningEn: String = "",
     val example: VocabExample = VocabExample(0, 0, 0, "", "", "", ""),
 )
 

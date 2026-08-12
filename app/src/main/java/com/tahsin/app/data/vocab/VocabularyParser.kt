@@ -30,6 +30,9 @@ object VocabularyParser {
         val meaningId: String? = null,
         val meaningEn: String? = null,
         val freq: Int = 0,
+        val root: String? = null,
+        val rootMeaningId: String? = null,
+        val rootMeaningEn: String? = null,
         val example: VocabExampleJson? = null,
     ) {
         fun toEntry() = VocabEntry(
@@ -39,6 +42,9 @@ object VocabularyParser {
             meaningId = meaningId.orEmpty(),
             meaningEn = meaningEn.orEmpty(),
             freq = freq,
+            root = root.orEmpty(),
+            rootMeaningId = rootMeaningId.orEmpty(),
+            rootMeaningEn = rootMeaningEn.orEmpty(),
             example = example?.toExample() ?: VocabExample(0, 0, 0, "", "", "", ""),
         )
     }
