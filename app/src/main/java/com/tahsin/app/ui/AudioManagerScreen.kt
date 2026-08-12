@@ -227,8 +227,9 @@ fun AudioManagerScreen(
                 }
             }
         } else {
+            val filesWord = if (state.language == AppLanguage.ID) "berkas" else "files"
             AyahText(
-                "Total: ${state.totalDownloaded} file • ${formatSize(state.totalSizeBytes)}",
+                "Total: ${state.totalDownloaded} $filesWord • ${formatSize(state.totalSizeBytes)}",
                 style = AyahTypography.Caption,
             )
             Spacer(modifier = Modifier.height(8.dp))

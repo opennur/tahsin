@@ -3,8 +3,14 @@ package com.tahsin.app.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,6 +53,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -71,6 +78,7 @@ import com.tahsin.app.data.tajwid.TajwidSpan
 import com.tahsin.app.stt.AlignedWord
 import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.AyahColors
+import com.tahsin.app.theme.AyahShapes
 import com.tahsin.app.theme.AyahTypography
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.AudioSpeeds
@@ -83,6 +91,7 @@ import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahCard
 import com.tahsin.app.ui.components.AyahErrorView
 import com.tahsin.app.ui.components.AyahLoadingView
+import com.tahsin.app.ui.components.AyahSwitch
 import com.tahsin.app.ui.components.AyahText
 import com.tahsin.app.ui.components.DropdownOption
 import com.tahsin.app.ui.components.SimpleDropdown
@@ -235,6 +244,9 @@ private fun TahsinContent(
 
     var drawerOpen by remember { mutableStateOf(false) }
 
+    // Tombol back sistem menutup drawer (bukan menutup aplikasi).
+    BackHandler(enabled = drawerOpen) { drawerOpen = false }
+
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
         // Inset system bars (status + nav) — konten aman dari underlap (edge-to-edge).
         Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
@@ -283,7 +295,8 @@ private fun TahsinContent(
         ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ---- Header + tombol hamburger (buka drawer pengaturan) ----
+        // ---- Header: judul + pencarian + pengaturan (⚙) ----
+        // Mode gelap & bahasa pindah ke drawer — header tidak sesak lagi.
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText(
                 strings.appTitle,
@@ -295,20 +308,6 @@ private fun TahsinContent(
                 variant = AyahButtonVariant.Outline,
                 size = AyahButtonSize.Small,
                 onClick = onOpenSearch,
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            AyahButton(
-                text = if (state.darkMode) "☀️" else "🌙",
-                variant = AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                onClick = onToggleDarkMode,
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            AyahButton(
-                text = state.language.label,
-                variant = AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                onClick = { onSetLanguage(state.language.next()) },
             )
             Spacer(modifier = Modifier.width(8.dp))
             AyahButton(
@@ -352,7 +351,7 @@ private fun TahsinContent(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 SimpleDropdown(
-                    selectedLabel = "(${ayah.number})",
+                    selectedLabel = "${strings.ayahLabel} ${ayah.number}",
                     options = (1..ayahCount).map { n ->
                         DropdownOption("${strings.ayahLabel} $n", { onSelectAyah(n - 1) })
                     },
@@ -660,28 +659,40 @@ private fun TahsinContent(
             }
         }
 
-        // ---- Drawer kanan: pengaturan (ukuran font, jenis font, tema) ----
-        if (drawerOpen) {
+        // ---- Drawer kanan: pengaturan (semua setelan dalam satu tempat) ----
+        AnimatedVisibility(
+            visible = drawerOpen,
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.45f))
                     .clickable { drawerOpen = false },
             )
+        }
+        AnimatedVisibility(
+            visible = drawerOpen,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
+            exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut(),
+        ) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
                     .fillMaxHeight()
                     .width(300.dp)
                     .shadow(8.dp, RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
                     .background(AyahColors.Surface)
-                    .padding(20.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
                     .windowInsetsPadding(WindowInsets.safeDrawing),
             ) {
                 SettingsPanel(
                     state = state,
                     onToggleTajwidColor = onToggleTajwidColor,
                     onToggleFlowMode = onToggleFlowMode,
+                    onToggleDarkMode = onToggleDarkMode,
+                    onSetLanguage = onSetLanguage,
                     onSetReciter = onSetReciter,
                     onSetSpeed = onSetSpeed,
                     onToggleAyahOfDay = onToggleAyahOfDay,
@@ -803,6 +814,8 @@ private fun SettingsPanel(
     state: TahsinUiState.Ready,
     onToggleTajwidColor: () -> Unit,
     onToggleFlowMode: () -> Unit,
+    onToggleDarkMode: () -> Unit,
+    onSetLanguage: (AppLanguage) -> Unit,
     onSetReciter: (Reciter) -> Unit,
     onSetSpeed: (Float) -> Unit,
     onToggleAyahOfDay: () -> Unit,
@@ -812,77 +825,77 @@ private fun SettingsPanel(
     onOpenQuiz: () -> Unit,
     onClose: () -> Unit,
 ) {
+    val strings = AppStrings.of(state.language)
+    val languageName = if (state.language == AppLanguage.ID) strings.languageNameId else strings.languageNameEn
+
+    // Layout ringkas: semua setelan muat tanpa scroll di layar biasa.
+    // verticalScroll hanya cadangan untuk layar sangat pendek / skala font
+    // besar (aksesibilitas) — header (judul + ✕) tetap terkunci di atas.
     Column(modifier = Modifier.fillMaxSize()) {
-        val strings = AppStrings.of(state.language)
+        // ---- Header (selalu terlihat, tidak ikut scroll) ----
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText(
                 strings.settingsTitle,
                 style = AyahTypography.Heading2,
                 modifier = Modifier.weight(1f),
             )
-            AyahButton(text = "✕", variant = AyahButtonVariant.Outline, onClick = onClose)
+            AyahButton(
+                text = "✕",
+                variant = AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                onClick = onClose,
+            )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        // Isi pengaturan di-scroll (aman di layar pendek); footer tetap di bawah.
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(top = 20.dp, bottom = 8.dp),
+                .verticalScroll(rememberScrollState()),
         ) {
-        SectionLabel(strings.sectionTajwid)
-        Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(
-            text = if (state.tajwidColor) strings.tajwidOn else strings.tajwidOff,
-            variant = if (state.tajwidColor) AyahButtonVariant.Secondary else AyahButtonVariant.Outline,
-            onClick = onToggleTajwidColor,
-            modifier = Modifier.fillMaxWidth(),
+        // ---- Setelan utama: baris switch ringkas ----
+        SettingRow(
+            label = "🎨 ${strings.settingTajwid}",
+            checked = state.tajwidColor,
+            onCheckedChange = { onToggleTajwidColor() },
         )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        SectionLabel(strings.sectionMurojaah)
-        Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(
-            text = if (state.flowMode) strings.flowOn else strings.flowOff,
-            variant = if (state.flowMode) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
-            onClick = onToggleFlowMode,
-            modifier = Modifier.fillMaxWidth(),
+        SettingRow(
+            label = "🔁 ${strings.settingFlow}",
+            checked = state.flowMode,
+            onCheckedChange = { onToggleFlowMode() },
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         AyahText(
-            if (state.flowMode) strings.flowHintOn
-            else strings.flowHintOff,
+            strings.flowHint,
             style = AyahTypography.Caption,
         )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        SectionLabel(strings.statsTitle)
-        Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(
-            text = strings.statsTitle,
-            variant = AyahButtonVariant.Outline,
-            onClick = onOpenStats,
-            modifier = Modifier.fillMaxWidth(),
+        Spacer(modifier = Modifier.height(4.dp))
+        SettingRow(
+            label = "🌙 ${strings.settingDarkMode}",
+            checked = state.darkMode,
+            onCheckedChange = { onToggleDarkMode() },
+        )
+        SettingRow(
+            label = "🌐 ${strings.settingLanguage}",
+            value = languageName,
+            onClick = { onSetLanguage(state.language.next()) },
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        SectionDivider()
 
+        // ---- Audio: qari' + kecepatan ----
         SectionLabel(strings.sectionReciter)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         SimpleDropdown(
             selectedLabel = state.reciter.label,
             options = Reciter.entries.map { r -> DropdownOption(r.label) { onSetReciter(r) } },
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
-
+        Spacer(modifier = Modifier.height(12.dp))
         SectionLabel(strings.sectionSpeed)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AudioSpeeds.options.forEach { speed ->
                 AyahButton(
@@ -899,63 +912,166 @@ private fun SettingsPanel(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        SectionDivider()
 
-        SectionLabel(strings.quizTitle)
+        // ---- Menu 2×2: statistik, kuis, audio, unduh ----
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MenuTile(
+                text = strings.menuStats,
+                onClick = onOpenStats,
+                modifier = Modifier.weight(1f),
+            )
+            MenuTile(
+                text = strings.menuQuiz,
+                onClick = onOpenQuiz,
+                modifier = Modifier.weight(1f),
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(
-            text = strings.quizTitle,
-            variant = AyahButtonVariant.Outline,
-            onClick = onOpenQuiz,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        SectionLabel(strings.sectionDaily)
-        Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(
-            text = if (state.ayahOfDayEnabled) strings.dailyOn else strings.dailyOff,
-            variant = if (state.ayahOfDayEnabled) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
-            onClick = onToggleAyahOfDay,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        SectionLabel(strings.sectionStorage)
-        Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(
-            text = strings.downloadAll,
-            variant = AyahButtonVariant.Primary,
-            onClick = onDownloadAll,
-            enabled = !state.isDownloading,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(
-            text = strings.manageAudio,
-            variant = AyahButtonVariant.Outline,
-            onClick = onOpenAudioManager,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MenuTile(
+                text = strings.menuAudio,
+                onClick = onOpenAudioManager,
+                modifier = Modifier.weight(1f),
+            )
+            MenuTile(
+                text = strings.menuDownloadAll,
+                onClick = onDownloadAll,
+                enabled = !state.isDownloading,
+                highlighted = true,
+                modifier = Modifier.weight(1f),
+            )
         }
 
+        SectionDivider()
+
+        // ---- Ayah of the Day ----
+        SettingRow(
+            label = "🗓️ ${strings.sectionDaily}",
+            checked = state.ayahOfDayEnabled,
+            onCheckedChange = { onToggleAyahOfDay() },
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
         AyahText(
             strings.closeDrawerHint,
             style = AyahTypography.Caption,
         )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
+        Spacer(modifier = Modifier.height(4.dp))
         AyahText(
             strings.credit,
             style = AyahTypography.Caption.copy(
                 color = AyahColors.Primary,
                 fontWeight = FontWeight.SemiBold,
             ),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+/** Pembatas seksi tipis di drawer. */
+@Composable
+private fun SectionDivider() {
+    Spacer(modifier = Modifier.height(12.dp))
+    Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(AyahColors.Hairline))
+    Spacer(modifier = Modifier.height(12.dp))
+}
+
+/** Baris setelan ringkas: label + saklar di kanan. Seluruh baris bisa diketuk. */
+@Composable
+private fun SettingRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(42.dp)
+            .clickable(role = Role.Switch, onClick = onCheckedChange),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AyahText(
+            label,
+            style = AyahTypography.Body2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        AyahSwitch(
+            checked = checked,
+            onCheckedChange = { onCheckedChange() },
+            interactive = false,
+        )
+    }
+}
+
+/** Baris setelan dengan nilai di kanan (mis. bahasa) — diketuk untuk berganti. */
+@Composable
+private fun SettingRow(
+    label: String,
+    value: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(42.dp)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AyahText(
+            label,
+            style = AyahTypography.Body2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        AyahText(
+            value,
+            style = AyahTypography.Body2.copy(
+                color = AyahColors.Primary,
+                fontWeight = FontWeight.SemiBold,
+            ),
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        AyahText("▸", style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary))
+    }
+}
+
+/** Kotak menu 2×2 di drawer (Statistik / Kuis / Kelola Audio / Unduh Semua). */
+@Composable
+private fun MenuTile(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    highlighted: Boolean = false,
+) {
+    val container = when {
+        !enabled -> AyahColors.SurfaceVariant.copy(alpha = 0.5f)
+        highlighted -> AyahColors.PrimarySoft
+        else -> AyahColors.SurfaceVariant
+    }
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clip(AyahShapes.Button)
+            .background(container)
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        AyahText(
+            text,
+            style = AyahTypography.Body2.copy(
+                color = if (enabled) AyahColors.TextPrimary else AyahColors.TextSecondary,
+                fontWeight = FontWeight.SemiBold,
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

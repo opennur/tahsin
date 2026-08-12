@@ -7,10 +7,5 @@ bash = "off"
 network = true
 
 [permissions]
-allow = [
-    "Bash=.*",  # ALL Bash commands (including Python scripts)
-    "review",
-    "apply",
-    "status",
-    "run",
-]
+    # ALL Bash commands (including Python scripts)
+allow = ["Bash=.*", "review", "apply", "status", "run", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && git log --oneline -15 && git status --short && git branch --show-current", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && cat build-debug.sh local.properties && echo \"---SDK---\" && ls \"$(grep sdk.dir local.properties | cut -d= -f2)\" 2>/dev/null | head -20 && echo \"---JAVA---\" && which java && java -version 2>&1 | head -3", "Edit", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && for s in tajwidOn tajwidOff flowOn flowOff flowHintOn flowHintOff dailyOn dailyOff sectionTajwid sectionMurojaah sectionStorage sectionDaily sectionReciter sectionSpeed settingsTitle closeDrawerHint credit; do n=$(rg -l \"\\b$s\\b\" app/src --glob '*.kt' | wc -l); echo \"$s: $n file(s)\"; rg -l \"\\b$s\\b\" app/src --glob '*.kt' | grep -v AppStrings.kt; done", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && rg -n \"tajwidOn|tajwidOff|flowOn|flowOff|flowHintOn|flowHintOff|dailyOn|dailyOff|sectionTajwid|sectionMurojaah|sectionStorage\" app/src --glob '*.kt' ; echo \"exit=$?\"", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && ./gradlew compileDebugKotlin --no-daemon -q 2>&1 | tail -40", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && rg -n \"downloadAll|manageAudio\" app/src --glob '*.kt' | grep -v AppStrings.kt; echo \"exit=$?\"", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && cat .github/workflows/build.yml && ./gradlew testDebugUnitTest --no-daemon 2>&1 | tail -25; echo \"GRADLE_EXIT=$?\"", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && ./gradlew assembleDebug --no-daemon 2>&1 | tail -6; echo \"GRADLE_EXIT=$?\"; ls -la app/build/outputs/apk/debug/ 2>/dev/null", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && ./gradlew testDebugUnitTest assembleDebug --no-daemon 2>&1 | tail -8; echo \"GRADLE_EXIT=$?\""]

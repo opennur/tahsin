@@ -3,6 +3,7 @@ package com.tahsin.app
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
@@ -51,6 +52,13 @@ class MainActivity : ComponentActivity() {
                 var showStats by remember { mutableStateOf(false) }
                 var showSearch by remember { mutableStateOf(false) }
                 var showQuiz by remember { mutableStateOf(false) }
+                // Tombol back sistem kembali ke layar utama (bukan menutup aplikasi).
+                BackHandler(enabled = showAudioManager || showStats || showSearch || showQuiz) {
+                    showAudioManager = false
+                    showStats = false
+                    showSearch = false
+                    showQuiz = false
+                }
                 when {
                     showAudioManager -> AudioManagerScreen(onBack = { showAudioManager = false })
                     showStats -> StatsScreen(
