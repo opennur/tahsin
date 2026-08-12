@@ -111,6 +111,8 @@ fun TahsinScreen(
     onOpenSearch: () -> Unit = {},
     /** Buka layar kuis tajwid (drawer pengaturan). */
     onOpenQuiz: () -> Unit = {},
+    /** Buka layar kosa kata (drawer pengaturan). */
+    onOpenVocab: () -> Unit = {},
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     target: OpenTarget? = null,
     modifier: Modifier = Modifier,
@@ -189,6 +191,7 @@ fun TahsinScreen(
             onOpenStats = onOpenStats,
             onOpenSearch = onOpenSearch,
             onOpenQuiz = onOpenQuiz,
+            onOpenVocab = onOpenVocab,
             onSetReciter = viewModel::setReciter,
             onSetSpeed = viewModel::setAudioSpeed,
             modifier = modifier,
@@ -224,6 +227,7 @@ private fun TahsinContent(
     onOpenStats: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenQuiz: () -> Unit,
+    onOpenVocab: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -311,7 +315,7 @@ private fun TahsinContent(
             )
             Spacer(modifier = Modifier.width(8.dp))
             AyahButton(
-                text = "⚙",
+                text = "☰ Menu",
                 variant = AyahButtonVariant.Outline,
                 size = AyahButtonSize.Small,
                 onClick = { drawerOpen = true },
@@ -709,6 +713,10 @@ private fun TahsinContent(
                         drawerOpen = false
                         onOpenQuiz()
                     },
+                    onOpenVocab = {
+                        drawerOpen = false
+                        onOpenVocab()
+                    },
                     onClose = { drawerOpen = false },
                 )
             }
@@ -823,6 +831,7 @@ private fun SettingsPanel(
     onOpenAudioManager: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenQuiz: () -> Unit,
+    onOpenVocab: () -> Unit,
     onClose: () -> Unit,
 ) {
     val strings = AppStrings.of(state.language)
@@ -854,7 +863,9 @@ private fun SettingsPanel(
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
         ) {
-        // ---- Setelan utama: baris switch ringkas ----
+        // ---- Tampilan: warna, mode, bahasa ----
+        SectionLabel(strings.sectionAppearance)
+        Spacer(modifier = Modifier.height(6.dp))
         SettingRow(
             label = "🎨 ${strings.settingTajwid}",
             checked = state.tajwidColor,
@@ -914,7 +925,16 @@ private fun SettingsPanel(
 
         SectionDivider()
 
-        // ---- Menu 2×2: statistik, kuis, audio, unduh ----
+        // ---- Menu: kosa kata (utama), lalu 2×2 ----
+        SectionLabel(strings.sectionMenu)
+        Spacer(modifier = Modifier.height(8.dp))
+        MenuTile(
+            text = strings.menuVocab,
+            onClick = onOpenVocab,
+            highlighted = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             MenuTile(
                 text = strings.menuStats,
@@ -952,7 +972,7 @@ private fun SettingsPanel(
             onCheckedChange = { onToggleAyahOfDay() },
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        SectionDivider()
         AyahText(
             strings.closeDrawerHint,
             style = AyahTypography.Caption,

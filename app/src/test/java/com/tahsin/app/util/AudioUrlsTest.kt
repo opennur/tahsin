@@ -33,4 +33,13 @@ class AudioUrlsTest {
             AudioUrls.wordUrl(1, 2, 2),
         )
     }
+
+    @Test
+    fun `konversi indeks kata vocab (1-based) ke audio (0-based)`() {
+        // VocabExample.word 1-based (tools/build_vocab.py, enumerate start=1);
+        // VocabularyViewModel.playCurrentWord memanggil playWord(word-1)
+        // karena wordKey/wordUrl menambah 1 di dalamnya.
+        assertEquals("002_004_008.mp3", AudioUrls.wordKey(2, 4, 8 - 1))
+        assertEquals("001_001_002.mp3", AudioUrls.wordKey(1, 1, 2 - 1))
+    }
 }

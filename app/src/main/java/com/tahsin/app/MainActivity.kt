@@ -17,6 +17,7 @@ import com.tahsin.app.ui.SearchScreen
 import com.tahsin.app.ui.StatsScreen
 import com.tahsin.app.ui.TahsinScreen
 import com.tahsin.app.ui.TajwidQuizScreen
+import com.tahsin.app.ui.VocabularyScreen
 import com.tahsin.app.widget.AyahOfTheDayAlarm
 
 class MainActivity : ComponentActivity() {
@@ -52,12 +53,14 @@ class MainActivity : ComponentActivity() {
                 var showStats by remember { mutableStateOf(false) }
                 var showSearch by remember { mutableStateOf(false) }
                 var showQuiz by remember { mutableStateOf(false) }
+                var showVocab by remember { mutableStateOf(false) }
                 // Tombol back sistem kembali ke layar utama (bukan menutup aplikasi).
-                BackHandler(enabled = showAudioManager || showStats || showSearch || showQuiz) {
+                BackHandler(enabled = showAudioManager || showStats || showSearch || showQuiz || showVocab) {
                     showAudioManager = false
                     showStats = false
                     showSearch = false
                     showQuiz = false
+                    showVocab = false
                 }
                 when {
                     showAudioManager -> AudioManagerScreen(onBack = { showAudioManager = false })
@@ -76,11 +79,19 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                     showQuiz -> TajwidQuizScreen(onBack = { showQuiz = false })
+                    showVocab -> VocabularyScreen(
+                        onBack = { showVocab = false },
+                        onOpenAyah = { s, a ->
+                            pendingOpenTarget = OpenTarget(s, a, targetDelivery++)
+                            showVocab = false
+                        },
+                    )
                     else -> TahsinScreen(
                         onOpenAudioManager = { showAudioManager = true },
                         onOpenStats = { showStats = true },
                         onOpenSearch = { showSearch = true },
                         onOpenQuiz = { showQuiz = true },
+                        onOpenVocab = { showVocab = true },
                         target = pendingOpenTarget ?: target,
                     )
                 }
