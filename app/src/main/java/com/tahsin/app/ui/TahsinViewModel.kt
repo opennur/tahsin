@@ -70,6 +70,8 @@ sealed interface TahsinUiState {
         val tajwidColor: Boolean = true,
         /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya saat selesai benar. */
         val flowMode: Boolean = false,
+        /** Notifikasi harian "Ayah of the Day" (toggle di drawer). */
+        val ayahOfDayEnabled: Boolean = true,
         /** Sedang memutar audio (untuk tombol Dengar/Stop). */
         /** Audio ayat sedang diputar (tombol Dengar/Stop di footer). */
         val isAudioPlaying: Boolean = false,
@@ -101,6 +103,14 @@ data class ReadingIssue(
     val rules: List<TajwidRule>,
 )
 
+/** Target buka dari widget/notifikasi "Ayah of the Day" — deliveryId dibuat saat
+ * pengiriman (bukan dibekukan di PendingIntent) supaya ketukan berulang tetap memicu. */
+data class OpenTarget(
+    val surah: Int,
+    val ayah: Int,
+    val deliveryId: Long,
+)
+
 class TahsinViewModel(
     private val app: Context,
     private val repository: QuranRepository,
@@ -126,6 +136,10 @@ class TahsinViewModel(
     private var autoAdvanceHandled = false
     /** Auto-dengar tertunda sampai konten surah termuat (lintas surah). */
     private var pendingAutoListen = false
+    /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
+    private var pendingOpenAt: Pair<Int, Int>? = null
+    /** Ayat 0-based yang harus dipilih setelah konten surah termuat. */
+    private var pendingAyahAfterLoad: Int? = null
 
     init {
         AyahColors.isDark = settings.darkMode
@@ -155,6 +169,7 @@ class TahsinViewModel(
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
                 flowMode = settings.flowMode,
+                ayahOfDayEnabled = settings.ayahOfDayEnabled,
                 showSwipeHint = !settings.swipeHintDismissed,
             )
         } catch (e: Exception) {
@@ -170,6 +185,8 @@ class TahsinViewModel(
         }
         // Muat isi surah terakhir yang dibuka (default: Al-Fatihah ayat 1).
         (currentReady())?.let { loadSurahContent(it.surahNumber) }
+        // Target dari widget/notifikasi (state baru saja siap) → buka langsung.
+        pendingOpenAt?.let { (s, a) -> openAt(s, a) }
     }
 
     /** Tutup petunjuk geser (persisten — tidak muncul lagi setelah restart). */
@@ -182,6 +199,14 @@ class TahsinViewModel(
 
     fun selectSurah(number: Int) {
         pendingAutoListen = false // navigasi manual membatalkan auto-dengar tertunda
+        // Navigasi manual membatalkan target widget/notifikasi yang belum terpakai
+        // (mis. konten surah target belum termuat saat user pindah surah lain).
+        pendingOpenAt = null
+        pendingAyahAfterLoad = null
+        navigateToSurah(number)
+    }
+
+    private fun navigateToSurah(number: Int) {
         settings.surahNumber = number
         settings.ayahIndex = 0
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
@@ -232,6 +257,11 @@ class TahsinViewModel(
             pendingAutoListen = false
             startListeningForCurrentAyah()
         }
+        // Target dari widget/notifikasi: pilih ayat setelah konten surah termuat.
+        pendingAyahAfterLoad?.let { idx ->
+            pendingAyahAfterLoad = null
+            updateAyah(idx.coerceIn(0, surah.ayahs.lastIndex.coerceAtLeast(0)))
+        }
     }
 
     fun nextAyah() {
@@ -252,6 +282,7 @@ class TahsinViewModel(
     }
 
     private fun updateAyah(index: Int) {
+        pendingAyahAfterLoad = null // navigasi apa pun membatalkan target tertunda
         settings.ayahIndex = index
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             ayahIndex = index,
@@ -262,6 +293,36 @@ class TahsinViewModel(
             selectedWordRules = emptyList(),
             message = null,
         ) }
+    }
+
+    // ---- buka target (widget "Ayah of the Day" / notifikasi) ----
+
+    /** Buka surah/ayat tertentu; aman dipanggil kapan saja (state bisa belum siap). */
+    fun openAt(surahNumber: Int, ayahNumber: Int) {
+        if (currentReady() == null) {
+            pendingOpenAt = surahNumber to ayahNumber
+            return
+        }
+        applyOpenAt(surahNumber, ayahNumber)
+    }
+
+    private fun applyOpenAt(surahNumber: Int, ayahNumber: Int) {
+        pendingOpenAt = null
+        val s = currentReady() ?: return
+        val idx = (ayahNumber - 1).coerceAtLeast(0)
+        if (s.surahNumber == surahNumber && (s.surah?.ayahs?.size ?: 0) > 0) {
+            updateAyah(idx.coerceAtMost(s.surah!!.ayahs.lastIndex))
+        } else {
+            pendingAyahAfterLoad = idx
+            navigateToSurah(surahNumber)
+        }
+    }
+
+    /** Nyalakan/matikan notifikasi harian "Ayah of the Day" (toggle di drawer). */
+    fun toggleAyahOfDay() {
+        val next = !settings.ayahOfDayEnabled
+        settings.ayahOfDayEnabled = next
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(ayahOfDayEnabled = next) }
     }
 
     // ---- mic / STT ----
@@ -425,7 +486,8 @@ class TahsinViewModel(
     /** Getar singkat dua kali (pola buzz-buzz) untuk indikasi gagal. */
     private fun vibrateError() {
         runCatching {
-            val vib = app.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator ?: return
+            // getSystemService(Class) tidak deprecated (API 23+; minSdk 26).
+            val vib = app.getSystemService(Vibrator::class.java) ?: return
             if (!vib.hasVibrator()) return
             val pattern = longArrayOf(0, 160, 80, 160)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

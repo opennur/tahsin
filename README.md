@@ -40,7 +40,34 @@ tanpa melihat layar.
   dan **cache daftar** — membuka layar lagi instan tanpa pemindaian ulang.
 - 🌙 **Dark mode** (tombol di header), **ganti bahasa ID/EN** (tombol di header),
   drawer kanan via tombol ⚙ untuk pengaturan lain.
+- 🗓️ **Widget + notifikasi "Ayah of the Day"** — satu ayat berganti setiap hari
+  (deterministik per tanggal, offline dari bundel aset). Widget home screen
+  ringkas: terjemahan saja; notifikasi menampilkan teks Arab + terjemahan.
+  Ketuk widget/notifikasi → aplikasi terbuka tepat di ayat itu; update harian
+  via AlarmManager (+ reschedule saat boot), bisa dimatikan di drawer pengaturan.
 - 🔤 **Khat Utsmani (Amiri)** — font di-bundle ke APK, langsung tampil tanpa unduhan.
+
+## Ayah of the Day (widget & notifikasi harian)
+
+Satu ayat yang sama untuk semua pengguna sepanjang hari, berganti otomatis besok:
+
+- **Pemilihan deterministik** (`util/AyahOfTheDayManager.kt`) — seed = hari epoch
+  (jumlah hari sejak 1970-01-01) → `Random(seed)` memilih satu index dari total
+  6.236 ayat → dipetakan ke (surah, ayat) lewat daftar kumulatif per surah.
+  Stabil sepanjang hari dan **tanpa internet**.
+- **Konten** dibaca dari bundel aset mushaf (fallback: unduh), lalu di-cache ke
+  SharedPreferences dengan kunci **tanggal + bahasa** → update widget/notifikasi
+  instan tanpa parse ulang.
+- **Widget home screen**: ringkas — nama surah · nomor ayat + **terjemahan saja**
+  (teks Arab tampil di notifikasi).
+- **Notifikasi harian**: teks Arab + terjemahan (BigText), dipicu `AlarmManager`
+  (tengah malam, `setAndAllowWhileIdle`); alarm di-reschedule tiap kali menyala,
+  saat app dibuka (`MainActivity.onCreate`), dan saat perangkat restart
+  (`BOOT_COMPLETED`).
+- **Ketuk widget/notifikasi** → aplikasi terbuka tepat di surah/ayat itu
+  (deep link via extra Intent; aman dipanggil berulang, rotation-safe).
+- **Toggle** "🗓️ Notifikasi Harian" di drawer ⚙ (default nyala; pada Android 13+
+  izin notifikasi diminta saat user menghidupkannya).
 
 ## Arsitektur & stack
 
@@ -57,8 +84,10 @@ app/src/main/java/com/tahsin/app/
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM)
+├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + alarm harian/notifikasi
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
-│                   #   DownloadProgress, DownloadService, FontStore, SettingsStore
+│                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
+│                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
 
@@ -118,8 +147,9 @@ sdkmanager "platforms;android-35"
 ### Unit test
 
 Test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
-`ArabicNormalizer`, dan `QuranParser` (parsing JSON mushaf, di-extract dari
-`QuranRepository` agar bisa diuji tanpa Android):
+`ArabicNormalizer`, `QuranParser` (parsing JSON mushaf, di-extract dari
+`QuranRepository` agar bisa diuji tanpa Android), dan `AyahOfTheDayManager`
+(pemilihan ayat harian: batas index, lintas surah, determinisme):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon
@@ -159,9 +189,12 @@ keyPassword=rahasia
 - `RECORD_AUDIO` — penilaian bacaan (diminta saat pertama kali mic ditekan).
 - `VIBRATE` — getar saat ada kesalahan pengucapan (umpan muroja'ah).
 - `INTERNET` — unduh audio (konten mushaf sudah di-bundle).
-- `POST_NOTIFICATIONS`, `WAKE_LOCK`, `FOREGROUND_SERVICE`
-  (+ `FOREGROUND_SERVICE_DATA_SYNC`) — unduhan latar belakang saat layar mati,
-  setelah user mengizinkan lewat prompt.
+- `POST_NOTIFICATIONS` — notifikasi unduhan latar belakang + notifikasi harian
+  "Ayah of the Day" (diminta saat menghidupkan toggle di drawer).
+- `WAKE_LOCK`, `FOREGROUND_SERVICE` (+ `FOREGROUND_SERVICE_DATA_SYNC`) —
+  unduhan latar belakang saat layar mati, setelah user mengizinkan lewat prompt.
+- `RECEIVE_BOOT_COMPLETED` — reschedule alarm harian "Ayah of the Day" setelah
+  perangkat restart.
 
 ## Lisensi
 

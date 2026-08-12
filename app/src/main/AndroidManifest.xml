@@ -14,6 +14,8 @@
     <!-- Foreground service (wajib Android 14+ / targetSdk 34) + tipe dataSync -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Reschedule alarm harian "Ayah of the Day" setelah perangkat restart -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -36,6 +38,28 @@
             android:name=".util.DownloadService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <!-- Widget "Ayah of the Day" (home screen) -->
+        <receiver
+            android:name=".widget.AyahOfTheDayWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ayah_of_the_day_widget_info" />
+        </receiver>
+
+        <!-- Alarm harian (update widget + notifikasi) + reschedule saat boot -->
+        <receiver
+            android:name=".widget.AyahOfTheDayAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.tahsin.app.action.UPDATE_AYAH_OF_THE_DAY" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

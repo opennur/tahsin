@@ -11,6 +11,7 @@
     <!-- Text -->
     <color name="text_primary">#1A1A1A</color>
     <color name="text_secondary">#5A5A5A</color>
+    <color name="hairline">#DDD5C8</color>
 
     <!-- Status -->
     <color name="error">#D32F2F</color>

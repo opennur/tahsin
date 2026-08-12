@@ -52,4 +52,9 @@ class SettingsStore(context: Context) {
     var ayahIndex: Int
         get() = prefs.getInt("ayah_index", 0)
         set(value) = prefs.edit().putInt("ayah_index", value).apply()
+
+    /** Notifikasi harian "Ayah of the Day" (default nyala). */
+    var ayahOfDayEnabled: Boolean
+        get() = prefs.getBoolean("ayah_of_day_enabled", true)
+        set(value) = prefs.edit().putBoolean("ayah_of_day_enabled", value).apply()
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Tahsin Quran</string>
+    <string name="widget_ayah_of_the_day_description">Ayat &amp; terjemahan harian — ketuk untuk membuka</string>
 </resources>

@@ -2,6 +2,7 @@ package com.tahsin.app.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -92,11 +94,20 @@ import kotlin.math.roundToInt
 @Composable
 fun TahsinScreen(
     onOpenAudioManager: () -> Unit = {},
+    /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
+    target: OpenTarget? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val viewModel: TahsinViewModel = viewModel(factory = tahsinViewModelFactory(context))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Buka surah/ayat yang diminta widget/notifikasi. Key = OpenTarget (data class,
+    // berisi deliveryId unik per pengiriman) sehingga ketukan widget yang sama
+    // berulang tetap memicu LaunchedEffect.
+    LaunchedEffect(target) {
+        target?.let { viewModel.openAt(it.surah, it.ayah) }
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -107,6 +118,11 @@ fun TahsinScreen(
             viewModel.showMessage("Izin mikrofon diperlukan untuk mendeteksi bacaan.")
         }
     }
+
+    // Izin notifikasi (Android 13+) diminta saat user menghidupkan notifikasi harian.
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { /* keputusan dipakai otomatis oleh postNotification */ }
 
     when (val state = uiState) {
         TahsinUiState.Loading -> AyahLoadingView(modifier = modifier, message = "Memuat mushaf…")
@@ -137,6 +153,17 @@ fun TahsinScreen(
             onSetLanguage = viewModel::setLanguage,
             onToggleTajwidColor = viewModel::toggleTajwidColor,
             onToggleFlowMode = viewModel::toggleFlowMode,
+            onToggleAyahOfDay = {
+                val current = (uiState as? TahsinUiState.Ready)?.ayahOfDayEnabled ?: false
+                // Menghidupkan notifikasi tanpa izin (API 33+) → minta izin dulu.
+                if (!current && Build.VERSION.SDK_INT >= 33 &&
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                    PackageManager.PERMISSION_GRANTED
+                ) {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                viewModel.toggleAyahOfDay()
+            },
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onDismissDownloadNotice = viewModel::dismissDownloadNotice,
             onSetBackgroundAllowed = viewModel::setBackgroundDownloadAllowed,
@@ -164,6 +191,7 @@ private fun TahsinContent(
     onSetLanguage: (AppLanguage) -> Unit,
     onToggleTajwidColor: () -> Unit,
     onToggleFlowMode: () -> Unit,
+    onToggleAyahOfDay: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onDismissDownloadNotice: () -> Unit,
     onSetBackgroundAllowed: (Boolean) -> Unit,
@@ -618,6 +646,7 @@ private fun TahsinContent(
                     state = state,
                     onToggleTajwidColor = onToggleTajwidColor,
                     onToggleFlowMode = onToggleFlowMode,
+                    onToggleAyahOfDay = onToggleAyahOfDay,
                     onDownloadAll = onDownloadAll,
                     onOpenAudioManager = {
                         drawerOpen = false
@@ -728,6 +757,7 @@ private fun SettingsPanel(
     state: TahsinUiState.Ready,
     onToggleTajwidColor: () -> Unit,
     onToggleFlowMode: () -> Unit,
+    onToggleAyahOfDay: () -> Unit,
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
     onClose: () -> Unit,
@@ -769,6 +799,17 @@ private fun SettingsPanel(
             if (state.flowMode) strings.flowHintOn
             else strings.flowHintOff,
             style = AyahTypography.Caption,
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel(strings.sectionDaily)
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = if (state.ayahOfDayEnabled) strings.dailyOn else strings.dailyOff,
+            variant = if (state.ayahOfDayEnabled) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
+            onClick = onToggleAyahOfDay,
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(20.dp))
