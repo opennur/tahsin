@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.tahsin.app.data.quran.QuranRepository
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.AudioDownloader
@@ -12,12 +14,13 @@ import com.tahsin.app.util.DownloadProgress
 import com.tahsin.app.util.SettingsStore
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.io.File
 
 /** Satu baris pada layar manajemen audio. */
 data class AudioManagerItem(
@@ -57,12 +60,25 @@ data class AudioManagerState(
 /**
  * Manajemen audio terunduh: daftar surah yang punya audio, info kelengkapan,
  * dan aksi hapus (per surah / semua).
+ *
+ * Hasil pemindaian folder audio di-cache ke `filesDir/audio-manager-cache.json`.
+ * Cache dipakai hanya kalau tidak ada perubahan (tidak sedang mengunduh dan
+ * tidak baru dihapus) — buka layar lagi jadi instan tanpa listFiles ulang.
  */
 class AudioManagerViewModel(
+    app: Context,
     private val repository: QuranRepository,
     private val downloader: AudioDownloader,
     private val settings: SettingsStore,
 ) : ViewModel() {
+
+    private val gson = Gson()
+    private val itemsType = object : TypeToken<List<AudioManagerItem>>() {}.type
+    private val cacheFile = File(app.applicationContext.filesDir, "audio-manager-cache.json")
+
+    /** true = cache tidak boleh dipakai (ada perubahan file audio). */
+    @Volatile
+    private var cacheDirty = true
 
     private val _state = MutableStateFlow(AudioManagerState())
     val state: StateFlow<AudioManagerState> = _state.asStateFlow()
@@ -70,55 +86,96 @@ class AudioManagerViewModel(
     init {
         refresh()
         // Selama masih ada unduhan aktif, daftar audio otomatis di-refresh
-        // agar item yang baru selesai langsung muncul (max 1x/1,5 dtk).
+        // (live, bukan cache) agar item yang baru selesai langsung muncul.
+        // Saat unduhan selesai → cache ditandai basi lalu dihitung ulang.
         viewModelScope.launch {
             var lastRefresh = 0L
-            DownloadProgress.state.collectLatest {
-                if (it.isDownloading) {
+            var wasDownloading = false
+            DownloadProgress.state.collect { st ->
+                if (st.isDownloading) {
+                    wasDownloading = true
                     val now = System.currentTimeMillis()
                     if (now - lastRefresh >= 1500) {
                         lastRefresh = now
                         refresh()
                     }
+                } else if (wasDownloading) {
+                    // Transisi: unduhan selesai → daftar & cache perlu dihitung ulang.
+                    wasDownloading = false
+                    markDirty()
+                    refresh()
                 }
             }
         }
+    }
+
+    /** Paksa pemindaian ulang pada refresh berikutnya (cache dianggap basi). */
+    fun markDirty() {
+        cacheDirty = true
     }
 
     fun refresh() {
         // ListFiles/stat di folder audio bisa lambat (ribuan file) — jangan di thread utama.
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val surahs = repository.surahList()
-            val downloaded = downloader.downloadedSurahNumbers().toSet()
-            val items = surahs
-                .filter { it.number in downloaded }
-                .map { surah ->
-                    val cached = repository.cachedSurahPlain(surah.number)
-                    val totalWords = cached?.ayahs?.sumOf { it.words.size }
-                    val info = downloader.surahAudioInfo(surah.number, surah.ayahCount, totalWords)
-                    AudioManagerItem(
-                        number = surah.number,
-                        nameLatin = surah.nameLatin,
-                        nameArabic = surah.nameArabic,
-                        ayahFiles = info.ayahFiles,
-                        ayahCount = info.ayahCount,
-                        wordFiles = info.wordFiles,
-                        totalWords = info.totalWords,
-                        sizeBytes = info.sizeBytes,
-                        missingWords = info.missingWords,
-                        missingAyahs = info.missingAyahs,
-                    )
+            // Jalur cepat: cache valid (tidak sedang mengunduh & tidak basi).
+            if (!DownloadProgress.state.value.isDownloading && !cacheDirty) {
+                val cached = readCache()
+                if (cached != null) {
+                    _state.value = buildState(cached)
+                    return@launch
                 }
-                .sortedBy { it.number }
-            _state.value = AudioManagerState(
-                items = items,
-                totalDownloaded = items.sumOf { it.ayahFiles + it.wordFiles },
-                totalSizeBytes = items.sumOf { it.sizeBytes },
-                language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID,
-                isLoading = false,
-            )
+            }
+            // Jalur lambat: hitung dari disk, lalu simpan cache.
+            val items = computeItems()
+            writeCache(items)
+            cacheDirty = false
+            _state.value = buildState(items)
         }
+    }
+
+    private fun buildState(items: List<AudioManagerItem>): AudioManagerState = AudioManagerState(
+        items = items,
+        totalDownloaded = items.sumOf { it.ayahFiles + it.wordFiles },
+        totalSizeBytes = items.sumOf { it.sizeBytes },
+        language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID,
+        isLoading = false,
+    )
+
+    /** Baca cache JSON (null kalau belum ada / rusak). */
+    private fun readCache(): List<AudioManagerItem>? = runCatching {
+        if (!cacheFile.exists()) return null
+        gson.fromJson<List<AudioManagerItem>>(cacheFile.readText(), itemsType) ?: emptyList()
+    }.getOrNull()
+
+    private fun writeCache(items: List<AudioManagerItem>) {
+        runCatching { cacheFile.writeText(gson.toJson(items)) }
+    }
+
+    /** Pemindaian folder audio → daftar surah terunduh (jalur lambat). */
+    private fun computeItems(): List<AudioManagerItem> {
+        val surahs = repository.surahList()
+        val downloaded = downloader.downloadedSurahNumbers().toSet()
+        return surahs
+            .filter { it.number in downloaded }
+            .map { surah ->
+                val cached = repository.cachedSurahPlain(surah.number)
+                val totalWords = cached?.ayahs?.sumOf { it.words.size }
+                val info = downloader.surahAudioInfo(surah.number, surah.ayahCount, totalWords)
+                AudioManagerItem(
+                    number = surah.number,
+                    nameLatin = surah.nameLatin,
+                    nameArabic = surah.nameArabic,
+                    ayahFiles = info.ayahFiles,
+                    ayahCount = info.ayahCount,
+                    wordFiles = info.wordFiles,
+                    totalWords = info.totalWords,
+                    sizeBytes = info.sizeBytes,
+                    missingWords = info.missingWords,
+                    missingAyahs = info.missingAyahs,
+                )
+            }
+            .sortedBy { it.number }
     }
 
     fun requestDelete(number: Int) {
@@ -137,12 +194,14 @@ class AudioManagerViewModel(
         val number = _state.value.pendingDelete ?: return
         _state.update { it.copy(pendingDelete = null) }
         downloader.deleteSurahAudio(number)
+        markDirty()
         refresh()
     }
 
     fun confirmDeleteAll() {
         _state.update { it.copy(pendingDeleteAll = false) }
         downloader.deleteAllAudio()
+        markDirty()
         refresh()
     }
 }
@@ -152,6 +211,7 @@ fun audioManagerViewModelFactory(context: Context): ViewModelProvider.Factory = 
     initializer {
         val app = context.applicationContext
         AudioManagerViewModel(
+            app = app,
             repository = QuranRepository(app),
             downloader = AudioDownloader(app),
             settings = SettingsStore(app),

@@ -265,7 +265,49 @@ private fun TahsinContent(
             val density = LocalDensity.current
             val swipeThresholdPx = with(density) { 80.dp.toPx() }
             val tapSlopPx = with(density) { 12.dp.toPx() }
-            AyahCard(modifier = Modifier.fillMaxWidth()) {
+            // Area swipe diperluas: mushaf + terjemahan + ruang kosong di bawahnya.
+            // Column (bukan Box) supaya terjemahan tetap DI BAWAH mushaf.
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        // SWIPE untuk area terjemahan & ruang kosong. Area mushaf
+                        // punya gesture sendiri; event yang sudah dikonsumsi
+                        // (mushaf/scroll) diabaikan supaya tidak dobel pindah.
+                        awaitEachGesture {
+                            val down = awaitFirstDown()
+                            var totalX = 0f
+                            var totalY = 0f
+                            var swiping = false
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                                if (!change.pressed) break
+                                if (event.changes.any { it.isConsumed }) {
+                                    totalX = 0f
+                                    totalY = 0f
+                                    swiping = false
+                                } else {
+                                    totalX += change.position.x - change.previousPosition.x
+                                    totalY += change.position.y - change.previousPosition.y
+                                }
+                                if (!swiping &&
+                                    kotlin.math.abs(totalX) > swipeThresholdPx &&
+                                    kotlin.math.abs(totalX) > kotlin.math.abs(totalY)
+                                ) {
+                                    swiping = true
+                                }
+                                if (swiping) change.consume()
+                            }
+                            if (swiping) {
+                                // RTL: geser kanan = ayat berikutnya, kiri = sebelumnya.
+                                if (totalX >= swipeThresholdPx) onNextAyah()
+                                else if (totalX <= -swipeThresholdPx) onPrevAyah()
+                            }
+                        }
+                    },
+            ) {
+                AyahCard(modifier = Modifier.fillMaxWidth()) {
                 var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
                 val wordOffsets = remember(words) {
                     val arr = IntArray(words.size)
@@ -404,15 +446,18 @@ private fun TahsinContent(
                     }
                 }
             }
-            // Terjemahan ayat (bahasa aktif).
-            val translation = ayah?.translation.orEmpty()
-            if (translation.isNotBlank()) {
-                Spacer(modifier = Modifier.height(10.dp))
-                AyahText(
-                    translation,
-                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                // Terjemahan ayat (bahasa aktif).
+                val translation = ayah?.translation.orEmpty()
+                if (translation.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    AyahText(
+                        translation,
+                        style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                // Ruang kosong di bawah terjemahan — tetap bisa di-swipe.
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
 
