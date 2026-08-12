@@ -1,0 +1,40 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # Menerima lisensi SDK + menyediakan android-35 (compileSdk 35).
+      - uses: android-actions/setup-android@v3
+
+      # gradle.properties berisi override khusus Termux (aapt2/aidl) yang
+      # tidak ada di runner CI — hapus supaya AGP memakai versi dari Maven.
+      - name: Clear Termux-only Gradle overrides
+        run: |
+          sed -i '/android.aapt2FromMavenOverride/d; /android.aidlExecutable/d' gradle.properties
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk

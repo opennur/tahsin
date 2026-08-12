@@ -17,12 +17,12 @@ val releaseSigningConfigured = keystoreProps.getProperty("storeFile") != null
 
 android {
     namespace = "com.tahsin.app"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.tahsin.app"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
     }
@@ -87,4 +87,7 @@ dependencies {
 
     // ---- JSON parsing (mushaf asset) ----
     implementation(libs.gson)
+
+    // ---- Unit test (JVM) ----
+    testImplementation(libs.junit)
 }

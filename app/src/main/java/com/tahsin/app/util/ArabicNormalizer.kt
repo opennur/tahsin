@@ -14,8 +14,12 @@ object ArabicNormalizer {
      */
     private val MARKS = Regex("""[\u064B-\u0652\u0670\u06D6-\u06ED\u08D6-\u08ED]""")
 
-    /** Huruf dasar Arab (konsonan + vokal panjang). ە (U+06D5) sengaja TIDAK masuk. */
-    private val LETTERS = "ابتثجحخدذرزسشصضطظعغفقكلمنهويئةأآإى".toSet()
+    /**
+     * Huruf dasar Arab (konsonan + vokal panjang), termasuk hamza (ء) — hamza
+     * adalah huruf halqi dan diperlukan deteksi mad wajib muttasil & izhar halqi.
+     * ە (U+06D5) sengaja TIDAK masuk.
+     */
+    private val LETTERS = "ابتثجحخدذرزسشصضطظعغفقكلمنهويئةءأآإى".toSet()
 
     /** Apakah karakter ini huruf dasar Al-Quran. */
     fun isLetter(c: Char): Boolean = c in LETTERS

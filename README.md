@@ -45,7 +45,7 @@ tanpa melihat layar.
 ## Arsitektur & stack
 
 - **Kotlin + Jetpack Compose** — **tanpa Material 3** (custom design system di `theme/`).
-- compileSdk 34, targetSdk 34, minSdk 26 · AGP 8.4.0 · Kotlin 2.0.20 · Gradle 8.6 · Java 17.
+- compileSdk 35, targetSdk 35 (edge-to-edge wajib), minSdk 26 · AGP 8.4.0 · Kotlin 2.0.20 · Gradle 8.6 · Java 17.
 - Tanpa Room/Hilt/Retrofit/Navigation — DI manual (`ViewModel` + factory), Gson untuk JSON.
 - **Offline-first**: konten surah & terjemahan di-bundle ke APK (siap tanpa
   internet); audio diunduh in-app dan di-cache ke `filesDir/`; daftar audio
@@ -87,8 +87,10 @@ Tanpa script ini aplikasi tetap berfungsi (unduh on-demand + cache di
 
 ## Build (Termux)
 
-Prasyarat: Android SDK (android-34), JDK 17, `gradle.properties` dengan override
+Prasyarat: Android SDK (android-34 **dan android-35**), JDK 17, `gradle.properties` dengan override
 `android.aapt2FromMavenOverride`/`android.aidlExecutable` sesuai setup Termux.
+(AGP 8.4.0 + compileSdk 35 hanya mengeluarkan warning — sudah ditekan lewat
+`android.suppressUnsupportedCompileSdk=35` di `gradle.properties`.)
 
 ```bash
 # APK debug  → ~/storage/downloads/ayah-of-the-day.apk
@@ -106,6 +108,28 @@ Manual tanpa script:
 ./gradlew assembleDebug --no-daemon
 cp app/build/outputs/apk/debug/app-debug.apk ~/storage/downloads/ayah-of-the-day.apk
 ```
+
+Kalau belum ada platform android-35 (untuk compileSdk 35):
+
+```bash
+sdkmanager "platforms;android-35"
+```
+
+### Unit test
+
+Test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
+`ArabicNormalizer`, dan `QuranParser` (parsing JSON mushaf, di-extract dari
+`QuranRepository` agar bisa diuji tanpa Android):
+
+```bash
+./gradlew testDebugUnitTest --no-daemon
+```
+
+### CI (GitHub Actions)
+
+`.github/workflows/build.yml` menjalankan `testDebugUnitTest` + `assembleDebug`
+pada setiap push/PR. Di runner CI, override Termux (`aapt2`/`aidl`) dihapus
+otomatis dari `gradle.properties` sebelum build.
 
 ### Signing release
 

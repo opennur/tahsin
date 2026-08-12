@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -187,7 +190,8 @@ private fun TahsinContent(
     var drawerOpen by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        // Inset system bars (status + nav) — konten aman dari underlap (edge-to-edge).
+        Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -607,7 +611,8 @@ private fun TahsinContent(
                     .width(300.dp)
                     .shadow(8.dp, RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
                     .background(AyahColors.Surface)
-                    .padding(20.dp),
+                    .padding(20.dp)
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
             ) {
                 SettingsPanel(
                     state = state,
