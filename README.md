@@ -19,6 +19,12 @@ tanpa melihat layar.
   **offline bawaan** (Arab + terjemahan ID/EN di-bundle ke APK).
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
+- 📊 **Statistik & riwayat kesalahan** (persisten): setiap hasil bacaan final
+  disimpan per ayat — skor (0–100), jumlah percobaan, dan **kata yang sering
+  salah/terlewat** (dari `TranscriptAligner`). Layar **Statistik & Riwayat**
+  (drawer ⚙) menampilkan ringkasan global + "kata yang sering salah" per
+  surah; ketuk satu kata → langsung buka ayat itu untuk diperbaiki. Di layar
+  utama ada info cepat "N× dicoba · skor terbaik M%".
 - 🎨 **Warna tajwid** (nyala default, bisa dimatikan di drawer): mad (merah),
   ghunnah (hijau), qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye),
   lam jalalah (teal).
@@ -85,10 +91,12 @@ app/src/main/java/com/tahsin/app/
 ├── data/quran/     # model Surah/Ayah + repository (aset bundle → cache → equran.id)
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
-├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM)
+├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
+│                   #   StatsScreen + StatsViewModel (statistik & riwayat)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + alarm harian/notifikasi
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
+│                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
 │                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```

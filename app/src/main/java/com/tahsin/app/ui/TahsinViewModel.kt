@@ -28,7 +28,9 @@ import com.tahsin.app.util.AudioDownloader
 import com.tahsin.app.util.DownloadProgress
 import com.tahsin.app.util.DownloadService
 import com.tahsin.app.util.FontStore
+import com.tahsin.app.util.AyahStats
 import com.tahsin.app.util.PlaySource
+import com.tahsin.app.util.ReadingStatsStore
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import androidx.compose.ui.text.font.FontFamily
@@ -57,6 +59,8 @@ sealed interface TahsinUiState {
         val transcript: String = "",
         val alignedWords: List<AlignedWord> = emptyList(),
         val issues: List<ReadingIssue> = emptyList(),
+        /** Riwayat bacaan ayat aktif (dari ReadingStatsStore) — untuk info cepat. */
+        val ayahStats: AyahStats? = null,
         val selectedWordIndex: Int? = null,
         val selectedWordRules: List<TajwidRule> = emptyList(),
         val message: String? = null,
@@ -119,6 +123,7 @@ class TahsinViewModel(
     private val settings: SettingsStore,
     private val downloader: AudioDownloader,
     private val fontStore: FontStore,
+    private val statsStore: ReadingStatsStore,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
@@ -213,6 +218,7 @@ class TahsinViewModel(
             surahNumber = number,
             ayahIndex = 0,
             loadingSurah = true,
+            ayahStats = null,
             transcript = "",
             alignedWords = emptyList(),
             issues = emptyList(),
@@ -220,6 +226,7 @@ class TahsinViewModel(
             selectedWordRules = emptyList(),
             message = null,
         ) }
+        refreshAyahStats(number, 1)
         loadSurahContent(number)
     }
 
@@ -247,11 +254,14 @@ class TahsinViewModel(
         val s = currentReady() ?: return
         val index = s.ayahIndex.coerceIn(0, (surah.ayahs.size - 1).coerceAtLeast(0))
         if (index != s.ayahIndex) settings.ayahIndex = index
+        val ayah = surah.ayahs.getOrNull(index)
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             loadingSurah = false,
             surahs = it.surahs.map { x -> if (x.number == surah.number) surah else x },
             ayahIndex = index,
+            ayahStats = null,
         ) }
+        refreshAyahStats(surah.number, ayah?.number ?: 1)
         // Mode flow lintas surah: mulai dengar begitu konten siap.
         if (pendingAutoListen) {
             pendingAutoListen = false
@@ -284,8 +294,11 @@ class TahsinViewModel(
     private fun updateAyah(index: Int) {
         pendingAyahAfterLoad = null // navigasi apa pun membatalkan target tertunda
         settings.ayahIndex = index
+        val s = currentReady() ?: return
+        val ayahNumber = index + 1 // nomor ayat 1-based
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
             ayahIndex = index,
+            ayahStats = null,
             transcript = "",
             alignedWords = emptyList(),
             issues = emptyList(),
@@ -293,6 +306,7 @@ class TahsinViewModel(
             selectedWordRules = emptyList(),
             message = null,
         ) }
+        refreshAyahStats(s.surahNumber, ayahNumber)
     }
 
     // ---- buka target (widget "Ayah of the Day" / notifikasi) ----
@@ -352,6 +366,7 @@ class TahsinViewModel(
             override fun onPartial(text: String) = onTranscript(text, words)
             override fun onResult(text: String) {
                 onTranscript(text, words)
+                recordAttempt(text, words)
                 maybeAutoAdvance()
                 maybePlayErrorTone()
             }
@@ -508,6 +523,45 @@ class TahsinViewModel(
             it.status == WordStatus.MISMATCH || it.status == WordStatus.SKIPPED
         }
         if (hasError) playErrorFeedback()
+    }
+
+    /**
+     * Muat riwayat ayat aktif dari penyimpanan di thread IO; hasilnya hanya
+     * diterapkan kalau user masih berada di ayat yang sama (bisa sudah pindah
+     * saat pembacaan file berjalan).
+     */
+    private fun refreshAyahStats(surahNumber: Int, ayahNumber: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val stats = statsStore.statsFor(surahNumber, ayahNumber)
+            val s = currentReady() ?: return@launch
+            if (s.surahNumber == surahNumber && s.ayah?.number == ayahNumber) {
+                updateReady { it.copy(ayahStats = stats) }
+            }
+        }
+    }
+
+    /**
+     * Simpan satu percobaan (hasil final) ke riwayat bacaan: skor, jumlah
+     * percobaan, dan kata yang salah/terlewat. Hanya hasil yang benar-benar
+     * ada ucapan yang dihitung (transkrip kosong = bukan percobaan baca).
+     * I/O disk dijalankan di Dispatchers.IO; hasilnya hanya diterapkan kalau
+     * user masih di ayat yang sama (bisa sudah pindah saat penulisan selesai).
+     */
+    private fun recordAttempt(text: String, words: List<String>) {
+        val s = currentReady() ?: return
+        val ayah = s.ayah ?: return
+        if (text.isBlank() || words.isEmpty() || s.alignedWords.isEmpty()) return
+        val surahNumber = s.surahNumber
+        val ayahNumber = ayah.number
+        val aligned = s.alignedWords
+        viewModelScope.launch(Dispatchers.IO) {
+            statsStore.record(surahNumber, ayahNumber, aligned, words)
+            val updated = statsStore.statsFor(surahNumber, ayahNumber)
+            val cur = currentReady() ?: return@launch
+            if (cur.surahNumber == surahNumber && cur.ayah?.number == ayahNumber) {
+                updateReady { it.copy(ayahStats = updated) }
+            }
+        }
     }
 
     private fun onTranscript(text: String, words: List<String>) {
@@ -876,6 +930,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             settings = SettingsStore(app),
             downloader = AudioDownloader(app),
             fontStore = FontStore(app),
+            statsStore = ReadingStatsStore(app),
         )
     }
 }

@@ -17,6 +17,12 @@ continuous muraja'ah without looking at the screen.
   **offline by default** (Arabic + ID/EN translations bundled into the APK).
 - 🎙️ **Real-time scoring**: words turn green (correct) / red (wrong) / yellow
   (currently being read) as you recite into the microphone (SpeechRecognizer `ar-SA`).
+- 📊 **Statistics & error history** (persistent): every final recitation result is
+  stored per ayah — score (0–100), number of attempts, and the **frequently
+  wrong/missed words** (from `TranscriptAligner`). The **Statistics & History**
+  screen (⚙ drawer) shows a global summary plus "frequently wrong words" per
+  surah; tap a word to jump straight to that ayah to fix it. The main screen
+  shows a quick line "N× attempted · best score M%".
 - 🎨 **Tajwid colors** (on by default, toggleable in the drawer): mad (red),
   ghunnah (green), qalqalah (blue), ikhfa' (gray), iqlab (purple), idgham (orange),
   lam jalalah (teal).
@@ -85,10 +91,12 @@ app/src/main/java/com/tahsin/app/
 ├── data/quran/     # Surah/Ayah models + repository (asset bundle → cache → equran.id)
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (color spans)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
-├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM)
+├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
+│                   #   StatsScreen + StatsViewModel (statistics & history)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + daily alarm/notification
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
+│                   #   ReadingStatsStore (per-ayah reading history, JSON filesDir),
 │                   #   AyahOfTheDayManager (daily ayah selection + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```

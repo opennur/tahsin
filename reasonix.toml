@@ -1,0 +1,2 @@
+[permissions]
+allow = ["Bash=./gradlew assembleDebug --no-daemon 2>&1 | tail -12", "review", "Bash=./gradlew testDebugUnitTest assembleDebug --no-daemon 2>&1 | tail -8", "Bash=./gradlew testDebugUnitTest assembleDebug --no-daemon 2>&1 | tail -6"]

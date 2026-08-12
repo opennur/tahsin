@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import com.tahsin.app.theme.AyahTheme
 import com.tahsin.app.ui.AudioManagerScreen
 import com.tahsin.app.ui.OpenTarget
+import com.tahsin.app.ui.StatsScreen
 import com.tahsin.app.ui.TahsinScreen
 import com.tahsin.app.widget.AyahOfTheDayAlarm
 
@@ -29,6 +30,10 @@ class MainActivity : ComponentActivity() {
     /** Counter pengiriman target: naik tiap deep link valid → key LaunchedEffect unik. */
     private var targetDelivery = 0L
 
+    /** Target buka ayat dari layar statistik (ketuk kata sering salah) — dikonsumsi
+     * saat deep link widget/notifikasi baru datang (onNewIntent). */
+    private var statsTarget by mutableStateOf<OpenTarget?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // targetSdk 35 mewajibkan edge-to-edge: konten digambar di belakang
@@ -41,12 +46,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             AyahTheme {
                 var showAudioManager by remember { mutableStateOf(false) }
-                if (showAudioManager) {
-                    AudioManagerScreen(onBack = { showAudioManager = false })
-                } else {
-                    TahsinScreen(
+                var showStats by remember { mutableStateOf(false) }
+                when {
+                    showAudioManager -> AudioManagerScreen(onBack = { showAudioManager = false })
+                    showStats -> StatsScreen(
+                        onBack = { showStats = false },
+                        onOpenAyah = { s, a ->
+                            statsTarget = OpenTarget(s, a, targetDelivery++)
+                            showStats = false
+                        },
+                    )
+                    else -> TahsinScreen(
                         onOpenAudioManager = { showAudioManager = true },
-                        target = target,
+                        onOpenStats = { showStats = true },
+                        target = statsTarget ?: target,
                     )
                 }
             }
@@ -56,6 +69,9 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        // Deep link baru (widget/notifikasi) menang atas target statistik lama
+        // yang belum sempat dipakai — biar ketukan widget tidak diabaikan.
+        statsTarget = null
         target = readTarget(intent)
     }
 

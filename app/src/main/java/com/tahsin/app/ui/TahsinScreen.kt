@@ -94,6 +94,8 @@ import kotlin.math.roundToInt
 @Composable
 fun TahsinScreen(
     onOpenAudioManager: () -> Unit = {},
+    /** Buka layar statistik & riwayat kesalahan (dari drawer pengaturan). */
+    onOpenStats: () -> Unit = {},
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     target: OpenTarget? = null,
     modifier: Modifier = Modifier,
@@ -169,6 +171,7 @@ fun TahsinScreen(
             onSetBackgroundAllowed = viewModel::setBackgroundDownloadAllowed,
             onDownloadAll = viewModel::downloadAllAudio,
             onOpenAudioManager = onOpenAudioManager,
+            onOpenStats = onOpenStats,
             modifier = modifier,
         )
     }
@@ -197,6 +200,7 @@ private fun TahsinContent(
     onSetBackgroundAllowed: (Boolean) -> Unit,
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
+    onOpenStats: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -576,6 +580,17 @@ private fun TahsinContent(
             Spacer(modifier = Modifier.height(4.dp))
         }
 
+        // ---- Info riwayat ayat aktif (dari statistik persisten) ----
+        state.ayahStats?.let { st ->
+            if (st.attempts > 0) {
+                Spacer(modifier = Modifier.height(12.dp))
+                AyahText(
+                    strings.statsInline.format(st.attempts, st.bestScore),
+                    style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+                )
+            }
+        }
+
         // ---- Pesan sistem ----
         state.message?.let { msg ->
             AyahCard(modifier = Modifier.fillMaxWidth(), onClick = onDismissMessage) {
@@ -651,6 +666,10 @@ private fun TahsinContent(
                     onOpenAudioManager = {
                         drawerOpen = false
                         onOpenAudioManager()
+                    },
+                    onOpenStats = {
+                        drawerOpen = false
+                        onOpenStats()
                     },
                     onClose = { drawerOpen = false },
                 )
@@ -760,6 +779,7 @@ private fun SettingsPanel(
     onToggleAyahOfDay: () -> Unit,
     onDownloadAll: () -> Unit,
     onOpenAudioManager: () -> Unit,
+    onOpenStats: () -> Unit,
     onClose: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -799,6 +819,17 @@ private fun SettingsPanel(
             if (state.flowMode) strings.flowHintOn
             else strings.flowHintOff,
             style = AyahTypography.Caption,
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        SectionLabel(strings.statsTitle)
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = strings.statsTitle,
+            variant = AyahButtonVariant.Outline,
+            onClick = onOpenStats,
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(20.dp))
