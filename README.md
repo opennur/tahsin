@@ -1,5 +1,7 @@
 # Tahsin Quran
 
+> 🌐 **English version:** [README.en.md](README.en.md)
+
 Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf dengan gaya
 khat Utsmani, penilaian bacaan real-time lewat mikrofon, pewarnaan huruf tajwid,
 audio qari per ayat + per kata, dan **mode flow** untuk muroja'ah berkelanjutan
