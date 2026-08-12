@@ -18,6 +18,8 @@ data class Surah(
 data class Ayah(
     val number: Int,
     val text: String,
+    /** Terjemahan dalam bahasa aktif (ID: Kemenag; EN: Saheeh Intl.). */
+    val translation: String = "",
 ) {
     /** Kata-kata ayat (token yang mengandung huruf Arab; penanda waqaf dibuang). */
     val words: List<String>

@@ -19,6 +19,8 @@ import com.tahsin.app.stt.TranscriptAligner
 import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.ArabicFont
 import com.tahsin.app.theme.AyahColors
+import com.tahsin.app.ui.AppStrings
+import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.AudioDownloader
 import com.tahsin.app.util.DownloadService
 import com.tahsin.app.util.FontStore
@@ -53,6 +55,7 @@ sealed interface TahsinUiState {
         val selectedWordRules: List<TajwidRule> = emptyList(),
         val message: String? = null,
         val fontScale: Float = 1.5f,
+        val language: AppLanguage = AppLanguage.ID,
         val arabicFont: ArabicFont = ArabicFont.UTSMANI,
         /** FontFamily efektif (font file kalau ada, fallback sistem). */
         val arabicFontFamily: FontFamily = FontFamily.Default,
@@ -130,6 +133,7 @@ class TahsinViewModel(
                 ayahIndex = settings.ayahIndex,
                 loadingSurah = true,
                 fontScale = 1.5f,
+                language = currentLanguage(),
                 arabicFont = ArabicFont.UTSMANI,
                 arabicFontFamily = fontStore.loadFamily(ArabicFont.UTSMANI),
                 darkMode = settings.darkMode,
@@ -174,17 +178,18 @@ class TahsinViewModel(
     /** Muat isi surah: cache dulu, kalau belum ada unduh dari equran.id. */
     private fun loadSurahContent(number: Int) {
         viewModelScope.launch {
-            val cached = repository.cachedSurah(number)
+            val lang = currentLanguage()
+            val cached = repository.cachedSurah(number, lang)
             if (cached != null) {
                 replaceSurah(cached)
                 return@launch
             }
             try {
-                replaceSurah(repository.fetchSurah(number))
+                replaceSurah(repository.fetchSurah(number, lang))
             } catch (e: Exception) {
                 updateReady { it.copy(
                     loadingSurah = false,
-                    message = "Gagal memuat surah $number: ${e.message ?: "periksa koneksi"}",
+                    message = "${AppStrings.of(lang).msgSurahLoadFailed} $number: ${e.message ?: "periksa koneksi"}",
                 ) }
             }
         }
@@ -323,19 +328,19 @@ class TahsinViewModel(
         val surah = s.surah ?: return
         if (s.ayahIndex < surah.ayahs.size - 1) {
             updateAyah(s.ayahIndex + 1)
-            updateReady { it.copy(message = "✅ Ayat selesai — lanjut ke ayat berikutnya") }
+            updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgAyahDone) }
             startListeningForCurrentAyah()
             return
         }
         val idx = s.surahs.indexOfFirst { it.number == surah.number }
         val nextNumber = s.surahs.getOrNull(idx + 1)?.number
         if (nextNumber != null) {
-            updateReady { it.copy(message = "✅ Surah selesai — lanjut ke surah berikutnya") }
+            updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgSurahDone) }
             selectSurah(nextNumber)
             pendingAutoListen = true
             return
         }
-        updateReady { it.copy(message = "🎉 Selesai muroja'ah — seluruh Al-Qur'an dibaca benar!") }
+        updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgMurojaahDone) }
     }
 
     /** Mulai mendengar ayat yang sedang aktif; tunda dulu kalau konten belum siap. */
@@ -487,7 +492,7 @@ class TahsinViewModel(
                 }
             } catch (e: Exception) {
                 updateReady { it.copy(
-                    message = "Gagal mengunduh ${surah.nameLatin}: ${e.message ?: "periksa koneksi"}",
+                    message = "${AppStrings.of(currentLanguage()).msgDownloadFailed} ${surah.nameLatin}: ${e.message ?: "periksa koneksi"}",
                 ) }
             }
             activeDownloads.remove(surah.number)
@@ -555,7 +560,7 @@ class TahsinViewModel(
             audioPlayer.playAyah(s.surahNumber, ayah.number, ayah.text) {
                 audioPlayer.speak(ayah.text)
                 if (!audioPlayer.isArabicTtsAvailable()) {
-                    showMessage("Audio belum tersedia. Cek koneksi lalu coba lagi.")
+                    showMessage(AppStrings.of(currentLanguage()).msgAudioUnavailable)
                 }
             }
         }
@@ -587,7 +592,7 @@ class TahsinViewModel(
             audioPlayer.playWord(s.surahNumber, ayah.number, wordIndex, word) {
                 audioPlayer.speak(word)
                 if (!audioPlayer.isArabicTtsAvailable()) {
-                    showMessage("Audio kata belum tersedia. Cek koneksi lalu coba lagi.")
+                    showMessage(AppStrings.of(currentLanguage()).msgWordUnavailable)
                 }
             }
         }
@@ -628,8 +633,8 @@ class TahsinViewModel(
                 message = null,
             ) }
             s.surahs.forEach { meta ->
-                val surah = repository.cachedSurah(meta.number)
-                    ?: runCatching { repository.fetchSurah(meta.number) }.getOrNull()
+                val surah = repository.cachedSurahPlain(meta.number)
+                    ?: runCatching { repository.fetchSurah(meta.number, currentLanguage()) }.getOrNull()
                 if (surah == null) {
                     failed++
                     return@forEach
@@ -655,9 +660,9 @@ class TahsinViewModel(
                 isDownloading = false,
                 isDownloadingAll = false,
                 message = if (failed > 0) {
-                    "Unduh selesai: $failed surah gagal."
+                    AppStrings.of(currentLanguage()).msgDownloadAllPartial.format(failed)
                 } else {
-                    "Semua audio berhasil diunduh ✓"
+                    AppStrings.of(currentLanguage()).msgDownloadAllDone
                 },
             ) }
             if (settings.backgroundDownloadAllowed == true && DownloadService.isRunning()) {
@@ -684,6 +689,25 @@ class TahsinViewModel(
 
     fun clearMessage() {
         _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(message = null) }
+    }
+
+    // ---- bahasa ----
+
+    /** Bahasa aktif dari settings (fallback Indonesia). */
+    private fun currentLanguage(): AppLanguage =
+        AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID
+
+    /** Ganti bahasa aplikasi & terjemahan; muat ulang isi surah aktif. */
+    fun setLanguage(lang: AppLanguage) {
+        if (lang == currentLanguage()) return
+        settings.languageCode = lang.code
+        val s = currentReady() ?: return
+        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+            language = lang,
+            loadingSurah = true,
+            message = null,
+        ) }
+        loadSurahContent(s.surahNumber)
     }
 
     private fun currentReady(): TahsinUiState.Ready? = _uiState.value as? TahsinUiState.Ready

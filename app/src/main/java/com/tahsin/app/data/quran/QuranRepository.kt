@@ -2,6 +2,7 @@ package com.tahsin.app.data.quran
 
 import android.content.Context
 import com.google.gson.Gson
+import com.tahsin.app.util.AppLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -40,26 +41,41 @@ class QuranRepository(context: Context) {
         }
     }
 
-    /** Surah yang sudah pernah diunduh (dari cache). Null kalau belum pernah. */
-    fun cachedSurah(number: Int): Surah? {
+    /** Surah yang sudah pernah diunduh (teks saja, tanpa terjemahan bahasa lain). */
+    fun cachedSurahPlain(number: Int): Surah? {
         val file = File(quranDir, "surah-$number.json")
         if (!file.exists()) return null
-        return runCatching {
-            gson.fromJson(file.readText(), SurahResponse::class.java)?.data?.toSurah()
+        return runCatching { parseSurah(file.readText()) }.getOrNull()
+    }
+
+    /**
+     * Surah dari cache + terjemahan bahasa aktif. Kalau terjemahan bahasa itu
+     * belum ada, diunduh dulu (EN: quran.com; ID: dari respons equran.id).
+     * Null kalau isi surah belum pernah diunduh.
+     */
+    suspend fun cachedSurah(number: Int, lang: AppLanguage): Surah? = withContext(Dispatchers.IO) {
+        val file = File(quranDir, "surah-$number.json")
+        if (!file.exists()) return@withContext null
+        runCatching {
+            val raw = file.readText()
+            val surah = parseSurah(raw)
+            surah.withTranslation(translationFor(number, lang, raw, surah.ayahs.size))
         }.getOrNull()
     }
 
-    /** Unduh surah dari equran.id lalu simpan ke cache. */
-    suspend fun fetchSurah(number: Int): Surah = withContext(Dispatchers.IO) {
-        val text = httpGet("https://equran.id/api/v2/surat/$number")
-        val response = gson.fromJson(text, SurahResponse::class.java)
-        val surah = response.data?.toSurah()
-            ?: throw IOException("Respons API kosong untuk surah $number.")
-        File(quranDir, "surah-$number.json").apply {
-            parentFile?.mkdirs()
-            writeText(text)
+    /** Unduh surah (equran.id) + terjemahan bahasa aktif, lalu simpan ke cache. */
+    suspend fun fetchSurah(number: Int, lang: AppLanguage): Surah = withContext(Dispatchers.IO) {
+        val file = File(quranDir, "surah-$number.json")
+        val raw: String = if (file.exists()) {
+            file.readText()
+        } else {
+            val text = httpGet("https://equran.id/api/v2/surat/$number")
+            file.parentFile?.mkdirs()
+            file.writeText(text)
+            text
         }
-        surah
+        val surah = parseSurah(raw)
+        surah.withTranslation(translationFor(number, lang, raw, surah.ayahs.size))
     }
 
     private fun httpGet(url: String): String {
@@ -74,6 +90,52 @@ class QuranRepository(context: Context) {
             conn.disconnect()
         }
     }
+
+    // ---- terjemahan per bahasa ----
+
+    /** Respons equran.id (mentah) → Surah (teks Arab saja). */
+    private fun parseSurah(raw: String): Surah {
+        val response = gson.fromJson(raw, SurahResponse::class.java)
+        return response.data?.toSurah()
+            ?: throw IOException("Respons API kosong.")
+    }
+
+    private fun Surah.withTranslation(translations: List<String>): Surah =
+        copy(ayahs = ayahs.mapIndexed { i, a -> a.copy(translation = translations.getOrNull(i).orEmpty()) })
+
+    /**
+     * Terjemahan per ayat untuk satu bahasa.
+     * - ID: `teksIndonesia` dari respons equran.id (sudah tersimpan di cache surah).
+     * - EN: quran.com API (Saheeh International, resource 20), di-cache
+     *   di `trans-en-<n>.json` agar offline untuk kunjungan berikutnya.
+     */
+    private suspend fun translationFor(
+        number: Int,
+        lang: AppLanguage,
+        rawEquran: String,
+        ayahCount: Int,
+    ): List<String> {
+        if (lang == AppLanguage.ID) {
+            val dto = gson.fromJson(rawEquran, SurahResponse::class.java) ?: return emptyList()
+            return dto.data?.ayat?.map { it.teksIndonesia } ?: emptyList()
+        }
+        val file = File(quranDir, "trans-en-$number.json")
+        if (file.exists()) {
+            val cached = runCatching {
+                gson.fromJson(file.readText(), TranslationListJson::class.java)?.translations?.map { it.text }
+            }.getOrNull()
+            if (cached != null && cached.size == ayahCount) return cached
+        }
+        val json = httpGet("https://api.quran.com/api/v4/quran/translations/20?chapter_number=$number")
+        val parsed = gson.fromJson(json, TranslationListJson::class.java) ?: return emptyList()
+        val texts = parsed.translations.map { stripHtml(it.text) }
+        file.parentFile?.mkdirs()
+        file.writeText(gson.toJson(TranslationListJson(parsed.translations)))
+        return texts
+    }
+
+    /** Buang tag HTML (mis. `<sup foot_note=...>1</sup>` dari quran.com). */
+    private fun stripHtml(s: String): String = s.replace(Regex("<[^>]*>"), "").trim()
 
     // ---- DTO (JSON) ----
 
@@ -106,5 +168,18 @@ class QuranRepository(context: Context) {
         )
     }
 
-    private data class AyahData(val nomorAyat: Int = 0, val teksArab: String = "")
+    private data class AyahData(
+        val nomorAyat: Int = 0,
+        val teksArab: String = "",
+        val teksIndonesia: String = "",
+    )
+
+    private data class TranslationListJson(
+        val translations: List<TranslationItemJson> = emptyList(),
+    )
+
+    private data class TranslationItemJson(
+        val resource_id: Int = 0,
+        val text: String = "",
+    )
 }

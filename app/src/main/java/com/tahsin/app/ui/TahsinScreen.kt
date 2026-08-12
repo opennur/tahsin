@@ -66,6 +66,8 @@ import com.tahsin.app.stt.AlignedWord
 import com.tahsin.app.stt.WordStatus
 import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTypography
+import com.tahsin.app.util.AppLanguage
+import com.tahsin.app.util.next
 import com.tahsin.app.ui.components.AyahButton
 import com.tahsin.app.ui.components.AyahButtonSize
 import com.tahsin.app.ui.components.AyahButtonVariant
@@ -125,6 +127,7 @@ fun TahsinScreen(
             onPlaySelectedWord = viewModel::playSelectedWord,
             onDismissMessage = viewModel::clearMessage,
             onToggleDarkMode = viewModel::toggleDarkMode,
+            onSetLanguage = viewModel::setLanguage,
             onToggleTajwidColor = viewModel::toggleTajwidColor,
             onToggleFlowMode = viewModel::toggleFlowMode,
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
@@ -149,6 +152,7 @@ private fun TahsinContent(
     onPlaySelectedWord: () -> Unit,
     onDismissMessage: () -> Unit,
     onToggleDarkMode: () -> Unit,
+    onSetLanguage: (AppLanguage) -> Unit,
     onToggleTajwidColor: () -> Unit,
     onToggleFlowMode: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
@@ -162,6 +166,7 @@ private fun TahsinContent(
     val words = ayah?.words.orEmpty()
     val statusByIndex = state.alignedWords.associateBy { it.index }
     val ayahCount = state.surah?.ayahs?.size ?: 0
+    val strings = AppStrings.of(state.language)
 
     // Span warna tajwid per kata (dihitung sekali per ayat).
     val spansByWord = remember(words) {
@@ -188,7 +193,7 @@ private fun TahsinContent(
         // ---- Header + tombol hamburger (buka drawer pengaturan) ----
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText(
-                "Tahsin Qur'an",
+                strings.appTitle,
                 style = AyahTypography.Heading1,
                 modifier = Modifier.weight(1f),
             )
@@ -200,6 +205,13 @@ private fun TahsinContent(
             )
             Spacer(modifier = Modifier.width(8.dp))
             AyahButton(
+                text = state.language.label,
+                variant = AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                onClick = { onSetLanguage(state.language.next()) },
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahButton(
                 text = "⚙",
                 variant = AyahButtonVariant.Outline,
                 size = AyahButtonSize.Small,
@@ -208,25 +220,25 @@ private fun TahsinContent(
         }
         Spacer(modifier = Modifier.height(4.dp))
         AyahText(
-            "Baca ayat ke mikrofon.\nSetiap kata dicek langsung.",
+            strings.subtitle,
             style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            LegendDot(color = AyahColors.Success, label = "benar")
-            LegendDot(color = AyahColors.Error, label = "salah")
-            LegendDot(color = AyahColors.Reading, label = "dibaca")
-            LegendDot(color = AyahColors.Surface, label = "belum")
+            LegendDot(color = AyahColors.Success, label = strings.legendCorrect)
+            LegendDot(color = AyahColors.Error, label = strings.legendWrong)
+            LegendDot(color = AyahColors.Reading, label = strings.legendReading)
+            LegendDot(color = AyahColors.Surface, label = strings.legendNotReached)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
         // ---- Pilih surah (dropdown, bukan tab) ----
         SimpleDropdown(
-            selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin} (${it.ayahCount} ayat)" } ?: "-",
+            selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin} (${it.ayahCount} ${strings.ayahWord})" } ?: "-",
             options = state.surahs.map { s ->
                 DropdownOption(
-                    "${s.number}. ${s.nameLatin} (${s.ayahCount} ayat)",
+                    "${s.number}. ${s.nameLatin} (${s.ayahCount} ${strings.ayahWord})",
                     { onSelectSurah(s.number) },
                 )
             },
@@ -239,7 +251,7 @@ private fun TahsinContent(
         if (state.loadingSurah) {
             AyahCard(modifier = Modifier.fillMaxWidth()) {
                 AyahText(
-                    "Memuat surah…",
+                    strings.loadingSurah,
                     style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
                 )
             }
@@ -254,9 +266,9 @@ private fun TahsinContent(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 SimpleDropdown(
-                    selectedLabel = "Ayat ${ayah.number} / $ayahCount",
+                    selectedLabel = "${strings.ayahLabel} ${ayah.number} / $ayahCount",
                     options = (1..ayahCount).map { n ->
-                        DropdownOption("Ayat $n", { onSelectAyah(n - 1) })
+                        DropdownOption("${strings.ayahLabel} $n", { onSelectAyah(n - 1) })
                     },
                     modifier = Modifier.weight(1f),
                 )
@@ -374,7 +386,7 @@ private fun TahsinContent(
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         AyahButton(
-                                            text = "▶ Kata",
+                                            text = strings.playWord,
                                             variant = AyahButtonVariant.Secondary,
                                             size = AyahButtonSize.Small,
                                             onClick = onPlaySelectedWord,
@@ -384,7 +396,7 @@ private fun TahsinContent(
                                     val rules = state.selectedWordRules
                                     if (rules.isEmpty()) {
                                         AyahText(
-                                            "Tidak ada aturan tajwid khusus pada kata ini.",
+                                            strings.noTajwidRule,
                                             style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
                                         )
                                     } else {
@@ -401,13 +413,23 @@ private fun TahsinContent(
                     }
                 }
             }
+            // Terjemahan ayat (bahasa aktif).
+            val translation = ayah?.translation.orEmpty()
+            if (translation.isNotBlank()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                AyahText(
+                    translation,
+                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
 
         // ---- Transkrip real-time ----
         if (state.listening) {
             Spacer(modifier = Modifier.height(8.dp))
             AyahText(
-                "🎙️ Terdeteksi: ${state.transcript.ifBlank { "…" }}",
+                "${strings.detectedPrefix} ${state.transcript.ifBlank { "…" }}",
                 style = AyahTypography.Caption.copy(color = AyahColors.Primary),
             )
         }
@@ -417,13 +439,14 @@ private fun TahsinContent(
         // ---- Daftar kesalahan bacaan ----
         if (state.issues.isNotEmpty()) {
             AyahText(
-                "Kesalahan terdeteksi (${state.issues.size})",
+                "${strings.issuesTitle} (${state.issues.size})",
                 style = AyahTypography.Heading2,
             )
             Spacer(modifier = Modifier.height(8.dp))
             state.issues.forEach { issue ->
                 IssueCard(
                     issue = issue,
+                    strings = strings,
                     fontScale = state.fontScale,
                     fontFamily = state.arabicFontFamily,
                 )
@@ -448,6 +471,7 @@ private fun TahsinContent(
                 isDownloading = state.isDownloading,
                 done = state.downloadDone,
                 total = state.downloadTotal,
+                strings = strings,
             )
 
             // ---- Bar bawah TETAP: mic + dengar/stop (tidak ikut scroll) ----
@@ -461,13 +485,13 @@ private fun TahsinContent(
                     MicButton(listening = state.listening, onClick = onMicClick)
                     Spacer(modifier = Modifier.width(14.dp))
                     AyahText(
-                        if (state.listening) "Membaca… tekan ⏹ untuk berhenti"
-                        else "Tekan 🎙️\nlalu bacalah",
+                        if (state.listening) strings.listeningHint
+                        else strings.micHint,
                         style = AyahTypography.Caption,
                         modifier = Modifier.weight(1f),
                     )
                     AyahButton(
-                        text = if (state.isAudioPlaying) "⏹ Stop" else "▶ Dengar",
+                        text = if (state.isAudioPlaying) strings.stop else strings.listen,
                         variant = if (state.isAudioPlaying) AyahButtonVariant.Danger else AyahButtonVariant.Secondary,
                         onClick = onToggleAudioPlayback,
                     )
@@ -508,11 +532,11 @@ private fun TahsinContent(
 
         // ---- Popup keterangan: unduh audio dimulai ----
         if (state.showDownloadNotice) {
-            DownloadNoticeDialog(onDismiss = onDismissDownloadNotice)
+            DownloadNoticeDialog(strings = strings, onDismiss = onDismissDownloadNotice)
         }
         // ---- Prompt izin unduhan latar belakang (sekali) ----
         if (state.showBackgroundPrompt) {
-            BackgroundPromptDialog(onSetBackgroundAllowed = onSetBackgroundAllowed)
+            BackgroundPromptDialog(strings = strings, onSetBackgroundAllowed = onSetBackgroundAllowed)
         }
     }
 }
@@ -539,6 +563,7 @@ private fun LegendDot(color: Color, label: String) {
 @Composable
 private fun IssueCard(
     issue: ReadingIssue,
+    strings: Strings,
     fontScale: Float,
     fontFamily: FontFamily,
 ) {
@@ -558,7 +583,7 @@ private fun IssueCard(
         issue.spoken?.let { spoken ->
             Spacer(modifier = Modifier.height(4.dp))
             AyahText(
-                "Terdeteksi: $spoken",
+                "${strings.issueDetected} $spoken",
                 style = AyahTypography.Caption.copy(color = AyahColors.Error),
             )
         }
@@ -610,9 +635,10 @@ private fun SettingsPanel(
     onClose: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
+        val strings = AppStrings.of(state.language)
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText(
-                "Pengaturan",
+                strings.settingsTitle,
                 style = AyahTypography.Heading2,
                 modifier = Modifier.weight(1f),
             )
@@ -621,10 +647,10 @@ private fun SettingsPanel(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        SectionLabel("Tajwid")
+        SectionLabel(strings.sectionTajwid)
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = if (state.tajwidColor) "🎨 Warna Tajwid: Nyala" else "🎨 Warna Tajwid: Mati",
+            text = if (state.tajwidColor) strings.tajwidOn else strings.tajwidOff,
             variant = if (state.tajwidColor) AyahButtonVariant.Secondary else AyahButtonVariant.Outline,
             onClick = onToggleTajwidColor,
             modifier = Modifier.fillMaxWidth(),
@@ -632,27 +658,27 @@ private fun SettingsPanel(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        SectionLabel("Muroja'ah")
+        SectionLabel(strings.sectionMurojaah)
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = if (state.flowMode) "🔁 Mode Flow: Nyala" else "🔁 Mode Flow: Mati",
+            text = if (state.flowMode) strings.flowOn else strings.flowOff,
             variant = if (state.flowMode) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
             onClick = onToggleFlowMode,
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(6.dp))
         AyahText(
-            if (state.flowMode) "Lanjut otomatis ke ayat berikutnya saat semua kata benar."
-            else "Lanjut otomatis antar-ayat untuk muroja'ah.",
+            if (state.flowMode) strings.flowHintOn
+            else strings.flowHintOff,
             style = AyahTypography.Caption,
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        SectionLabel("Penyimpanan")
+        SectionLabel(strings.sectionStorage)
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = "Unduh semua audio",
+            text = strings.downloadAll,
             variant = AyahButtonVariant.Primary,
             onClick = onDownloadAll,
             enabled = !state.isDownloading,
@@ -660,7 +686,7 @@ private fun SettingsPanel(
         )
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = "Kelola audio terunduh",
+            text = strings.manageAudio,
             variant = AyahButtonVariant.Outline,
             onClick = onOpenAudioManager,
             modifier = Modifier.fillMaxWidth(),
@@ -671,14 +697,14 @@ private fun SettingsPanel(
         Spacer(modifier = Modifier.weight(1f))
 
         AyahText(
-            "Ketuk di luar panel untuk menutup.",
+            strings.closeDrawerHint,
             style = AyahTypography.Caption,
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         AyahText(
-            "Made with ❤️ by Lutfian Dwi Cahyono",
+            strings.credit,
             style = AyahTypography.Caption.copy(
                 color = AyahColors.Primary,
                 fontWeight = FontWeight.SemiBold,
@@ -706,6 +732,7 @@ private fun DownloadFooter(
     isDownloading: Boolean,
     done: Int,
     total: Int,
+    strings: Strings,
 ) {
     if (!isDownloading) return
     Column(
@@ -716,7 +743,7 @@ private fun DownloadFooter(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahText(
-                "Mengunduh audio…",
+                strings.downloadingLabel,
                 style = AyahTypography.Caption.copy(color = AyahColors.Primary),
                 modifier = Modifier.weight(1f),
             )
@@ -733,7 +760,7 @@ private fun DownloadFooter(
 
 /** Popup keterangan singkat saat unduhan audio dimulai. */
 @Composable
-private fun DownloadNoticeDialog(onDismiss: () -> Unit) {
+private fun DownloadNoticeDialog(strings: Strings, onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -748,18 +775,16 @@ private fun DownloadNoticeDialog(onDismiss: () -> Unit) {
                 .background(AyahColors.Surface)
                 .padding(20.dp),
         ) {
-            AyahText("Mengunduh audio…", style = AyahTypography.Heading2)
+            AyahText(strings.downloadNoticeTitle, style = AyahTypography.Heading2)
             Spacer(modifier = Modifier.height(8.dp))
             AyahText(
-                "Audio surah ini belum diunduh. Unduhan dimulai otomatis — " +
-                    "ikuti progres di atas tombol. Bacaan contoh akan diputar " +
-                    "setelah unduhan selesai.",
+                strings.downloadNoticeBody,
                 style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
             )
             Spacer(modifier = Modifier.height(20.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.weight(1f))
-                AyahButton(text = "Mengerti", variant = AyahButtonVariant.Primary, onClick = onDismiss)
+                AyahButton(text = strings.gotIt, variant = AyahButtonVariant.Primary, onClick = onDismiss)
             }
         }
     }
@@ -767,7 +792,7 @@ private fun DownloadNoticeDialog(onDismiss: () -> Unit) {
 
 /** Prompt (sekali) untuk mengizinkan unduhan berjalan di latar belakang. */
 @Composable
-private fun BackgroundPromptDialog(onSetBackgroundAllowed: (Boolean) -> Unit) {
+private fun BackgroundPromptDialog(strings: Strings, onSetBackgroundAllowed: (Boolean) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -782,25 +807,23 @@ private fun BackgroundPromptDialog(onSetBackgroundAllowed: (Boolean) -> Unit) {
                 .background(AyahColors.Surface)
                 .padding(20.dp),
         ) {
-            AyahText("Unduhan latar belakang?", style = AyahTypography.Heading2)
+            AyahText(strings.bgPromptTitle, style = AyahTypography.Heading2)
             Spacer(modifier = Modifier.height(8.dp))
             AyahText(
-                "Izinkan unduhan terus berjalan saat layar mati / aplikasi di " +
-                    "latar belakang? Unduhan besar (mis. Al-Baqarah ≈ 440 MB) " +
-                    "bisa gagal kalau tidak.",
+                strings.bgPromptBody,
                 style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
             )
             Spacer(modifier = Modifier.height(20.dp))
             Column {
                 AyahButton(
-                    text = "Izinkan",
+                    text = strings.bgAllow,
                     variant = AyahButtonVariant.Primary,
                     onClick = { onSetBackgroundAllowed(true) },
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 AyahButton(
-                    text = "Tidak, cukup saat aplikasi terbuka",
+                    text = strings.bgDeny,
                     variant = AyahButtonVariant.Outline,
                     onClick = { onSetBackgroundAllowed(false) },
                     modifier = Modifier.fillMaxWidth(),

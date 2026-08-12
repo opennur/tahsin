@@ -17,6 +17,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean("tajwid_color", true)
         set(value) = prefs.edit().putBoolean("tajwid_color", value).apply()
 
+    /** Bahasa aplikasi & terjemahan (default Indonesia). */
+    var languageCode: String
+        get() = prefs.getString("language_code", AppLanguage.ID.code) ?: AppLanguage.ID.code
+        set(value) = prefs.edit().putString("language_code", value).apply()
+
     /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya (default mati). */
     var flowMode: Boolean
         get() = prefs.getBoolean("flow_mode", false)

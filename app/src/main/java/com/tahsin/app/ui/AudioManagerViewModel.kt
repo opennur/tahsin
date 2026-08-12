@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tahsin.app.data.quran.QuranRepository
+import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.AudioDownloader
+import com.tahsin.app.util.SettingsStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +39,8 @@ data class AudioManagerState(
     val items: List<AudioManagerItem> = emptyList(),
     val totalDownloaded: Int = 0,
     val totalSizeBytes: Long = 0L,
+    /** Bahasa aktif untuk teks UI. */
+    val language: AppLanguage = AppLanguage.ID,
     /** Surah yang menunggu konfirmasi hapus. */
     val pendingDelete: Int? = null,
     /** Konfirmasi hapus semua. */
@@ -50,6 +54,7 @@ data class AudioManagerState(
 class AudioManagerViewModel(
     private val repository: QuranRepository,
     private val downloader: AudioDownloader,
+    private val settings: SettingsStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AudioManagerState())
@@ -65,7 +70,7 @@ class AudioManagerViewModel(
         val items = surahs
             .filter { it.number in downloaded }
             .map { surah ->
-                val cached = repository.cachedSurah(surah.number)
+                val cached = repository.cachedSurahPlain(surah.number)
                 val totalWords = cached?.ayahs?.sumOf { it.words.size }
                 val info = downloader.surahAudioInfo(surah.number, surah.ayahCount, totalWords)
                 AudioManagerItem(
@@ -86,6 +91,7 @@ class AudioManagerViewModel(
             items = items,
             totalDownloaded = items.sumOf { it.ayahFiles + it.wordFiles },
             totalSizeBytes = items.sumOf { it.sizeBytes },
+            language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID,
         )
     }
 
@@ -122,6 +128,7 @@ fun audioManagerViewModelFactory(context: Context): ViewModelProvider.Factory = 
         AudioManagerViewModel(
             repository = QuranRepository(app),
             downloader = AudioDownloader(app),
+            settings = SettingsStore(app),
         )
     }
 }

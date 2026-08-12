@@ -47,6 +47,7 @@ fun AudioManagerScreen(
     val context = LocalContext.current
     val viewModel: AudioManagerViewModel = viewModel(factory = audioManagerViewModelFactory(context))
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val strings = AppStrings.of(state.language)
 
     // Refresh setiap kali layar dibuka (mungkin ada unduhan baru dari TahsinScreen).
     LaunchedEffect(Unit) { viewModel.refresh() }
@@ -65,13 +66,13 @@ fun AudioManagerScreen(
             AyahButton(text = "←", variant = AyahButtonVariant.Outline, onClick = onBack)
             Spacer(modifier = Modifier.width(12.dp))
             AyahText(
-                "Audio Terunduh",
+                strings.audioManagerTitle,
                 style = AyahTypography.Heading1,
                 modifier = Modifier.weight(1f),
             )
             if (state.items.isNotEmpty()) {
                 AyahButton(
-                    text = "🗑 Semua",
+                    text = strings.audioDeleteAll,
                     variant = AyahButtonVariant.Outline,
                     onClick = viewModel::requestDeleteAll,
                 )
@@ -79,7 +80,7 @@ fun AudioManagerScreen(
         }
         Spacer(modifier = Modifier.height(4.dp))
         AyahText(
-            "Kelola audio yang sudah diunduh per surah.",
+            strings.audioManagerSubtitle,
             style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
 
@@ -88,8 +89,7 @@ fun AudioManagerScreen(
         if (state.items.isEmpty()) {
             AyahCard(modifier = Modifier.fillMaxWidth()) {
                 AyahText(
-                    "Belum ada audio terunduh. Buka sebuah surah lalu tekan " +
-                        "▶ Dengar Ayat untuk mengunduhnya.",
+                    strings.audioNoDownload,
                     style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
                 )
             }
@@ -102,6 +102,7 @@ fun AudioManagerScreen(
             state.items.forEach { item ->
                 AudioItemCard(
                     item = item,
+                    strings = strings,
                     onDelete = { viewModel.requestDelete(item.number) },
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -116,9 +117,9 @@ fun AudioManagerScreen(
     if (pending != null) {
         val item = state.items.find { it.number == pending }
         DeleteConfirmDialog(
-            title = "Hapus audio ${item?.let { "${it.number}. ${it.nameLatin}" } ?: "surah $pending"}?",
-            message = "File audio surah ini (ayat + kata) akan dihapus dari penyimpanan" +
-                (item?.let { " (${formatSize(it.sizeBytes)})" } ?: "") + ".",
+            strings = strings,
+            title = "${strings.audioDeleteTitle} ${item?.let { "${it.number}. ${it.nameLatin}" } ?: "$pending"}",
+            message = strings.audioDeleteBody + (item?.let { " (${formatSize(it.sizeBytes)})" } ?: ""),
             onConfirm = viewModel::confirmDelete,
             onCancel = viewModel::cancelDelete,
         )
@@ -127,9 +128,9 @@ fun AudioManagerScreen(
     // ---- Dialog konfirmasi hapus semua ----
     if (state.pendingDeleteAll) {
         DeleteConfirmDialog(
-            title = "Hapus semua audio?",
-            message = "Semua audio terunduh (${formatSize(state.totalSizeBytes)}) " +
-                "akan dihapus dari penyimpanan.",
+            strings = strings,
+            title = strings.audioDeleteAllTitle,
+            message = strings.audioDeleteAllBody + " (${formatSize(state.totalSizeBytes)})",
             onConfirm = viewModel::confirmDeleteAll,
             onCancel = viewModel::cancelDelete,
         )
@@ -139,6 +140,7 @@ fun AudioManagerScreen(
 @Composable
 private fun AudioItemCard(
     item: AudioManagerItem,
+    strings: Strings,
     onDelete: () -> Unit,
 ) {
     AyahCard(modifier = Modifier.fillMaxWidth()) {
@@ -149,15 +151,15 @@ private fun AudioItemCard(
                     style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
                 )
                 val missingNote = if (item.missingWords > 0 || item.missingAyahs > 0) {
-                    " • ${item.missingWords + item.missingAyahs} audio tak tersedia di server"
+                    " • " + strings.audioMissingNote.format(item.missingWords + item.missingAyahs)
                 } else ""
                 AyahText(
-                    "Ayat: ${item.ayahFiles}/${item.ayahCount} • Kata: ${item.wordFiles}/${item.totalWords ?: "?"} • ${formatSize(item.sizeBytes)}$missingNote",
+                    "${strings.audioAyat}: ${item.ayahFiles}/${item.ayahCount} • ${strings.audioKata}: ${item.wordFiles}/${item.totalWords ?: "?"} • ${formatSize(item.sizeBytes)}$missingNote",
                     style = AyahTypography.Caption,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 AyahText(
-                    if (item.isComplete) "✓ Lengkap" else "Belum lengkap",
+                    if (item.isComplete) strings.audioStatusComplete else strings.audioStatusIncomplete,
                     style = AyahTypography.Caption.copy(
                         color = if (item.isComplete) AyahColors.Success else AyahColors.Error,
                     ),
@@ -165,7 +167,7 @@ private fun AudioItemCard(
             }
             Spacer(modifier = Modifier.width(12.dp))
             AyahButton(
-                text = "🗑 Hapus",
+                text = strings.audioDelete,
                 variant = AyahButtonVariant.Outline,
                 onClick = onDelete,
             )
@@ -176,6 +178,7 @@ private fun AudioItemCard(
 /** Dialog konfirmasi hapus audio. */
 @Composable
 private fun DeleteConfirmDialog(
+    strings: Strings,
     title: String,
     message: String,
     onConfirm: () -> Unit,
@@ -204,9 +207,9 @@ private fun DeleteConfirmDialog(
             Spacer(modifier = Modifier.height(20.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.weight(1f))
-                AyahButton(text = "Batal", variant = AyahButtonVariant.Outline, onClick = onCancel)
+                AyahButton(text = strings.audioCancel, variant = AyahButtonVariant.Outline, onClick = onCancel)
                 Spacer(modifier = Modifier.width(12.dp))
-                AyahButton(text = "🗑 Hapus", variant = AyahButtonVariant.Primary, onClick = onConfirm)
+                AyahButton(text = strings.audioDelete, variant = AyahButtonVariant.Primary, onClick = onConfirm)
             }
         }
     }
