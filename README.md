@@ -1,9 +1,9 @@
 # Tahsin Quran
 
-Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf kata-per-kata
-dengan penilaian bacaan real-time lewat mikrofon, pewarnaan huruf tajwid, audio
-qari per ayat + per kata, dan **mode flow** untuk muroja'ah berkelanjutan tanpa
-melihat layar.
+Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf dengan gaya
+khat Utsmani, penilaian bacaan real-time lewat mikrofon, pewarnaan huruf tajwid,
+audio qari per ayat + per kata, dan **mode flow** untuk muroja'ah berkelanjutan
+tanpa melihat layar.
 
 > ⚠️ **Batasan jujur** — aplikasi ini adalah alat bantu latihan, **bukan pengganti guru**.
 > STT (speech-to-text) hanya membaca *teks* ucapan: aplikasi bisa menilai kata
@@ -13,46 +13,61 @@ melihat layar.
 
 ## Fitur
 
-- 📖 **Mushaf kata-per-kata** (susunan RTL) — semua 114 surah, **offline bawaan**
-  (di-bundle ke APK; lihat "Konten offline bawaan" di bawah).
+- 📖 **Mushaf gaya mushaf asli** — kata tersambung, susunan RTL, semua 114 surah,
+  **offline bawaan** (Arab + terjemahan ID/EN di-bundle ke APK).
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
-- 🎨 **Warna tajwid** (nyala default, bisa dimatikan): mad (merah), ghunnah (hijau),
-  qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye), lam jalalah (teal).
+- 🎨 **Warna tajwid** (nyala default, bisa dimatikan di drawer): mad (merah),
+  ghunnah (hijau), qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye),
+  lam jalalah (teal).
 - 🔁 **Mode Flow (muroja'ah)**: kalau satu ayat selesai benar, otomatis lanjut ke
-  ayat berikutnya + mikrofon menyala lagi; beep sukses/gagal biar bisa tanpa lihat layar.
+  ayat berikutnya + mikrofon menyala lagi; **bunyi gagal ganda + getar** saat ada
+  kesalahan, beep sukses saat ayat tuntas — bisa muroja'ah tanpa lihat layar.
+- 👆 **Gesture**: **geser layar** (mushaf, terjemahan, maupun background) ke
+  kanan/kiri untuk ganti ayat (RTL: kanan = ayat berikutnya); petunjuk geser bisa
+  ditutup permanen lewat tombol ✕.
+- 🧭 **Navigasi satu baris**: `[‹ next] [surah ▾] [Ayat (n) ▾] [› prev]` — label
+  surah/ayat ter-truncate otomatis (ellipsis) supaya selalu muat satu layar.
+- 🔍 **Panel kata**: ketuk kata di mushaf → hukum tajwid + penjelasan + putar
+  audio kata; tombolnya berubah jadi **⏹ Stop** saat kata sedang diputar
+  (terpisah dari tombol Dengar ayat — bebas race).
 - 🔊 **Audio contoh**: Minshawy Murattal per ayat + audio per kata (qurancdn wbw),
-  diunduh in-app (per surah / semua), offline setelah terunduh.
-- 📂 **Manajemen audio terunduh**: lihat ukuran, hapus per surah / hapus semua.
-- 🔤 **Jenis font Arab**: Utsmani (default, Amiri — lisensi OFL, diunduh otomatis),
-  Indopak (siap; taruh TTF di `filesDir/fonts/indopak.ttf`), Android.
-- 🌙 **Dark mode**, ukuran font A−/A+, dropdown surah & ayat (bukan tab).
-- 🔍 **Panel kata**: ketuk kata → hukum tajwid + penjelasan + putar audio kata.
+  diunduh in-app per surah / **semua surah** (tanpa estimasi), dengan **progress
+  bar di footer** + nama surah yang sedang diunduh; unduhan latar belakang
+  (foreground service) setelah user mengizinkan.
+- 📂 **Manajemen audio terunduh**: ukuran per surah, hapus per surah / hapus
+  semua (dengan konfirmasi), **kartu progres live** saat ada unduhan berjalan,
+  dan **cache daftar** — membuka layar lagi instan tanpa pemindaian ulang.
+- 🌙 **Dark mode** (tombol di header), **ganti bahasa ID/EN** (tombol di header),
+  drawer kanan via tombol ⚙ untuk pengaturan lain.
+- 🔤 **Khat Utsmani (Amiri)** — font di-bundle ke APK, langsung tampil tanpa unduhan.
 
 ## Arsitektur & stack
 
 - **Kotlin + Jetpack Compose** — **tanpa Material 3** (custom design system di `theme/`).
 - compileSdk 34, targetSdk 34, minSdk 26 · AGP 8.4.0 · Kotlin 2.0.20 · Gradle 8.6 · Java 17.
 - Tanpa Room/Hilt/Retrofit/Navigation — DI manual (`ViewModel` + factory), Gson untuk JSON.
-- **Offline-first**: konten surah & terjemahan bisa **di-bundle langsung ke APK**
-  (script `tools/fetch_quran_data.py`) — siap pakai tanpa internet; audio tetap
-  diunduh in-app dan di-cache ke `filesDir/`.
+- **Offline-first**: konten surah & terjemahan di-bundle ke APK (siap tanpa
+  internet); audio diunduh in-app dan di-cache ke `filesDir/`; daftar audio
+  manajemen ikut di-cache.
 
 ```
 app/src/main/java/com/tahsin/app/
-├── data/quran/     # model Surah/Ayah + repository (equran.id, cache filesDir)
+├── data/quran/     # model Surah/Ayah + repository (aset bundle → cache → equran.id)
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
-├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen
-├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer, FontStore, SettingsStore
+├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM)
+├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
+│                   #   DownloadProgress, DownloadService, FontStore, SettingsStore
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
 
 ## Konten offline bawaan (bundle ke APK)
 
-Mushaf, terjemahan Indonesia, dan terjemahan Inggris **bisa ikut di-bundle ke APK**
-sehingga aplikasi langsung siap dipakai tanpa internet (hanya audio yang tetap
-perlu diunduh di dalam aplikasi). Jalankan sekali di Termux sebelum build:
+Mushaf, terjemahan Indonesia, terjemahan Inggris, dan font khat Utsmani
+**di-bundle ke APK** sehingga aplikasi langsung siap dipakai tanpa internet
+(hanya audio yang tetap diunduh di dalam aplikasi). Jalankan sekali di Termux
+sebelum build:
 
 ```bash
 python3 tools/fetch_quran_data.py            # unduh 114 surah (Arab+ID & EN)
@@ -60,14 +75,15 @@ python3 tools/fetch_quran_data.py --force    # kalau mau unduh ulang semua
 bash tools/fetch_font.sh                     # bundle font khat Utsmani (Amiri/OFL)
 ```
 
-Hasilnya ditulis ke `app/src/main/assets/quran/data/`:
+Hasilnya ditulis ke `app/src/main/assets/`:
 
-- `surah-<n>.json` — respons mentah equran.id (Arab + terjemahan Indonesia)
-- `trans-en-<n>.json` — terjemahan Inggris (quran.com, Saheeh International,
-  tag HTML & footnote `<sup>` sudah dibersihkan)
+- `quran/data/surah-<n>.json` — respons mentah equran.id (Arab + terjemahan Indonesia)
+- `quran/data/trans-en-<n>.json` — terjemahan Inggris (quran.com, Saheeh
+  International; tag HTML & footnote `<sup>` sudah dibersihkan)
+- `fonts/uthmani.ttf` — font Amiri (SIL OFL 1.1)
 
-Tanpa script ini aplikasi tetap berfungsi seperti sebelumnya (unduh on-demand +
-cache), hanya saja butuh internet saat pertama kali membuka surah.
+Tanpa script ini aplikasi tetap berfungsi (unduh on-demand + cache di
+`filesDir/`), hanya saja butuh internet saat pertama kali membuka surah/font.
 
 ## Build (Termux)
 
@@ -108,7 +124,8 @@ keyPassword=rahasia
 
 | Data | Sumber | Lisensi/Status |
 |---|---|---|
-| Teks Arab + terjemahan | [equran.id API](https://equran.id/apidev) | Digunakan non-komersial |
+| Teks Arab + terjemahan Indonesia | [equran.id API](https://equran.id/apidev) | Digunakan non-komersial |
+| Terjemahan Inggris (Saheeh Int'l) | [quran.com API v4](https://api.quran.com) | Digunakan non-komersial |
 | Audio ayat (Minshawy Murattal) | [everyayah.com](https://everyayah.com) | Tersedia untuk umum |
 | Audio per kata (wbw) | audio.qurancdn.com | Tersedia untuk umum |
 | Font Amiri (Utsmani) | [Google Fonts](https://fonts.google.com/specimen/Amiri) | SIL OFL 1.1 |
@@ -116,7 +133,11 @@ keyPassword=rahasia
 ## Izin aplikasi
 
 - `RECORD_AUDIO` — penilaian bacaan (diminta saat pertama kali mic ditekan).
-- `INTERNET` — unduh surah/audio/font (semua konten di-cache setelahnya).
+- `VIBRATE` — getar saat ada kesalahan pengucapan (umpan muroja'ah).
+- `INTERNET` — unduh audio (konten mushaf sudah di-bundle).
+- `POST_NOTIFICATIONS`, `WAKE_LOCK`, `FOREGROUND_SERVICE`
+  (+ `FOREGROUND_SERVICE_DATA_SYNC`) — unduhan latar belakang saat layar mati,
+  setelah user mengizinkan lewat prompt.
 
 ---
 
