@@ -363,29 +363,40 @@ class TahsinViewModel(
     private fun ensurePageLoaded(index: Int, force: Boolean = false) {
         val s = currentReady() ?: return
         val page = s.pagination.pages.getOrNull(index) ?: return
-        val needed = page.segments.map { it.surah }.toSet() +
-            (s.pagination.pages.getOrNull(index + 1)?.segments?.firstOrNull()?.surah ?: 0)
+        val currentNeeded = page.segments.map { it.surah }.toSet()
+        // Praload BACKGROUND halaman sebelum & sesudah (biar swipe mulus tanpa
+        // kilat "memuat surah"): semua surah di halaman index-1..index+1.
+        val neighborNeeded = buildSet {
+            for (i in index - 1..index + 1) {
+                if (i in 0 until s.pageCount) {
+                    val p = s.pagination.pages[i]
+                    addAll(p.segments.map { it.surah })
+                }
+            }
+        } - currentNeeded
         // force=true (ganti bahasa): surah yang sudah dimuat tetap dimuat ulang
         // supaya terjemahan mengikuti bahasa yang baru.
-        val missing = needed.filter { n ->
-            force || s.surahs.firstOrNull { it.number == n }?.ayahs?.isEmpty() != false
-        }
+        val loaded = { n: Int -> s.surahs.firstOrNull { it.number == n }?.ayahs?.isEmpty() != false }
+        val currentMissing = currentNeeded.filter { force || loaded(it) }
+        val neighborMissing = neighborNeeded.filter { force || loaded(it) }
         val gen = ++pageLoadGeneration
-        if (missing.isEmpty()) {
+        if (currentMissing.isEmpty() && neighborMissing.isEmpty()) {
             refreshCurrentPage(gen)
             return
         }
-        updateReady { it.copy(loadingSurah = true) }
+        // Indikator loading HANYA kalau konten halaman AKTIF yang belum ada —
+        // praload tetangga berjalan sunyi di background.
+        if (currentMissing.isNotEmpty()) updateReady { it.copy(loadingSurah = true) }
         viewModelScope.launch {
             val lang = currentLanguage()
-            missing.forEach { number ->
+            (currentMissing + neighborMissing).forEach { number ->
                 val cached = runCatching { repository.cachedSurah(number, lang) }.getOrNull()
-                val loaded = cached ?: runCatching { repository.fetchSurah(number, lang) }.getOrNull()
-                if (loaded != null) {
+                val loadedSurah = cached ?: runCatching { repository.fetchSurah(number, lang) }.getOrNull()
+                if (loadedSurah != null) {
                     updateReady { st ->
-                        st.copy(surahs = st.surahs.map { x -> if (x.number == loaded.number) loaded else x })
+                        st.copy(surahs = st.surahs.map { x -> if (x.number == loadedSurah.number) loadedSurah else x })
                     }
-                } else {
+                } else if (number in currentMissing) {
                     updateReady { st ->
                         st.copy(message = "${AppStrings.of(lang).msgSurahLoadFailed} $number: ${AppStrings.of(lang).msgCheckConnection}")
                     }

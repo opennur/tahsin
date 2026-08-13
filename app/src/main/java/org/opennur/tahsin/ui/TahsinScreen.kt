@@ -40,6 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -49,8 +53,11 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -619,10 +626,10 @@ private fun BasmalahRow(fontFamily: FontFamily) {
         modifier = Modifier.fillMaxWidth(),
     )
 }
-
-/** Satu ayat di halaman: teks kata-berwarna-tajwid (konsisten aktif/non-aktif)
- *  + badge akhir ayat (lingkaran nomor Arab-Indik) + badge sujud. Mengaktifkan
- *  ayat TIDAK mengubah ukuran/posisi teks (hanya tint latar + interaksi). */
+/** Satu ayat di halaman: teks PENUH (tanda waqaf ikut tampil) + warna tajwid +
+ *  status STT per kata (aktif). Badge akhir ayat & sujud DIGAMBAR tepat di
+ *  ujung teks (baris terakhir) — menyambung kata terakhir seperti mushaf.
+ *  Mengaktifkan ayat TIDAK mengubah ukuran/posisi teks (hanya tint latar). */
 @Composable
 private fun AyahBlock(
     entry: MushafAyah,
@@ -634,8 +641,26 @@ private fun AyahBlock(
     onPlaySelectedWord: () -> Unit,
     onStopSelectedWord: () -> Unit,
 ) {
+    // Kata STT = token berhuruf (tanda waqaf yang berdiri sendiri dibuang
+    // seperti biasa), lalu dicari LOKASINYA di teks lengkap. Teks yang
+    // dirender adalah teks penuh — aktif & non-aktif render string yang sama,
+    // jadi tidak ada tanda waqaf yang muncul/hilang saat highlight.
     val words = remember(entry.text) {
         org.opennur.tahsin.data.quran.Ayah(entry.number, entry.text).words
+    }
+    val wordRanges = remember(words, entry.text) {
+        val ranges = IntArray(words.size)
+        var searchFrom = 0
+        words.forEachIndexed { i, w ->
+            val idx = entry.text.indexOf(w, searchFrom)
+            if (idx >= 0) {
+                ranges[i] = idx
+                searchFrom = idx + w.length
+            } else {
+                ranges[i] = searchFrom
+            }
+        }
+        ranges
     }
     // Status bacaan STT hanya untuk ayat aktif; warna TAJWID untuk SEMUA ayat.
     val statusByIndex = if (isActive) state.alignedWords.associateBy { it.index } else emptyMap()
@@ -648,9 +673,11 @@ private fun AyahBlock(
             )
         }
     }
-    val annotated = remember(words, spansByWord, statusByIndex, selectedIndex, state.tajwidColor) {
+    val annotated = remember(entry.text, wordRanges, spansByWord, statusByIndex, selectedIndex, state.tajwidColor) {
         buildAyahAnnotated(
+            fullText = entry.text,
             words = words,
+            wordRanges = wordRanges,
             spansByWord = spansByWord,
             statusByIndex = statusByIndex,
             selectedIndex = selectedIndex,
@@ -658,19 +685,14 @@ private fun AyahBlock(
         )
     }
     var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
-    val wordOffsets = remember(words) {
-        val arr = IntArray(words.size)
-        var pos = 0
-        words.forEachIndexed { i, w ->
-            arr[i] = pos
-            pos += w.length + 1 // kata + spasi
-        }
-        arr
-    }
+    val textMeasurer = rememberTextMeasurer()
+    // Ruang cadang di kiri (RTL) untuk badge: nomor ayat + badge sujud kalau ada.
+    val badgeReserve = 34.dp + if (entry.isSajdah) 30.dp else 0.dp
 
-    // Baris RTL: teks ayat di kanan, badge akhir ayat & sujud di ujung kiri
-    // (posisi akhir baris terakhir — ala mushaf). Tint latar TANPA padding untuk
-    // ayat aktif supaya ukuran/posisi teks tidak berubah saat diketuk.
+    // Baris RTL: teks di kanan; badge akhir ayat & sujud digambar di ujung
+    // baris terakhir teks (menyambung kata terakhir — ala mushaf asli).
+    // Tint latar TANPA padding untuk ayat aktif supaya ukuran/posisi teks
+    // tidak berubah saat diketuk.
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Row(
             modifier = Modifier
@@ -687,7 +709,38 @@ private fun AyahBlock(
             verticalAlignment = Alignment.Bottom,
         ) {
             // Kotak teks: ketukan & tooltip berlabuh di sini (koordinat = teks).
-            Box(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .drawWithContent {
+                        drawContent()
+                        val layout = textLayout
+                        if (layout != null) {
+                            // Ujung teks = kursor setelah karakter terakhir
+                            // (RTL: ujung kiri baris terakhir). Badge menempel
+                            // di situ, bukan di tepi layar — seperti mushaf.
+                            val end = layout.getCursorRect(layout.layoutInput.text.length)
+                            val radius = 12.dp.toPx()
+                            val centerY = end.top + end.height / 2f
+                            // Teks berada dalam padding end/RTL sebesar badgeReserve,
+                            // jadi tepi kiri teks = badgeReserve dari tepi kotak.
+                            val centerX = badgeReserve.toPx() + end.left - radius - 2.dp.toPx()
+                            if (entry.isSajdah) {
+                                drawSajdahBadge(
+                                    center = Offset(centerX - 30.dp.toPx(), centerY),
+                                    measurer = textMeasurer,
+                                    radius = radius,
+                                )
+                            }
+                            drawVerseNumberBadge(
+                                center = Offset(centerX, centerY),
+                                number = entry.number,
+                                measurer = textMeasurer,
+                                radius = radius,
+                            )
+                        }
+                    },
+            ) {
                 BasicText(
                     text = annotated,
                     onTextLayout = { textLayout = it },
@@ -698,18 +751,18 @@ private fun AyahBlock(
                         textAlign = TextAlign.Start,
                         fontFamily = state.arabicFontFamily,
                     ),
-                    // Satu jalur ketukan untuk aktif & non-aktif (detectTapGestures
-                    // TIDAK memaksa ukuran sentuh minimum 48dp seperti clickable —
-                    // mengetuk ayat pendek tidak mengubah tinggi baris).
+                    // padding(end) = ruang cadang badge di kiri; ditaruh SEBELUM
+                    // pointerInput agar koordinat ketukan = koordinat teks.
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(end = badgeReserve)
                         .pointerInput(state.selectedWordIndex, isActive) {
                             detectTapGestures { position ->
                                 if (isActive) {
                                     val layout = textLayout
                                     if (layout != null) {
                                         val charOffset = layout.getOffsetForPosition(position)
-                                        val idx = wordIndexAt(charOffset, wordOffsets)
+                                        val idx = wordIndexAt(charOffset, wordRanges)
                                         if (idx in words.indices) {
                                             onSelectWord(if (idx == selectedIndex) -1 else idx)
                                         }
@@ -726,7 +779,7 @@ private fun AyahBlock(
                     val sel = selectedIndex
                     val layout = textLayout
                     if (sel != null && layout != null && sel < words.size) {
-                        val rect = layout.getBoundingBox(wordOffsets[sel])
+                        val rect = layout.getBoundingBox(wordRanges[sel])
                         Popup(
                             alignment = Alignment.TopStart,
                             offset = IntOffset(rect.left.roundToInt(), rect.bottom.roundToInt() + 6),
@@ -784,47 +837,45 @@ private fun AyahBlock(
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(6.dp))
-            AyahEndBadge(entry.number)
-            if (entry.isSajdah) {
-                Spacer(modifier = Modifier.width(6.dp))
-                SajdahBadge()
-            }
         }
     }
 }
 
-/** Badge akhir ayat: lingkaran kecil + nomor Arab-Indik (pengganti glif ۝). */
-@Composable
-private fun AyahEndBadge(number: Int) {
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .background(AyahColors.PrimarySoft, CircleShape)
-            .border(1.dp, AyahColors.Primary.copy(alpha = 0.55f), CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        AyahText(
-            AyahNumbering.toArabicIndic(number),
-            style = AyahTypography.Caption.copy(fontSize = 11.sp, color = AyahColors.Primary),
-        )
-    }
+/** Badge akhir ayat (lingkaran + nomor Arab-Indik) digambar di ujung teks. */
+private fun DrawScope.drawVerseNumberBadge(
+    center: Offset,
+    number: Int,
+    measurer: TextMeasurer,
+    radius: Float,
+) {
+    drawCircle(color = AyahColors.PrimarySoft, radius = radius, center = center)
+    drawCircle(
+        color = AyahColors.Primary.copy(alpha = 0.55f),
+        radius = radius,
+        center = center,
+        style = Stroke(width = 1.dp.toPx()),
+    )
+    val label = measurer.measure(
+        text = AnnotatedString(AyahNumbering.toArabicIndic(number)),
+        style = AyahTypography.Caption.copy(fontSize = 11.sp, color = AyahColors.Primary),
+    )
+    drawText(
+        textLayoutResult = label,
+        topLeft = Offset(center.x - label.size.width / 2f, center.y - label.size.height / 2f),
+    )
 }
 
-/** Badge sujud tilawah: lingkaran kecil dengan tanda ۩. */
-@Composable
-private fun SajdahBadge() {
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .background(AyahColors.Primary, CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        AyahText(
-            SajdahSigns.SIGN,
-            style = AyahTypography.Caption.copy(fontSize = 14.sp, color = Color.White),
-        )
-    }
+/** Badge sujud tilawah (lingkaran penuh + ۩) di sebelah kiri badge nomor. */
+private fun DrawScope.drawSajdahBadge(center: Offset, measurer: TextMeasurer, radius: Float) {
+    drawCircle(color = AyahColors.Primary, radius = radius, center = center)
+    val label = measurer.measure(
+        text = AnnotatedString(SajdahSigns.SIGN),
+        style = AyahTypography.Caption.copy(fontSize = 14.sp, color = Color.White),
+    )
+    drawText(
+        textLayoutResult = label,
+        topLeft = Offset(center.x - label.size.width / 2f, center.y - label.size.height / 2f),
+    )
 }
 
 // ============================================================ Sub-komponen
@@ -996,21 +1047,24 @@ private fun wordIndexAt(offset: Int, wordOffsets: IntArray): Int {
  * dan highlight kata yang dipilih.
  */
 private fun buildAyahAnnotated(
+    fullText: String,
     words: List<String>,
+    wordRanges: IntArray,
     spansByWord: List<List<TajwidSpan>>,
     statusByIndex: Map<Int, AlignedWord>,
     selectedIndex: Int?,
     tajwidColor: Boolean,
 ): AnnotatedString = buildAnnotatedString {
-    words.forEachIndexed { index, word ->
-        val start = length
-        append(word)
-        val end = length
-        if (index < words.size - 1) append(' ')
+    append(fullText)
+    wordRanges.forEachIndexed { index, start ->
+        val wordLength = words.getOrNull(index)?.length ?: 0
+        // Clamp: kalau kata gagal ditemukan (fallback), rentang tetap aman.
+        val s0 = start.coerceIn(0, fullText.length)
+        val end = (s0 + wordLength).coerceAtMost(fullText.length)
         if (tajwidColor) {
             for (sp in spansByWord.getOrNull(index).orEmpty()) {
                 val color = tajwidColorFor(sp.category) ?: continue
-                addStyle(SpanStyle(color = color), start + sp.start, start + sp.end.coerceAtMost(word.length))
+                addStyle(SpanStyle(color = color), s0 + sp.start.coerceAtMost(wordLength), (s0 + sp.end.coerceAtMost(wordLength)).coerceAtMost(fullText.length))
             }
         }
         val bg = when (statusByIndex[index]?.status) {

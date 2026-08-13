@@ -52,8 +52,6 @@ fun HomeScreen(
     onOpenVocab: () -> Unit,
     onOpenQuiz: () -> Unit,
     onOpenStats: () -> Unit,
-    onOpenSearch: () -> Unit,
-    onOpenAudioManager: () -> Unit,
     onOpenDreamBig: () -> Unit,
     onOpenLughoh: () -> Unit,
     onOpenAyatQuiz: () -> Unit,
@@ -169,22 +167,7 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 3: Pencarian + Kelola Audio
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            HomeMenuCard(
-                text = strings.searchTitle,
-                onClick = onOpenSearch,
-                modifier = Modifier.weight(1f),
-            )
-            HomeMenuCard(
-                text = strings.menuAudio,
-                onClick = onOpenAudioManager,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Baris 4: Dream BIG + Belajar Arab (dua kartu setengah)
+        // Baris 3: Dream BIG + Belajar Arab (dua kartu setengah)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             HomeMenuCard(
                 text = strings.menuDreamBig,

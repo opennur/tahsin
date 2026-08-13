@@ -62,6 +62,7 @@ fun SettingsScreen(
     onToggleAyahOfDay: () -> Unit,
     onToggleStreakReminder: () -> Unit,
     onDownloadAll: () -> Unit,
+    onOpenAudioManager: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -150,8 +151,15 @@ fun SettingsScreen(
 
             SectionDivider()
 
-            // ---- Unduh Semua (aksi) ----
+            // ---- Aksi: Kelola Audio (pindah dari menu utama) + Unduh Semua ----
             SectionLabel(strings.sectionMenu)
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahButton(
+                text = strings.menuAudio,
+                variant = AyahButtonVariant.Outline,
+                onClick = onOpenAudioManager,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Spacer(modifier = Modifier.height(8.dp))
             AyahButton(
                 text = strings.menuDownloadAll,

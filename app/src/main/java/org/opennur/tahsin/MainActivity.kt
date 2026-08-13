@@ -121,8 +121,6 @@ class MainActivity : ComponentActivity() {
                         onOpenVocab = { push(AppScreen.Vocab) },
                         onOpenQuiz = { push(AppScreen.Quiz) },
                         onOpenStats = { push(AppScreen.Stats) },
-                        onOpenSearch = { push(AppScreen.Search) },
-                        onOpenAudioManager = { push(AppScreen.AudioManager) },
                         onOpenDreamBig = { push(AppScreen.DreamBig) },
                         onOpenLughoh = { push(AppScreen.Lughoh) },
                         onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
@@ -173,6 +171,7 @@ class MainActivity : ComponentActivity() {
                         onToggleAyahOfDay = tahsinViewModel::toggleAyahOfDay,
                         onToggleStreakReminder = tahsinViewModel::toggleStreakReminder,
                         onDownloadAll = tahsinViewModel::downloadAllAudio,
+                        onOpenAudioManager = { push(AppScreen.AudioManager) },
                     )
                 }
 
