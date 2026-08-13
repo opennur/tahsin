@@ -29,6 +29,7 @@ import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahShapes
 import com.tahsin.app.theme.AyahTypography
 import com.tahsin.app.ui.components.AyahText
+import com.tahsin.app.ui.components.CreditLink
 
 /**
  * Portal layar utama: grid kartu menu untuk semua fitur.
@@ -122,13 +123,9 @@ fun HomeScreen(
         )
 
         Spacer(modifier = Modifier.height(28.dp))
-        AyahText(
-            strings.credit,
-            style = AyahTypography.Caption.copy(
-                color = AyahColors.Primary,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-            ),
+        CreditLink(
+            text = strings.credit,
+            textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(8.dp))

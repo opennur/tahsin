@@ -235,4 +235,4 @@ see [LICENSE](LICENSE) for the full text.
 
 ---
 
-Made with ❤️ by Lutfian Dwi Cahyono.
+Made with ❤️ by [OpenNur Project (FOSS)](https://github.com/opennur/opennur).

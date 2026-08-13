@@ -206,7 +206,7 @@ object AppStrings {
         menuAudio = "🎵 Kelola Audio",
         menuDownloadAll = "📥 Unduh Semua",
         swipeHint = "Geser layar ke kiri/kanan untuk ganti ayat",
-        credit = "Made with ❤️ by Lutfian Dwi Cahyono",
+        credit = "Made with ❤️ by OpenNur Project (FOSS)",
         downloadNoticeTitle = "Mengunduh audio…",
         downloadNoticeBody = "Audio surah ini belum diunduh. Unduhan dimulai otomatis — " +
             "ikuti progres di atas tombol. Bacaan contoh akan diputar setelah unduhan selesai.",
@@ -350,7 +350,7 @@ object AppStrings {
         menuAudio = "🎵 Audio",
         menuDownloadAll = "📥 Download All",
         swipeHint = "Swipe the screen left/right to change ayah",
-        credit = "Made with ❤️ by Lutfian Dwi Cahyono",
+        credit = "Made with ❤️ by OpenNur Project (FOSS)",
         downloadNoticeTitle = "Downloading audio…",
         downloadNoticeBody = "This surah's audio is not downloaded yet. The download starts " +
             "automatically — follow the progress above the buttons. The example recitation " +

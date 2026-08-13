@@ -38,6 +38,7 @@ import com.tahsin.app.ui.components.AyahButtonSize
 import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahSwitch
 import com.tahsin.app.ui.components.AyahText
+import com.tahsin.app.ui.components.CreditLink
 import com.tahsin.app.ui.components.DropdownOption
 import com.tahsin.app.ui.components.SimpleDropdown
 import com.tahsin.app.util.AppLanguage
@@ -197,13 +198,7 @@ fun SettingsScreen(
             )
 
             SectionDivider()
-            AyahText(
-                strings.credit,
-                style = AyahTypography.Caption.copy(
-                    color = AyahColors.Primary,
-                    fontWeight = FontWeight.SemiBold,
-                ),
-            )
+            CreditLink(text = strings.credit)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }

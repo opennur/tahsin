@@ -233,4 +233,4 @@ lihat [LICENSE](LICENSE) untuk teks lengkap.
 
 ---
 
-Dibuat dengan ❤️ oleh Lutfian Dwi Cahyono.
+Dibuat dengan ❤️ oleh [OpenNur Project (FOSS)](https://github.com/opennur/opennur).
