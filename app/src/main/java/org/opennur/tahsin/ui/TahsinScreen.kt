@@ -164,6 +164,7 @@ fun TahsinScreen(
             onStopSelectedWord = viewModel::stopWordPlayback,
             onToggleTranslation = viewModel::toggleTranslation,
             onSetFontScale = viewModel::setFontScale,
+            onSetAudioMode = viewModel::setAudioMode,
             onDismissMessage = viewModel::clearMessage,
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onOpenSearch = onOpenSearch,
@@ -189,6 +190,7 @@ private fun TahsinContent(
     onStopSelectedWord: () -> Unit,
     onToggleTranslation: () -> Unit,
     onSetFontScale: (Float) -> Unit,
+    onSetAudioMode: (AudioPlaybackMode) -> Unit,
     onDismissMessage: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onOpenSearch: () -> Unit,
@@ -342,6 +344,16 @@ private fun TahsinContent(
                     style = AyahTypography.Caption,
                     modifier = Modifier.weight(1f),
                 )
+                SimpleDropdown(
+                    selectedLabel = audioModeSymbol(state.audioMode),
+                    options = listOf(
+                        DropdownOption("١ — ${strings.tahsinAudioSingle}", { onSetAudioMode(AudioPlaybackMode.AYAH) }),
+                        DropdownOption("→ — ${strings.tahsinAudioContinuous}", { onSetAudioMode(AudioPlaybackMode.CONTINUOUS) }),
+                        DropdownOption("↻ — ${strings.tahsinAudioRepeat}", { onSetAudioMode(AudioPlaybackMode.REPEAT) }),
+                    ),
+                    modifier = Modifier.width(88.dp),
+                )
+                Spacer(modifier = Modifier.width(10.dp))
                 AyahButton(
                     text = if (state.isAudioPlaying) strings.stop else strings.listen,
                     variant = if (state.isAudioPlaying) AyahButtonVariant.Danger else AyahButtonVariant.Secondary,
@@ -405,7 +417,19 @@ private fun MushafPageView(
             }
         } else {
             // ---- Isi halaman: ayat-ayat mushaf ----
+            var prevSurah: Int? = null
             composed.ayahs.forEach { entry ->
+                if (prevSurah != null && entry.surah != prevSurah) {
+                    // Surah baru mulai di tengah halaman (umum di juz 30):
+                    // pembatas + nama surah, ala mushaf cetak.
+                    Spacer(modifier = Modifier.height(8.dp))
+                    SurahDivider(
+                        nameArabic = state.surahs.firstOrNull { it.number == entry.surah }?.nameArabic.orEmpty(),
+                        fontFamily = state.arabicFontFamily,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                prevSurah = entry.surah
                 if (entry.hasBasmalah) {
                     Spacer(modifier = Modifier.height(8.dp))
                     BasmalahRow(fontFamily = state.arabicFontFamily)
@@ -430,6 +454,15 @@ private fun MushafPageView(
                 // Terjemahan ayat aktif — tersembunyi kecuali toggle dinyalakan.
                 if (state.showTranslation && ayah.translation.isNotBlank()) {
                     Spacer(modifier = Modifier.height(6.dp))
+                    // Indikator: terjemahan ini untuk ayat ke berapa.
+                    AyahText(
+                        "${state.surah?.nameLatin ?: ""} ${AyahNumbering.toArabicIndic(state.ayahIndex + 1)}",
+                        style = AyahTypography.Caption.copy(
+                            color = AyahColors.Primary,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
                     AyahText(
                         ayah.translation,
                         style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
@@ -547,6 +580,28 @@ private fun PageHeaderBand(
                 )
             }
         }
+    }
+}
+
+/** Pembatas antar-surah dalam satu halaman: garis + nama surah (ala mushaf cetak). */
+@Composable
+private fun SurahDivider(nameArabic: String, fontFamily: FontFamily) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+    ) {
+        Box(modifier = Modifier.weight(1f).height(1.dp).background(AyahColors.Divider))
+        AyahText(
+            nameArabic,
+            style = AyahTypography.Arabic.copy(
+                fontSize = 15.sp,
+                fontFamily = fontFamily,
+                color = AyahColors.Primary,
+                fontWeight = FontWeight.Bold,
+            ),
+            modifier = Modifier.padding(horizontal = 10.dp),
+        )
+        Box(modifier = Modifier.weight(1f).height(1.dp).background(AyahColors.Divider))
     }
 }
 
@@ -819,6 +874,13 @@ private fun IssueCard(
             )
         }
     }
+}
+
+/** Simbol mode pemutaran audio untuk tombol di samping "Dengar". */
+private fun audioModeSymbol(mode: AudioPlaybackMode): String = when (mode) {
+    AudioPlaybackMode.AYAH -> "١"
+    AudioPlaybackMode.CONTINUOUS -> "→"
+    AudioPlaybackMode.REPEAT -> "↻"
 }
 
 @Composable

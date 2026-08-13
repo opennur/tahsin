@@ -91,8 +91,8 @@ sealed interface TahsinUiState {
         val darkMode: Boolean = false,
         /** Pewarnaan huruf tajwid di mushaf (gaya mushaf tajwid). */
         val tajwidColor: Boolean = true,
-        /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya saat selesai benar. */
-        val flowMode: Boolean = false,
+        /** Mode pemutaran audio: ayat ini saja / lanjut terus / ulang terus. */
+        val audioMode: AudioPlaybackMode = AudioPlaybackMode.AYAH,
         /** Qari' (perawi) audio ayat aktif. */
         val reciter: Reciter = Reciter.MINSHAWY,
         /** Kecepatan pemutaran audio (0.5×–1.25×). */
@@ -146,7 +146,6 @@ data class SettingsUiState(
     val language: AppLanguage = AppLanguage.ID,
     val darkMode: Boolean = false,
     val tajwidColor: Boolean = true,
-    val flowMode: Boolean = false,
     val reciter: Reciter = Reciter.MINSHAWY,
     val audioSpeed: Float = 1.0f,
     val ayahOfDayEnabled: Boolean = true,
@@ -157,6 +156,14 @@ data class SettingsUiState(
     val showDownloadNotice: Boolean = false,
     val showBackgroundPrompt: Boolean = false,
 )
+
+/**
+ * Mode pemutaran audio mushaf (tombol di samping "Dengar").
+ * - AYAH: putar ayat aktif sekali lalu berhenti.
+ * - CONTINUOUS: lanjut otomatis ke ayat berikutnya (seperti membaca terus).
+ * - REPEAT: ulangi ayat aktif terus-menerus.
+ */
+enum class AudioPlaybackMode { AYAH, CONTINUOUS, REPEAT }
 
 class TahsinViewModel(
     private val app: Context,
@@ -179,7 +186,6 @@ class TahsinViewModel(
             language = currentLanguage(),
             darkMode = settings.darkMode,
             tajwidColor = settings.tajwidColor,
-            flowMode = settings.flowMode,
             reciter = settings.reciter,
             audioSpeed = settings.audioSpeed,
             ayahOfDayEnabled = settings.ayahOfDayEnabled,
@@ -196,14 +202,14 @@ class TahsinViewModel(
     /** Callback play yang menunggu unduhan surah selesai. */
     private val pendingCallbacks = mutableMapOf<Int, MutableList<() -> Unit>>()
 
-    /** Cegah auto-advance ganda dalam satu sesi baca (di-reset tiap mulai dengar). */
-    private var autoAdvanceHandled = false
-    /** Auto-dengar tertunda sampai konten surah termuat (lintas surah). */
-    private var pendingAutoListen = false
+    /** Mode lanjut (audio) menunggu halaman berikutnya termuat untuk diputar. */
+    private var pendingAutoPlay = false
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     private var pendingOpenAt: Pair<Int, Int>? = null
     /** Penjaga muatan halaman: geser cepat → muatan lama yang selesai belakangan dibuang. */
     private var pageLoadGeneration = 0
+    /** Stop/start putar: putar yang masih menunggu unduhan dibatalkan saat berubah. */
+    private var playGeneration = 0
 
     init {
         AyahColors.isDark = settings.darkMode
@@ -215,6 +221,8 @@ class TahsinViewModel(
                 isWordPlaying = playing && audioPlayer.source == PlaySource.WORD,
             ) }
         }
+        // Audio selesai natural → lanjut/ulang sesuai mode pemutaran.
+        audioPlayer.onCompletion = { onAudioCompleted() }
         reload()
     }
 
@@ -239,7 +247,7 @@ class TahsinViewModel(
                 arabicFontFamily = fontStore.loadFamily(ArabicFont.UTSMANI),
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
-                flowMode = settings.flowMode,
+                audioMode = currentAudioMode(),
                 reciter = settings.reciter,
                 audioSpeed = settings.audioSpeed,
                 ayahOfDayEnabled = settings.ayahOfDayEnabled,
@@ -289,7 +297,7 @@ class TahsinViewModel(
 
     /** Lompat ke halaman pertama surah [number]. */
     fun jumpToSurah(number: Int) {
-        pendingAutoListen = false // navigasi manual membatalkan auto-dengar tertunda
+        pendingAutoPlay = false // navigasi manual membatalkan rantai audio tertunda
         // Navigasi manual membatalkan target widget/notifikasi yang belum terpakai.
         pendingOpenAt = null
         val s = currentReady() ?: return
@@ -299,7 +307,7 @@ class TahsinViewModel(
 
     /** Lompat ke halaman awal juz [juz] (1..30). */
     fun jumpToJuz(juz: Int) {
-        pendingAutoListen = false
+        pendingAutoPlay = false
         pendingOpenAt = null
         val s = currentReady() ?: return
         val start = s.pagination.juzStarts.firstOrNull { it.juz == juz } ?: return
@@ -309,7 +317,7 @@ class TahsinViewModel(
 
     /** Lompat langsung ke halaman [page] (1-based, 1..604) — navigasi utama mushaf. */
     fun jumpToPage(page: Int) {
-        pendingAutoListen = false
+        pendingAutoPlay = false
         pendingOpenAt = null
         val s = currentReady() ?: return
         if (page !in 1..s.pageCount) return
@@ -352,13 +360,15 @@ class TahsinViewModel(
      * Pastikan konten surah pada halaman [index] (+ surah pertama halaman
      * berikutnya untuk pra-muat) tersedia, lalu susun ulang halaman.
      */
-    private fun ensurePageLoaded(index: Int) {
+    private fun ensurePageLoaded(index: Int, force: Boolean = false) {
         val s = currentReady() ?: return
         val page = s.pagination.pages.getOrNull(index) ?: return
         val needed = page.segments.map { it.surah }.toSet() +
             (s.pagination.pages.getOrNull(index + 1)?.segments?.firstOrNull()?.surah ?: 0)
+        // force=true (ganti bahasa): surah yang sudah dimuat tetap dimuat ulang
+        // supaya terjemahan mengikuti bahasa yang baru.
         val missing = needed.filter { n ->
-            s.surahs.firstOrNull { it.number == n }?.ayahs?.isEmpty() != false
+            force || s.surahs.firstOrNull { it.number == n }?.ayahs?.isEmpty() != false
         }
         val gen = ++pageLoadGeneration
         if (missing.isEmpty()) {
@@ -396,10 +406,10 @@ class TahsinViewModel(
             composedPage = composed,
         ) }
         refreshAyahStats(s.surahNumber, s.ayah?.number ?: 1)
-        // Mode flow lintas halaman/surah: mulai dengar begitu konten siap.
-        if (pendingAutoListen) {
-            pendingAutoListen = false
-            startListeningForCurrentAyah()
+        // Mode audio lanjut lintas halaman: putar ayat pertama begitu konten siap.
+        if (pendingAutoPlay) {
+            pendingAutoPlay = false
+            playAyahNow()
         }
     }
 
@@ -516,14 +526,13 @@ class TahsinViewModel(
             speech.stop()
             return
         }
-        pendingAutoListen = false // inisiatif manual membatalkan auto-dengar tertunda
+        pendingAutoPlay = false // inisiatif manual membatalkan rantai audio tertunda
         val words = s.ayah?.words.orEmpty()
         if (words.isEmpty()) return
         startListeningSession(words)
     }
 
     private fun startListeningSession(words: List<String>) {
-        autoAdvanceHandled = false
         updateReady { it.copy(
             listening = true,
             transcript = "",
@@ -536,11 +545,9 @@ class TahsinViewModel(
             override fun onResult(text: String) {
                 onTranscript(text, words)
                 recordAttempt(text, words)
-                maybeAutoAdvance()
-                maybePlayErrorTone()
+                maybePlayFeedbackTone()
             }
             override fun onError(error: Int) {
-                autoAdvanceHandled = true
                 updateReady { it.copy(
                     listening = false,
                     message = AppStrings.sttErrorMessage(error, currentLanguage()),
@@ -553,15 +560,17 @@ class TahsinViewModel(
         })
     }
 
-    // ---- mode flow (muroja'ah): lanjut otomatis kalau satu ayat selesai benar ----
+    // ---- mode pemutaran audio (tombol di samping "Dengar") ----
 
-    /** Aktifkan/nonaktifkan mode flow. Persisten walau Tahsin belum siap. */
-    fun toggleFlowMode() {
-        val next = !settings.flowMode
-        settings.flowMode = next
-        _settingsState.update { it.copy(flowMode = next) }
-        updateReady { it.copy(flowMode = next) }
+    /** Ubah mode pemutaran: ayat ini saja / lanjut otomatis / ulang terus. */
+    fun setAudioMode(mode: AudioPlaybackMode) {
+        settings.audioMode = mode.name
+        updateReady { it.copy(audioMode = mode) }
     }
+
+    private fun currentAudioMode(): AudioPlaybackMode =
+        AudioPlaybackMode.entries.firstOrNull { it.name == settings.audioMode }
+            ?: AudioPlaybackMode.AYAH
 
     // ---- qari' & kecepatan audio ----
 
@@ -582,60 +591,35 @@ class TahsinViewModel(
 
     /**
      * Dipanggil saat hasil final STT tiba. Kalau mode flow nyala dan SELURUH
-     * kata terbaca benar (tidak ada yang terlewat/salah), jadwalkan pindah ke
-     * ayat berikutnya lalu lanjut mendengar (muroja'ah berkelanjutan).
+     * selesai — lanjut/ulang sesuai mode pemutaran (bukan mode flow lagi).
      */
-    private fun maybeAutoAdvance() {
-        if (autoAdvanceHandled) return
-        val s = currentReady() ?: return
-        if (!s.flowMode) return
-        val words = s.ayah?.words.orEmpty()
-        val aligned = s.alignedWords
-        if (words.isEmpty() || aligned.isEmpty()) return
-        val perfect = aligned.size == words.size && aligned.all { it.status == WordStatus.CORRECT }
-        if (!perfect) return
-        autoAdvanceHandled = true
-        playSuccessTone()
-        val fromSurah = s.surahNumber
-        val fromAyah = s.ayahIndex
-        viewModelScope.launch {
-            delay(1200)
-            val st = currentReady() ?: return@launch
-            if (!st.flowMode) return@launch
-            if (st.listening) return@launch          // user sudah mulai baca lagi — jangan ganggu
-            if (st.surahNumber != fromSurah || st.ayahIndex != fromAyah) return@launch
-            advanceToNext()
+    private fun onAudioCompleted() {
+        // Hanya untuk audio AYAH — pemutaran kata (tooltip) tidak ikut rantai.
+        if (audioPlayer.source != PlaySource.AYAH) return
+        when (currentReady()?.audioMode ?: return) {
+            AudioPlaybackMode.REPEAT -> playAyahNow()
+            AudioPlaybackMode.CONTINUOUS -> advanceAudioToNextAyah()
+            AudioPlaybackMode.AYAH -> Unit
         }
     }
 
-    private fun advanceToNext() {
+    /** Mode lanjut: pindah ke ayat berikutnya (dalam halaman, atau halaman berikutnya). */
+    private fun advanceAudioToNextAyah() {
         val s = currentReady() ?: return
         val page = s.composedPage ?: return
         val pos = page.ayahs.indexOfFirst { it.surah == s.surahNumber && it.number == s.ayahIndex + 1 }
-        val isLastOnPage = pos < 0 || pos == page.ayahs.lastIndex
-        if (s.pageIndex >= s.pageCount - 1 && isLastOnPage) {
-            updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgMurojaahDone) }
-            return
-        }
-        val next = page.ayahs.getOrNull(pos + 1)
-        updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgAyahDone) }
-        if (next != null) {
+        if (pos >= 0 && pos < page.ayahs.lastIndex) {
+            val next = page.ayahs[pos + 1]
             setActiveAyah(next.surah, next.number)
-        } else {
-            moveToPage(s.pageIndex + 1)
-        }
-        startListeningForCurrentAyah()
-    }
-
-    /** Mulai mendengar ayat yang sedang aktif; tunda dulu kalau konten belum siap. */
-    private fun startListeningForCurrentAyah() {
-        val s = currentReady() ?: return
-        val ayah = s.ayah ?: return
-        if (s.loadingSurah || ayah.words.isEmpty()) {
-            pendingAutoListen = true
+            playAyahNow()
             return
         }
-        startListeningSession(ayah.words)
+        if (s.pageIndex < s.pageCount - 1) {
+            pendingAutoPlay = true
+            moveToPage(s.pageIndex + 1)
+            return
+        }
+        updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgMurojaahDone) }
     }
 
     // ---- umpan suara muroja'ah (bisa muroja'ah tanpa melihat layar) ----
@@ -699,15 +683,15 @@ class TahsinViewModel(
         }
     }
 
-    /** Saat hasil final: kalau ada kata yang salah, kasih umpan gagal (bunyi + getar). */
-    private fun maybePlayErrorTone() {
-        if (autoAdvanceHandled) return // sudah sukses — beep sukses sudah diputar
+    /** Saat hasil final: ada kata salah → umpan gagal; sempurna → umpan sukses. */
+    private fun maybePlayFeedbackTone() {
         val s = currentReady() ?: return
         val aligned = s.alignedWords
+        if (aligned.isEmpty()) return
         val hasError = aligned.any {
             it.status == WordStatus.MISMATCH || it.status == WordStatus.SKIPPED
         }
-        if (hasError) playErrorFeedback()
+        if (hasError) playErrorFeedback() else playSuccessTone()
     }
 
     /**
@@ -922,8 +906,11 @@ class TahsinViewModel(
         val ayah = s.ayah ?: return
         // Mulai putar ayat = batalkan status pemutaran kata yang tertunda.
         updateReady { it.copy(isWordPlaying = false) }
+        val gen = playGeneration
         viewModelScope.launch {
             val file = runCatching { downloader.ensureAyah(s.surahNumber, ayah.number) }.getOrNull()
+            // User menekan Stop saat menunggu unduhan → jangan mulai putar.
+            if (gen != playGeneration) return@launch
             if (file == null && downloader.isAyahMissing(s.surahNumber, ayah.number)) {
                 // Audio ayat memang tidak tersedia — langsung TTS tanpa coba URL.
                 audioPlayer.speak(ayah.text)
@@ -983,6 +970,7 @@ class TahsinViewModel(
     fun toggleAudioPlayback() {
         val s = currentReady() ?: return
         if (s.isAudioPlaying) {
+            playGeneration++ // batalkan putar tertunda (sedang unduh)
             audioPlayer.stop()
         } else {
             playAyah()
@@ -1092,7 +1080,9 @@ class TahsinViewModel(
             loadingSurah = true,
             message = null,
         ) }
-        ensurePageLoaded(s.pageIndex)
+        // Reload paksa: konten surah yang sudah dimuat masih berbahasa lama —
+        // tanpa ini terjemahan mushaf tidak ikut ganti bahasa.
+        ensurePageLoaded(s.pageIndex, force = true)
     }
 
     private fun currentReady(): TahsinUiState.Ready? = _uiState.value as? TahsinUiState.Ready
@@ -1111,7 +1101,6 @@ class TahsinViewModel(
             language = s.language,
             darkMode = s.darkMode,
             tajwidColor = s.tajwidColor,
-            flowMode = s.flowMode,
             reciter = s.reciter,
             audioSpeed = s.audioSpeed,
             ayahOfDayEnabled = s.ayahOfDayEnabled,

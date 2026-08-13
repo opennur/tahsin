@@ -55,7 +55,6 @@ fun SettingsScreen(
     onBack: () -> Unit,
     settings: SettingsUiState,
     onToggleTajwidColor: () -> Unit,
-    onToggleFlowMode: () -> Unit,
     onToggleDarkMode: () -> Unit,
     onSetLanguage: (AppLanguage) -> Unit,
     onSetReciter: (Reciter) -> Unit,
@@ -108,17 +107,6 @@ fun SettingsScreen(
                 checked = settings.tajwidColor,
                 onCheckedChange = onToggleTajwidColor,
             )
-            SettingRow(
-                label = "🔁 ${strings.settingFlow}",
-                checked = settings.flowMode,
-                onCheckedChange = onToggleFlowMode,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            AyahText(
-                strings.flowHint,
-                style = AyahTypography.Caption,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
             SettingRow(
                 label = "🌙 ${strings.settingDarkMode}",
                 checked = settings.darkMode,

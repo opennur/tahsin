@@ -27,10 +27,10 @@ class SettingsStore(context: Context) {
         get() = prefs.getString("language_code", AppLanguage.ID.code) ?: AppLanguage.ID.code
         set(value) = prefs.edit().putString("language_code", value).apply()
 
-    /** Mode flow (muroja'ah): lanjut otomatis ke ayat berikutnya (default mati). */
-    var flowMode: Boolean
-        get() = prefs.getBoolean("flow_mode", false)
-        set(value) = prefs.edit().putBoolean("flow_mode", value).apply()
+    /** Mode pemutaran audio mushaf: nama enum AudioPlaybackMode (single/continuous/repeat). */
+    var audioMode: String
+        get() = prefs.getString("audio_mode", "AYAH") ?: "AYAH"
+        set(value) = prefs.edit().putString("audio_mode", value).apply()
 
     /**
      * Izin pengguna untuk unduhan latar belakang (foreground service).

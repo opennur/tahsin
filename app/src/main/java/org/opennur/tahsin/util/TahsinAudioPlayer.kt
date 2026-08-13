@@ -37,6 +37,9 @@ class TahsinAudioPlayer(context: Context, private val settings: SettingsStore) {
     /** Callback status pemutaran (true = sedang memutar). Dipakai UI untuk tombol Dengar/Stop. */
     var onPlaybackChange: ((Boolean) -> Unit)? = null
 
+    /** Dipanggil saat audio selesai NATURAL (tidak saat stop manual / release). */
+    var onCompletion: (() -> Unit)? = null
+
     /** Hentikan audio yang sedang diputar. */
     fun stop() {
         releaseMedia()
@@ -190,6 +193,11 @@ class TahsinAudioPlayer(context: Context, private val settings: SettingsStore) {
         runCatching {
             mediaPlayer?.playbackParams = PlaybackParams().setSpeed(settings.audioSpeed)
         }
+        mediaPlayer?.setOnCompletionListener {
+            // Selesai natural: reset flag pemutaran + beri tahu VM (rantai lanjut/ulang).
+            setPlaying(false)
+            onCompletion?.invoke()
+        }
         runCatching { mediaPlayer?.start() }
     }
 
@@ -198,6 +206,8 @@ class TahsinAudioPlayer(context: Context, private val settings: SettingsStore) {
         // berhenti (release() saja tidak memicu onCompletion) — kalau tidak,
         // UI bisa "stuck" (tombol Stop tidak muncul).
         if (isPlaying) setPlaying(false)
+        // Stop manual tidak boleh memicu onCompletion (supaya mode lanjut/ulang berhenti).
+        runCatching { mediaPlayer?.setOnCompletionListener(null) }
         runCatching { mediaPlayer?.release() }
         mediaPlayer = null
         runCatching { openAfd?.close() }
