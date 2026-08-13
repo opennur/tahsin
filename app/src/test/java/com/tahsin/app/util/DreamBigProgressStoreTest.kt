@@ -3,6 +3,7 @@ package com.tahsin.app.util
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -65,5 +66,28 @@ class DreamBigProgressStoreTest {
     fun `read - file rusak - default (tidak crash)`() {
         file.writeText("bukan json{{{")
         assertEquals(DreamBigStats(), store().read())
+    }
+
+
+    @Test
+    fun `write - target berupa direktori - tidak crash`() {
+        file.mkdirs()
+        java.io.File(file, "placeholder").writeText("x") // dir tidak kosong → renameTo pasti gagal
+        store().write(DreamBigStats(bestScore = 1, bestStreak = 1, roundsPlayed = 1))
+        assertTrue(file.isDirectory)
+    }
+
+
+    @Test
+    fun `read - json literal null - keadaan default`() {
+        file.writeText("null")
+        assertEquals(DreamBigStats(), store().read())
+    }
+
+
+    @Test
+    fun `writeDirect - file biasa - tersimpan`() {
+        store().writeDirect("""{"bestScore":1}""")
+        assertTrue(file.readText().contains("1"))
     }
 }

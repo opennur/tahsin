@@ -47,10 +47,13 @@ object TranscriptAligner {
         val ref = reference.map { ArabicNormalizer.normalize(it) }
         val steps = greedyAlign(ref, spoken)
 
-        val result = reference.mapIndexed { i, w ->
-            val step = steps.find { it.refIndex == i }
+        // greedyAlign selalu menghasilkan SATU Step per kata acuan (indeks
+        // berurutan), jadi iterasi steps langsung — tanpa find/null-arm yang
+        // sebenarnya tidak pernah terjadi.
+        val result = steps.map { step ->
+            val i = step.refIndex
+            val w = reference[i]
             when {
-                step == null -> AlignedWord(i, w, WordStatus.NOT_REACHED)
                 step.spokenIndex == null -> AlignedWord(i, w, WordStatus.SKIPPED)
                 step.similarity >= MATCH_THRESHOLD ->
                     AlignedWord(i, w, WordStatus.CORRECT, spoken[step.spokenIndex])
@@ -110,10 +113,15 @@ object TranscriptAligner {
         return 1.0 - dist.toDouble() / maxOf(a.length, b.length)
     }
 
-    private fun levenshtein(a: String, b: String): Int {
+    /** Jarak Levenshtein — internal supaya bisa diuji unit langsung (edge empty). */
+    internal fun levenshtein(a: String, b: String): Int {
         val dp = Array(a.length + 1) { IntArray(b.length + 1) }
-        for (i in 0..a.length) dp[i][0] = i
-        for (j in 0..b.length) dp[0][j] = j
+        // while, bukan `for (i in 0..len)` — kompilator menambah cek `i == len`
+        // yang membuat cabang `i > len` tak terjangkau; while bersih 2 cabang.
+        var i = 0
+        while (i <= a.length) { dp[i][0] = i; i++ }
+        var j = 0
+        while (j <= b.length) { dp[0][j] = j; j++ }
         for (i in 1..a.length) {
             for (j in 1..b.length) {
                 dp[i][j] = minOf(

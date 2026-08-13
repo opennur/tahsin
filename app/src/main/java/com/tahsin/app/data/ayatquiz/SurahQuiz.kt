@@ -33,7 +33,9 @@ object SurahQuiz {
         surahNames: List<Pair<Int, String>>,
         random: Random = Random.Default,
     ): SurahQuizQuestion? {
-        val correctName = surahNames.firstOrNull { it.first == surahNumber }?.second ?: return null
+        val match = surahNames.firstOrNull { it.first == surahNumber }
+            ?: return null
+        val correctName = match.second
         val distractorNames = surahNames
             .filter { it.first != surahNumber }
             .map { it.second }

@@ -148,4 +148,35 @@ class TranscriptAlignerTest {
     fun `similarity - sangat berbeda mendekati 0`() {
         assertEquals(0.0, TranscriptAligner.similarity("abc", "xyz"), 0.0001)
     }
+
+
+    @Test
+    fun `align - ucapan kosong - semua belum terbaca`() {
+        val out = TranscriptAligner.align("   ", listOf("الرَّحْمَٰنِ", "الرَّحِيمِ"))
+        assertEquals(2, out.size)
+        assertTrue(out.all { it.status == com.tahsin.app.stt.WordStatus.NOT_REACHED })
+    }
+
+    @Test
+    fun `align - acuan kosong - hasil kosong`() {
+        assertTrue(TranscriptAligner.align("بسم الله", emptyList()).isEmpty())
+    }
+
+
+    @Test
+    fun `align - kata acuan dilewati karena kata ucapan ekstra - SKIPPED`() {
+        val out = TranscriptAligner.align("أ ب ج", listOf("أ", "ج"))
+        assertEquals(2, out.size)
+        assertEquals(com.tahsin.app.stt.WordStatus.CORRECT, out[0].status)
+        assertEquals(com.tahsin.app.stt.WordStatus.SKIPPED, out[1].status)
+    }
+
+    @Test
+    fun `levenshtein - edge string kosong dan identik`() {
+        assertEquals(3, TranscriptAligner.levenshtein("", "abc"))
+        assertEquals(2, TranscriptAligner.levenshtein("ab", ""))
+        assertEquals(0, TranscriptAligner.levenshtein("", ""))
+        assertEquals(0, TranscriptAligner.levenshtein("kata", "kata"))
+        assertEquals(1, TranscriptAligner.levenshtein("kata", "kaza"))
+    }
 }

@@ -175,4 +175,23 @@ class AchievementsTest {
         assertTrue(Achievements.ALL.all { it.key.isNotBlank() && it.emoji.isNotBlank() })
         assertEquals(null, Achievements.byKey("tidak-ada"))
     }
+
+
+    @Test
+    fun `profileOf - percobaan tanpa attempts dan skor di bawah ambang`() {
+        val profile = Achievements.profileOf(
+            readingStats = listOf(
+                AyahStats(surahNumber = 1, ayahNumber = 1, attempts = 0, bestScore = 0),
+                AyahStats(surahNumber = 2, ayahNumber = 2, attempts = 3, bestScore = 89),
+            ),
+            vocab = VocabState(),
+            dream = DreamBigStats(),
+            lughoh = LughohStats(),
+            gamification = GamificationStats(xp = 0),
+            ayahCounts = mapOf(1 to 1, 2 to 2),
+        )
+        assertEquals(0, profile.perfectAyahs) // tidak ada bestScore >= 90
+        assertEquals(3, profile.ayahAttempts)
+        assertEquals(0, profile.surahsCompleted) // surah 2 belum semua ayat dibaca
+    }
 }

@@ -137,6 +137,7 @@ data class Strings(
     val ayatQuizModeSurah: String,
     val ayatQuizCompleteQuestion: String,
     val ayatQuizSurahQuestion: String,
+    val ayatQuizWrong: String,
     // Kosa kata
     val menuVocab: String,
     // Materi Dream BIG
@@ -360,6 +361,7 @@ object AppStrings {
         ayatQuizModeSurah = "Tebak Surah",
         ayatQuizCompleteQuestion = "Kata mana yang melengkapi ayat ini?",
         ayatQuizSurahQuestion = "Ayat ini dari surah apa?",
+        ayatQuizWrong = "✗ Belum tepat. Jawabannya: %s",
         menuVocab = "📖 Kosakata",
         menuDreamBig = "🎬 Dream BIG",
         dreamBigTitle = "🎬 Dream BIG",
@@ -573,6 +575,7 @@ object AppStrings {
         ayatQuizModeSurah = "Guess Surah",
         ayatQuizCompleteQuestion = "Which word completes this ayah?",
         ayatQuizSurahQuestion = "Which surah is this ayah from?",
+        ayatQuizWrong = "✗ Not quite. The answer: %s",
         menuVocab = "📖 Vocabulary",
         menuDreamBig = "🎬 Dream BIG",
         dreamBigTitle = "🎬 Dream BIG",

@@ -116,4 +116,25 @@ class TajwidColorizerTest {
             prevEnd = span.end
         }
     }
+
+
+    @Test
+    fun `span - getter konsisten + kategori diwarnai + enum lengkap`() {
+        // Tanpa rule → kosong.
+        assertTrue(com.tahsin.app.data.tajwid.TajwidColorizer.spans("قل", emptyList()).isEmpty())
+
+        val rules = listOf(
+            com.tahsin.app.data.tajwid.TajwidRule(
+                com.tahsin.app.data.tajwid.RuleCategory.MAD, "Mad", 1,
+                "panjang", "panjang",
+            ),
+        )
+        val spans = com.tahsin.app.data.tajwid.TajwidColorizer.spans("قَالَ", rules)
+        assertEquals(1, spans.size)
+        val span = spans[0]
+        assertEquals(1, span.start)
+        assertEquals(2, span.end) // berhenti di huruf berikutnya ("ل")
+        assertEquals(com.tahsin.app.data.tajwid.RuleCategory.MAD, span.category)
+        assertEquals(13, com.tahsin.app.data.tajwid.RuleCategory.entries.size)
+    }
 }

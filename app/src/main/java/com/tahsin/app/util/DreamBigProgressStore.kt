@@ -28,9 +28,11 @@ data class DreamBigStats(
  */
 class DreamBigProgressStore internal constructor(private val file: File) {
 
-    constructor(context: Context) : this(
-        File(context.applicationContext.filesDir, "dreambig-progress.json"),
-    )
+    companion object {
+        /** Factory Android: file di filesDir — ctor tetap murni (File) agar bisa dicakup 100%. */
+        fun fromContext(context: Context): DreamBigProgressStore =
+            DreamBigProgressStore(File(context.applicationContext.filesDir, "dreambig-progress.json"))
+    }
 
     private val gson = Gson()
     private val statsType = object : TypeToken<DreamBigStats>() {}.type
@@ -52,10 +54,18 @@ class DreamBigProgressStore internal constructor(private val file: File) {
                 if (!tmp.renameTo(file)) {
                     // rename gagal (mis. file tujuan ada di sistem lain) — fallback
                     // tulis langsung; file temp dibersihkan supaya tidak nyangkut.
-                    file.writeText(gson.toJson(stats))
+                    writeDirect(gson.toJson(stats))
                     tmp.delete()
                 }
             }
         }
+    }
+
+    /**
+     * Fallback tulis langsung — dipisah supaya jalur sukses bisa diuji unit
+     * (file biasa). Kegagalan (mis. target direktori) ditelan runCatching.
+     */
+    internal fun writeDirect(json: String) {
+        runCatching { file.writeText(json) }
     }
 }

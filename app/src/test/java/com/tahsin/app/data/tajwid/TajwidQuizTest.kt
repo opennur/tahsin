@@ -125,4 +125,21 @@ class TajwidQuizTest {
             }
         }
     }
+
+
+    // ---- gap coverage: default argumen (random/panjang) ----
+
+    @Test
+    fun `pickWord - tanpa random eksplisit - jalan`() {
+        // Kata harus punya hukum tajwid agar jadi kandidat.
+        val words = listOf("قَالَ", "رَبُّكُمُ", "وَمَا")
+        val picked = TajwidQuiz.pickWord(words)
+        assertNotNull(picked)
+    }
+
+    @Test
+    fun `buildOptions - tanpa random eksplisit - jalan`() {
+        val options = TajwidQuiz.buildOptions("مرحبا")
+        assertNotNull(options)
+    }
 }

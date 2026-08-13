@@ -116,7 +116,9 @@ object VocabularyEngine {
         // Akar yang sudah muncul (kartu due) tidak diulang sebagai kata baru.
         val seenRoots = due.mapTo(mutableSetOf()) { it.root.ifBlank { it.key } }
         val fresh = entries.filter { entry ->
-            entry.key !in cards && entry.key !in dueKeys
+            // dueKeys ⊆ cards (kartu yang jatuh tempo pasti ada di `cards`),
+            // jadi cek kunci kartu sudah cukup.
+            entry.key !in cards
         }.filter { entry ->
             val root = entry.root.ifBlank { entry.key }
             if (root in seenRoots) false else {

@@ -217,7 +217,9 @@ object TajwidEngine {
                 val thick = when {
                     prevMark == KASRA -> false
                     prevMark == FATHA || prevMark == DAMMA -> true
-                    else -> mark == FATHA || mark == DAMMA // fallback: harakat pada لّ
+                    // Fallback (prevWord null / tanpa isyarat): kondisi di atas
+                    // menjamin mark == SHADDAH, jadi cabang ini selalu tipis.
+                    else -> false
                 }
                 rules += rule(
                     RuleCategory.LAM_JALALAH,
@@ -320,8 +322,8 @@ object TajwidEngine {
 
     // ---- helper ----
 
-    private fun rule(category: RuleCategory, name: String, index: Int, explanation: String, explanationEn: String? = null) =
-        TajwidRule(category, name, index, explanation, explanationEn ?: explanation)
+    private fun rule(category: RuleCategory, name: String, index: Int, explanation: String, explanationEn: String) =
+        TajwidRule(category, name, index, explanation, explanationEn)
 
     /** Harakat terakhir SEBELUM posisi `idx` (scan mundur; berhenti di huruf tanpa tanda). */
     private fun findVowelBefore(word: String, idx: Int): Char? {

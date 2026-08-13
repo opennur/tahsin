@@ -116,11 +116,11 @@ fun statsViewModelFactory(context: Context): ViewModelProvider.Factory = viewMod
     initializer {
         val app = context.applicationContext
         StatsViewModel(
-            statsStore = ReadingStatsStore(app),
-            vocabStatsStore = VocabularyStatsStore(app),
-            dreamBigStore = DreamBigProgressStore(app),
-            lughohStore = LughohProgressStore(app),
-            gamificationStore = GamificationStore(app),
+            statsStore = ReadingStatsStore.fromContext(app),
+            vocabStatsStore = VocabularyStatsStore.fromContext(app),
+            dreamBigStore = DreamBigProgressStore.fromContext(app),
+            lughohStore = LughohProgressStore.fromContext(app),
+            gamificationStore = GamificationStore.fromContext(app),
             settings = SettingsStore(app),
         )
     }

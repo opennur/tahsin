@@ -62,4 +62,51 @@ class SurahQuizTest {
         assertTrue(SurahQuiz.isCorrect("Ali 'Imran", q))
         assertFalse(SurahQuiz.isCorrect("Al-Baqarah", q))
     }
+
+
+    @Test
+    fun `model - getter ayahNumber konsisten`() {
+        val q = SurahQuiz.makeQuestion(2, 7, "بِسْمِ اللَّهِ", names, Random(1))!!
+        assertEquals(2, q.surahNumber)
+        assertEquals(7, q.ayahNumber)
+    }
+
+    @Test
+    fun `makeQuestion - tanpa random eksplisit - jalan`() {
+        val q = SurahQuiz.makeQuestion(1, 1, "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", names)
+        assertNotNull(q)
+        assertEquals(4, q!!.options.size)
+    }
+
+
+    @Test
+    fun `makeQuestion - nama surah kosong dibuang dari opsi`() {
+        val withBlank = names + (99 to "   ")
+        val q = SurahQuiz.makeQuestion(1, 1, "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", withBlank, Random(1))
+        assertNotNull(q)
+        assertTrue(q!!.options.none { it.isBlank() })
+    }
+
+
+    @Test
+    fun `makeQuestion - surah yang dicari bukan elemen pertama`() {
+        val q = SurahQuiz.makeQuestion(2, 7, "بِسْمِ اللَّهِ", names, Random(1))
+        assertNotNull(q)
+        assertEquals(names.first { it.first == 2 }.second, q!!.correctName)
+    }
+
+    @Test
+    fun `makeQuestion - spasi ganda dalam ayat - fragment bersih`() {
+        val q = SurahQuiz.makeQuestion(1, 1, "بِسْمِ  اللَّهِ  الرَّحْمَٰنِ", names, Random(1))
+        assertNotNull(q)
+        assertTrue(q!!.fragment.split(" ").none { it.isBlank() })
+    }
+
+
+    @Test
+    fun `makeQuestion - arabic hanya spasi - fragment kosong aman`() {
+        val q = SurahQuiz.makeQuestion(1, 1, "     ", names, Random(1))
+        assertNotNull(q)
+        assertTrue(q!!.fragment.isEmpty())
+    }
 }

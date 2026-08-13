@@ -259,7 +259,7 @@ fun vocabularyViewModelFactory(context: Context): ViewModelProvider.Factory = vi
         VocabularyViewModel(
             app = app,
             repository = VocabularyRepository(app),
-            store = VocabularyStatsStore(app),
+            store = VocabularyStatsStore.fromContext(app),
             settings = SettingsStore(app),
             audioPlayer = TahsinAudioPlayer(app, SettingsStore(app)),
         )

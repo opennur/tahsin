@@ -254,20 +254,47 @@ sdkmanager "platforms;android-35"
 ### Unit tests
 
 Pure JVM tests for `TajwidEngine`, `TranscriptAligner` (Levenshtein),
-`ArabicNormalizer`, `QuranParser` (mushaf JSON parsing), `AyahOfTheDayManager`
-(daily ayah selection: index boundaries, cross-surah mapping, determinism),
-the **Vocabulary** engine (`VocabularyEngine`: SRS + quiz), **Dream BIG**
-(`DreamBigGame`: random rounds + stars), **Learn Arabic** (`LughohParser`/
-`LughohEngine`: random sessions, option shuffling, word arrangement), the
-**Ayah Quiz** (`AyatQuiz`/`SurahQuiz`: Complete-the-Ayah & Guess-the-Surah),
-the **gamification** system (`GamificationStore`: level/streak/todayXp;
-`Achievements`: progressive badges & tier evaluator), and all
-*progress stores* (`ReadingStatsStore`, `VocabularyStatsStore`,
+`ArabicNormalizer`, `QuranParser` (mushaf JSON parsing), `AyahOfTheDayPicker`
+(daily ayah selection: index boundaries, cross-surah mapping, determinism,
+cache validation), the **Vocabulary** engine (`VocabularyEngine`: SRS + quiz),
+**Dream BIG** (`DreamBigGame`: random rounds + stars), **Learn Arabic**
+(`LughohParser`/`LughohEngine`: random sessions, option shuffling, word
+arrangement), the **Ayah Quiz** (`AyatQuiz`/`SurahQuiz`: Complete-the-Ayah &
+Guess-the-Surah), the **gamification** system (`GamificationStore`:
+level/streak/todayXp; `Achievements`: progressive badges & tier evaluator),
+and all *progress stores* (`ReadingStatsStore`, `VocabularyStatsStore`,
 `DreamBigProgressStore`, `LughohProgressStore`):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon
 ```
+
+#### 100% coverage of the correctness-critical core (JaCoCo)
+
+Every piece of logic that decides **text & harakah accuracy** is tested to
+**100% lines AND 100% branches** (verified with JaCoCo):
+
+```bash
+./gradlew jacocoCoreReport --no-daemon
+# Report: app/build/reports/jacoco/core/ (XML + HTML)
+```
+
+The "correctness core" = `data/**` (parsers, engines, models, quiz engines) +
+pure `util/` (`ArabicNormalizer`, `AyahSearch`, `ReadingStats`, `Reciter`,
+`AudioUrls`, `DownloadProgress`, `AppLanguage`, `Achievements`,
+`GamificationStore`, `GamificationEvents`, all *progress stores*,
+`AyahOfTheDayPicker`) + `stt/TranscriptAligner`. The **mushaf integrity golden
+test** (`MushafIntegrityTest`) validates the actual bundled data: 114 surahs,
+6,236 ayahs total, per-surah ayah counts exactly matching the standard mushaf,
+and no blank texts (Arabic / ID / EN translation) anywhere — if even a single
+harakah goes missing or corrupts, this test fails.
+
+**Documented exclusions** (need an emulator/Robolectric): pure Android layers —
+`ui/**`, `widget/**`, `theme/**`, `MainActivity`, `DownloadService`,
+`TahsinAudioPlayer`, `ArabicSpeechRecognizer`, repositories (asset I/O),
+`SettingsStore`, `FontStore`, `GamificationHub` (Context glue),
+`AyahOfTheDayManager` (prefs/repository glue — its logic lives in
+`AyahOfTheDayPicker`, which is 100% covered).
 
 ### CI (GitHub Actions)
 

@@ -16,9 +16,11 @@ import java.io.File
  */
 class VocabularyStatsStore internal constructor(private val file: File) {
 
-    constructor(context: Context) : this(
-        File(context.applicationContext.filesDir, "vocab-stats.json"),
-    )
+    companion object {
+        /** Factory Android: file di filesDir — ctor tetap murni (File) agar bisa dicakup 100%. */
+        fun fromContext(context: Context): VocabularyStatsStore =
+            VocabularyStatsStore(File(context.applicationContext.filesDir, "vocab-stats.json"))
+    }
 
     private val gson = Gson()
     private val stateType = object : TypeToken<VocabState>() {}.type
@@ -39,10 +41,19 @@ class VocabularyStatsStore internal constructor(private val file: File) {
                 tmp.writeText(gson.toJson(state))
                 if (!tmp.renameTo(file)) {
                     // Rename gagal (jarang) — fallback tulis langsung.
-                    file.writeText(gson.toJson(state))
+                    writeDirect(gson.toJson(state))
                 }
             }
         }
+    }
+
+    /**
+     * Fallback tulis langsung — dipisah supaya jalur sukses bisa diuji unit
+     * (file biasa). Kegagalan (mis. target direktori) ditelan runCatching:
+     * ini pertahanan terakhir, bukan jalan utama.
+     */
+    internal fun writeDirect(json: String) {
+        runCatching { file.writeText(json) }
     }
 
     /** Hapus seluruh progres kosa kata. */

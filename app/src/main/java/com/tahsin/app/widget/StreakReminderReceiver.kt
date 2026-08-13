@@ -95,7 +95,7 @@ class StreakReminderReceiver : BroadcastReceiver() {
         ) {
             return
         }
-        val stats = GamificationStore(app).read()
+        val stats = GamificationStore.fromContext(app).read()
         if (stats.streak <= 0) return
         val today = LocalDate.now().toEpochDay()
         val todayXp = Gamification.todayXpFor(stats, today)

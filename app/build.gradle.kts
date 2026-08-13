@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // JaCoCo bawaan Gradle (bukan dari Plugin Portal — org.jacoco tidak ada di sana).
+    jacoco
 }
 
 // Signing rilis: kalau ada keystore.properties di root proyek, dipakai.
@@ -90,4 +92,67 @@ dependencies {
 
     // ---- Unit test (JVM) ----
     testImplementation(libs.junit)
+}
+
+/**
+ * Laporan cakupan INTI KEBENARAN: data/ (parser, engine, model, kuis) +
+ * util/ murni + stt/TranscriptAligner — lapisan tempat akurasi teks &
+ * harakat Al-Qur'an ditentukan. UI/lapisan Android (repository, widget,
+ * MainActivity, ui/, widget/, GamificationHub) DIKECUALIKAN secara
+ * terdokumentasi (butuh emulator/instrumented test).
+ *
+ * Pakai: ./gradlew jacocoCoreReport
+ * (menjalankan testDebugUnitTest dulu, lalu laporan XML+HTML ke
+ * build/reports/jacoco/core/)
+ */
+tasks.register<JacocoReport>("jacocoCoreReport") {
+    group = "verification"
+    description = "JaCoCo: cakupan inti kebenaran (data/ + util murni + TranscriptAligner)."
+    dependsOn("testDebugUnitTest")
+
+    // Data eksekusi dari agent bawaan plugin jacoco (tiap Test task
+    // diinstrumentasi otomatis → build/jacoco/<namaTask>.exec).
+    executionData.from(
+        fileTree(layout.buildDirectory.dir("jacoco")) {
+            include("testDebugUnitTest.exec")
+        },
+    )
+
+    sourceDirectories.setFrom(files("$projectDir/src/main/java"))
+
+    classDirectories.setFrom(
+        fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+            include(
+                "com/tahsin/app/data/**",
+                "com/tahsin/app/util/Achievements*",
+                "com/tahsin/app/util/AppLanguage*",
+                "com/tahsin/app/util/ArabicNormalizer*",
+                "com/tahsin/app/util/AudioUrls*",
+                "com/tahsin/app/util/AyahOfTheDayPicker*",
+                "com/tahsin/app/util/AyahSearch*",
+                "com/tahsin/app/util/DownloadProgress*",
+                "com/tahsin/app/util/DreamBigProgressStore*",
+                "com/tahsin/app/util/GamificationEvents*",
+                "com/tahsin/app/util/GamificationStore*",
+                "com/tahsin/app/util/LughohProgressStore*",
+                "com/tahsin/app/util/ReadingStats*",
+                "com/tahsin/app/util/Reciter*",
+                "com/tahsin/app/util/VocabularyStatsStore*",
+                "com/tahsin/app/stt/TranscriptAligner*",
+            )
+            exclude(
+                // Sintetik Kotlin (lambdas, when-mappings, default-impl).
+                "**/*\$*",
+                // Lapisan Android dalam data/ (assets/files) — butuh Robolectric.
+                "com/tahsin/app/data/**/*Repository*",
+            )
+        },
+    )
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/core/jacocoCoreReport.xml"))
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/core/html"))
+    }
 }

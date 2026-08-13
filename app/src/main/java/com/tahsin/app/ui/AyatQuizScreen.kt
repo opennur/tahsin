@@ -153,9 +153,15 @@ private fun QuestionCard(
         AyatQuizMode.COMPLETE -> state.completeQuestion!!.blankedText
         AyatQuizMode.SURAH -> state.surahQuestion!!.fragment
     }
+    val correctAnswer = when (state.mode) {
+        AyatQuizMode.COMPLETE -> state.completeQuestion!!.correctWord
+        AyatQuizMode.SURAH -> state.surahQuestion!!.correctName
+    }
 
     AyahCard(modifier = Modifier.fillMaxWidth()) {
-        if (state.ayahLabel.isNotBlank()) {
+        // Label surah:ayat hanya di Lengkapi Ayat — di Tebak Surah nama surah
+        // justru bocor ke jawaban, jadi disembunyikan.
+        if (state.mode == AyatQuizMode.COMPLETE && state.ayahLabel.isNotBlank()) {
             AyahText(
                 state.ayahLabel,
                 style = AyahTypography.Caption.copy(
@@ -192,8 +198,11 @@ private fun QuestionCard(
 
         options.forEach { option ->
             val variant = when {
+                // Belum menjawab: semua opsi netral.
                 !answered -> AyahButtonVariant.Outline
-                option == state.selected && isCorrectPick -> AyahButtonVariant.Primary
+                // Sudah menjawab: jawaban BENAR selalu disorot (Primary),
+                // pilihan user yang salah disorot merah (Danger).
+                option == correctAnswer -> AyahButtonVariant.Primary
                 option == state.selected -> AyahButtonVariant.Danger
                 else -> AyahButtonVariant.Outline
             }
@@ -212,7 +221,8 @@ private fun QuestionCard(
         Spacer(modifier = Modifier.height(12.dp))
         AyahCard(modifier = Modifier.fillMaxWidth()) {
             AyahText(
-                if (isCorrectPick) strings.quizCorrect else strings.quizWrong,
+                if (isCorrectPick) strings.quizCorrect
+                else strings.ayatQuizWrong.format(correctAnswer),
                 style = AyahTypography.Body2.copy(
                     color = if (isCorrectPick) AyahColors.Success else AyahColors.Error,
                     fontWeight = FontWeight.SemiBold,

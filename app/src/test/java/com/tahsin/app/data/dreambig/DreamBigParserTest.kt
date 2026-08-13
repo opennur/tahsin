@@ -143,4 +143,27 @@ class DreamBigParserTest {
         assertEquals("", levels[0].title)
         assertTrue(levels[0].wordKeys.isEmpty())
     }
+
+
+    @Test
+    fun `paragraph - getter startMs konsisten`() {
+        val p = com.tahsin.app.data.dreambig.TranscriptParagraph(startMs = 1234L, text = "teks")
+        assertEquals(1234L, p.startMs)
+        assertEquals("teks", p.text)
+    }
+
+
+    @Test
+    fun `parseTranscript - json kosong dan segmen teks kosong - aman`() {
+        val t1 = DreamBigParser.parseTranscript("{}")
+        assertEquals("", t1.videoId)
+        assertEquals("", t1.source)
+        assertTrue(t1.segments.isEmpty())
+
+        val t2 = DreamBigParser.parseTranscript(
+            """{"videoId":"v1","segments":[{"startMs":0,"durationMs":10,"text":"   "}]}""",
+        )
+        assertEquals("v1", t2.videoId)
+        assertTrue(t2.segments.isEmpty()) // teks kosong → segmen dilewati
+    }
 }

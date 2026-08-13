@@ -30,7 +30,9 @@ object QuranParser {
     fun parseSurah(raw: String): Surah {
         val response = runCatching { gson.fromJson(raw, SurahResponse::class.java) }.getOrNull()
             ?: throw IOException("Respons API tidak valid.")
-        return response.data?.toSurah() ?: throw IOException("Respons API kosong.")
+        val data = response.data
+            ?: throw IOException("Respons API kosong.")
+        return data.toSurah()
     }
 
     /**

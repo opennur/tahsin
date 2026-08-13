@@ -1036,7 +1036,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             settings = SettingsStore(app),
             downloader = AudioDownloader(app, SettingsStore(app)),
             fontStore = FontStore(app),
-            statsStore = ReadingStatsStore(app),
+            statsStore = ReadingStatsStore.fromContext(app),
         )
     }
 }

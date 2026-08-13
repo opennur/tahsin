@@ -209,4 +209,53 @@ class QuranParserTest {
     fun `buildEnCacheJson - JSON tidak valid = null (tidak ditulis ke cache)`() {
         assertNull(QuranParser.buildEnCacheJson("bukan json"))
     }
+
+
+    // ---- gap coverage ----
+
+    @Test
+    fun `parseSurah - data null - IOException`() {
+        assertThrows(java.io.IOException::class.java) { QuranParser.parseSurah("{}") }
+    }
+
+    @Test
+    fun `parseIdTranslations - data null - daftar kosong`() {
+        assertEquals(emptyList<Pair<Int, String>>(), QuranParser.parseIdTranslations("{}"))
+    }
+
+    @Test
+    fun `buildEnCacheJson - tanpa translations - tidak null`() {
+        val json = QuranParser.buildEnCacheJson("{}")
+        assertTrue(json != null && json.contains("translations"))
+    }
+
+
+    @Test
+    fun `parseSurah - data minimal - Surah dengan default aman`() {
+        val surah = QuranParser.parseSurah("""{"data":{"nomor":1}}""")
+        assertEquals(1, surah.number)
+    }
+
+    @Test
+    fun `buildEnCacheJson - bersihkan tag HTML dan footnote`() {
+        val json = """{"translations":[{"resource_id":20,"text":"<sup footnotes='1'>1</sup>Bismi <i>llahi</i>"}]}"""
+        val out = QuranParser.buildEnCacheJson(json)
+        assertTrue(out != null && !out.contains("<sup") && !out.contains("<i>"))
+    }
+
+
+    @Test
+    fun `buildEnCacheJson - teks kosong dan tanpa tag - bersih`() {
+        val out1 = QuranParser.buildEnCacheJson("""{"translations":[{"resource_id":20,"text":""}]}""")
+        assertTrue(out1 != null)
+        val out2 = QuranParser.buildEnCacheJson("""{"translations":[]}""")
+        assertTrue(out2 != null && out2.contains("translations"))
+    }
+
+
+    @Test
+    fun `buildEnCacheJson - translations null eksplisit`() {
+        val out = QuranParser.buildEnCacheJson("""{"translations":null}""")
+        assertTrue(out != null && out.contains("translations"))
+    }
 }

@@ -21,7 +21,7 @@ object GamificationHub {
      */
     fun award(context: Context, xp: Int): ActivityResult {
         val app = context.applicationContext
-        val g = GamificationStore(app)
+        val g = GamificationStore.fromContext(app)
         val result = g.recordActivity(xp)
         val newTiers = checkAndUnlock(app, g)
         celebrate(result, newTiers)
@@ -76,7 +76,7 @@ object GamificationHub {
      * dibuka digabung (keep max) ke [GamificationStats.badgeTiers] lalu
      * di-persist. Mengembalikan key → tier yang BARU dibuka (untuk perayaan).
      */
-    fun checkAndUnlock(app: Context, g: GamificationStore = GamificationStore(app)): Map<String, Int> =
+    fun checkAndUnlock(app: Context, g: GamificationStore = GamificationStore.fromContext(app)): Map<String, Int> =
         g.withWriteLock {
             val stats = g.read()
             val profile = loadProfile(app, stats)
@@ -92,10 +92,10 @@ object GamificationHub {
     fun loadProfile(app: Context, gamification: GamificationStats): PlayerProfile {
         val surahs = runCatching { QuranRepository(app).surahList() }.getOrDefault(emptyList())
         return Achievements.profileOf(
-            readingStats = ReadingStatsStore(app).all(),
-            vocab = VocabularyStatsStore(app).read(),
-            dream = DreamBigProgressStore(app).read(),
-            lughoh = LughohProgressStore(app).read(),
+            readingStats = ReadingStatsStore.fromContext(app).all(),
+            vocab = VocabularyStatsStore.fromContext(app).read(),
+            dream = DreamBigProgressStore.fromContext(app).read(),
+            lughoh = LughohProgressStore.fromContext(app).read(),
             gamification = gamification,
             ayahCounts = surahs.associate { it.number to it.ayahCount },
         )

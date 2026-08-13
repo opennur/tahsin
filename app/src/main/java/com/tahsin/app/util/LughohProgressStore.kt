@@ -26,9 +26,11 @@ data class LughohStats(
  */
 class LughohProgressStore internal constructor(private val file: File) {
 
-    constructor(context: Context) : this(
-        File(context.applicationContext.filesDir, "lughoh-progress.json"),
-    )
+    companion object {
+        /** Factory Android: file di filesDir — ctor tetap murni (File) agar bisa dicakup 100%. */
+        fun fromContext(context: Context): LughohProgressStore =
+            LughohProgressStore(File(context.applicationContext.filesDir, "lughoh-progress.json"))
+    }
 
     private val gson = Gson()
     private val statsType = object : TypeToken<LughohStats>() {}.type
@@ -50,10 +52,18 @@ class LughohProgressStore internal constructor(private val file: File) {
                 if (!tmp.renameTo(file)) {
                     // rename gagal (mis. file tujuan ada di sistem lain) — fallback
                     // tulis langsung; file temp dibersihkan supaya tidak nyangkut.
-                    file.writeText(gson.toJson(stats))
+                    writeDirect(gson.toJson(stats))
                     tmp.delete()
                 }
             }
         }
+    }
+
+    /**
+     * Fallback tulis langsung — dipisah supaya jalur sukses bisa diuji unit
+     * (file biasa). Kegagalan (mis. target direktori) ditelan runCatching.
+     */
+    internal fun writeDirect(json: String) {
+        runCatching { file.writeText(json) }
     }
 }

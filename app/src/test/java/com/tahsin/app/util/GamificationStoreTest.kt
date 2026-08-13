@@ -189,4 +189,69 @@ class GamificationStoreTest {
         assertEquals(0, Gamification.todayXpFor(stats, today = 6))
         assertEquals(0, Gamification.todayXpFor(stats, today = 4))
     }
+
+
+    // ---- gap coverage ----
+
+    @Test
+    fun `recordActivity - tanpa tanggal eksplisit - memakai hari ini`() {
+        val r = store().recordActivity(5)
+        assertEquals(5, r.after.xp)
+        assertEquals(1, r.after.streak)
+    }
+
+    @Test
+    fun `read - json valid tanpa field badges - tidak dimigrasi`() {
+        file.writeText("{\"xp\":42,\"todayXp\":7,\"lastActiveDay\":3,\"streak\":1}")
+        val s = store().read()
+        assertEquals(42, s.xp)
+        assertTrue(s.badgeTiers.isEmpty())
+    }
+
+    @Test
+    fun `read - json literal null - default, dan migrasi tidak crash`() {
+        file.writeText("null")
+        val s = store().read()
+        assertEquals(GamificationStats(), s)
+        assertTrue(s.badgeTiers.isEmpty())
+    }
+
+    @Test
+    fun `read - legacy hanya berisi key tak dikenal - tidak ada tier`() {
+        file.writeText("""{"xp":10,"badges":["tidak-ada-1","tidak-ada-2"]}""")
+        val s = store().read()
+        assertEquals(10, s.xp)
+        assertTrue(s.badgeTiers.isEmpty())
+    }
+
+    @Test
+    fun `write - target berupa direktori - tidak crash (fallback gagal aman)`() {
+        // renameTo(temp → dir) gagal → fallback writeText juga gagal → runCatching.
+        file.mkdirs()
+        java.io.File(file, "placeholder").writeText("x") // dir tidak kosong → renameTo pasti gagal
+        store().write(GamificationStats(xp = 1))
+        assertTrue(file.isDirectory)
+    }
+
+
+    @Test
+    fun `read - file belum ada - keadaan default`() {
+        assertEquals(GamificationStats(), store().read())
+    }
+
+    @Test
+    fun `recordActivity - xp nol di hari sama - tidak menulis (state sama)`() {
+        val seeded = GamificationStats(xp = 10, todayXp = 5, lastActiveDay = 10, streak = 2)
+        store().write(seeded)
+        val r = store().recordActivity(0, LocalDate.ofEpochDay(10))
+        assertEquals(seeded, r.after)
+        assertEquals(seeded, store().read())
+    }
+
+
+    @Test
+    fun `writeDirect - file biasa - tersimpan`() {
+        store().writeDirect("""{"xp":1}""")
+        assertTrue(file.readText().contains("1"))
+    }
 }

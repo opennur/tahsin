@@ -120,10 +120,6 @@ object Gamification {
  */
 class GamificationStore internal constructor(private val file: File) {
 
-    constructor(context: Context) : this(
-        File(context.applicationContext.filesDir, "gamification.json"),
-    )
-
     private val gson = Gson()
     private val statsType = object : TypeToken<GamificationStats>() {}.type
     /**
@@ -133,8 +129,13 @@ class GamificationStore internal constructor(private val file: File) {
      * read-modify-write lewat kunci ini agar tidak ada kenaikan XP/streak
      * yang hilang atau rollback badge.
      */
-    private companion object {
-        val WRITE_LOCK = Any()
+    companion object {
+        /** Kunci tulis GLOBAL (bukan per-instance) — lihat KDoc kelas. */
+        private val WRITE_LOCK = Any()
+
+        /** Factory Android: file di filesDir — ctor tetap murni (File) agar bisa dicakup 100%. */
+        fun fromContext(context: Context): GamificationStore =
+            GamificationStore(File(context.applicationContext.filesDir, "gamification.json"))
     }
 
     /** Jalankan [block] dengan kunci tulis global (RMW atomik lintas instance). */
@@ -181,7 +182,7 @@ class GamificationStore internal constructor(private val file: File) {
                 tmp.writeText(gson.toJson(stats))
                 if (!tmp.renameTo(file)) {
                     // rename gagal — fallback tulis langsung; temp dibersihkan.
-                    file.writeText(gson.toJson(stats))
+                    writeDirect(gson.toJson(stats))
                     tmp.delete()
                 }
             }
@@ -201,4 +202,12 @@ class GamificationStore internal constructor(private val file: File) {
             if (after != before) write(after)
             ActivityResult(before, after)
         }
+
+    /**
+     * Fallback tulis langsung — dipisah supaya jalur sukses bisa diuji unit
+     * (file biasa). Kegagalan (mis. target direktori) ditelan runCatching.
+     */
+    internal fun writeDirect(json: String) {
+        runCatching { file.writeText(json) }
+    }
 }

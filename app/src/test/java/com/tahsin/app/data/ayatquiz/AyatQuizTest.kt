@@ -84,4 +84,21 @@ class AyatQuizTest {
         assertTrue(AyatQuiz.isCorrect("اللّهِ", q)) // harakat beda, huruf sama
         assertFalse(AyatQuiz.isCorrect("الرَّحِيمِ", q))
     }
+
+
+    @Test
+    fun `model - getter surah dan nomor ayat konsisten`() {
+        val q = AyatQuiz.makeQuestion(3, 5, words, pool, Random(1))!!
+        assertEquals(3, q.surahNumber)
+        assertEquals(5, q.ayahNumber)
+    }
+
+
+    @Test
+    fun `makeQuestion - kata kosong dalam kolam dibuang`() {
+        val dirtyPool = pool + listOf("   ", "")
+        val q = AyatQuiz.makeQuestion(3, 5, words, dirtyPool, Random(1))
+        assertNotNull(q)
+        assertTrue(q!!.options.none { it.isBlank() })
+    }
 }

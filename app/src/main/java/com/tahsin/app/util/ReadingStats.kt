@@ -79,7 +79,7 @@ object ReadingStats {
             val cur = mergedErrors[idx]
             mergedErrors[idx] = WordError(
                 wordIndex = idx,
-                word = cur?.word?.takeIf { it.isNotBlank() } ?: word,
+                word = if (cur != null && cur.word.isNotBlank()) cur.word else word,
                 errorCount = (cur?.errorCount ?: 0) + 1,
             )
         }

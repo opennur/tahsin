@@ -251,19 +251,47 @@ sdkmanager "platforms;android-35"
 ### Unit test
 
 Test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
-`ArabicNormalizer`, `QuranParser` (parsing JSON mushaf), `AyahOfTheDayManager`
-(pemilihan ayat harian: batas index, lintas surah, determinisme), mesin
-**Kosakata** (`VocabularyEngine`: SRS + quiz), **Dream BIG** (`DreamBigGame`:
-ronde acak + bintang), **Belajar Arab** (`LughohParser`/`LughohEngine`: sesi
-acak, acak opsi, susun kata), **Kuis Ayat** (`AyatQuiz`/`SurahQuiz`: soal
-Lengkapi Ayat & Tebak Surah), sistem **gamification** (`GamificationStore`:
-level/streak/todayXp; `Achievements`: badge progresif & evaluator tier), dan
-semua *progress store* (`ReadingStatsStore`, `VocabularyStatsStore`,
-`DreamBigProgressStore`, `LughohProgressStore`):
+`ArabicNormalizer`, `QuranParser` (parsing JSON mushaf), `AyahOfTheDayPicker`
+(pemilihan ayat harian: batas index, lintas surah, determinisme, validasi
+cache), mesin **Kosakata** (`VocabularyEngine`: SRS + quiz), **Dream BIG**
+(`DreamBigGame`: ronde acak + bintang), **Belajar Arab** (`LughohParser`/
+`LughohEngine`: sesi acak, acak opsi, susun kata), **Kuis Ayat**
+(`AyatQuiz`/`SurahQuiz`: soal Lengkapi Ayat & Tebak Surah), sistem
+**gamification** (`GamificationStore`: level/streak/todayXp; `Achievements`:
+badge progresif & evaluator tier), dan semua *progress store*
+(`ReadingStatsStore`, `VocabularyStatsStore`, `DreamBigProgressStore`,
+`LughohProgressStore`):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon
 ```
+
+#### Cakupan 100% inti kebenaran (JaCoCo)
+
+Seluruh logika yang menentukan **akurasi teks & harakat** diuji sampai
+**100% baris DAN 100% cabang** (verified dengan JaCoCo):
+
+```bash
+./gradlew jacocoCoreReport --no-daemon
+# Laporan: app/build/reports/jacoco/core/ (XML + HTML)
+```
+
+Lingkup "inti kebenaran" = `data/**` (parser, engine, model, kuis) + util/ yang
+murni (`ArabicNormalizer`, `AyahSearch`, `ReadingStats`, `Reciter`,
+`AudioUrls`, `DownloadProgress`, `AppLanguage`, `Achievements`,
+`GamificationStore`, `GamificationEvents`, semua *progress store*,
+`AyahOfTheDayPicker`) + `stt/TranscriptAligner`. **Tes emas integritas
+mushaf** (`MushafIntegrityTest`) memvalidasi data asli yang dibundel: 114
+surah, total 6.236 ayat, jumlah ayat per surah persis mushaf standar, dan
+tidak ada teks kosong (Arab / terjemahan ID / EN) — kalau satu harakat pun
+hilang atau rusak, tes ini gagal.
+
+Yang **dikecualikan secara terdokumentasi** (butuh emulator/Robolectric):
+lapisan Android murni — `ui/**`, `widget/**`, `theme/**`, `MainActivity`,
+`DownloadService`, `TahsinAudioPlayer`, `ArabicSpeechRecognizer`,
+repository (I/O assets), `SettingsStore`, `FontStore`, `GamificationHub`
+(glue Context), `AyahOfTheDayManager` (glue prefs/repository — logikanya ada
+di `AyahOfTheDayPicker` yang diuji 100%).
 
 ### CI (GitHub Actions)
 

@@ -77,4 +77,27 @@ class VocabularyStatsStoreTest {
         s.write(VocabState(cards = mapOf("الله" to VocabCard("الله", box = 2))))
         assertEquals(mapOf("الله" to VocabCard("الله", box = 2)), s.read().cards)
     }
+
+
+    @Test
+    fun `write - target berupa direktori - tidak crash`() {
+        file.mkdirs()
+        java.io.File(file, "placeholder").writeText("x") // dir tidak kosong → renameTo pasti gagal
+        store().write(VocabState())
+        assertTrue(file.isDirectory)
+    }
+
+
+    @Test
+    fun `read - json literal null - keadaan default`() {
+        file.writeText("null")
+        assertEquals(VocabState(), store().read())
+    }
+
+
+    @Test
+    fun `writeDirect - file biasa - tersimpan`() {
+        store().writeDirect("""{"xp":1}""")
+        assertTrue(file.readText().contains("1"))
+    }
 }

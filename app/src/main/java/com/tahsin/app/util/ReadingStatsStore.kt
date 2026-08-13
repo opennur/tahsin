@@ -19,9 +19,11 @@ import java.io.File
  */
 class ReadingStatsStore internal constructor(private val file: File) {
 
-    constructor(context: Context) : this(
-        File(context.applicationContext.filesDir, "reading-stats.json"),
-    )
+    companion object {
+        /** Factory Android: file di filesDir — ctor tetap murni (File) agar bisa dicakup 100%. */
+        fun fromContext(context: Context): ReadingStatsStore =
+            ReadingStatsStore(File(context.applicationContext.filesDir, "reading-stats.json"))
+    }
 
     private val gson = Gson()
     private val listType = object : TypeToken<List<AyahStats>>() {}.type

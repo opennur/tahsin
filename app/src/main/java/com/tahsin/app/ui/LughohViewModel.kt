@@ -294,7 +294,7 @@ fun lughohViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
         LughohViewModel(
             app = app,
             repository = LughohRepository(app),
-            progressStore = LughohProgressStore(app),
+            progressStore = LughohProgressStore.fromContext(app),
             settings = SettingsStore(app),
         )
     }

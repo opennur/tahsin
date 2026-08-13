@@ -53,7 +53,7 @@ class BadgesViewModel(
     fun refresh() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val g = GamificationStore(app)
+            val g = GamificationStore.fromContext(app)
             GamificationHub.checkAndUnlock(app, g)
             val stats = g.read()
             val profile = GamificationHub.loadProfile(app, stats)

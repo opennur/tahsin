@@ -224,7 +224,7 @@ fun dreamBigViewModelFactory(context: Context): ViewModelProvider.Factory = view
         DreamBigViewModel(
             app = app,
             vocabRepository = VocabularyRepository(app),
-            progressStore = DreamBigProgressStore(app),
+            progressStore = DreamBigProgressStore.fromContext(app),
             settings = SettingsStore(app),
         )
     }

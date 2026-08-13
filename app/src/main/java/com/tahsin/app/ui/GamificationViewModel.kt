@@ -54,7 +54,7 @@ class GamificationViewModel(
     fun refresh() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val stats = GamificationStore(app).read()
+            val stats = GamificationStore.fromContext(app).read()
             val today = LocalDate.now().toEpochDay()
             _state.value = GamificationUiState(
                 isLoading = false,

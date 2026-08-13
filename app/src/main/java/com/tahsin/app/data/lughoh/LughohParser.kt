@@ -137,7 +137,7 @@ object LughohParser {
         fun toExercise(): Exercise? = runCatching {
             when (type) {
                 "fillBlank" -> {
-                    val ans = answer?.asStringOrNull() ?: return@runCatching null
+                    val ans = answer.asStringOrNull() ?: return@runCatching null
                     FillBlankExercise(
                         promptId = promptId.orEmpty(),
                         promptAr = promptAr.orEmpty(),
@@ -147,7 +147,7 @@ object LughohParser {
                     )
                 }
                 "translateArId" -> {
-                    val ans = answer?.asStringOrNull() ?: return@runCatching null
+                    val ans = answer.asStringOrNull() ?: return@runCatching null
                     TranslateArIdExercise(
                         promptAr = promptAr.orEmpty(),
                         promptLatin = promptLatin.orEmpty(),
@@ -156,7 +156,7 @@ object LughohParser {
                     )
                 }
                 "translateIdAr" -> {
-                    val ans = answer?.asStringOrNull() ?: return@runCatching null
+                    val ans = answer.asStringOrNull() ?: return@runCatching null
                     TranslateIdArExercise(
                         promptId = promptId.orEmpty(),
                         options = options.orEmpty(),
@@ -177,5 +177,5 @@ object LughohParser {
 
     /** String hanya jika benar-benar primitif (bukan array/objek). */
     private fun JsonElement?.asStringOrNull(): String? =
-        this?.takeIf { it.isJsonPrimitive }?.asString
+        if (this == null || !this.isJsonPrimitive) null else asString
 }
