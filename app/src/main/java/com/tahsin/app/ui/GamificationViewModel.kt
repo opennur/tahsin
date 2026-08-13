@@ -30,6 +30,7 @@ data class GamificationUiState(
     val todayXp: Int = 0,
     val dailyGoalXp: Int = Gamification.DAILY_GOAL_XP,
     val latestBadgeKey: String? = null,
+    val latestBadgeTier: Int = 0,
     val earnedBadgeCount: Int = 0,
 )
 
@@ -61,8 +62,9 @@ class GamificationViewModel(
                 level = Gamification.levelFor(stats.xp),
                 streak = stats.streak,
                 todayXp = Gamification.todayXpFor(stats, today),
-                latestBadgeKey = stats.badges.lastOrNull(),
-                earnedBadgeCount = stats.badges.size,
+                latestBadgeKey = stats.badgeTiers.entries.lastOrNull()?.key,
+                latestBadgeTier = stats.badgeTiers.entries.lastOrNull()?.value ?: 0,
+                earnedBadgeCount = stats.badgeTiers.size,
             )
         }
     }

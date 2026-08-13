@@ -106,6 +106,8 @@ fun TahsinScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    // Bahasa untuk pesan di luar TahsinContent (loading/error/izin mik).
+    val strings = AppStrings.of(viewModel.settingsState.value.language)
 
     // Buka surah/ayat yang diminta widget/notifikasi. Key = OpenTarget (data class,
     // berisi deliveryId unik per pengiriman) sehingga ketukan widget yang sama
@@ -124,17 +126,18 @@ fun TahsinScreen(
         if (granted) {
             viewModel.toggleMic()
         } else {
-            viewModel.showMessage("Izin mikrofon diperlukan untuk mendeteksi bacaan.")
+            viewModel.showMessage(strings.msgMicPermission)
         }
     }
 
     // Izin notifikasi (Android 13+) dipindah ke layar Pengaturan (toggle
     // "Ayah of the Day" kini berada di sana).
     when (val state = uiState) {
-        TahsinUiState.Loading -> AyahLoadingView(modifier = modifier, message = "Memuat mushaf…")
+        TahsinUiState.Loading -> AyahLoadingView(modifier = modifier, message = strings.msgMushafLoading)
         is TahsinUiState.Error -> AyahErrorView(
             message = state.message,
             onRetry = viewModel::reload,
+            retryLabel = strings.msgRetry,
             modifier = modifier,
         )
         is TahsinUiState.Ready -> TahsinContent(
@@ -310,9 +313,9 @@ private fun TahsinContent(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 SimpleDropdown(
-                    selectedLabel = "${strings.ayahLabel} ${ayah.number}",
+                    selectedLabel = "${ayah.number}",
                     options = (1..ayahCount).map { n ->
-                        DropdownOption("${strings.ayahLabel} $n", { onSelectAyah(n - 1) })
+                        DropdownOption("$n", { onSelectAyah(n - 1) })
                     },
                     modifier = Modifier.weight(1f),
                 )

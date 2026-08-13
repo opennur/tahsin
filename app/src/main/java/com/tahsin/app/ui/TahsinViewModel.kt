@@ -226,7 +226,7 @@ class TahsinViewModel(
                 showSwipeHint = !settings.swipeHintDismissed,
             )
         } catch (e: Exception) {
-            TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
+            TahsinUiState.Error(e.message ?: AppStrings.of(currentLanguage()).msgMushafLoadFailed)
         }
         syncSettings()
         // Unduh font default (Utsmani/Amiri) otomatis kalau file belum ada.
@@ -293,7 +293,7 @@ class TahsinViewModel(
             } catch (e: Exception) {
                 updateReady { it.copy(
                     loadingSurah = false,
-                    message = "${AppStrings.of(lang).msgSurahLoadFailed} $number: ${e.message ?: "periksa koneksi"}",
+                    message = "${AppStrings.of(lang).msgSurahLoadFailed} $number: ${e.message ?: AppStrings.of(lang).msgCheckConnection}",
                 ) }
             }
         }
@@ -429,11 +429,11 @@ class TahsinViewModel(
                 maybeAutoAdvance()
                 maybePlayErrorTone()
             }
-            override fun onError(message: String) {
+            override fun onError(error: Int) {
                 autoAdvanceHandled = true
                 updateReady { it.copy(
                     listening = false,
-                    message = message,
+                    message = AppStrings.sttErrorMessage(error, currentLanguage()),
                 ) }
             }
 
@@ -752,7 +752,7 @@ class TahsinViewModel(
                 }
             } catch (e: Exception) {
                 updateReady { it.copy(
-                    message = "${AppStrings.of(currentLanguage()).msgDownloadFailed} ${surah.nameLatin}: ${e.message ?: "periksa koneksi"}",
+                    message = "${AppStrings.of(currentLanguage()).msgDownloadFailed} ${surah.nameLatin}: ${e.message ?: AppStrings.of(currentLanguage()).msgCheckConnection}",
                 ) }
             }
             activeDownloads.remove(surah.number)

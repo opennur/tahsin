@@ -21,7 +21,7 @@ class ArabicSpeechRecognizer(context: Context) {
     interface Listener {
         fun onPartial(text: String)
         fun onResult(text: String)
-        fun onError(message: String)
+        fun onError(error: Int)
         fun onListeningChanged(listening: Boolean)
     }
 
@@ -53,7 +53,9 @@ class ArabicSpeechRecognizer(context: Context) {
 
             override fun onError(error: Int) {
                 l.onListeningChanged(false)
-                l.onError(errorMessage(error))
+                // Kode mentah SpeechRecognizer — terjemahan diserahkan ke UI
+                // (AppStrings.sttErrorMessage) agar pembungkus tetap netral bahasa.
+                l.onError(error)
             }
 
             override fun onResults(results: Bundle?) {
@@ -85,19 +87,5 @@ class ArabicSpeechRecognizer(context: Context) {
 
     fun destroy() {
         runCatching { speech.destroy() }
-    }
-
-    private fun errorMessage(error: Int): String = when (error) {
-        SpeechRecognizer.ERROR_NO_MATCH ->
-            "Tidak ada yang cocok terdeteksi — coba baca lebih pelan dan jelas."
-        SpeechRecognizer.ERROR_SPEECH_TIMEOUT ->
-            "Tidak ada suara terdeteksi (timeout)."
-        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ->
-            "Izin mikrofon belum diberikan."
-        SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT ->
-            "STT butuh internet (atau pasang paket bahasa Arab offline di pengaturan HP)."
-        SpeechRecognizer.ERROR_RECOGNIZER_BUSY ->
-            "SpeechRecognizer sedang sibuk — coba lagi."
-        else -> "Error speech recognition (kode $error)."
     }
 }

@@ -64,11 +64,13 @@ and the **Learn Arabic** course (Durusul Lughoh-style methodology).
   **daily streak** is tracked per calendar day, and a **50 XP daily goal**
   shows a progress bar on Home & Stats. Level-ups, streak milestones
   (3/7/14/30 days), and new badges are celebrated with a dialog + vibration.
-- 🏅 **Badges**: **13 achievements** — first step, 3/7-day streaks, levels
-  2/5, 10 recitation attempts, perfect recitation (90+), 50/100 mastered
-  words, perfect Dream BIG round, 10 rounds, 5 Arabic sessions, completing a
-  surah (every ayah read once). A gallery screen shows earned/locked badges;
-  the latest badge appears on Home & Stats.
+- 🏅 **Badges**: **8 progressive achievements** — XP (knowledge seeker),
+  streak, Tahsin recitations, perfect recitation (90+), mastered words,
+  Dream BIG rounds, Arabic sessions, and completed surahs. Every badge has
+  **unlimited tiers** (thresholds keep rising: 50 words, 100, 150, …) — once
+  a tier unlocks, the next tier is always there to chase. The gallery shows
+  the current tier + a **progress bar toward the next tier**; the latest
+  badge (with its tier) appears on Home & Stats.
 - 🎯 **Ayah Quiz** (Ayah Quiz menu): two multiple-choice modes over the whole
   mushaf — **Complete the Ayah** (which word completes this ayah?) and
   **Guess the Surah** (which surah is this ayah from?) — distractors drawn
@@ -169,7 +171,7 @@ app/src/main/java/com/tahsin/app/
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (per-ayah reading history, JSON filesDir),
 │                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
-│                   #   Achievements (13-badge catalog + pure evaluator),
+│                   #   Achievements (8 progressive badges, unlimited tiers),
 │                   #   GamificationStore/Hub/Events (XP, level, streak, celebrations),
 │                   #   AyahSearch (normalized Arabic + translation search),
 │                   #   Reciter (everyayah reciters + 0.5×–1.25× audio speed),
@@ -259,7 +261,7 @@ the **Vocabulary** engine (`VocabularyEngine`: SRS + quiz), **Dream BIG**
 `LughohEngine`: random sessions, option shuffling, word arrangement), the
 **Ayah Quiz** (`AyatQuiz`/`SurahQuiz`: Complete-the-Ayah & Guess-the-Surah),
 the **gamification** system (`GamificationStore`: level/streak/todayXp;
-`Achievements`: badge catalog & unlock evaluator), and all
+`Achievements`: progressive badges & tier evaluator), and all
 *progress stores* (`ReadingStatsStore`, `VocabularyStatsStore`,
 `DreamBigProgressStore`, `LughohProgressStore`):
 

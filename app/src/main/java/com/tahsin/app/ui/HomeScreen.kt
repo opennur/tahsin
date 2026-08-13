@@ -112,7 +112,8 @@ fun HomeScreen(
                                     style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
                                 )
                                 AyahText(
-                                    "${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, settings.language)}",
+                                    "${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, settings.language)} · " +
+                                        strings.badgesTierLabel.format(gamification.latestBadgeTier),
                                     style = AyahTypography.Body2.copy(
                                         color = AyahColors.TextPrimary,
                                         fontWeight = FontWeight.Medium,

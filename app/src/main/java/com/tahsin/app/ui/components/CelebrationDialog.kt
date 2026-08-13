@@ -52,6 +52,7 @@ fun CelebrationDialog(
             title = strings.celebrateBadgeTitle
             body = strings.celebrateBadgeBody.format(
                 AppStrings.badgeTitle(event.badgeKey, language),
+                event.tier,
             )
         }
     }

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tahsin.app.util.Achievements
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.BadgeDef
+import com.tahsin.app.util.BadgeProgress
 import com.tahsin.app.util.Gamification
 import com.tahsin.app.util.GamificationHub
 import com.tahsin.app.util.GamificationStore
@@ -20,10 +21,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** Satu badge di layar: definisi + status diraih/belum. */
+/** Satu badge di layar: definisi + progres tier saat ini. */
 data class BadgeUi(
     val def: BadgeDef,
-    val earned: Boolean,
+    val progress: BadgeProgress,
 )
 
 data class BadgesUiState(
@@ -55,14 +56,23 @@ class BadgesViewModel(
             val g = GamificationStore(app)
             GamificationHub.checkAndUnlock(app, g)
             val stats = g.read()
-            val earned = stats.badges.toSet()
+            val profile = GamificationHub.loadProfile(app, stats)
             val lang = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
                 ?: AppLanguage.ID
             _state.value = BadgesUiState(
                 isLoading = false,
                 language = lang,
-                badges = Achievements.ALL.map { BadgeUi(it, it.key in earned) },
-                earnedCount = earned.size,
+                badges = Achievements.ALL.map { badge ->
+                    BadgeUi(
+                        def = badge,
+                        progress = Achievements.progressFor(
+                            badge,
+                            profile,
+                            stats.badgeTiers[badge.key] ?: 0,
+                        ),
+                    )
+                },
+                earnedCount = stats.badgeTiers.size,
                 totalCount = Achievements.ALL.size,
                 xp = stats.xp,
                 level = Gamification.levelFor(stats.xp),

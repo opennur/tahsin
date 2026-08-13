@@ -34,6 +34,8 @@ import com.tahsin.app.ui.components.AyahButton
 import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahCard
 import com.tahsin.app.ui.components.AyahText
+import com.tahsin.app.ui.components.GoalProgressBar
+import com.tahsin.app.util.BadgeProgress
 
 /**
  * Layar Penghargaan: ringkasan level/XP + daftar semua badge
@@ -91,7 +93,7 @@ fun BadgesScreen(
                     // ---- Ringkasan level & XP ----
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         StatCard(
-                            label = "Level ${state.level}",
+                            label = "${strings.levelLabel} ${state.level}",
                             value = "${state.xp} XP",
                             modifier = Modifier.weight(1f),
                         )
@@ -104,14 +106,14 @@ fun BadgesScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // ---- Daftar badge ----
+                    // ---- Daftar badge (progres tier tak terbatas) ----
                     state.badges.forEach { badge ->
                         BadgeRow(
                             emoji = badge.def.emoji,
                             title = AppStrings.badgeTitle(badge.def.key, state.language),
                             description = AppStrings.badgeDesc(badge.def.key, state.language),
-                            earned = badge.earned,
-                            earnedLabel = strings.badgesEarned,
+                            progress = badge.progress,
+                            tierLabel = strings.badgesTierLabel,
                             lockedLabel = strings.badgesLocked,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -143,45 +145,59 @@ private fun StatCard(
     }
 }
 
-/** Satu baris badge: emoji + judul + deskripsi + status. Terkunci diredupkan. */
+/**
+ * Satu baris badge: emoji + judul + deskripsi + TIER + progress menuju tier
+ * berikutnya (target tak terbatas). Terkunci (tier 0) diredupkan.
+ */
 @Composable
 private fun BadgeRow(
     emoji: String,
     title: String,
     description: String,
-    earned: Boolean,
-    earnedLabel: String,
+    progress: BadgeProgress,
+    tierLabel: String,
     lockedLabel: String,
 ) {
-    val emojiAlpha = if (earned) 1f else 0.35f
+    val unlocked = progress.isUnlocked
+    val emojiAlpha = if (unlocked) 1f else 0.35f
     AyahCard(modifier = Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            AyahText(
-                emoji,
-                style = AyahTypography.Heading1,
-                modifier = Modifier.width(48.dp).graphicsLayer { alpha = emojiAlpha },
-            )
-            Column(modifier = Modifier.weight(1f)) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 AyahText(
-                    title,
-                    style = AyahTypography.Body2.copy(
-                        color = if (earned) AyahColors.TextPrimary else AyahColors.TextSecondary,
-                        fontWeight = FontWeight.SemiBold,
+                    emoji,
+                    style = AyahTypography.Heading1,
+                    modifier = Modifier.width(48.dp).graphicsLayer { alpha = emojiAlpha },
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    AyahText(
+                        title,
+                        style = AyahTypography.Body2.copy(
+                            color = if (unlocked) AyahColors.TextPrimary else AyahColors.TextSecondary,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    )
+                    AyahText(
+                        description,
+                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                AyahText(
+                    if (unlocked) tierLabel.format(progress.currentTier) else lockedLabel,
+                    style = AyahTypography.Caption.copy(
+                        color = if (unlocked) AyahColors.Success else AyahColors.TextSecondary,
+                        fontWeight = FontWeight.Medium,
                     ),
                 )
-                AyahText(
-                    description,
-                    style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                )
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            // Progress menuju tier berikutnya — selalu ada target baru.
+            Spacer(modifier = Modifier.height(8.dp))
             AyahText(
-                if (earned) earnedLabel else lockedLabel,
-                style = AyahTypography.Caption.copy(
-                    color = if (earned) AyahColors.Success else AyahColors.TextSecondary,
-                    fontWeight = FontWeight.Medium,
-                ),
+                "${progress.metricValue}/${progress.nextThreshold}",
+                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
             )
+            Spacer(modifier = Modifier.height(4.dp))
+            GoalProgressBar(fraction = progress.fraction)
         }
     }
 }

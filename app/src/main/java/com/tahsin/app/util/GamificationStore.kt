@@ -2,6 +2,7 @@ package com.tahsin.app.util
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.time.LocalDate
@@ -26,8 +27,11 @@ data class GamificationStats(
     val lastActiveDay: Long = 0L,
     /** Hari beruntun aktif (0 = belum ada). */
     val streak: Int = 0,
-    /** ID badge yang sudah diraih (diisi oleh sistem achievement). */
-    val badges: List<String> = emptyList(),
+    /**
+     * Tier badge yang sudah dibuka: key badge → tier tertinggi (≥ 1).
+     * Badge progresif — tier terus bertambah tanpa batas ([Achievements]).
+     */
+    val badgeTiers: Map<String, Int> = emptyMap(),
 )
 
 /** Hasil pencatatan satu aktivitas: keadaan sebelum/sesudah + deteksi naik level. */
@@ -122,7 +126,6 @@ class GamificationStore internal constructor(private val file: File) {
 
     private val gson = Gson()
     private val statsType = object : TypeToken<GamificationStats>() {}.type
-
     /**
      * Kunci tulis GLOBAL (companion, bukan per-instance): award XP/cek badge
      * bisa datang dari beberapa ViewModel sekaligus — masing-masing membuat
@@ -141,8 +144,33 @@ class GamificationStore internal constructor(private val file: File) {
     fun read(): GamificationStats = synchronized(WRITE_LOCK) {
         runCatching {
             if (!file.exists()) GamificationStats()
-            else gson.fromJson<GamificationStats>(file.readText(), statsType) ?: GamificationStats()
+            else {
+                val raw = file.readText()
+                val stats = gson.fromJson<GamificationStats>(raw, statsType) ?: GamificationStats()
+                migrateLegacyBadges(stats, raw)
+            }
         }.getOrDefault(GamificationStats())
+    }
+
+    /**
+     * Migrasi sekali jalan dari format lama (`badges`: list one-time) →
+     * [GamificationStats.badgeTiers] tier 1 (via [Achievements.legacyKeyMap]).
+     * Dijalankan saat file lama terbaca; hasil langsung di-persist supaya
+     * tidak dievaluasi ulang dan tidak memicu perayaan ulang tier 1.
+     */
+    private fun migrateLegacyBadges(stats: GamificationStats, raw: String): GamificationStats {
+        if (stats.badgeTiers.isNotEmpty()) return stats
+        val obj = runCatching { gson.fromJson(raw, JsonObject::class.java) }.getOrNull() ?: return stats
+        val legacy = obj.getAsJsonArray("badges") ?: return stats
+        val tiers = mutableMapOf<String, Int>()
+        legacy.forEach { el ->
+            val newKey = Achievements.legacyKeyMap[el.asString] ?: return@forEach
+            tiers[newKey] = 1
+        }
+        if (tiers.isEmpty()) return stats
+        val migrated = stats.copy(badgeTiers = tiers)
+        write(migrated)
+        return migrated
     }
 
     /** Simpan keadaan penuh (atomik: temp → rename, fallback tulis langsung). */

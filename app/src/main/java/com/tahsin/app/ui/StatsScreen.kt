@@ -164,7 +164,8 @@ fun StatsScreen(
                                     )
                                     val badge = Achievements.byKey(latestKey)
                                     AyahText(
-                                        "${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, state.language)}",
+                                        "${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, state.language)} · " +
+                                            strings.badgesTierLabel.format(state.latestBadgeTier),
                                         style = AyahTypography.Body2.copy(
                                             color = AyahColors.TextPrimary,
                                             fontWeight = FontWeight.Medium,

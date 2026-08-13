@@ -23,8 +23,8 @@ object GamificationHub {
         val app = context.applicationContext
         val g = GamificationStore(app)
         val result = g.recordActivity(xp)
-        val newBadges = checkAndUnlock(app, g)
-        celebrate(result, newBadges)
+        val newTiers = checkAndUnlock(app, g)
+        celebrate(result, newTiers)
         return result
     }
 
@@ -35,7 +35,7 @@ object GamificationHub {
      * Post satu perayaan paling penting: level-up > streak milestone > badge.
      * Satu event per pemanggilan agar dialog tidak menumpuk.
      */
-    private fun celebrate(result: ActivityResult, newBadges: List<BadgeDef>) {
+    private fun celebrate(result: ActivityResult, newTiers: Map<String, Int>) {
         if (result.leveledUp) {
             GamificationEvents.post(
                 CelebrationEvent(
@@ -54,11 +54,13 @@ object GamificationHub {
             )
             return
         }
-        if (newBadges.isNotEmpty()) {
+        if (newTiers.isNotEmpty()) {
+            val (key, tier) = newTiers.entries.first()
             GamificationEvents.post(
                 CelebrationEvent(
                     type = CelebrationType.BADGE_EARNED,
-                    badgeKey = newBadges.first().key,
+                    badgeKey = key,
+                    tier = tier,
                 ),
             )
         }
@@ -66,18 +68,24 @@ object GamificationHub {
 
     /**
      * Evaluasi semua badge terhadap progres saat ini; badge yang baru
-     * terpenuhi ditambahkan ke [GamificationStats.badges] dan di-persist.
+     * terpenuhi digabung ke [GamificationStats.badgeTiers] dan di-persist.
      * Mengembalikan daftar badge yang baru diraih (untuk notifikasi UI).
      */
-    fun checkAndUnlock(app: Context, g: GamificationStore = GamificationStore(app)): List<BadgeDef> =
+    /**
+     * Evaluasi semua badge terhadap progres saat ini; tier baru yang layak
+     * dibuka digabung (keep max) ke [GamificationStats.badgeTiers] lalu
+     * di-persist. Mengembalikan key → tier yang BARU dibuka (untuk perayaan).
+     */
+    fun checkAndUnlock(app: Context, g: GamificationStore = GamificationStore(app)): Map<String, Int> =
         g.withWriteLock {
             val stats = g.read()
             val profile = loadProfile(app, stats)
-            val newOnes = Achievements.newlyEarned(profile, stats.badges.toSet())
-            if (newOnes.isNotEmpty()) {
-                g.write(stats.copy(badges = (stats.badges + newOnes.map { it.key }).distinct()))
+            val unlocked = Achievements.newlyUnlocked(profile, stats.badgeTiers)
+            if (unlocked.isNotEmpty()) {
+                // Map + Map: sisi kanan menang (tier baru selalu lebih tinggi).
+                g.write(stats.copy(badgeTiers = stats.badgeTiers + unlocked))
             }
-            newOnes
+            unlocked
         }
 
     /** Rakit profil pemain dari semua store (membaca disk — panggil di IO). */

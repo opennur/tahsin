@@ -64,11 +64,13 @@ Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
   beruntun** dihitung per hari kalender, dan **target harian 50 XP** tampil
   dengan progress bar di beranda & Statistik. Naik level, capaian streak
   (3/7/14/30 hari), atau badge baru dirayakan lewat dialog + getar.
-- 🏅 **Penghargaan (badges)**: **13 lencana** — langkah pertama, streak 3/7,
-  level 2/5, 10 percobaan bacaan, bacaan sempurna (90+), 50/100 kata
-  dikuasai, ronde Dream BIG sempurna, 10 ronde, 5 sesi Arab, tamat satu surah
-  (semua ayat pernah dibaca). Layar daftar diraih/terkunci dari menu utama;
-  badge terbaru tampil di beranda & Statistik.
+- 🏅 **Penghargaan (badges)**: **8 lencana progresif** — XP (pencari ilmu),
+  streak, bacaan Tahsin, bacaan sempurna (90+), kosakata dikuasai, ronde
+  Dream BIG, sesi Belajar Arab, dan surah ditamatkan. Setiap lencana punya
+  **tier tak terbatas** (ambang naik terus: 50 kata, 100, 150, …) — begitu
+  satu tier terbuka, masih ada tier berikutnya untuk dikejar. Layar daftar
+  menampilkan tier saat ini + **progress bar menuju tier berikutnya**; badge
+  terbaru (beserta tier-nya) tampil di beranda & Statistik.
 - 🎯 **Kuis Ayat** (menu Kuis Ayat): dua mode pilihan ganda dari seluruh
   mushaf — **Lengkapi Ayat** (kata mana yang melengkapi ayat ini?) dan
   **Tebak Surah** (ayat ini dari surah apa?) — pengecoh dari kata dalam
@@ -166,7 +168,7 @@ app/src/main/java/com/tahsin/app/
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
 │                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
-│                   #   Achievements (katalog 13 badge + evaluator murni),
+│                   #   Achievements (8 badge progresif, tier tak terbatas),
 │                   #   GamificationStore/Hub/Events (XP, level, streak, perayaan),
 │                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
 │                   #   Reciter (qari' everyayah + kecepatan audio 0.5×–1.25×),
@@ -255,7 +257,7 @@ Test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
 ronde acak + bintang), **Belajar Arab** (`LughohParser`/`LughohEngine`: sesi
 acak, acak opsi, susun kata), **Kuis Ayat** (`AyatQuiz`/`SurahQuiz`: soal
 Lengkapi Ayat & Tebak Surah), sistem **gamification** (`GamificationStore`:
-level/streak/todayXp; `Achievements`: katalog badge & evaluator unlock), dan
+level/streak/todayXp; `Achievements`: badge progresif & evaluator tier), dan
 semua *progress store* (`ReadingStatsStore`, `VocabularyStatsStore`,
 `DreamBigProgressStore`, `LughohProgressStore`):
 

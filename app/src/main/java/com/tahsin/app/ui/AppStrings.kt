@@ -1,5 +1,7 @@
 package com.tahsin.app.ui
 
+import android.speech.SpeechRecognizer
+
 import com.tahsin.app.util.AppLanguage
 
 /**
@@ -63,7 +65,11 @@ data class Strings(
     val loadingMushaf: String,
     // Pesan ViewModel
     val msgMicPermission: String,
+    val msgCheckConnection: String,
     val msgSurahLoadFailed: String,
+    val msgMushafLoading: String,
+    val msgMushafLoadFailed: String,
+    val msgRetry: String,
     val msgAyahDone: String,
     val msgSurahDone: String,
     val msgMurojaahDone: String,
@@ -209,11 +215,13 @@ data class Strings(
     val badgesCount: String,
     val badgesLocked: String,
     val badgesEarned: String,
+    val badgesTierLabel: String,
     // Gamification header (Home & ringkasan statistik)
     val homeLevelLine: String,
     val homeStreakLine: String,
     val homeBadgeLabel: String,
     val homeGoalLine: String,
+    val levelLabel: String,
     // Perayaan gamification
     val celebrateLevelUpTitle: String,
     val celebrateLevelUpBody: String,
@@ -266,14 +274,14 @@ object AppStrings {
         sectionReciter = "Qari' (Perawi)",
         sectionSpeed = "Kecepatan Audio",
         audioReciterLabel = "Qari'",
-        sectionDaily = "Ayah of the Day",
-        sectionStreakReminder = "Streak Reminder",
+        sectionDaily = "Ayat Hari Ini",
+        sectionStreakReminder = "Pengingat Streak",
         menuStats = "📊 Statistik",
         menuQuiz = "📝 Kuis",
         menuAudio = "🎵 Kelola Audio",
-        menuDownloadAll = "📥 Unduh Semua",
+        menuDownloadAll = "📥 Unduh Semua Audio",
         swipeHint = "Geser layar ke kiri/kanan untuk ganti ayat",
-        credit = "Made with ❤️ by OpenNur Project (FOSS)",
+        credit = "Dibuat dengan ❤️ oleh OpenNur Project (FOSS)",
         downloadNoticeTitle = "Mengunduh audio…",
         downloadNoticeBody = "Audio surah ini belum diunduh. Unduhan dimulai otomatis — " +
             "ikuti progres di atas tombol. Bacaan contoh akan diputar setelah unduhan selesai.",
@@ -285,7 +293,11 @@ object AppStrings {
         bgDeny = "Tidak, cukup saat aplikasi terbuka",
         loadingMushaf = "Memuat mushaf…",
         msgMicPermission = "Izin mikrofon diperlukan untuk mendeteksi bacaan.",
+        msgCheckConnection = "periksa koneksi",
         msgSurahLoadFailed = "Gagal memuat surah",
+        msgMushafLoading = "Memuat mushaf…",
+        msgMushafLoadFailed = "Gagal memuat mushaf.",
+        msgRetry = "🔄 Coba Lagi",
         msgAyahDone = "✅ Ayat selesai — lanjut ke ayat berikutnya",
         msgSurahDone = "✅ Surah selesai — lanjut ke surah berikutnya",
         msgMurojaahDone = "🎉 Selesai muroja'ah — seluruh Al-Qur'an dibaca benar!",
@@ -424,16 +436,18 @@ object AppStrings {
         badgesCount = "%d/%d lencana diraih",
         badgesLocked = "Terkunci",
         badgesEarned = "Diraih",
+        badgesTierLabel = "Tingkat %d",
         homeLevelLine = "Level %d · %d XP",
         homeStreakLine = "🔥 %d hari beruntun",
         homeBadgeLabel = "Badge terbaru:",
         homeGoalLine = "🎯 Target harian: %d/%d XP",
+        levelLabel = "Level",
         celebrateLevelUpTitle = "🎉 Naik Level!",
         celebrateLevelUpBody = "Selamat! Kamu sekarang di Level %d.",
         celebrateStreakTitle = "🔥 Streak!",
         celebrateStreakBody = "%d hari beruntun — pertahankan!",
         celebrateBadgeTitle = "🏅 Badge Baru!",
-        celebrateBadgeBody = "Kamu meraih badge: %s",
+        celebrateBadgeBody = "Badge %s mencapai tingkat %d.",
     )
 
     val English = Strings(
@@ -477,7 +491,7 @@ object AppStrings {
         menuStats = "📊 Stats",
         menuQuiz = "📝 Quiz",
         menuAudio = "🎵 Audio",
-        menuDownloadAll = "📥 Download All",
+        menuDownloadAll = "📥 Download All Audio",
         swipeHint = "Swipe the screen left/right to change ayah",
         credit = "Made with ❤️ by OpenNur Project (FOSS)",
         downloadNoticeTitle = "Downloading audio…",
@@ -492,7 +506,11 @@ object AppStrings {
         bgDeny = "No, only while the app is open",
         loadingMushaf = "Loading mushaf…",
         msgMicPermission = "Microphone permission is required to check your recitation.",
+        msgCheckConnection = "check connection",
         msgSurahLoadFailed = "Failed to load surah",
+        msgMushafLoading = "Loading mushaf…",
+        msgMushafLoadFailed = "Failed to load mushaf.",
+        msgRetry = "🔄 Try Again",
         msgAyahDone = "✅ Ayah complete — moving to the next ayah",
         msgSurahDone = "✅ Surah complete — moving to the next surah",
         msgMurojaahDone = "🎉 Muraja'ah complete — the whole Qur'an read correctly!",
@@ -631,50 +649,42 @@ object AppStrings {
         badgesCount = "%d/%d badges earned",
         badgesLocked = "Locked",
         badgesEarned = "Earned",
+        badgesTierLabel = "Tier %d",
         homeLevelLine = "Level %d · %d XP",
         homeStreakLine = "🔥 %d-day streak",
         homeBadgeLabel = "Latest badge:",
         homeGoalLine = "🎯 Daily goal: %d/%d XP",
+        levelLabel = "Level",
         celebrateLevelUpTitle = "🎉 Level Up!",
         celebrateLevelUpBody = "Congrats! You're now Level %d.",
         celebrateStreakTitle = "🔥 Streak!",
         celebrateStreakBody = "%d-day streak — keep it up!",
         celebrateBadgeTitle = "🏅 New Badge!",
-        celebrateBadgeBody = "You earned the badge: %s",
+        celebrateBadgeBody = "Badge %s reached tier %d.",
     )
 
     /** Judul badge terjemahan — key = [com.tahsin.app.util.BadgeDef.key]. */
     fun badgeTitle(key: String, lang: AppLanguage): String = when (lang) {
         AppLanguage.ID -> when (key) {
-            "first-step" -> "Langkah Pertama"
-            "streak-3" -> "Konsisten"
-            "streak-7" -> "Rajin"
-            "level-2" -> "Pembelajar"
-            "level-5" -> "Cendekia"
-            "tahsin-10" -> "Tekun Berlatih"
+            "xp" -> "Pencari Ilmu"
+            "streak" -> "Konsisten"
+            "tahsin" -> "Tekun Berlatih"
             "tahsin-perfect" -> "Bacaan Sempurna"
-            "vocab-50" -> "Pengumpul Kata"
-            "vocab-100" -> "Ahli Kosakata"
-            "dream-perfect" -> "Mimpi Besar"
-            "dream-10" -> "Pemain Tangguh"
-            "lughoh-5" -> "Poliglot Pemula"
-            "surah-complete" -> "Penuntas Surah"
+            "vocab" -> "Pengumpul Kata"
+            "dream" -> "Mimpi Besar"
+            "lughoh" -> "Poliglot Pemula"
+            "surah" -> "Penuntas Surah"
             else -> key
         }
         AppLanguage.EN -> when (key) {
-            "first-step" -> "First Step"
-            "streak-3" -> "Consistent"
-            "streak-7" -> "Diligent"
-            "level-2" -> "Learner"
-            "level-5" -> "Scholar"
-            "tahsin-10" -> "Dedicated Reciter"
+            "xp" -> "Knowledge Seeker"
+            "streak" -> "Consistent"
+            "tahsin" -> "Dedicated Reciter"
             "tahsin-perfect" -> "Perfect Recitation"
-            "vocab-50" -> "Word Collector"
-            "vocab-100" -> "Vocabulary Master"
-            "dream-perfect" -> "Big Dreamer"
-            "dream-10" -> "Seasoned Player"
-            "lughoh-5" -> "Budding Polyglot"
-            "surah-complete" -> "Surah Finisher"
+            "vocab" -> "Word Collector"
+            "dream" -> "Big Dreamer"
+            "lughoh" -> "Budding Polyglot"
+            "surah" -> "Surah Finisher"
             else -> key
         }
     }
@@ -682,36 +692,54 @@ object AppStrings {
     /** Deskripsi badge terjemahan — key = [com.tahsin.app.util.BadgeDef.key]. */
     fun badgeDesc(key: String, lang: AppLanguage): String = when (lang) {
         AppLanguage.ID -> when (key) {
-            "first-step" -> "Raih XP pertamamu."
-            "streak-3" -> "Aktif 3 hari berturut-turut."
-            "streak-7" -> "Aktif 7 hari berturut-turut."
-            "level-2" -> "Capai level 2."
-            "level-5" -> "Capai level 5."
-            "tahsin-10" -> "Selesaikan 10 percobaan bacaan."
-            "tahsin-perfect" -> "Baca satu ayat dengan skor 90+."
-            "vocab-50" -> "Kuasai 50 kata kosakata."
-            "vocab-100" -> "Kuasai 100 kata kosakata."
-            "dream-perfect" -> "Skor sempurna dalam satu ronde Dream BIG."
-            "dream-10" -> "Mainkan 10 ronde Dream BIG."
-            "lughoh-5" -> "Selesaikan 5 sesi Belajar Arab."
-            "surah-complete" -> "Tamatkan satu surah: semua ayatnya pernah dibaca."
+            "xp" -> "Kumpulkan XP untuk naik level."
+            "streak" -> "Pertahankan streak hari beruntun."
+            "tahsin" -> "Selesaikan percobaan bacaan Tahsin."
+            "tahsin-perfect" -> "Baca ayat dengan skor 90+."
+            "vocab" -> "Kuasai kata kosakata."
+            "dream" -> "Mainkan ronde Dream BIG."
+            "lughoh" -> "Selesaikan sesi Belajar Arab."
+            "surah" -> "Tamatkan surah: semua ayatnya pernah dibaca."
             else -> ""
         }
         AppLanguage.EN -> when (key) {
-            "first-step" -> "Earn your first XP."
-            "streak-3" -> "Stay active 3 days in a row."
-            "streak-7" -> "Stay active 7 days in a row."
-            "level-2" -> "Reach level 2."
-            "level-5" -> "Reach level 5."
-            "tahsin-10" -> "Complete 10 recitation attempts."
-            "tahsin-perfect" -> "Recite one ayah with a 90+ score."
-            "vocab-50" -> "Master 50 vocabulary words."
-            "vocab-100" -> "Master 100 vocabulary words."
-            "dream-perfect" -> "Score a perfect round in Dream BIG."
-            "dream-10" -> "Play 10 Dream BIG rounds."
-            "lughoh-5" -> "Finish 5 Learn Arabic sessions."
-            "surah-complete" -> "Complete a surah: every ayah read at least once."
+            "xp" -> "Earn XP to level up."
+            "streak" -> "Keep your daily streak alive."
+            "tahsin" -> "Complete Tahsin recitation attempts."
+            "tahsin-perfect" -> "Recite ayahs with a 90+ score."
+            "vocab" -> "Master vocabulary words."
+            "dream" -> "Play Dream BIG rounds."
+            "lughoh" -> "Finish Learn Arabic sessions."
+            "surah" -> "Complete a surah: every ayah read at least once."
             else -> ""
+        }
+    }
+
+    /**
+     * Pesan error STT terjemahan dari kode [SpeechRecognizer] — pembungkus
+     * STT tetap netral bahasa (hanya mengirim kode mentah).
+     */
+    fun sttErrorMessage(error: Int, lang: AppLanguage): String {
+        val id = lang == AppLanguage.ID
+        return when (error) {
+            SpeechRecognizer.ERROR_NO_MATCH ->
+                if (id) "Tidak ada yang cocok terdeteksi — coba baca lebih pelan dan jelas."
+                else "Nothing matched — try reciting slower and clearer."
+            SpeechRecognizer.ERROR_SPEECH_TIMEOUT ->
+                if (id) "Tidak ada suara terdeteksi (timeout)."
+                else "No speech detected (timeout)."
+            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ->
+                if (id) "Izin mikrofon belum diberikan."
+                else "Microphone permission not granted."
+            SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT ->
+                if (id) "STT butuh internet (atau pasang paket bahasa Arab offline di pengaturan HP)."
+                else "Speech recognition needs internet (or install the offline Arabic pack in device settings)."
+            SpeechRecognizer.ERROR_RECOGNIZER_BUSY ->
+                if (id) "SpeechRecognizer sedang sibuk — coba lagi."
+                else "Speech recognizer is busy — try again."
+            else ->
+                if (id) "Error speech recognition (kode $error)."
+                else "Speech recognition error (code $error)."
         }
     }
 }

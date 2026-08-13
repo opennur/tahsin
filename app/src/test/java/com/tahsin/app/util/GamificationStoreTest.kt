@@ -102,11 +102,11 @@ class GamificationStoreTest {
                 todayXp = 30,
                 lastActiveDay = 42,
                 streak = 3,
-                badges = listOf("first-step"),
+                badgeTiers = mapOf("xp" to 2),
             ),
         )
         assertEquals(
-            GamificationStats(xp = 250, todayXp = 30, lastActiveDay = 42, streak = 3, badges = listOf("first-step")),
+            GamificationStats(xp = 250, todayXp = 30, lastActiveDay = 42, streak = 3, badgeTiers = mapOf("xp" to 2)),
             store().read(),
         )
         assertFalse(file.readText().isBlank())
@@ -116,6 +116,21 @@ class GamificationStoreTest {
     fun `read - file rusak - default (tidak crash)`() {
         file.writeText("bukan json{{{")
         assertEquals(GamificationStats(), store().read())
+    }
+
+    @Test
+    fun `read - format lama (badges list) - migrasi ke badgeTiers tier 1`() {
+        file.writeText(
+            """{"xp":100,"todayXp":10,"lastActiveDay":5,"streak":2,"badges":["vocab-50","streak-7","dream-10","tidak-ada"]}""",
+        )
+        val s = store().read()
+        assertEquals(
+            mapOf("vocab" to 1, "streak" to 1, "dream" to 1),
+            s.badgeTiers,
+        )
+        assertEquals(100, s.xp) // nilai lain tetap dipertahankan
+        // Migrasi di-persist: read berikutnya tidak perlu migrasi ulang.
+        assertEquals(s, store().read())
     }
 
     @Test

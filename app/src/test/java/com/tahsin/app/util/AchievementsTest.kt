@@ -7,27 +7,24 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Tes katalog badge & evaluator unlock (murni — tanpa Android). */
+/** Tes badge progresif (metrik + tier tak terbatas) — murni, tanpa Android. */
 class AchievementsTest {
 
     private fun profile(
         xp: Int = 0,
         streak: Int = 0,
         ayahAttempts: Int = 0,
-        bestAyahScore: Int = 0,
+        perfectAyahs: Int = 0,
         wordsMastered: Int = 0,
-        dreamBigBest: Int = 0,
         dreamBigRounds: Int = 0,
         lughohRounds: Int = 0,
         surahsCompleted: Int = 0,
     ) = PlayerProfile(
         xp = xp,
         streak = streak,
-        level = Gamification.levelFor(xp),
         ayahAttempts = ayahAttempts,
-        bestAyahScore = bestAyahScore,
+        perfectAyahs = perfectAyahs,
         wordsMastered = wordsMastered,
-        dreamBigBest = dreamBigBest,
         dreamBigRounds = dreamBigRounds,
         lughohRounds = lughohRounds,
         surahsCompleted = surahsCompleted,
@@ -56,12 +53,10 @@ class AchievementsTest {
             ayahCounts = mapOf(1 to 2),
         )
         assertEquals(5, p.ayahAttempts)
-        assertEquals(95, p.bestAyahScore)
+        assertEquals(1, p.perfectAyahs) // hanya ayat 2 (95 ≥ 90)
         assertEquals(1, p.wordsMastered)
-        assertEquals(10, p.dreamBigBest)
         assertEquals(12, p.dreamBigRounds)
         assertEquals(4, p.lughohRounds)
-        assertEquals(2, p.level)
         assertEquals(1, p.surahsCompleted) // surah 1: ayat 1 & 2 keduanya pernah dibaca
     }
 
@@ -79,71 +74,105 @@ class AchievementsTest {
             gamification = GamificationStats(),
             ayahCounts = mapOf(2 to 4),
         )
-        assertEquals(0, p.surahsCompleted) // ayat 2 & 4 belum pernah dibaca
+        assertEquals(0, p.surahsCompleted)
     }
 
-    // ---- newlyEarned ----
+    // ---- highestReachableTier (tak terbatas) ----
 
     @Test
-    fun `newlyEarned - profil kosong - tidak ada badge`() {
-        val earned = Achievements.newlyEarned(profile(), emptySet())
-        assertTrue(earned.isEmpty())
+    fun `highestReachableTier - xp mengikuti kurva level`() {
+        val xpBadge = Achievements.byKey("xp")!!
+        assertEquals(0, Achievements.highestReachableTier(xpBadge, 0))
+        assertEquals(1, Achievements.highestReachableTier(xpBadge, 100))
+        assertEquals(1, Achievements.highestReachableTier(xpBadge, 399))
+        assertEquals(2, Achievements.highestReachableTier(xpBadge, 400))
+        assertEquals(6, Achievements.highestReachableTier(xpBadge, 3600)) // 100·6²=3600 → tier 6
     }
 
     @Test
-    fun `newlyEarned - hanya badge yang kondisinya terpenuhi`() {
-        val earned = Achievements.newlyEarned(
-            profile(xp = 150, streak = 4, ayahAttempts = 12),
-            emptySet(),
+    fun `highestReachableTier - vocab 50 per tier, naik terus`() {
+        val vocab = Achievements.byKey("vocab")!!
+        assertEquals(0, Achievements.highestReachableTier(vocab, 49))
+        assertEquals(1, Achievements.highestReachableTier(vocab, 50))
+        assertEquals(2, Achievements.highestReachableTier(vocab, 100))
+        assertEquals(5, Achievements.highestReachableTier(vocab, 260)) // 50·5=250 ≤ 260 < 300
+    }
+
+    // ---- newlyUnlocked ----
+
+    @Test
+    fun `newlyUnlocked - profil kosong - tidak ada`() {
+        assertTrue(Achievements.newlyUnlocked(profile(), emptyMap()).isEmpty())
+    }
+
+    @Test
+    fun `newlyUnlocked - buka beberapa badge sekaligus dengan tier masing-masing`() {
+        val unlocked = Achievements.newlyUnlocked(
+            profile(xp = 450, streak = 7, ayahAttempts = 25, perfectAyahs = 2, wordsMastered = 120),
+            emptyMap(),
         )
-        val keys = earned.map { it.key }
-        assertTrue("first-step" in keys)
-        assertTrue("streak-3" in keys)
-        assertTrue("level-2" in keys)
-        assertTrue("tahsin-10" in keys)
-        assertFalse("streak-7" in keys)
-        assertFalse("level-5" in keys)
-        assertFalse("vocab-50" in keys)
+        assertEquals(2, unlocked["xp"])        // 400 ≤ 450 < 900
+        assertEquals(2, unlocked["streak"])    // 3·2=6 ≤ 7 < 9
+        assertEquals(2, unlocked["tahsin"])    // 10·2=20 ≤ 25 < 30
+        assertEquals(2, unlocked["tahsin-perfect"]) // tier = jumlah perfect (2)
+        assertEquals(2, unlocked["vocab"])     // 50·2=100 ≤ 120 < 150
+        assertFalse("dream" in unlocked)   // belum main → tidak ikut
     }
 
     @Test
-    fun `newlyEarned - badge yang sudah diraih tidak diulang`() {
-        val earned = Achievements.newlyEarned(profile(xp = 150), setOf("first-step", "level-2"))
-        val keys = earned.map { it.key }
-        assertFalse("first-step" in keys)
-        assertFalse("level-2" in keys)
-        assertTrue(keys.isEmpty()) // semua badge yang terpenuhi sudah diraih
+    fun `newlyUnlocked - tier yang sudah diraih tidak diulang`() {
+        val unlocked = Achievements.newlyUnlocked(
+            profile(xp = 450),
+            mapOf("xp" to 2, "streak" to 1),
+        )
+        assertFalse("xp" in unlocked) // sudah tier 2 = maksimal
+        assertFalse("streak" in unlocked) // streak 0 < ambang tier 1
     }
 
     @Test
-    fun `badge - vocab-50 terpenuhi saat 50 kata dikuasai`() {
-        val earned = Achievements.newlyEarned(profile(wordsMastered = 50), emptySet())
-        assertTrue(earned.any { it.key == "vocab-50" })
+    fun `newlyUnlocked - naik multi-tier dalam satu evaluasi`() {
+        // Dari tier 1 → langsung tier 5 (metrik sudah jauh melewati ambang).
+        val unlocked = Achievements.newlyUnlocked(
+            profile(wordsMastered = 260),
+            mapOf("vocab" to 1),
+        )
+        assertEquals(5, unlocked["vocab"])
+    }
+
+    // ---- progressFor ----
+
+    @Test
+    fun `progressFor - tier saat ini, nilai, dan ambang berikutnya`() {
+        val p = Achievements.progressFor(
+            Achievements.byKey("vocab")!!,
+            profile(wordsMastered = 120),
+            earnedTier = 2,
+        )
+        assertEquals(2, p.currentTier)
+        assertTrue(p.isUnlocked)
+        assertEquals(120, p.metricValue)
+        assertEquals(150, p.nextThreshold) // 50·3
+        assertEquals(120f / 150f, p.fraction, 0.001f)
     }
 
     @Test
-    fun `badge - dream-perfect butuh skor ronde penuh`() {
-        val p = profile(dreamBigBest = 9)
-        assertFalse(Achievements.newlyEarned(p, emptySet()).any { it.key == "dream-perfect" })
-        val full = profile(dreamBigBest = 10)
-        assertTrue(Achievements.newlyEarned(full, emptySet()).any { it.key == "dream-perfect" })
+    fun `progressFor - terkunci menuju ambang pertama`() {
+        val p = Achievements.progressFor(
+            Achievements.byKey("vocab")!!,
+            profile(wordsMastered = 25),
+            earnedTier = 0,
+        )
+        assertFalse(p.isUnlocked)
+        assertEquals(0, p.currentTier)
+        assertEquals(50, p.nextThreshold)
     }
 
-    @Test
-    fun `badge - tahsin-perfect butuh skor ayat 90+`() {
-        assertFalse(Achievements.newlyEarned(profile(bestAyahScore = 89), emptySet()).any { it.key == "tahsin-perfect" })
-        assertTrue(Achievements.newlyEarned(profile(bestAyahScore = 90), emptySet()).any { it.key == "tahsin-perfect" })
-    }
+    // ---- katalog ----
 
     @Test
-    fun `badge - surah-complete butuh minimal satu surah tuntas`() {
-        assertFalse(Achievements.newlyEarned(profile(surahsCompleted = 0), emptySet()).any { it.key == "surah-complete" })
-        assertTrue(Achievements.newlyEarned(profile(surahsCompleted = 1), emptySet()).any { it.key == "surah-complete" })
-    }
-
-    @Test
-    fun `byKey - key tak dikenal - null`() {
+    fun `katalog - 8 badge progresif, byKey untuk yang tak dikenal = null`() {
+        assertEquals(8, Achievements.ALL.size)
+        assertTrue(Achievements.ALL.all { it.key.isNotBlank() && it.emoji.isNotBlank() })
         assertEquals(null, Achievements.byKey("tidak-ada"))
-        assertEquals("first-step", Achievements.byKey("first-step")?.key)
     }
 }

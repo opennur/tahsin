@@ -70,6 +70,7 @@ fun AyahErrorView(
     message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    retryLabel: String = "🔄 Coba Lagi",
 ) {
     Column(
         modifier = modifier
@@ -91,7 +92,7 @@ fun AyahErrorView(
             ),
         )
         Spacer(modifier = Modifier.height(16.dp))
-        AyahButton(text = "🔄 Coba Lagi", onClick = onRetry)
+        AyahButton(text = retryLabel, onClick = onRetry)
     }
 }
 

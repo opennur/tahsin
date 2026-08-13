@@ -13,6 +13,8 @@ data class CelebrationEvent(
     val level: Int = 0,
     val streak: Int = 0,
     val badgeKey: String = "",
+    /** Tier badge yang baru dibuka (untuk event BADGE_EARNED). */
+    val tier: Int = 0,
 )
 
 /**
