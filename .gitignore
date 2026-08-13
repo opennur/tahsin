@@ -10,4 +10,5 @@ local.properties
 *.apk
 *.aab
 .kotlin/errors/
-.reasonix/tasks/
+.reasonix/tasks/__pycache__/
+*.pyc
