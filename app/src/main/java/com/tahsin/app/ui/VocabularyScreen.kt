@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -58,6 +59,7 @@ fun VocabularyScreen(
 ) {
     val context = LocalContext.current
     val viewModel: VocabularyViewModel = viewModel(factory = vocabularyViewModelFactory(context))
+    LaunchedEffect(viewModel) { viewModel.refreshLanguage() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
     val arabicFamily = remember { FontStore(context).loadFamily(ArabicFont.UTSMANI) }

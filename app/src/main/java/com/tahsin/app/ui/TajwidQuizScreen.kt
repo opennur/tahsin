@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,7 @@ fun TajwidQuizScreen(
 ) {
     val context = LocalContext.current
     val viewModel: TajwidQuizViewModel = viewModel(factory = tajwidQuizViewModelFactory(context))
+    LaunchedEffect(viewModel) { viewModel.refreshLanguage() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
     val arabicFamily = remember { FontStore(context).loadFamily(ArabicFont.UTSMANI) }

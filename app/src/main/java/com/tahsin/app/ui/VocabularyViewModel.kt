@@ -104,6 +104,27 @@ class VocabularyViewModel(
         audioPlayer.stop()
     }
 
+    /**
+     * Sinkronkan bahasa terbaru dari pengaturan. VM layar fitur di-cache per
+     * Activity (`viewModel(factory)` default owner = Activity), jadi bahasa
+     * awal bisa basi setelah user pindah bahasa di Pengaturan — UI memanggil
+     * ini setiap layar terbuka.
+     */
+    fun refreshLanguage() {
+        val lang = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
+            ?: AppLanguage.ID
+        val s = _state.value
+        if (s.language == lang) return
+        _state.update { it.copy(language = lang) }
+        // Opsi soal dibuat dalam bahasa saat itu → regenerasi biar ikut bahasa
+        // baru. Hanya kalau soal belum dijawab: yang sudah dijawab skornya
+        // sudah dihitung — jangan sampai bisa dijawab ulang (XP ganda).
+        val s2 = _state.value
+        if (s2.mode == VocabMode.QUIZ && s2.question != null && s2.selected == null) {
+            loadNextQuestion()
+        }
+    }
+
     // ---- Sesi kartu ----
 
     /** Bangun sesi: kartu jatuh tempo dulu, lalu kata baru (frekuensi). */

@@ -68,7 +68,7 @@ class DreamBigViewModel(
     private val app: Context,
     private val vocabRepository: VocabularyRepository,
     private val progressStore: DreamBigProgressStore,
-    settings: SettingsStore,
+    private val settings: SettingsStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DreamBigUiState())
@@ -84,6 +84,9 @@ class DreamBigViewModel(
 
     /** Soal ronde aktif (private — UI cuma lihat state.quiz). */
     private var roundQuestions: List<VocabQuizQuestion> = emptyList()
+
+    /** Sasaran ronde aktif (language-neutral) — untuk regenerasi saat bahasa berganti. */
+    private var roundTargets: List<VocabEntry> = emptyList()
 
     init {
         viewModelScope.launch {
@@ -122,6 +125,7 @@ class DreamBigViewModel(
         if (questions.isEmpty()) return
 
         roundQuestions = questions
+        roundTargets = targets
         _state.update {
             it.copy(
                 mode = DreamBigMode.QUIZ,
@@ -210,6 +214,44 @@ class DreamBigViewModel(
 
     /** Main lagi (ronde baru). */
     fun playAgain() = startRound()
+
+    /**
+     * Sinkronkan bahasa terbaru dari pengaturan (VM di-cache per Activity) —
+     * opsi soal dibuat dalam bahasa saat itu, jadi ronde aktif di-regenerasi.
+     * Dipanggil UI setiap layar terbuka.
+     */
+    fun refreshLanguage() {
+        val lang = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
+            ?: AppLanguage.ID
+        val s = _state.value
+        if (s.language == lang) return
+        _state.update { it.copy(language = lang) }
+        // Soal belum dijawab → regenerasi opsi dalam bahasa baru. Yang sudah
+        // dijawab dibiarkan (skor sudah dihitung; `answer()` memblokir ulang).
+        if (s.quiz != null && s.quiz.selected == null && roundTargets.isNotEmpty()) {
+            regenerateRound(lang)
+        }
+    }
+
+    /** Bangun ulang soal ronde aktif dalam bahasa baru (sasaran tetap sama). */
+    private fun regenerateRound(lang: AppLanguage) {
+        val s = _state.value
+        val quiz = s.quiz ?: return
+        val questions = roundTargets.mapNotNull { target ->
+            DreamBigGame.question(
+                pool = vocabEntries,
+                target = target,
+                lang = lang,
+                reverse = Random.Default.nextBoolean(),
+                random = Random.Default,
+            )
+        }
+        if (questions.size != roundTargets.size) return // kolam berubah → biarkan apa adanya
+        roundQuestions = questions
+        _state.update {
+            it.copy(quiz = quiz.copy(question = questions.getOrNull(quiz.index) ?: quiz.question))
+        }
+    }
 
     /** Kembali ke layar awal (skor terbaik tetap tersimpan). */
     fun backToHome() {

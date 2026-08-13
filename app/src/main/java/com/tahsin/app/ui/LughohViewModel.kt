@@ -89,7 +89,7 @@ class LughohViewModel(
     private val app: Context,
     private val repository: LughohRepository,
     private val progressStore: LughohProgressStore,
-    settings: SettingsStore,
+    private val settings: SettingsStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LughohUiState())
@@ -266,6 +266,18 @@ class LughohViewModel(
 
     /** Ulangi sesi latihan acak. */
     fun restartExercises() = startRandomExercises()
+
+    /**
+     * Sinkronkan bahasa terbaru dari pengaturan (VM di-cache per Activity).
+     * Konten pelajaran bersifat data (Arab + Indonesia, tanpa teks EN), jadi
+     * yang ikut bahasa hanyalah string UI — dipanggil setiap layar terbuka.
+     */
+    fun refreshLanguage() {
+        val lang = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
+            ?: AppLanguage.ID
+        if (_state.value.language == lang) return
+        _state.update { it.copy(language = lang) }
+    }
 
     /** Kembali ke halaman awal (dari hasil sesi). */
     fun backToLesson() = backToHome()

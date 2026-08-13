@@ -66,6 +66,9 @@ class AyatQuizViewModel(
     private var wordsBySurah: Map<Int, List<String>>? = null
     private val random = Random(System.currentTimeMillis())
 
+    /** Ayat sumber soal aktif — untuk menerjemahkan ulang saat bahasa berganti. */
+    private var currentEntry: SearchableAyah? = null
+
     init {
         val names = repository.surahList().associate { it.number to it.nameLatin }
         val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
@@ -127,6 +130,7 @@ class AyatQuizViewModel(
                 }
             }
             val prev = _state.value
+            currentEntry = entry
             val label = entry?.let { e ->
                 "${prev.surahNames[e.surahNumber] ?: "Surah ${e.surahNumber}"} :${e.ayahNumber}"
             }.orEmpty()
@@ -141,6 +145,24 @@ class AyatQuizViewModel(
                 ayahLabel = label,
                 translation = translation,
             )
+        }
+    }
+
+    /**
+     * Sinkronkan bahasa terbaru dari pengaturan (VM di-cache per Activity) —
+     * terjemahan ayat sumber ikut bahasa baru; dipanggil UI saat layar terbuka.
+     */
+    fun refreshLanguage() {
+        val lang = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
+            ?: AppLanguage.ID
+        val s = _state.value
+        if (s.language == lang) return
+        _state.update { it.copy(language = lang) }
+        val e = currentEntry
+        if (e != null) {
+            _state.update {
+                it.copy(translation = if (lang == AppLanguage.EN) e.translationEn else e.translationId)
+            }
         }
     }
 

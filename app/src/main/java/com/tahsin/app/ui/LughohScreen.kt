@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +69,7 @@ fun LughohScreen(
 ) {
     val context = LocalContext.current
     val viewModel: LughohViewModel = viewModel(factory = lughohViewModelFactory(context))
+    LaunchedEffect(viewModel) { viewModel.refreshLanguage() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
     val arabicFamily = remember { FontStore(context).loadFamily(ArabicFont.UTSMANI) }

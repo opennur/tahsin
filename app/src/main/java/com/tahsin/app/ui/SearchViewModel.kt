@@ -62,6 +62,14 @@ class SearchViewModel(
         _state.value = SearchState(surahNames = names, language = language)
     }
 
+    /** Sinkronkan bahasa terbaru dari pengaturan (VM di-cache per Activity). */
+    fun refreshLanguage() {
+        val lang = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
+            ?: AppLanguage.ID
+        if (_state.value.language == lang) return
+        _state.update { it.copy(language = lang) }
+    }
+
     /** Ubah kata kunci; pencarian dijalankan setelah debounce. */
     fun setQuery(query: String) {
         _state.update { it.copy(query = query) }
