@@ -18,11 +18,11 @@ val keystoreProps = Properties().apply {
 val releaseSigningConfigured = keystoreProps.getProperty("storeFile") != null
 
 android {
-    namespace = "com.tahsin.app"
+    namespace = "org.opennur.tahsin"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.tahsin.app"
+        applicationId = "org.opennur.tahsin"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -123,28 +123,28 @@ tasks.register<JacocoReport>("jacocoCoreReport") {
     classDirectories.setFrom(
         fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
             include(
-                "com/tahsin/app/data/**",
-                "com/tahsin/app/util/Achievements*",
-                "com/tahsin/app/util/AppLanguage*",
-                "com/tahsin/app/util/ArabicNormalizer*",
-                "com/tahsin/app/util/AudioUrls*",
-                "com/tahsin/app/util/AyahOfTheDayPicker*",
-                "com/tahsin/app/util/AyahSearch*",
-                "com/tahsin/app/util/DownloadProgress*",
-                "com/tahsin/app/util/DreamBigProgressStore*",
-                "com/tahsin/app/util/GamificationEvents*",
-                "com/tahsin/app/util/GamificationStore*",
-                "com/tahsin/app/util/LughohProgressStore*",
-                "com/tahsin/app/util/ReadingStats*",
-                "com/tahsin/app/util/Reciter*",
-                "com/tahsin/app/util/VocabularyStatsStore*",
-                "com/tahsin/app/stt/TranscriptAligner*",
+                "org/opennur/tahsin/data/**",
+                "org/opennur/tahsin/util/Achievements*",
+                "org/opennur/tahsin/util/AppLanguage*",
+                "org/opennur/tahsin/util/ArabicNormalizer*",
+                "org/opennur/tahsin/util/AudioUrls*",
+                "org/opennur/tahsin/util/AyahOfTheDayPicker*",
+                "org/opennur/tahsin/util/AyahSearch*",
+                "org/opennur/tahsin/util/DownloadProgress*",
+                "org/opennur/tahsin/util/DreamBigProgressStore*",
+                "org/opennur/tahsin/util/GamificationEvents*",
+                "org/opennur/tahsin/util/GamificationStore*",
+                "org/opennur/tahsin/util/LughohProgressStore*",
+                "org/opennur/tahsin/util/ReadingStats*",
+                "org/opennur/tahsin/util/Reciter*",
+                "org/opennur/tahsin/util/VocabularyStatsStore*",
+                "org/opennur/tahsin/stt/TranscriptAligner*",
             )
             exclude(
                 // Sintetik Kotlin (lambdas, when-mappings, default-impl).
                 "**/*\$*",
                 // Lapisan Android dalam data/ (assets/files) — butuh Robolectric.
-                "com/tahsin/app/data/**/*Repository*",
+                "org/opennur/tahsin/data/**/*Repository*",
             )
         },
     )
