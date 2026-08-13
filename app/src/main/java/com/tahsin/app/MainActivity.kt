@@ -21,6 +21,7 @@ import com.tahsin.app.ui.AppStrings
 import com.tahsin.app.ui.AudioManagerScreen
 import com.tahsin.app.ui.DreamBigScreen
 import com.tahsin.app.ui.HomeScreen
+import com.tahsin.app.ui.LughohScreen
 import com.tahsin.app.ui.OpenTarget
 import com.tahsin.app.ui.SearchScreen
 import com.tahsin.app.ui.SettingsScreen
@@ -114,6 +115,7 @@ class MainActivity : ComponentActivity() {
                         onOpenSearch = { push(AppScreen.Search) },
                         onOpenAudioManager = { push(AppScreen.AudioManager) },
                         onOpenDreamBig = { push(AppScreen.DreamBig) },
+                        onOpenLughoh = { push(AppScreen.Lughoh) },
                         onOpenSettings = { push(AppScreen.Settings) },
                         settings = settingsState,
                     )
@@ -145,6 +147,7 @@ class MainActivity : ComponentActivity() {
                     AppScreen.Quiz -> TajwidQuizScreen(onBack = { pop() })
                     AppScreen.AudioManager -> AudioManagerScreen(onBack = { pop() })
                     AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
+                    AppScreen.Lughoh -> LughohScreen(onBack = { pop() })
                     AppScreen.Settings -> SettingsScreen(
                         onBack = { pop() },
                         settings = settingsState,

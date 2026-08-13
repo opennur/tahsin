@@ -46,6 +46,7 @@ fun HomeScreen(
     onOpenSearch: () -> Unit,
     onOpenAudioManager: () -> Unit,
     onOpenDreamBig: () -> Unit,
+    onOpenLughoh: () -> Unit,
     onOpenSettings: () -> Unit,
     settings: SettingsUiState,
     modifier: Modifier = Modifier,
@@ -123,7 +124,15 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 5: Pengaturan (penuh, disorot)
+        // Baris 5: Belajar Arab (penuh)
+        HomeMenuCard(
+            text = strings.menuLughoh,
+            onClick = onOpenLughoh,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Baris 6: Pengaturan (penuh, disorot)
         HomeMenuCard(
             text = strings.menuSettings,
             onClick = onOpenSettings,
