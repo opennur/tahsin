@@ -5,7 +5,9 @@
 Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf dengan gaya
 khat Utsmani, penilaian bacaan real-time lewat mikrofon, pewarnaan huruf tajwid,
 audio qari per ayat + per kata, dan **mode flow** untuk muroja'ah berkelanjutan
-tanpa melihat layar.
+tanpa melihat layar — plus **jalur belajar Qur'an & Bahasa Arab**: Kosakata,
+Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
+(metodologi ala Durusul Lughoh).
 
 > ⚠️ **Batasan jujur** — aplikasi ini adalah alat bantu latihan, **bukan pengganti guru**.
 > STT (speech-to-text) hanya membaca *teks* ucapan: aplikasi bisa menilai kata
@@ -15,29 +17,46 @@ tanpa melihat layar.
 
 ## Fitur
 
+- 🧭 **Menu utama** (layar beranda): semua fitur dibuka lewat kartu menu —
+  **Tahsin**, **Kosakata**, **Kuis Tajwid**, **Statistik**, **Pencarian**,
+  **Kelola Audio**, **Dream BIG**, **Belajar Arab**, dan **Pengaturan**.
 - 📖 **Mushaf gaya mushaf asli** — kata tersambung, susunan RTL, semua 114 surah,
   **offline bawaan** (Arab + terjemahan ID/EN di-bundle ke APK).
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
-- 📊 **Statistik & riwayat kesalahan** (persisten): setiap hasil bacaan final
-  disimpan per ayat — skor (0–100), jumlah percobaan, dan **kata yang sering
-  salah/terlewat** (dari `TranscriptAligner`). Layar **Statistik & Riwayat**
-  (drawer ⚙) menampilkan ringkasan global + "kata yang sering salah" per
-  surah; ketuk satu kata → langsung buka ayat itu untuk diperbaiki. Di layar
-  utama ada info cepat "N× dicoba · skor terbaik M%".
-- 🎨 **Warna tajwid** (nyala default, bisa dimatikan di drawer): mad (merah),
+- 📊 **Statistik gabungan semua challenge** (persisten): layar **Statistik**
+  mengagregasi seluruh aktivitas — Tahsin (skor per ayat 0–100 & jumlah
+  percobaan), **Dream BIG** (ronde & skor terbaik), **Belajar Arab** (sesi &
+  skor terbaik), dan **Kosakata** (kata dikuasai). Ringkasan: **Total Sesi,
+  Skor Terbaik %, Total Ronde, Kata Dikuasai** + rincian per fitur. Di layar
+  utama Tahsin tetap ada info cepat "N× dicoba · skor terbaik M%".
+- 🎨 **Warna tajwid** (nyala default, bisa dimatikan di menu Pengaturan): mad (merah),
   ghunnah (hijau), qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye),
   lam jalalah (teal).
+- 🔁 **Mode Flow (muroja'ah)**: kalau satu ayat selesai benar, otomatis lanjut ke
+  ayat berikutnya + mikrofon menyala lagi; **bunyi gagal ganda + getar** saat ada
+  kesalahan, beep sukses saat ayat tuntas — bisa muroja'ah tanpa lihat layar.
 - 🧠 **Mesin tajwid lengkap + kuis**: selain mad wajib/jaiz & lam jalalah yang
   sudah ada, engine kini mendeteksi **tafkhim/tarqiq** (huruf isti'la & ra'),
   **mad badal/iwad/aridh lis-sukun**, dan **tanda waqaf mushaf** (مـ wajib,
   لا jangan berhenti, ج boleh, صلي/قلي lebih utama, ∴ berpasangan) — muncul di
-  panel kata & daftar kesalahan. **📝 Kuis Tajwid** (drawer ⚙) menebak "hukum
+  panel kata & daftar kesalahan. **📝 Kuis Tajwid** (menu Kuis) menebak "hukum
   apa pada kata ini?" dari kata acak di seluruh mushaf (4 pilihan ganda, skor,
   penjelasan) — belajar, bukan cuma pewarnaan.
-- 🔁 **Mode Flow (muroja'ah)**: kalau satu ayat selesai benar, otomatis lanjut ke
-  ayat berikutnya + mikrofon menyala lagi; **bunyi gagal ganda + getar** saat ada
-  kesalahan, beep sukses saat ayat tuntas — bisa muroja'ah tanpa lihat layar.
+- 📖 **Kosakata Qur'an** (menu Kosakata): **589 kata terkurasi** dari seluruh
+  mushaf (mirror VocabKey) — kartu kata dengan arti + contoh ayat, sistem
+  SRS (kata baru vs. lagi diulang), mode **quiz** pilihan ganda, dan lompat
+  langsung ke ayat contoh.
+- 🎬 **Dream BIG** (menu Dream BIG, **arcade**): ronde kuis kosakata **tak
+  terbatas** — 10 soal diacak dari seluruh kosakata terkurasi setiap ronde;
+  rekor **skor, streak, dan jumlah ronde** tersimpan. Tanpa level/unlock,
+  bisa terus dimainkan.
+- 📚 **Belajar Arab** (menu Belajar Arab): kursus Bahasa Arab untuk pemula ala
+  metodologi Durusul Lughoh — **15 pelajaran orisinal** (3 level: perkenalan &
+  kehidupan sehari-hari, aktivitas, kehidupan sosial) berisi dialog, kosakata,
+  tata bahasa. Latihan berupa **sesi acak tak terbatas** (8 soal dari seluruh
+  pelajaran, urutan opsi diacak) dengan rekor skor; materi tetap bisa dibaca
+  lewat browser level/pelajaran. Konten 100% orisinal (tanpa salinan kitab).
 - 👆 **Gesture**: **geser layar** (mushaf, terjemahan, maupun background) ke
   kanan/kiri untuk ganti ayat (RTL: kanan = ayat berikutnya); petunjuk geser bisa
   ditutup permanen lewat tombol ✕.
@@ -50,24 +69,25 @@ tanpa melihat layar.
 - 🔍 **Panel kata**: ketuk kata di mushaf → hukum tajwid + penjelasan + putar
   audio kata; tombolnya berubah jadi **⏹ Stop** saat kata sedang diputar
   (terpisah dari tombol Dengar ayat — bebas race).
-- 🔊 **Audio contoh**: **pilih qari'** (drawer ⚙): Minshawy, Husary, Husary
+- 🔊 **Audio contoh**: **pilih qari'** (menu Pengaturan): Minshawy, Husary, Husary
   Muallim, Abdul Basit, Alafasy, As-Sudais, Hudhaify (everyayah.com — audio
   ayat tersimpan per qari' di `filesDir/audio/<qari'>/`) + audio per kata
   (qurancdn wbw); **kecepatan pemutaran 0.5×–1.25×** untuk latihan pelan-pelan
   (berlaku langsung saat sedang memutar). Diunduh in-app per surah / **semua
-  surah** (tanpa estimasi), dengan **progress bar di footer** + nama surah yang
+  surah** (dari Pengaturan atau tombol "Unduh Semua — Qari'" di Kelola Audio
+  saat belum ada audio), dengan **progress bar di footer** + nama surah yang
   sedang diunduh; unduhan latar belakang (foreground service) setelah user
   mengizinkan.
 - 📂 **Manajemen audio terunduh**: ukuran per surah, hapus per surah / hapus
   semua (dengan konfirmasi), **kartu progres live** saat ada unduhan berjalan,
   dan **cache daftar** — membuka layar lagi instan tanpa pemindaian ulang.
-- 🌙 **Dark mode** (tombol di header), **ganti bahasa ID/EN** (tombol di header),
-  drawer kanan via tombol ⚙ untuk pengaturan lain.
+- 🌙 **Dark mode** & **ganti bahasa ID/EN** lewat menu **Pengaturan**; setiap
+  layar punya tombol kembali (←) di kiri atas.
 - 🗓️ **Widget + notifikasi "Ayah of the Day"** — satu ayat berganti setiap hari
   (deterministik per tanggal, offline dari bundel aset). Widget home screen
   ringkas: terjemahan saja; notifikasi menampilkan teks Arab + terjemahan.
   Ketuk widget/notifikasi → aplikasi terbuka tepat di ayat itu; update harian
-  via AlarmManager (+ reschedule saat boot), bisa dimatikan di drawer pengaturan.
+  via AlarmManager (+ reschedule saat boot), bisa dimatikan di menu Pengaturan.
 - 🔤 **Khat Utsmani (Amiri)** — font di-bundle ke APK, langsung tampil tanpa unduhan.
 
 ## Ayah of the Day (widget & notifikasi harian)
@@ -89,7 +109,7 @@ Satu ayat yang sama untuk semua pengguna sepanjang hari, berganti otomatis besok
   (`BOOT_COMPLETED`).
 - **Ketuk widget/notifikasi** → aplikasi terbuka tepat di surah/ayat itu
   (deep link via extra Intent; aman dipanggil berulang, rotation-safe).
-- **Toggle** "🗓️ Notifikasi Harian" di drawer ⚙ (default nyala; pada Android 13+
+- **Toggle** "🗓️ Notifikasi Harian" di menu Pengaturan (default nyala; pada Android 13+
   izin notifikasi diminta saat user menghidupkannya).
 
 ## Arsitektur & stack
@@ -106,15 +126,23 @@ app/src/main/java/com/tahsin/app/
 ├── data/quran/     # model Surah/Ayah + repository (aset bundle → cache → equran.id)
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
 │                   #   + TajwidQuiz (kuis "hukum apa pada kata ini?")
+├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
+│                   #   (589 kata terkurasi → assets/quran/vocab.json)
+├── data/dreambig/  # DreamBigGame (ronde arcade); Models/Parser/Repository
+│                   #   lama (era level/transkrip) = dead code yang dipertahankan
+├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 pelajaran orisinal
+│                   #   → assets/lughoh/lessons.json; sesi latihan acak)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
-├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
-│                   #   StatsScreen + StatsViewModel (statistik & riwayat),
-│                   #   SearchScreen + SearchViewModel (pencarian ayat),
-│                   #   TajwidQuizScreen + VM (kuis hukum tajwid)
+├── ui/             # TahsinScreen/VM, AudioManagerScreen/VM, StatsScreen/VM
+│                   #   (statistik gabungan semua challenge), SearchScreen/VM,
+│                   #   TajwidQuizScreen/VM, VocabularyScreen/VM,
+│                   #   DreamBigScreen/VM (arcade), LughohScreen/VM (arcade),
+│                   #   SettingsScreen (dark mode, bahasa, unduh semua)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + alarm harian/notifikasi
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
+│                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
 │                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
 │                   #   Reciter (qari' everyayah + kecepatan audio 0.5×–1.25×),
 │                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
@@ -143,6 +171,25 @@ Hasilnya ditulis ke `app/src/main/assets/`:
 
 Tanpa script ini aplikasi tetap berfungsi (unduh on-demand + cache di
 `filesDir/`), hanya saja butuh internet saat pertama kali membuka surah/font.
+
+### Pipeline konten belajar (`tools/`)
+
+Konten fitur belajar **dibuat dari nol (orisinal)** lewat script Python dan
+di-bundle ke APK — jalankan ulang saat konten diubah:
+
+```bash
+python3 tools/build_vocab.py       # 589 kata terkurasi → assets/quran/vocab.json
+python3 tools/build_lughoh.py      # 15 pelajaran Belajar Arab → assets/lughoh/lessons.json
+                                   #   (validasi 10 aturan; --level N untuk cek per level)
+```
+
+- `tools/lughoh-schema.md` — skema & aturan validasi data Belajar Arab
+  (mufrodat harus muncul di dialog, contoh qawa'id dari dialog, dst.).
+- `tools/curate_vocab.py`, `tools/vocab_roots.py` — kurasi & analisis akar kata.
+- `tools/scrape_dreambig.py`, `tools/dreambig_levels.py` — pipeline lama
+  Dream BIG (era level + transkrip YouTube). **Tidak lagi dipakai** sejak
+  Dream BIG menjadi arcade tanpa level/transkrip; script & aset transkrip
+  (`assets/dreambig/transcripts/`) dipertahankan di repo.
 
 ## Build (Termux)
 
@@ -177,9 +224,12 @@ sdkmanager "platforms;android-35"
 ### Unit test
 
 Test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
-`ArabicNormalizer`, `QuranParser` (parsing JSON mushaf, di-extract dari
-`QuranRepository` agar bisa diuji tanpa Android), dan `AyahOfTheDayManager`
-(pemilihan ayat harian: batas index, lintas surah, determinisme):
+`ArabicNormalizer`, `QuranParser` (parsing JSON mushaf), `AyahOfTheDayManager`
+(pemilihan ayat harian: batas index, lintas surah, determinisme), mesin
+**Kosakata** (`VocabularyEngine`: SRS + quiz), **Dream BIG** (`DreamBigGame`:
+ronde acak + bintang), **Belajar Arab** (`LughohParser`/`LughohEngine`: sesi
+acak, acak opsi, susun kata), dan semua *progress store* (`ReadingStatsStore`,
+`VocabularyStatsStore`, `DreamBigProgressStore`, `LughohProgressStore`):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon
@@ -220,7 +270,7 @@ keyPassword=rahasia
 - `VIBRATE` — getar saat ada kesalahan pengucapan (umpan muroja'ah).
 - `INTERNET` — unduh audio (konten mushaf sudah di-bundle).
 - `POST_NOTIFICATIONS` — notifikasi unduhan latar belakang + notifikasi harian
-  "Ayah of the Day" (diminta saat menghidupkan toggle di drawer).
+  "Ayah of the Day" (diminta saat menghidupkan toggle di menu Pengaturan).
 - `WAKE_LOCK`, `FOREGROUND_SERVICE` (+ `FOREGROUND_SERVICE_DATA_SYNC`) —
   unduhan latar belakang saat layar mati, setelah user mengizinkan lewat prompt.
 - `RECEIVE_BOOT_COMPLETED` — reschedule alarm harian "Ayah of the Day" setelah
