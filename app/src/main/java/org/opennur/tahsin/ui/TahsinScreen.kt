@@ -7,24 +7,24 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +62,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.opennur.tahsin.data.quran.AyahNumbering
+import org.opennur.tahsin.data.quran.Basmalah
+import org.opennur.tahsin.data.quran.ComposedPage
+import org.opennur.tahsin.data.quran.MushafAyah
+import org.opennur.tahsin.data.quran.MushafPageComposer
+import org.opennur.tahsin.data.quran.SajdahSigns
 import org.opennur.tahsin.data.tajwid.RuleCategory
 import org.opennur.tahsin.data.tajwid.TajwidColorizer
 import org.opennur.tahsin.data.tajwid.TajwidEngine
@@ -72,6 +78,7 @@ import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTypography
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.DownloadProgress
+import org.opennur.tahsin.util.FontScales
 import org.opennur.tahsin.ui.components.AyahButton
 import org.opennur.tahsin.ui.components.AyahButtonSize
 import org.opennur.tahsin.ui.components.AyahButtonVariant
@@ -84,9 +91,10 @@ import org.opennur.tahsin.ui.components.SimpleDropdown
 import kotlin.math.roundToInt
 
 /**
- * Layar utama Tahsin Quran: pilih surah → baca ayat ke mic → highlight
- * kata di mushaf (hijau benar / merah salah / kuning sedang dibaca),
- * daftar kesalahan + hukum tajwid, dan audio contoh.
+ * Layar Tahsin — mushaf halaman (604 halaman Madani): baca seperti membuka
+ * mushaf asli (flip halaman RTL), tanda akhir ayat ۝+nomor, tanda sujud ۩,
+ * basmalah di awal surah, terjemahan disembunyikan secara default. Ketuk
+ * ayat → jadikan ayat aktif, latihan STT inline (warna kata + umpan balik).
  */
 @Composable
 fun TahsinScreen(
@@ -130,8 +138,6 @@ fun TahsinScreen(
         }
     }
 
-    // Izin notifikasi (Android 13+) dipindah ke layar Pengaturan (toggle
-    // "Ayah of the Day" kini berada di sana).
     when (val state = uiState) {
         TahsinUiState.Loading -> AyahLoadingView(modifier = modifier, message = strings.msgMushafLoading)
         is TahsinUiState.Error -> AyahErrorView(
@@ -142,10 +148,10 @@ fun TahsinScreen(
         )
         is TahsinUiState.Ready -> TahsinContent(
             state = state,
-            onSelectSurah = viewModel::selectSurah,
-            onSelectAyah = viewModel::selectAyah,
-            onPrevAyah = viewModel::prevAyah,
-            onNextAyah = viewModel::nextAyah,
+            onSelectPage = viewModel::selectPage,
+            onJumpToSurah = viewModel::jumpToSurah,
+            onJumpToPage = viewModel::jumpToPage,
+            onSelectAyah = viewModel::selectAyahAt,
             onSelectWord = viewModel::selectWord,
             onMicClick = {
                 val granted = ContextCompat.checkSelfPermission(
@@ -156,8 +162,9 @@ fun TahsinScreen(
             },
             onPlaySelectedWord = viewModel::playSelectedWord,
             onStopSelectedWord = viewModel::stopWordPlayback,
+            onToggleTranslation = viewModel::toggleTranslation,
+            onSetFontScale = viewModel::setFontScale,
             onDismissMessage = viewModel::clearMessage,
-            onDismissSwipeHint = viewModel::dismissSwipeHint,
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onOpenSearch = onOpenSearch,
             onOpenSettings = onOpenSettings,
@@ -167,32 +174,417 @@ fun TahsinScreen(
     }
 }
 
+// ============================================================ Konten utama
+
 @Composable
 private fun TahsinContent(
     state: TahsinUiState.Ready,
-    onSelectSurah: (Int) -> Unit,
-    onSelectAyah: (Int) -> Unit,
-    onPrevAyah: () -> Unit,
-    onNextAyah: () -> Unit,
+    onSelectPage: (Int) -> Unit,
+    onJumpToSurah: (Int) -> Unit,
+    onJumpToPage: (Int) -> Unit,
+    onSelectAyah: (Int, Int) -> Unit,
     onSelectWord: (Int) -> Unit,
     onMicClick: () -> Unit,
     onPlaySelectedWord: () -> Unit,
     onStopSelectedWord: () -> Unit,
+    onToggleTranslation: () -> Unit,
+    onSetFontScale: (Float) -> Unit,
     onDismissMessage: () -> Unit,
-    onDismissSwipeHint: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val ayah = state.ayah
-    val words = ayah?.words.orEmpty()
-    val statusByIndex = state.alignedWords.associateBy { it.index }
-    val ayahCount = state.surah?.ayahs?.size ?: 0
     val strings = AppStrings.of(state.language)
 
-    // Span warna tajwid per kata (dihitung sekali per ayat).
+    // Pager halaman mushaf — alur RTL (halaman 1 di kanan, seperti mushaf asli).
+    val pagerState = rememberPagerState(initialPage = state.pageIndex) { state.pageCount }
+    // VM pindah halaman (jump surah/juz, openAt, auto-advance) → pager mengikuti.
+    LaunchedEffect(state.pageIndex) {
+        if (pagerState.currentPage != state.pageIndex) pagerState.scrollToPage(state.pageIndex)
+    }
+    // User menggeser pager → VM memuat & menyusun halaman baru.
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != state.pageIndex) onSelectPage(pagerState.currentPage)
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(AyahColors.Background)
+            .windowInsetsPadding(WindowInsets.safeDrawing),
+    ) {
+        // ---- Header: kembali, judul, toggle terjemahan, pencarian, pengaturan ----
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AyahButton(text = "←", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onBack)
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahText(strings.appTitle, style = AyahTypography.Heading1, modifier = Modifier.weight(1f))
+            AyahButton(
+                text = strings.tahsinTranslation,
+                variant = if (state.showTranslation) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                onClick = onToggleTranslation,
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            AyahButton(text = "🔍", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSearch)
+            Spacer(modifier = Modifier.width(6.dp))
+            AyahButton(text = "⚙", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSettings)
+        }
+
+        // ---- Navigasi lompat: surah / juz + indikator halaman ----
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SimpleDropdown(
+                selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
+                options = state.surahs.map { s ->
+                    DropdownOption("${s.number}. ${s.nameLatin}", { onJumpToSurah(s.number) })
+                },
+                modifier = Modifier.weight(2f),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            SimpleDropdown(
+                // Label cukup nomor halaman (Arab-Indik) — "Halaman" terlalu panjang
+                // dan kepotong di dropdown yang sempit.
+                selectedLabel = AyahNumbering.toArabicIndic(state.pageIndex + 1),
+                options = (1..state.pageCount).map { p ->
+                    DropdownOption("${strings.tahsinPage} ${AyahNumbering.toArabicIndic(p)}", { onJumpToPage(p) })
+                },
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahText(
+                "${AyahNumbering.toArabicIndic(state.pageIndex + 1)} / ${AyahNumbering.toArabicIndic(state.pageCount)}",
+                style = AyahTypography.Caption.copy(textAlign = TextAlign.Center),
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        // ---- Kontrol ukuran huruf (A− / A+) ----
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AyahButton(
+                text = "A−",
+                variant = AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                enabled = state.fontScale > FontScales.MIN,
+                onClick = { onSetFontScale(state.fontScale - FontScales.STEP) },
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            AyahText(
+                "${(state.fontScale * 100).roundToInt()}%",
+                style = AyahTypography.Caption.copy(textAlign = TextAlign.Center),
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            AyahButton(
+                text = "A+",
+                variant = AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                enabled = state.fontScale < FontScales.MAX,
+                onClick = { onSetFontScale(state.fontScale + FontScales.STEP) },
+            )
+        }
+
+        // ---- Pager halaman mushaf ----
+        HorizontalPager(
+            state = pagerState,
+            reverseLayout = true,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+        ) { pageIndex ->
+            MushafPageView(
+                state = state,
+                pageIndex = pageIndex,
+                strings = strings,
+                onSelectAyah = onSelectAyah,
+                onSelectWord = onSelectWord,
+                onPlaySelectedWord = onPlaySelectedWord,
+                onStopSelectedWord = onStopSelectedWord,
+                onDismissMessage = onDismissMessage,
+            )
+        }
+
+        // ---- Progress unduh audio (di ATAS tombol mic & dengar) ----
+        DownloadFooter(
+            isDownloading = state.isDownloading,
+            done = state.downloadDone,
+            total = state.downloadTotal,
+            strings = strings,
+        )
+
+        // ---- Bar bawah TETAP: mic + dengar/stop (tidak ikut scroll) ----
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(AyahColors.Background)
+                .padding(horizontal = 20.dp, vertical = 10.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                MicButton(listening = state.listening, onClick = onMicClick)
+                Spacer(modifier = Modifier.width(14.dp))
+                AyahText(
+                    if (state.listening) strings.listeningHint else strings.micHint,
+                    style = AyahTypography.Caption,
+                    modifier = Modifier.weight(1f),
+                )
+                AyahButton(
+                    text = if (state.isAudioPlaying) strings.stop else strings.listen,
+                    variant = if (state.isAudioPlaying) AyahButtonVariant.Danger else AyahButtonVariant.Secondary,
+                    onClick = onToggleAudioPlayback,
+                )
+            }
+        }
+    }
+}
+
+/** Susun halaman [pageIndex] dari konten surah yang sudah dimuat (null = belum siap). */
+private fun composePage(state: TahsinUiState.Ready, pageIndex: Int): ComposedPage? =
+    MushafPageComposer.composePage(
+        state.pagination,
+        pageIndex + 1,
+        state.surahs.associateBy { it.number },
+    )
+
+// ============================================================ Satu halaman
+
+@Composable
+private fun MushafPageView(
+    state: TahsinUiState.Ready,
+    pageIndex: Int,
+    strings: Strings,
+    onSelectAyah: (Int, Int) -> Unit,
+    onSelectWord: (Int) -> Unit,
+    onPlaySelectedWord: () -> Unit,
+    onStopSelectedWord: () -> Unit,
+    onDismissMessage: () -> Unit,
+) {
+    val composed = remember(state.surahs, state.pagination, pageIndex) {
+        composePage(state, pageIndex)
+    }
+    val isCurrentPage = pageIndex == state.pageIndex
+    val ayah = state.ayah
+    val activeOnPage = composed?.ayahs?.any {
+        it.surah == state.surahNumber && it.number == state.ayahIndex + 1
+    } == true
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 14.dp),
+    ) {
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // ---- Band header ala mushaf Madani ----
+        if (composed != null) {
+            PageHeaderBand(composed = composed, strings = strings, fontFamily = state.arabicFontFamily)
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+
+        if (composed == null) {
+            AyahCard(modifier = Modifier.fillMaxWidth()) {
+                AyahText(
+                    strings.loadingSurah,
+                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                )
+            }
+        } else {
+            // ---- Isi halaman: ayat-ayat mushaf ----
+            composed.ayahs.forEach { entry ->
+                if (entry.hasBasmalah) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    BasmalahRow(fontFamily = state.arabicFontFamily)
+                    Spacer(modifier = Modifier.height(6.dp))
+                }
+                val isActive = entry.surah == state.surahNumber && entry.number == state.ayahIndex + 1
+                AyahBlock(
+                    entry = entry,
+                    isActive = isActive,
+                    state = state,
+                    strings = strings,
+                    onSelectAyah = onSelectAyah,
+                    onSelectWord = onSelectWord,
+                    onPlaySelectedWord = onPlaySelectedWord,
+                    onStopSelectedWord = onStopSelectedWord,
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+            }
+
+            // ---- Ekstra latihan HANYA di halaman aktif (praktik STT) ----
+            if (isCurrentPage && ayah != null && activeOnPage) {
+                // Terjemahan ayat aktif — tersembunyi kecuali toggle dinyalakan.
+                if (state.showTranslation && ayah.translation.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    AyahText(
+                        ayah.translation,
+                        style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                // Transkrip real-time.
+                if (state.listening) {
+                    AyahText(
+                        "${strings.detectedPrefix} ${state.transcript.ifBlank { "…" }}",
+                        style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                // Daftar kesalahan bacaan.
+                if (state.issues.isNotEmpty()) {
+                    AyahText(
+                        "${strings.issuesTitle} (${state.issues.size})",
+                        style = AyahTypography.Heading2,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    state.issues.forEach { issue ->
+                        IssueCard(
+                            issue = issue,
+                            strings = strings,
+                            language = state.language,
+                            fontScale = state.fontScale,
+                            fontFamily = state.arabicFontFamily,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+                // Info riwayat ayat aktif.
+                state.ayahStats?.let { st ->
+                    if (st.attempts > 0) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        AyahText(
+                            strings.statsInline.format(st.attempts, st.bestScore),
+                            style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+                        )
+                    }
+                }
+            }
+
+            // ---- Pesan sistem ----
+            if (isCurrentPage) {
+                state.message?.let { msg ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AyahCard(modifier = Modifier.fillMaxWidth(), onClick = onDismissMessage) {
+                        AyahText(msg, style = AyahTypography.Body2, color = AyahColors.Error)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+/** Band header halaman ala mushaf Madani: nomor halaman, nama surah, juz. */
+@Composable
+private fun PageHeaderBand(
+    composed: ComposedPage,
+    strings: Strings,
+    fontFamily: FontFamily,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(AyahColors.SurfaceVariant)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AyahText(
+                    AyahNumbering.toArabicIndic(composed.page),
+                    style = AyahTypography.Arabic.copy(
+                        fontSize = 13.sp,
+                        fontFamily = fontFamily,
+                        color = AyahColors.TextSecondary,
+                    ),
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                AyahText(
+                    composed.surahNameArabic,
+                    style = AyahTypography.Arabic.copy(
+                        fontSize = 18.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold,
+                        color = AyahColors.TextPrimary,
+                    ),
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                AyahText(
+                    "${strings.tahsinJuz} ${AyahNumbering.toArabicIndic(composed.juz)}",
+                    style = AyahTypography.Caption.copy(
+                        color = if (composed.juzStartsOnPage) AyahColors.Primary else AyahColors.TextSecondary,
+                        fontWeight = if (composed.juzStartsOnPage) FontWeight.Bold else FontWeight.Normal,
+                    ),
+                )
+            }
+            if (composed.juzStartsOnPage) {
+                Spacer(modifier = Modifier.height(2.dp))
+                AyahText(
+                    "❁ ${strings.tahsinJuz} ${AyahNumbering.toArabicIndic(composed.juz)}",
+                    style = AyahTypography.Caption.copy(
+                        color = AyahColors.Primary,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+/** Ornamen basmalah di awal surah (kecuali At-Tawbah; Al-Fatihah tidak ganda). */
+@Composable
+private fun BasmalahRow(fontFamily: FontFamily) {
+    AyahText(
+        Basmalah.TEXT,
+        style = AyahTypography.Arabic.copy(
+            fontSize = 20.sp,
+            fontFamily = fontFamily,
+            color = AyahColors.Primary,
+            textAlign = TextAlign.Center,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+/** Satu ayat di halaman: teks kata-berwarna-tajwid (konsisten aktif/non-aktif)
+ *  + badge akhir ayat (lingkaran nomor Arab-Indik) + badge sujud. Mengaktifkan
+ *  ayat TIDAK mengubah ukuran/posisi teks (hanya tint latar + interaksi). */
+@Composable
+private fun AyahBlock(
+    entry: MushafAyah,
+    isActive: Boolean,
+    state: TahsinUiState.Ready,
+    strings: Strings,
+    onSelectAyah: (Int, Int) -> Unit,
+    onSelectWord: (Int) -> Unit,
+    onPlaySelectedWord: () -> Unit,
+    onStopSelectedWord: () -> Unit,
+) {
+    val words = remember(entry.text) {
+        org.opennur.tahsin.data.quran.Ayah(entry.number, entry.text).words
+    }
+    // Status bacaan STT hanya untuk ayat aktif; warna TAJWID untuk SEMUA ayat.
+    val statusByIndex = if (isActive) state.alignedWords.associateBy { it.index } else emptyMap()
+    val selectedIndex = if (isActive) state.selectedWordIndex else null
     val spansByWord = remember(words) {
         words.mapIndexed { idx, w ->
             TajwidColorizer.spans(
@@ -201,264 +593,82 @@ private fun TahsinContent(
             )
         }
     }
-
-    Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
-        // Inset system bars (status + nav) — konten aman dari underlap (edge-to-edge).
-        Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .pointerInput(Unit) {
-                    // SWIPE di SELURUH latar konten (background) untuk ganti ayat.
-                    // Event yang sudah dikonsumsi (mushaf/scroll/dropdown) diabaikan
-                    // supaya tidak dobel pindah & tidak mengganggu interaksi lain.
-                    val swipeThreshold = 80.dp.toPx()
-                    awaitEachGesture {
-                        val down = awaitFirstDown()
-                        var totalX = 0f
-                        var totalY = 0f
-                        var swiping = false
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                            if (!change.pressed) break
-                            if (event.changes.any { it.isConsumed }) {
-                                totalX = 0f
-                                totalY = 0f
-                                swiping = false
-                            } else {
-                                totalX += change.position.x - change.previousPosition.x
-                                totalY += change.position.y - change.previousPosition.y
-                            }
-                            if (!swiping &&
-                                kotlin.math.abs(totalX) > swipeThreshold &&
-                                kotlin.math.abs(totalX) > kotlin.math.abs(totalY)
-                            ) {
-                                swiping = true
-                            }
-                            if (swiping) change.consume()
-                        }
-                        if (swiping) {
-                            // RTL: geser kanan = ayat berikutnya, kiri = sebelumnya.
-                            if (totalX >= swipeThreshold) onNextAyah()
-                            else if (totalX <= -swipeThreshold) onPrevAyah()
-                        }
-                    }
-                }
-                .padding(horizontal = 20.dp),
-        ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ---- Header: kembali + judul + pencarian + pengaturan (⚙) ----
-        // Mode gelap & bahasa kini di layar Pengaturan (bukan drawer).
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            AyahButton(
-                text = "←",
-                variant = AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                onClick = onBack,
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            AyahText(
-                strings.appTitle,
-                style = AyahTypography.Heading1,
-                modifier = Modifier.weight(1f),
-            )
-            AyahButton(
-                text = "🔍",
-                variant = AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                onClick = onOpenSearch,
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            AyahButton(
-                text = "⚙",
-                variant = AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                onClick = onOpenSettings,
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        AyahText(
-            strings.subtitle,
-            style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+    val annotated = remember(words, spansByWord, statusByIndex, selectedIndex, state.tajwidColor) {
+        buildAyahAnnotated(
+            words = words,
+            spansByWord = spansByWord,
+            statusByIndex = statusByIndex,
+            selectedIndex = selectedIndex,
+            tajwidColor = state.tajwidColor,
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            LegendDot(color = AyahColors.Success, label = strings.legendCorrect)
-            LegendDot(color = AyahColors.Error, label = strings.legendWrong)
-            LegendDot(color = AyahColors.Reading, label = strings.legendReading)
-            LegendDot(color = AyahColors.Surface, label = strings.legendNotReached)
+    }
+    var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
+    val wordOffsets = remember(words) {
+        val arr = IntArray(words.size)
+        var pos = 0
+        words.forEachIndexed { i, w ->
+            arr[i] = pos
+            pos += w.length + 1 // kata + spasi
         }
+        arr
+    }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // ---- Navigasi satu baris: [prev] [surah ▾] [ayat ▾] [next] ----
-        if (ayah != null && !state.loadingSurah) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AyahButton(
-                    text = "‹",
-                    variant = AyahButtonVariant.Outline,
-                    size = AyahButtonSize.Small,
-                    onClick = onNextAyah,
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                SimpleDropdown(
-                    selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
-                    options = state.surahs.map { s ->
-                        DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
+    // Baris RTL: teks ayat di kanan, badge akhir ayat & sujud di ujung kiri
+    // (posisi akhir baris terakhir — ala mushaf). Tint latar TANPA padding untuk
+    // ayat aktif supaya ukuran/posisi teks tidak berubah saat diketuk.
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (isActive) {
+                        Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(AyahColors.PrimarySoft.copy(alpha = 0.45f))
+                    } else {
+                        Modifier
                     },
-                    modifier = Modifier.weight(2f),
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                SimpleDropdown(
-                    selectedLabel = "${ayah.number}",
-                    options = (1..ayahCount).map { n ->
-                        DropdownOption("$n", { onSelectAyah(n - 1) })
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                AyahButton(
-                    text = "›",
-                    variant = AyahButtonVariant.Outline,
-                    size = AyahButtonSize.Small,
-                    onClick = onPrevAyah,
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            // Petunjuk geser — bisa ditutup permanen lewat tombol ✕.
-            if (state.showSwipeHint) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    AyahText(
-                        strings.swipeHint,
-                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                        modifier = Modifier.weight(1f),
-                    )
-                    AyahButton(
-                        text = "✕",
-                        variant = AyahButtonVariant.Ghost,
-                        size = AyahButtonSize.Small,
-                        onClick = onDismissSwipeHint,
-                    )
-                }
-            }
-        } else {
-            // Sedang memuat / belum ada ayat — dropdown surah tetap tersedia.
-            SimpleDropdown(
-                selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
-                options = state.surahs.map { s ->
-                    DropdownOption("${s.number}. ${s.nameLatin}", { onSelectSurah(s.number) })
-                },
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // ---- Muat konten surah / mushaf ----
-
-        // ---- Navigasi ayat ----
-        if (state.loadingSurah) {
-            AyahCard(modifier = Modifier.fillMaxWidth()) {
-                AyahText(
-                    strings.loadingSurah,
-                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
-                )
-            }
-        } else if (ayah != null) {
-            // ---- Mushaf kontinu (gaya mushaf asli: kata tersambung RTL) ----
-            // Satu gesture menangani TAP (pilih kata → tooltip) dan SWIPE
-            // (ganti ayat) sekaligus — tanpa konflik arena gesture.
-            val density = LocalDensity.current
-            val swipeThresholdPx = with(density) { 80.dp.toPx() }
-            val tapSlopPx = with(density) { 12.dp.toPx() }
-            // Mushaf + terjemahan + transkrip + kesalahan (layout berurutan).
-            // Gesture swipe kini ada di level scroll Column (mencakup background),
-            // jadi wrapper ini cukup untuk tata letak saja.
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                AyahCard(modifier = Modifier.fillMaxWidth()) {
-                var textLayout by remember(words) { mutableStateOf<TextLayoutResult?>(null) }
-                val wordOffsets = remember(words) {
-                    val arr = IntArray(words.size)
-                    var pos = 0
-                    words.forEachIndexed { i, w ->
-                        arr[i] = pos
-                        pos += w.length + 1 // kata + spasi
-                    }
-                    arr
-                }
-                val annotated = remember(words, spansByWord, statusByIndex, state.selectedWordIndex, state.tajwidColor) {
-                    buildAyahAnnotated(
-                        words = words,
-                        spansByWord = spansByWord,
-                        statusByIndex = statusByIndex,
-                        selectedIndex = state.selectedWordIndex,
-                        tajwidColor = state.tajwidColor,
-                    )
-                }
-                Box(
+                ),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            // Kotak teks: ketukan & tooltip berlabuh di sini (koordinat = teks).
+            Box(modifier = Modifier.weight(1f)) {
+                BasicText(
+                    text = annotated,
+                    onTextLayout = { textLayout = it },
+                    style = AyahTypography.ArabicWord.copy(
+                        color = AyahColors.TextPrimary,
+                        fontSize = (14 * state.fontScale).sp,
+                        lineHeight = (14 * state.fontScale * 2.2f).sp,
+                        textAlign = TextAlign.Start,
+                        fontFamily = state.arabicFontFamily,
+                    ),
+                    // Satu jalur ketukan untuk aktif & non-aktif (detectTapGestures
+                    // TIDAK memaksa ukuran sentuh minimum 48dp seperti clickable —
+                    // mengetuk ayat pendek tidak mengubah tinggi baris).
                     modifier = Modifier
                         .fillMaxWidth()
-                        .pointerInput(state.selectedWordIndex) {
-                            awaitEachGesture {
-                                val down = awaitFirstDown()
-                                var lastPos = down.position
-                                var totalX = 0f
-                                var totalY = 0f
-                                var swiping = false
-                                while (true) {
-                                    val event = awaitPointerEvent()
-                                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                                    if (!change.pressed) break
-                                    lastPos = change.position
-                                    totalX += change.position.x - change.previousPosition.x
-                                    totalY += change.position.y - change.previousPosition.y
-                                    if (!swiping &&
-                                        kotlin.math.abs(totalX) > swipeThresholdPx &&
-                                        kotlin.math.abs(totalX) > kotlin.math.abs(totalY)
-                                    ) {
-                                        swiping = true
-                                    }
-                                    if (swiping) change.consume()
-                                }
-                                if (swiping) {
-                                    // RTL: geser kanan = ayat berikutnya, kiri = sebelumnya.
-                                    if (totalX >= swipeThresholdPx) onNextAyah()
-                                    else if (totalX <= -swipeThresholdPx) onPrevAyah()
-                                } else if (kotlin.math.abs(totalX) < tapSlopPx && kotlin.math.abs(totalY) < tapSlopPx) {
-                                    // Tap: pilih kata di bawah jari (teks dimulai di (0,0) Box).
+                        .pointerInput(state.selectedWordIndex, isActive) {
+                            detectTapGestures { position ->
+                                if (isActive) {
                                     val layout = textLayout
                                     if (layout != null) {
-                                        val charOffset = layout.getOffsetForPosition(lastPos)
+                                        val charOffset = layout.getOffsetForPosition(position)
                                         val idx = wordIndexAt(charOffset, wordOffsets)
                                         if (idx in words.indices) {
-                                            onSelectWord(if (idx == state.selectedWordIndex) -1 else idx)
+                                            onSelectWord(if (idx == selectedIndex) -1 else idx)
                                         }
                                     }
+                                } else {
+                                    onSelectAyah(entry.surah, entry.number)
                                 }
                             }
                         },
-                ) {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        BasicText(
-                            text = annotated,
-                            onTextLayout = { textLayout = it },
-                            style = AyahTypography.ArabicWord.copy(
-                                color = AyahColors.TextPrimary,
-                                fontSize = (20 * state.fontScale).sp,
-                                lineHeight = (20 * state.fontScale * 2.4f).sp,
-                                textAlign = TextAlign.Start,
-                                fontFamily = state.arabicFontFamily,
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                    // Tooltip mengambang di bawah kata yang dipilih.
-                    val sel = state.selectedWordIndex
+                )
+                // Tooltip kata terpilih (hanya ayat aktif) — di dalam kotak teks
+                // supaya koordinat rect (relatif teks) sama dengan jangkar Popup.
+                if (isActive) {
+                    val sel = selectedIndex
                     val layout = textLayout
                     if (sel != null && layout != null && sel < words.size) {
                         val rect = layout.getBoundingBox(wordOffsets[sel])
@@ -519,134 +729,56 @@ private fun TahsinContent(
                     }
                 }
             }
-                // Terjemahan ayat (bahasa aktif).
-                val translation = ayah?.translation.orEmpty()
-                if (translation.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    AyahText(
-                        translation,
-                        style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                // Ruang kosong di bawah terjemahan — tetap bisa di-swipe.
-                Spacer(modifier = Modifier.height(24.dp))
-
-        // ---- Transkrip real-time ----
-        if (state.listening) {
-            Spacer(modifier = Modifier.height(8.dp))
-            AyahText(
-                "${strings.detectedPrefix} ${state.transcript.ifBlank { "…" }}",
-                style = AyahTypography.Caption.copy(color = AyahColors.Primary),
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // ---- Daftar kesalahan bacaan ----
-        if (state.issues.isNotEmpty()) {
-            AyahText(
-                "${strings.issuesTitle} (${state.issues.size})",
-                style = AyahTypography.Heading2,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            state.issues.forEach { issue ->
-                IssueCard(
-                    issue = issue,
-                    strings = strings,
-                    fontScale = state.fontScale,
-                    fontFamily = state.arabicFontFamily,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-
-        // ---- Info riwayat ayat aktif (dari statistik persisten) ----
-        state.ayahStats?.let { st ->
-            if (st.attempts > 0) {
-                Spacer(modifier = Modifier.height(12.dp))
-                AyahText(
-                    strings.statsInline.format(st.attempts, st.bestScore),
-                    style = AyahTypography.Caption.copy(color = AyahColors.Primary),
-                )
+            Spacer(modifier = Modifier.width(6.dp))
+            AyahEndBadge(entry.number)
+            if (entry.isSajdah) {
+                Spacer(modifier = Modifier.width(6.dp))
+                SajdahBadge()
             }
         }
+    }
+}
 
-        // ---- Pesan sistem ----
-        state.message?.let { msg ->
-            AyahCard(modifier = Modifier.fillMaxWidth(), onClick = onDismissMessage) {
-                AyahText(msg, style = AyahTypography.Body2, color = AyahColors.Error)
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-        }
+/** Badge akhir ayat: lingkaran kecil + nomor Arab-Indik (pengganti glif ۝). */
+@Composable
+private fun AyahEndBadge(number: Int) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .background(AyahColors.PrimarySoft, CircleShape)
+            .border(1.dp, AyahColors.Primary.copy(alpha = 0.55f), CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        AyahText(
+            AyahNumbering.toArabicIndic(number),
+            style = AyahTypography.Caption.copy(fontSize = 11.sp, color = AyahColors.Primary),
+        )
+    }
+}
 
-            // Penutup area swipe: mushaf → terjemahan → kosong → kesalahan.
-            }
-        }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // ---- Progress unduh audio (di ATAS tombol mic & dengar) ----
-            DownloadFooter(
-                isDownloading = state.isDownloading,
-                done = state.downloadDone,
-                total = state.downloadTotal,
-                strings = strings,
-            )
-
-            // ---- Bar bawah TETAP: mic + dengar/stop (tidak ikut scroll) ----
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(AyahColors.Background)
-                    .padding(horizontal = 20.dp, vertical = 10.dp),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    MicButton(listening = state.listening, onClick = onMicClick)
-                    Spacer(modifier = Modifier.width(14.dp))
-                    AyahText(
-                        if (state.listening) strings.listeningHint
-                        else strings.micHint,
-                        style = AyahTypography.Caption,
-                        modifier = Modifier.weight(1f),
-                    )
-                    AyahButton(
-                        text = if (state.isAudioPlaying) strings.stop else strings.listen,
-                        variant = if (state.isAudioPlaying) AyahButtonVariant.Danger else AyahButtonVariant.Secondary,
-                        onClick = onToggleAudioPlayback,
-                    )
-                }
-            }
-        }
-
+/** Badge sujud tilawah: lingkaran kecil dengan tanda ۩. */
+@Composable
+private fun SajdahBadge() {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .background(AyahColors.Primary, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        AyahText(
+            SajdahSigns.SIGN,
+            style = AyahTypography.Caption.copy(fontSize = 14.sp, color = Color.White),
+        )
     }
 }
 
 // ============================================================ Sub-komponen
 
 @Composable
-private fun LegendDot(color: Color, label: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(10.dp)
-                .background(color, CircleShape)
-                .then(
-                    if (color == AyahColors.Surface) Modifier.border(1.dp, AyahColors.Divider, CircleShape)
-                    else Modifier,
-                ),
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        AyahText(label, style = AyahTypography.Caption)
-    }
-}
-
-@Composable
 private fun IssueCard(
     issue: ReadingIssue,
     strings: Strings,
+    language: AppLanguage,
     fontScale: Float,
     fontFamily: FontFamily,
 ) {
@@ -673,15 +805,16 @@ private fun IssueCard(
         if (issue.rules.isNotEmpty()) {
             Spacer(modifier = Modifier.height(6.dp))
             issue.rules.forEach { rule ->
+                val exp = if (language == AppLanguage.EN) rule.explanationEn else rule.explanation
                 AyahText(
-                    "• ${rule.name} — ${rule.explanation}",
+                    "• ${rule.name} — $exp",
                     style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
                 )
             }
         } else {
             Spacer(modifier = Modifier.height(4.dp))
             AyahText(
-                "Bacalah kata ini sesuai teks mushaf (huruf & harakat).",
+                strings.issueFallback,
                 style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
             )
         }
@@ -717,7 +850,6 @@ private fun DownloadFooter(
     strings: Strings,
 ) {
     if (!isDownloading) return
-    // Surah yang sedang diunduh (dari status global unduhan).
     val dl by DownloadProgress.state.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
@@ -828,7 +960,14 @@ private fun buildAyahAnnotated(
         }
         if (bg != null) addStyle(SpanStyle(background = bg), start, end)
         if (selectedIndex == index) {
-            addStyle(SpanStyle(background = AyahColors.PrimarySoft), start, end)
+            addStyle(
+                SpanStyle(
+                    background = AyahColors.Primary.copy(alpha = 0.42f),
+                    color = AyahColors.Primary,
+                ),
+                start,
+                end,
+            )
         }
     }
 }

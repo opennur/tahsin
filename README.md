@@ -10,6 +10,9 @@ Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
 (metodologi ala Durusul Lughoh).
 
 > ⚠️ **Batasan jujur** — aplikasi ini adalah alat bantu latihan, **bukan pengganti guru**.
+> Tampilan mushaf halaman memakai paginasi Madani yang PERSIS (isi ayat per halaman
+> sama dengan mushaf cetak), tapi teksnya disusun mengalir rata kanan-kiri (belum
+> ada data layout 15-baris per halaman yang pixel-exact).
 > STT (speech-to-text) hanya membaca *teks* ucapan: aplikasi bisa menilai kata
 > terlewat/salah susun/salah huruf, tapi **tidak bisa menilai makhraj atau
 > panjang-pendek harakat**. Deteksi tajwid bersifat rule-based ("peta hukum"
@@ -20,8 +23,14 @@ Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
 - 🧭 **Menu utama** (layar beranda): semua fitur dibuka lewat kartu menu —
   **Tahsin**, **Kosakata**, **Kuis Tajwid**, **Statistik**, **Pencarian**,
   **Kelola Audio**, **Dream BIG**, **Belajar Arab**, dan **Pengaturan**.
-- 📖 **Mushaf gaya mushaf asli** — kata tersambung, susunan RTL, semua 114 surah,
-  **offline bawaan** (Arab + terjemahan ID/EN di-bundle ke APK).
+- 📖 **Mushaf halaman ala mushaf Madani asli** — navigasi per HALAMAN (604 halaman,
+  alur RTL seperti membuka mushaf cetak), tanda akhir ayat **۝+nomor Arab-Indik**,
+  tanda **sujud tilawah ۩** di 15 tempat sujud, basmalah di awal surah, band header
+  (nama surah + juz), **offline bawaan** (Arab + terjemahan ID/EN di-bundle ke APK).
+  Terjemahan **tersembunyi secara default** (toggle di header); ketuk satu ayat
+  untuk menjadikannya ayat aktif latihan STT. Navigasi lompat **per halaman**
+  (dropdown Halaman 1..604) + dropdown surah; kontrol ukuran huruf **A− / A+
+  (persisten)** untuk yang butuh teks lebih besar.
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
 - 📊 **Statistik gabungan semua challenge** (persisten): layar **Statistik**
@@ -194,6 +203,8 @@ Hasilnya ditulis ke `app/src/main/assets/`:
 - `quran/data/surah-<n>.json` — respons mentah equran.id (Arab + terjemahan Indonesia)
 - `quran/data/trans-en-<n>.json` — terjemahan Inggris (quran.com, Saheeh
   International; tag HTML & footnote `<sup>` sudah dibersihkan)
+- `quran/pages.json` — paginasi mushaf Madani (604 halaman + 30 juz) dari
+  `tools/build_pages.py` (metadata alquran.cloud; teks Arab tetap dari bundel)
 - `fonts/uthmani.ttf` — font Amiri (SIL OFL 1.1)
 
 Tanpa script ini aplikasi tetap berfungsi (unduh on-demand + cache di
@@ -205,6 +216,7 @@ Konten fitur belajar **dibuat dari nol (orisinal)** lewat script Python dan
 di-bundle ke APK — jalankan ulang saat konten diubah:
 
 ```bash
+python3 tools/build_pages.py      # paginasi mushaf Madani → assets/quran/pages.json
 python3 tools/build_vocab.py       # 589 kata terkurasi → assets/quran/vocab.json
 python3 tools/build_lughoh.py      # 15 pelajaran Belajar Arab → assets/lughoh/lessons.json
                                    #   (validasi 11 aturan; --level N untuk cek per level)

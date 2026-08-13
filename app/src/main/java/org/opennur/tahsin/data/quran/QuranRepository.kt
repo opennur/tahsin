@@ -29,6 +29,9 @@ class QuranRepository(context: Context) {
     @Volatile
     private var cachedList: List<Surah>? = null
 
+    @Volatile
+    private var cachedPages: MushafPagination? = null
+
     /** Daftar 114 surah (metadata saja, `ayahs` kosong). */
     fun surahList(): List<Surah> = cachedList ?: synchronized(this) {
         cachedList ?: run {
@@ -39,6 +42,19 @@ class QuranRepository(context: Context) {
             val list = QuranParser.parseSurahList(json)
             cachedList = list
             list
+        }
+    }
+
+    /** Paginasi mushaf Madani (604 halaman + 30 juz) dari bundle aset. */
+    fun pagination(): MushafPagination = cachedPages ?: synchronized(this) {
+        cachedPages ?: run {
+            val json = appContext.assets
+                .open("quran/pages.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val pages = MushafPagesParser.parse(json)
+            cachedPages = pages
+            pages
         }
     }
 

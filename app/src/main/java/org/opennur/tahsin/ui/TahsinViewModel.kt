@@ -12,6 +12,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import org.opennur.tahsin.data.quran.Ayah
+import org.opennur.tahsin.data.quran.ComposedPage
+import org.opennur.tahsin.data.quran.MushafPageComposer
+import org.opennur.tahsin.data.quran.MushafPagination
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.data.quran.Surah
 import org.opennur.tahsin.data.tajwid.TajwidEngine
@@ -27,6 +30,7 @@ import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.AudioDownloader
 import org.opennur.tahsin.util.DownloadProgress
 import org.opennur.tahsin.util.DownloadService
+import org.opennur.tahsin.util.FontScales
 import org.opennur.tahsin.util.FontStore
 import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationHub
@@ -56,6 +60,16 @@ sealed interface TahsinUiState {
 
     data class Ready(
         val surahs: List<Surah> = emptyList(),
+        /** Paginasi mushaf Madani (604 halaman) — dari assets/quran/pages.json. */
+        val pagination: MushafPagination = MushafPagination(0, 0, emptyList(), emptyList()),
+        /** Halaman aktif 0-based — navigasi seperti membalik halaman mushaf. */
+        val pageIndex: Int = 0,
+        val pageCount: Int = 1,
+        /** Halaman tersusun siap-render (null selama konten surah di halaman dimuat). */
+        val composedPage: ComposedPage? = null,
+        /** Terjemahan tersembunyi secara default (mushaf asli); toggle di header. */
+        val showTranslation: Boolean = false,
+        /** Surah & ayat AKTIF = sasaran latihan STT (bukan navigasi). */
         val surahNumber: Int = 1,
         val ayahIndex: Int = 0,
         /** Isi surah sedang dimuat (diunduh dari equran.id). */
@@ -188,8 +202,8 @@ class TahsinViewModel(
     private var pendingAutoListen = false
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     private var pendingOpenAt: Pair<Int, Int>? = null
-    /** Ayat 0-based yang harus dipilih setelah konten surah termuat. */
-    private var pendingAyahAfterLoad: Int? = null
+    /** Penjaga muatan halaman: geser cepat → muatan lama yang selesai belakangan dibuang. */
+    private var pageLoadGeneration = 0
 
     init {
         AyahColors.isDark = settings.darkMode
@@ -207,12 +221,19 @@ class TahsinViewModel(
     fun reload() {
         _uiState.value = TahsinUiState.Loading
         _uiState.value = try {
+            val pagination = repository.pagination()
+            val pageCount = pagination.pageCount.coerceAtLeast(1)
+            val startPage = ((pagination.pageOf(settings.surahNumber, settings.ayahIndex + 1) ?: 1) - 1)
+                .coerceIn(0, pageCount - 1)
             TahsinUiState.Ready(
                 surahs = repository.surahList(),
+                pagination = pagination,
+                pageIndex = startPage,
+                pageCount = pageCount,
                 surahNumber = settings.surahNumber,
                 ayahIndex = settings.ayahIndex,
                 loadingSurah = true,
-                fontScale = 1.5f,
+                fontScale = settings.fontScale,
                 language = currentLanguage(),
                 arabicFont = ArabicFont.UTSMANI,
                 arabicFontFamily = fontStore.loadFamily(ArabicFont.UTSMANI),
@@ -237,8 +258,8 @@ class TahsinViewModel(
                 updateReady { it.copy(arabicFontFamily = fontStore.loadFamily(activeFont)) }
             }
         }
-        // Muat isi surah terakhir yang dibuka (default: Al-Fatihah ayat 1).
-        (currentReady())?.let { loadSurahContent(it.surahNumber) }
+        // Muat konten surah pada halaman terakhir yang dibuka (default: Al-Fatihah).
+        (currentReady())?.let { ensurePageLoaded(it.pageIndex) }
         // Target dari widget/notifikasi (state baru saja siap) → buka langsung.
         pendingOpenAt?.let { (s, a) -> openAt(s, a) }
     }
@@ -249,24 +270,72 @@ class TahsinViewModel(
         updateReady { it.copy(showSwipeHint = false) }
     }
 
-    // ---- navigasi surah/ayat ----
+    // ---- navigasi HALAMAN mushaf (bukan per ayat) ----
 
-    fun selectSurah(number: Int) {
-        pendingAutoListen = false // navigasi manual membatalkan auto-dengar tertunda
-        // Navigasi manual membatalkan target widget/notifikasi yang belum terpakai
-        // (mis. konten surah target belum termuat saat user pindah surah lain).
-        pendingOpenAt = null
-        pendingAyahAfterLoad = null
-        navigateToSurah(number)
+    /** Halaman berikutnya (alur RTL: geser kiri) — seperti membalik mushaf. */
+    fun nextPage() {
+        val s = currentReady() ?: return
+        if (s.pageIndex < s.pageCount - 1) moveToPage(s.pageIndex + 1)
     }
 
-    private fun navigateToSurah(number: Int) {
-        settings.surahNumber = number
-        settings.ayahIndex = 0
+    /** Halaman sebelumnya (alur RTL: geser kanan). */
+    fun prevPage() {
+        val s = currentReady() ?: return
+        if (s.pageIndex > 0) moveToPage(s.pageIndex - 1)
+    }
+
+    /** Pager digeser ke halaman [index] — muat konten & set ayat aktif (ayat pertama). */
+    fun selectPage(index: Int) = moveToPage(index)
+
+    /** Lompat ke halaman pertama surah [number]. */
+    fun jumpToSurah(number: Int) {
+        pendingAutoListen = false // navigasi manual membatalkan auto-dengar tertunda
+        // Navigasi manual membatalkan target widget/notifikasi yang belum terpakai.
+        pendingOpenAt = null
+        val s = currentReady() ?: return
+        val page = s.pagination.firstPageOf(number) ?: return
+        moveToPage(page - 1, activeSurah = number, activeAyahNumber = 1)
+    }
+
+    /** Lompat ke halaman awal juz [juz] (1..30). */
+    fun jumpToJuz(juz: Int) {
+        pendingAutoListen = false
+        pendingOpenAt = null
+        val s = currentReady() ?: return
+        val start = s.pagination.juzStarts.firstOrNull { it.juz == juz } ?: return
+        val page = s.pagination.pageOf(start.surah, start.ayah) ?: return
+        moveToPage(page - 1, activeSurah = start.surah, activeAyahNumber = start.ayah)
+    }
+
+    /** Lompat langsung ke halaman [page] (1-based, 1..604) — navigasi utama mushaf. */
+    fun jumpToPage(page: Int) {
+        pendingAutoListen = false
+        pendingOpenAt = null
+        val s = currentReady() ?: return
+        if (page !in 1..s.pageCount) return
+        moveToPage(page - 1)
+    }
+
+    /**
+     * Pindah ke halaman [index] (0-based). [activeSurah]/[activeAyahNumber]
+     * menentukan ayat aktif (sasaran latihan STT); default: ayat pertama halaman.
+     */
+    private fun moveToPage(
+        index: Int,
+        activeSurah: Int? = null,
+        activeAyahNumber: Int? = null,
+    ) {
+        val s = currentReady() ?: return
+        val clamped = index.coerceIn(0, s.pageCount - 1)
+        val first = s.pagination.firstAyahOf(clamped + 1)
+        val surah = activeSurah ?: first?.first ?: s.surahNumber
+        val ayahNumber = activeAyahNumber ?: first?.second ?: 1
+        settings.surahNumber = surah
+        settings.ayahIndex = ayahNumber - 1
         updateReady { it.copy(
-            surahNumber = number,
-            ayahIndex = 0,
-            loadingSurah = true,
+            pageIndex = clamped,
+            surahNumber = surah,
+            ayahIndex = ayahNumber - 1,
             ayahStats = null,
             transcript = "",
             alignedWords = emptyList(),
@@ -275,78 +344,109 @@ class TahsinViewModel(
             selectedWordRules = emptyList(),
             message = null,
         ) }
-        refreshAyahStats(number, 1)
-        loadSurahContent(number)
+        refreshAyahStats(surah, ayahNumber)
+        ensurePageLoaded(clamped)
     }
 
-    /** Muat isi surah: cache dulu, kalau belum ada unduh dari equran.id. */
-    private fun loadSurahContent(number: Int) {
+    /**
+     * Pastikan konten surah pada halaman [index] (+ surah pertama halaman
+     * berikutnya untuk pra-muat) tersedia, lalu susun ulang halaman.
+     */
+    private fun ensurePageLoaded(index: Int) {
+        val s = currentReady() ?: return
+        val page = s.pagination.pages.getOrNull(index) ?: return
+        val needed = page.segments.map { it.surah }.toSet() +
+            (s.pagination.pages.getOrNull(index + 1)?.segments?.firstOrNull()?.surah ?: 0)
+        val missing = needed.filter { n ->
+            s.surahs.firstOrNull { it.number == n }?.ayahs?.isEmpty() != false
+        }
+        val gen = ++pageLoadGeneration
+        if (missing.isEmpty()) {
+            refreshCurrentPage(gen)
+            return
+        }
+        updateReady { it.copy(loadingSurah = true) }
         viewModelScope.launch {
             val lang = currentLanguage()
-            val cached = repository.cachedSurah(number, lang)
-            if (cached != null) {
-                replaceSurah(cached)
-                return@launch
+            missing.forEach { number ->
+                val cached = runCatching { repository.cachedSurah(number, lang) }.getOrNull()
+                val loaded = cached ?: runCatching { repository.fetchSurah(number, lang) }.getOrNull()
+                if (loaded != null) {
+                    updateReady { st ->
+                        st.copy(surahs = st.surahs.map { x -> if (x.number == loaded.number) loaded else x })
+                    }
+                } else {
+                    updateReady { st ->
+                        st.copy(message = "${AppStrings.of(lang).msgSurahLoadFailed} $number: ${AppStrings.of(lang).msgCheckConnection}")
+                    }
+                }
             }
-            try {
-                replaceSurah(repository.fetchSurah(number, lang))
-            } catch (e: Exception) {
-                updateReady { it.copy(
-                    loadingSurah = false,
-                    message = "${AppStrings.of(lang).msgSurahLoadFailed} $number: ${e.message ?: AppStrings.of(lang).msgCheckConnection}",
-                ) }
-            }
+            refreshCurrentPage(gen)
         }
     }
 
-    private fun replaceSurah(surah: Surah) {
+    /** Susun ulang halaman aktif — hanya untuk generasi muatan terbaru. */
+    private fun refreshCurrentPage(gen: Int = pageLoadGeneration) {
+        if (gen != pageLoadGeneration) return // muatan halaman lama dibuang
         val s = currentReady() ?: return
-        val index = s.ayahIndex.coerceIn(0, (surah.ayahs.size - 1).coerceAtLeast(0))
-        if (index != s.ayahIndex) settings.ayahIndex = index
-        val ayah = surah.ayahs.getOrNull(index)
+        val contents = s.surahs.associateBy { it.number }
+        val composed = MushafPageComposer.composePage(s.pagination, s.pageIndex + 1, contents)
         updateReady { it.copy(
             loadingSurah = false,
-            surahs = it.surahs.map { x -> if (x.number == surah.number) surah else x },
-            ayahIndex = index,
-            ayahStats = null,
+            composedPage = composed,
         ) }
-        refreshAyahStats(surah.number, ayah?.number ?: 1)
-        // Mode flow lintas surah: mulai dengar begitu konten siap.
+        refreshAyahStats(s.surahNumber, s.ayah?.number ?: 1)
+        // Mode flow lintas halaman/surah: mulai dengar begitu konten siap.
         if (pendingAutoListen) {
             pendingAutoListen = false
             startListeningForCurrentAyah()
         }
-        // Target dari widget/notifikasi: pilih ayat setelah konten surah termuat.
-        pendingAyahAfterLoad?.let { idx ->
-            pendingAyahAfterLoad = null
-            updateAyah(idx.coerceIn(0, surah.ayahs.lastIndex.coerceAtLeast(0)))
+    }
+
+    /** Ayat aktif berikutnya dalam halaman; habis → halaman berikutnya. */
+    fun nextAyah() {
+        val s = currentReady() ?: return
+        val page = s.composedPage ?: return
+        val pos = page.ayahs.indexOfFirst { it.surah == s.surahNumber && it.number == s.ayahIndex + 1 }
+        if (pos >= 0 && pos < page.ayahs.lastIndex) {
+            val next = page.ayahs[pos + 1]
+            setActiveAyah(next.surah, next.number)
+            return
+        }
+        if (s.pageIndex < s.pageCount - 1) moveToPage(s.pageIndex + 1)
+    }
+
+    /** Ayat aktif sebelumnya dalam halaman; di awal halaman → halaman sebelumnya. */
+    fun prevAyah() {
+        val s = currentReady() ?: return
+        val page = s.composedPage ?: return
+        val pos = page.ayahs.indexOfFirst { it.surah == s.surahNumber && it.number == s.ayahIndex + 1 }
+        if (pos > 0) {
+            val prev = page.ayahs[pos - 1]
+            setActiveAyah(prev.surah, prev.number)
+            return
+        }
+        if (s.pageIndex > 0) {
+            val prevPage = s.pagination.pages.getOrNull(s.pageIndex - 1)
+            val last = prevPage?.segments?.lastOrNull()
+            if (last != null) {
+                moveToPage(s.pageIndex - 1, activeSurah = last.surah, activeAyahNumber = last.toAyah)
+            } else {
+                moveToPage(s.pageIndex - 1)
+            }
         }
     }
 
-    fun nextAyah() {
-        val s = currentReady() ?: return
-        val max = (s.surah?.ayahs?.size ?: 1) - 1
-        if (s.ayahIndex < max) updateAyah(s.ayahIndex + 1)
-    }
+    /** Ketuk ayat di halaman → jadikan ayat aktif (sasaran latihan). */
+    fun selectAyahAt(surah: Int, ayahNumber: Int) = setActiveAyah(surah, ayahNumber)
 
-    fun prevAyah() {
-        val s = currentReady() ?: return
-        if (s.ayahIndex > 0) updateAyah(s.ayahIndex - 1)
-    }
-
-    fun selectAyah(index: Int) {
-        val s = currentReady() ?: return
-        val max = (s.surah?.ayahs?.size ?: 1) - 1
-        if (index in 0..max) updateAyah(index)
-    }
-
-    private fun updateAyah(index: Int) {
-        pendingAyahAfterLoad = null // navigasi apa pun membatalkan target tertunda
-        settings.ayahIndex = index
-        val s = currentReady() ?: return
-        val ayahNumber = index + 1 // nomor ayat 1-based
+    /** Jadikan surah:ayat sebagai ayat aktif tanpa pindah halaman. */
+    private fun setActiveAyah(surah: Int, ayahNumber: Int) {
+        settings.surahNumber = surah
+        settings.ayahIndex = ayahNumber - 1
         updateReady { it.copy(
-            ayahIndex = index,
+            surahNumber = surah,
+            ayahIndex = ayahNumber - 1,
             ayahStats = null,
             transcript = "",
             alignedWords = emptyList(),
@@ -355,12 +455,27 @@ class TahsinViewModel(
             selectedWordRules = emptyList(),
             message = null,
         ) }
-        refreshAyahStats(s.surahNumber, ayahNumber)
+        refreshAyahStats(surah, ayahNumber)
+    }
+
+    /** Tampilkan/sembunyikan terjemahan di bawah mushaf (default: tersembunyi). */
+    fun toggleTranslation() {
+        updateReady { it.copy(showTranslation = !it.showTranslation) }
+    }
+
+    /**
+     * Ubah ukuran huruf mushaf (tombol A− / A+): di-clamp ke rentang yang
+     * aman, disimpan ke settings supaya bertahan saat app ditutup.
+     */
+    fun setFontScale(value: Float) {
+        val next = FontScales.clamp(value)
+        settings.fontScale = next
+        updateReady { it.copy(fontScale = next) }
     }
 
     // ---- buka target (widget "Ayah of the Day" / notifikasi) ----
 
-    /** Buka surah/ayat tertentu; aman dipanggil kapan saja (state bisa belum siap). */
+    /** Buka surah/ayat tertentu (halaman yang memuatnya); aman dipanggil kapan saja. */
     fun openAt(surahNumber: Int, ayahNumber: Int) {
         if (currentReady() == null) {
             pendingOpenAt = surahNumber to ayahNumber
@@ -372,13 +487,8 @@ class TahsinViewModel(
     private fun applyOpenAt(surahNumber: Int, ayahNumber: Int) {
         pendingOpenAt = null
         val s = currentReady() ?: return
-        val idx = (ayahNumber - 1).coerceAtLeast(0)
-        if (s.surahNumber == surahNumber && (s.surah?.ayahs?.size ?: 0) > 0) {
-            updateAyah(idx.coerceAtMost(s.surah!!.ayahs.lastIndex))
-        } else {
-            pendingAyahAfterLoad = idx
-            navigateToSurah(surahNumber)
-        }
+        val page = s.pagination.pageOf(surahNumber, ayahNumber) ?: return
+        moveToPage(page - 1, activeSurah = surahNumber, activeAyahNumber = ayahNumber)
     }
 
     /** Nyalakan/matikan notifikasi harian "Ayah of the Day" (toggle di Pengaturan). */
@@ -500,22 +610,21 @@ class TahsinViewModel(
 
     private fun advanceToNext() {
         val s = currentReady() ?: return
-        val surah = s.surah ?: return
-        if (s.ayahIndex < surah.ayahs.size - 1) {
-            updateAyah(s.ayahIndex + 1)
-            updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgAyahDone) }
-            startListeningForCurrentAyah()
+        val page = s.composedPage ?: return
+        val pos = page.ayahs.indexOfFirst { it.surah == s.surahNumber && it.number == s.ayahIndex + 1 }
+        val isLastOnPage = pos < 0 || pos == page.ayahs.lastIndex
+        if (s.pageIndex >= s.pageCount - 1 && isLastOnPage) {
+            updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgMurojaahDone) }
             return
         }
-        val idx = s.surahs.indexOfFirst { it.number == surah.number }
-        val nextNumber = s.surahs.getOrNull(idx + 1)?.number
-        if (nextNumber != null) {
-            updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgSurahDone) }
-            selectSurah(nextNumber)
-            pendingAutoListen = true
-            return
+        val next = page.ayahs.getOrNull(pos + 1)
+        updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgAyahDone) }
+        if (next != null) {
+            setActiveAyah(next.surah, next.number)
+        } else {
+            moveToPage(s.pageIndex + 1)
         }
-        updateReady { it.copy(message = AppStrings.of(currentLanguage()).msgMurojaahDone) }
+        startListeningForCurrentAyah()
     }
 
     /** Mulai mendengar ayat yang sedang aktif; tunda dulu kalau konten belum siap. */
@@ -983,7 +1092,7 @@ class TahsinViewModel(
             loadingSurah = true,
             message = null,
         ) }
-        loadSurahContent(s.surahNumber)
+        ensurePageLoaded(s.pageIndex)
     }
 
     private fun currentReady(): TahsinUiState.Ready? = _uiState.value as? TahsinUiState.Ready

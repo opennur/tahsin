@@ -8,6 +8,9 @@ learning tracks**: Vocabulary, Tajweed Quiz, the **Dream BIG** game (arcade),
 and the **Learn Arabic** course (Durusul Lughoh-style methodology).
 
 > ⚠️ **Honest limitations** — this app is a practice aid, **not a substitute for a teacher**.
+> The page-based mushaf uses the EXACT Madani pagination (the ayahs per page match a
+> printed mushaf), but the text flows justified right-to-left (pixel-exact 15-line
+> page layout data is not bundled).
 > STT (speech-to-text) only reads the *text* of what you say: it can catch skipped
 > words, wrong word order, or wrong letters, but it **cannot judge makhraj
 > (articulation) or vowel length**. Tajwid detection is rule-based (a "rule map"
@@ -18,8 +21,14 @@ and the **Learn Arabic** course (Durusul Lughoh-style methodology).
 - 🧭 **Main menu** (home screen): every feature is opened from a menu card —
   **Tahsin**, **Vocabulary**, **Tajweed Quiz**, **Statistics**, **Search**,
   **Audio Manager**, **Dream BIG**, **Learn Arabic**, and **Settings**.
-- 📖 **Authentic mushaf style** — connected script, RTL layout, all 114 surahs,
-  **offline by default** (Arabic + ID/EN translations bundled into the APK).
+- 📖 **Page-based mushaf like the real Madani mushaf** — navigation per PAGE (604 pages,
+  RTL flow like flipping a printed mushaf), verse-end marks **۝+Arabic-Indic numbers**,
+  **sajdah (prostration) marks ۩** at the 15 sajdah verses, basmalah at surah starts,
+  header band (surah name + juz), **offline by default** (Arabic + ID/EN translations
+  bundled into the APK). Translations are **hidden by default** (toggle in the header);
+  tap an ayah to make it the active STT practice target. Jump navigation is **per page**
+  (Page dropdown 1..604) plus a surah dropdown; a **persistent A− / A+ font-size control**
+  lets readers enlarge the mushaf text.
 - 🎙️ **Real-time scoring**: words turn green (correct) / red (wrong) / yellow
   (currently being read) as you recite into the microphone (SpeechRecognizer `ar-SA`).
 - 📊 **Aggregate statistics across all challenges** (persistent): the
@@ -196,6 +205,8 @@ Output is written to `app/src/main/assets/`:
 - `quran/data/surah-<n>.json` — raw equran.id response (Arabic + Indonesian translation)
 - `quran/data/trans-en-<n>.json` — English translation (quran.com, Saheeh
   International; HTML tags & `<sup>` footnotes already stripped)
+- `quran/pages.json` — Madani mushaf pagination (604 pages + 30 juz) from
+  `tools/build_pages.py` (alquran.cloud metadata; Arabic text stays from the bundle)
 - `fonts/uthmani.ttf` — Amiri font (SIL OFL 1.1)
 
 Without these scripts the app still works (on-demand download + cache in
@@ -207,6 +218,7 @@ The learning features' content is **authored from scratch (original)** via
 Python scripts and bundled into the APK — re-run them when content changes:
 
 ```bash
+python3 tools/build_pages.py      # Madani mushaf pagination → assets/quran/pages.json
 python3 tools/build_vocab.py       # 589 curated words → assets/quran/vocab.json
 python3 tools/build_lughoh.py      # 15 Learn Arabic lessons → assets/lughoh/lessons.json
                                    #   (11 validation rules; --level N for per-level check)

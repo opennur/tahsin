@@ -76,4 +76,21 @@ class SettingsStore(context: Context) {
     var audioSpeed: Float
         get() = AudioSpeeds.clamp(prefs.getFloat("audio_speed", 1.0f))
         set(value) = prefs.edit().putFloat("audio_speed", AudioSpeeds.clamp(value)).apply()
+
+    /**
+     * Ukuran huruf mushaf halaman (pengali teks). Rentang 1.0–2.5, default 1.5
+     * (tampilan bawaan layar Tahsin). Dipakai tombol A− / A+ di layar Tahsin.
+     */
+    var fontScale: Float
+        get() = FontScales.clamp(prefs.getFloat("font_scale", 1.5f))
+        set(value) = prefs.edit().putFloat("font_scale", FontScales.clamp(value)).apply()
+}
+
+/** Rentang ukuran huruf mushaf (A− / A+). */
+object FontScales {
+    const val MIN = 1.0f
+    const val MAX = 2.5f
+    const val STEP = 0.25f
+
+    fun clamp(value: Float): Float = value.coerceIn(MIN, MAX)
 }
