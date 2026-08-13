@@ -16,61 +16,71 @@
        "speaker": "Ahmad",
        "ar": "السَّلَامُ عَلَيْكُمْ",
        "latin": "As-salāmu ʿalaikum",
-       "id": "Semoga keselamatan atas kalian"
+       "id": "Semoga keselamatan atas kalian",
+       "en": "Peace be upon you"
       },
       {
        "speaker": "Fatimah",
        "ar": "وَعَلَيْكُمُ السَّلَامُ",
        "latin": "Wa ʿalaikumus-salām",
-       "id": "Dan semoga keselamatan atas kalian juga"
+       "id": "Dan semoga keselamatan atas kalian juga",
+       "en": "And peace be upon you too"
       },
       {
        "speaker": "Ahmad",
        "ar": "مَا اسْمُكِ؟",
        "latin": "Mā ismuki?",
-       "id": "Siapa namamu?"
+       "id": "Siapa namamu?",
+       "en": "What is your name?"
       },
       {
        "speaker": "Fatimah",
        "ar": "اِسْمِي فَاطِمَةُ. وَأَنْتَ؟",
        "latin": "Ismī Fāṭimah. Wa anta?",
-       "id": "Namaku Fatimah. Dan kamu?"
+       "id": "Namaku Fatimah. Dan kamu?",
+       "en": "My name is Fatimah. And you?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَنَا أَحْمَدُ. أَهْلًا وَسَهْلًا",
        "latin": "Anā Aḥmad. Ahlan wa sahlan",
-       "id": "Aku Ahmad. Selamat datang"
+       "id": "Aku Ahmad. Selamat datang",
+       "en": "I am Ahmad. Welcome"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَهْلًا بِكَ",
        "latin": "Ahlan bika",
-       "id": "Selamat datang juga"
+       "id": "Selamat datang juga",
+       "en": "Welcome to you too"
       },
       {
        "speaker": "Ahmad",
        "ar": "مِنْ أَيْنَ أَنْتِ؟",
        "latin": "Min ayna anti?",
-       "id": "Dari mana kamu?"
+       "id": "Dari mana kamu?",
+       "en": "Where are you from?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَنَا مِنْ إِنْدُونِيسِيَّا. وَأَنْتَ؟",
        "latin": "Anā min Indūnīsiyyā. Wa anta?",
-       "id": "Aku dari Indonesia. Dan kamu?"
+       "id": "Aku dari Indonesia. Dan kamu?",
+       "en": "I am from Indonesia. And you?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَنَا مِنْ إِنْدُونِيسِيَّا أَيْضًا",
        "latin": "Anā min Indūnīsiyyā ayḍan",
-       "id": "Aku juga dari Indonesia"
+       "id": "Aku juga dari Indonesia",
+       "en": "I am from Indonesia too"
       },
       {
        "speaker": "Fatimah",
        "ar": "تَشَرَّفْنَا",
        "latin": "Tasharrafnā",
-       "id": "Senang berkenalan"
+       "id": "Senang berkenalan",
+       "en": "Nice to meet you"
       }
      ],
      "mufrodat": [
@@ -80,7 +90,9 @@
        "id": "salam sejahtera",
        "exampleAr": "السَّلَامُ عَلَيْكُمْ يَا أَحْمَدُ",
        "exampleLatin": "As-salāmu ʿalaikum yā Aḥmad",
-       "exampleId": "Semoga keselamatan atasmu, Ahmad"
+       "exampleId": "Semoga keselamatan atasmu, Ahmad",
+       "en": "greetings of peace",
+       "exampleEn": "Peace be upon you, Ahmad"
       },
       {
        "ar": "اِسْم",
@@ -88,7 +100,9 @@
        "id": "nama",
        "exampleAr": "اِسْمِي أَحْمَدُ",
        "exampleLatin": "Ismī Aḥmad",
-       "exampleId": "Namaku Ahmad"
+       "exampleId": "Namaku Ahmad",
+       "en": "name",
+       "exampleEn": "My name is Ahmad"
       },
       {
        "ar": "مَا",
@@ -96,7 +110,9 @@
        "id": "apa",
        "exampleAr": "مَا هٰذَا؟",
        "exampleLatin": "Mā hādhā?",
-       "exampleId": "Apa ini?"
+       "exampleId": "Apa ini?",
+       "en": "what",
+       "exampleEn": "What is this?"
       },
       {
        "ar": "أَنَا",
@@ -104,7 +120,9 @@
        "id": "saya",
        "exampleAr": "أَنَا طَالِبٌ",
        "exampleLatin": "Anā ṭālibun",
-       "exampleId": "Aku seorang pelajar"
+       "exampleId": "Aku seorang pelajar",
+       "en": "I",
+       "exampleEn": "I am a student"
       },
       {
        "ar": "أَنْتَ",
@@ -112,7 +130,9 @@
        "id": "kamu (laki-laki)",
        "exampleAr": "مَا اسْمُكَ؟",
        "exampleLatin": "Mā ismuka?",
-       "exampleId": "Siapa namamu?"
+       "exampleId": "Siapa namamu?",
+       "en": "you (male)",
+       "exampleEn": "What is your name?"
       },
       {
        "ar": "أَنْتِ",
@@ -120,7 +140,9 @@
        "id": "kamu (perempuan)",
        "exampleAr": "مِنْ أَيْنَ أَنْتِ؟",
        "exampleLatin": "Min ayna anti?",
-       "exampleId": "Dari mana kamu?"
+       "exampleId": "Dari mana kamu?",
+       "en": "you (female)",
+       "exampleEn": "Where are you from?"
       },
       {
        "ar": "مِنْ",
@@ -128,7 +150,9 @@
        "id": "dari",
        "exampleAr": "أَنَا مِنْ جَاكَرْتَا",
        "exampleLatin": "Anā min Jākartā",
-       "exampleId": "Aku dari Jakarta"
+       "exampleId": "Aku dari Jakarta",
+       "en": "from",
+       "exampleEn": "I am from Jakarta"
       },
       {
        "ar": "أَيْنَ",
@@ -136,7 +160,9 @@
        "id": "di mana",
        "exampleAr": "أَيْنَ أَنْتَ؟",
        "exampleLatin": "Ayna anta?",
-       "exampleId": "Di mana kamu?"
+       "exampleId": "Di mana kamu?",
+       "en": "where",
+       "exampleEn": "Where are you?"
       },
       {
        "ar": "إِنْدُونِيسِيَّا",
@@ -144,7 +170,9 @@
        "id": "Indonesia",
        "exampleAr": "أَنَا مِنْ إِنْدُونِيسِيَّا",
        "exampleLatin": "Anā min Indūnīsiyyā",
-       "exampleId": "Aku dari Indonesia"
+       "exampleId": "Aku dari Indonesia",
+       "en": "Indonesia",
+       "exampleEn": "I am from Indonesia"
       },
       {
        "ar": "أَيْضًا",
@@ -152,7 +180,9 @@
        "id": "juga",
        "exampleAr": "أَنَا طَالِبٌ أَيْضًا",
        "exampleLatin": "Anā ṭālibun ayḍan",
-       "exampleId": "Aku juga seorang pelajar"
+       "exampleId": "Aku juga seorang pelajar",
+       "en": "also, too",
+       "exampleEn": "I am a student too"
       }
      ],
      "qawaid": [
@@ -161,21 +191,30 @@
        "id": "أَنَا berarti saya, أَنْتَ berarti kamu (untuk laki-laki), dan أَنْتِ berarti kamu (untuk perempuan). Perhatikan bahwa kata ganti 'kamu' berbeda jenis kelaminnya.",
        "exampleAr": "أَنَا أَحْمَدُ",
        "exampleLatin": "Anā Aḥmad",
-       "exampleId": "Aku Ahmad"
+       "exampleId": "Aku Ahmad",
+       "titleEn": "Personal pronouns (ضمائر): أَنَا، أَنْتَ، أَنْتِ",
+       "en": "أَنَا means I, أَنْتَ means you (for a male), and أَنْتِ means you (for a female). Notice that the pronoun 'you' differs by gender.",
+       "exampleEn": "I am Ahmad"
       },
       {
        "titleId": "Kalimat nominal (jumlah ismiyyah)",
        "id": "Kalimat Arab bisa tersusun tanpa kata kerja: kata pertama disebut mubtada' (subjek), kata kedua khabar (predikat). Contoh: أَنَا = mubtada', مِنْ إِنْدُونِيسِيَّا = khabar.",
        "exampleAr": "أَنَا مِنْ إِنْدُونِيسِيَّا أَيْضًا",
        "exampleLatin": "Anā min Indūnīsiyyā ayḍan",
-       "exampleId": "Aku juga dari Indonesia"
+       "exampleId": "Aku juga dari Indonesia",
+       "titleEn": "Nominal sentence (jumlah ismiyyah)",
+       "en": "An Arabic sentence can be formed without a verb: the first word is called mubtada' (subject) and the second khabar (predicate). Example: أَنَا = mubtada', مِنْ إِنْدُونِيسِيَّا = khabar.",
+       "exampleEn": "I am from Indonesia too"
       },
       {
        "titleId": "Kata tanya مَا",
        "id": "مَا dipakai untuk menanyakan nama atau benda, artinya 'apa'. Untuk bertanya nama, gunakan مَا اسْمُكَ (kepada laki-laki) atau مَا اسْمُكِ (kepada perempuan).",
        "exampleAr": "مَا اسْمُكِ؟",
        "exampleLatin": "Mā ismuki?",
-       "exampleId": "Siapa namamu?"
+       "exampleId": "Siapa namamu?",
+       "titleEn": "The question word مَا",
+       "en": "مَا is used to ask about a name or a thing; it means 'what'. To ask for a name, use مَا اسْمُكَ (to a male) or مَا اسْمُكِ (to a female).",
+       "exampleEn": "What is your name?"
       }
      ],
      "tadribat": [
@@ -190,7 +229,8 @@
         "كِتَابُكِ",
         "قَلَمُكِ"
        ],
-       "answer": "اسْمُكِ"
+       "answer": "اسْمُكِ",
+       "promptEn": "Fill in the blank: What ___?"
       },
       {
        "type": "fillBlank",
@@ -203,7 +243,8 @@
         "الْمَغْرِبِ",
         "تُونِسَ"
        ],
-       "answer": "إِنْدُونِيسِيَّا"
+       "answer": "إِنْدُونِيسِيَّا",
+       "promptEn": "Fill in the blank: I am also from ___"
       },
       {
        "type": "translateArId",
@@ -215,7 +256,14 @@
         "Dari mana kamu?",
         "Di mana rumahmu?"
        ],
-       "answer": "Siapa namamu?"
+       "answer": "Siapa namamu?",
+       "optionsEn": [
+        "What is your name?",
+        "How are you?",
+        "Where are you from?",
+        "Where is your house?"
+       ],
+       "answerEn": "What is your name?"
       },
       {
        "type": "translateArId",
@@ -227,7 +275,14 @@
         "Sampai jumpa",
         "Terima kasih"
        ],
-       "answer": "Selamat datang"
+       "answer": "Selamat datang",
+       "optionsEn": [
+        "Welcome",
+        "Good morning",
+        "Goodbye",
+        "Thank you"
+       ],
+       "answerEn": "Welcome"
       },
       {
        "type": "translateIdAr",
@@ -238,7 +293,8 @@
         "مَعَ السَّلَامَةِ",
         "صَبَاحَ الْخَيْرِ"
        ],
-       "answer": "تَشَرَّفْنَا"
+       "answer": "تَشَرَّفْنَا",
+       "promptEn": "Nice to meet you."
       },
       {
        "type": "translateIdAr",
@@ -249,7 +305,8 @@
         "كَيْفَ حَالُكِ؟",
         "أَيْنَ بَيْتُكِ؟"
        ],
-       "answer": "مِنْ أَيْنَ أَنْتِ؟"
+       "answer": "مِنْ أَيْنَ أَنْتِ؟",
+       "promptEn": "Where are you from?"
       },
       {
        "type": "rearrange",
@@ -300,7 +357,8 @@
         "أَنْتِ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Self-Introduction"
     },
     {
      "id": "1-2",
@@ -311,61 +369,71 @@
        "speaker": "Salim",
        "ar": "مَا هٰذَا يَا أَحْمَدُ؟",
        "latin": "Mā hādhā yā Aḥmad?",
-       "id": "Apa ini, Ahmad?"
+       "id": "Apa ini, Ahmad?",
+       "en": "What is this, Ahmad?"
       },
       {
        "speaker": "Ahmad",
        "ar": "هٰذِهِ صُورَةُ عَائِلَتِي",
        "latin": "Hādhihi ṣūratu ʿā'ilatī",
-       "id": "Ini foto keluargaku"
+       "id": "Ini foto keluargaku",
+       "en": "This is a picture of my family"
       },
       {
        "speaker": "Salim",
        "ar": "مَنْ هٰذَا؟",
        "latin": "Man hādhā?",
-       "id": "Siapa ini?"
+       "id": "Siapa ini?",
+       "en": "Who is this?"
       },
       {
        "speaker": "Ahmad",
        "ar": "هٰذَا أَبِي",
        "latin": "Hādhā abī",
-       "id": "Ini ayahku"
+       "id": "Ini ayahku",
+       "en": "This is my father"
       },
       {
        "speaker": "Salim",
        "ar": "وَمَنْ هٰذِهِ؟",
        "latin": "Wa man hādhihi?",
-       "id": "Dan siapa ini?"
+       "id": "Dan siapa ini?",
+       "en": "And who is this?"
       },
       {
        "speaker": "Ahmad",
        "ar": "هٰذِهِ أُمِّي",
        "latin": "Hādhihi ummī",
-       "id": "Ini ibuku"
+       "id": "Ini ibuku",
+       "en": "This is my mother"
       },
       {
        "speaker": "Salim",
        "ar": "هَلْ لَكَ إِخْوَةٌ؟",
        "latin": "Hal laka ikhwatun?",
-       "id": "Apakah kamu punya saudara?"
+       "id": "Apakah kamu punya saudara?",
+       "en": "Do you have siblings?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، لِي أَخٌ وَأُخْتٌ",
        "latin": "Naʿam, lī akhun wa ukhtun",
-       "id": "Ya, aku punya saudara laki-laki dan saudara perempuan"
+       "id": "Ya, aku punya saudara laki-laki dan saudara perempuan",
+       "en": "Yes, I have a brother and a sister"
       },
       {
        "speaker": "Salim",
        "ar": "وَمَنْ هٰذَا وَهٰذِهِ؟",
        "latin": "Wa man hādhā wa hādhihi?",
-       "id": "Dan siapa ini dan ini?"
+       "id": "Dan siapa ini dan ini?",
+       "en": "And who are this one and this one?"
       },
       {
        "speaker": "Ahmad",
        "ar": "هٰذَا جَدِّي وَهٰذِهِ جَدَّتِي",
        "latin": "Hādhā jaddī wa hādhihi jaddatī",
-       "id": "Ini kakekku dan ini nenekku"
+       "id": "Ini kakekku dan ini nenekku",
+       "en": "This is my grandfather and this is my grandmother"
       }
      ],
      "mufrodat": [
@@ -375,7 +443,9 @@
        "id": "ini (laki-laki/benda maskulin)",
        "exampleAr": "هٰذَا كِتَابٌ",
        "exampleLatin": "Hādhā kitābun",
-       "exampleId": "Ini sebuah buku"
+       "exampleId": "Ini sebuah buku",
+       "en": "this (masculine)",
+       "exampleEn": "This is a book"
       },
       {
        "ar": "هٰذِهِ",
@@ -383,7 +453,9 @@
        "id": "ini (perempuan/benda feminin)",
        "exampleAr": "هٰذِهِ مَدْرَسَةٌ",
        "exampleLatin": "Hādhihi madrasatun",
-       "exampleId": "Ini sebuah sekolah"
+       "exampleId": "Ini sebuah sekolah",
+       "en": "this (feminine)",
+       "exampleEn": "This is a school"
       },
       {
        "ar": "صُورَة",
@@ -391,7 +463,9 @@
        "id": "foto, gambar",
        "exampleAr": "هٰذِهِ صُورَةُ بَيْتِي",
        "exampleLatin": "Hādhihi ṣūratu baytī",
-       "exampleId": "Ini foto rumahku"
+       "exampleId": "Ini foto rumahku",
+       "en": "picture, photo",
+       "exampleEn": "This is a picture of my house"
       },
       {
        "ar": "عَائِلَة",
@@ -399,7 +473,9 @@
        "id": "keluarga",
        "exampleAr": "عَائِلَتِي كَبِيرَةٌ",
        "exampleLatin": "ʿā'ilatī kabīrah",
-       "exampleId": "Keluargaku besar"
+       "exampleId": "Keluargaku besar",
+       "en": "family",
+       "exampleEn": "My family is big"
       },
       {
        "ar": "أَب",
@@ -407,7 +483,9 @@
        "id": "ayah",
        "exampleAr": "أَبِي طَبِيبٌ",
        "exampleLatin": "Abī ṭabībun",
-       "exampleId": "Ayahku seorang dokter"
+       "exampleId": "Ayahku seorang dokter",
+       "en": "father",
+       "exampleEn": "My father is a doctor"
       },
       {
        "ar": "أُمّ",
@@ -415,7 +493,9 @@
        "id": "ibu",
        "exampleAr": "أُمِّي مُدَرِّسَةٌ",
        "exampleLatin": "Ummī mudarrisah",
-       "exampleId": "Ibuku seorang guru"
+       "exampleId": "Ibuku seorang guru",
+       "en": "mother",
+       "exampleEn": "My mother is a teacher"
       },
       {
        "ar": "أَخ",
@@ -423,7 +503,9 @@
        "id": "saudara laki-laki",
        "exampleAr": "أَخِي صَغِيرٌ",
        "exampleLatin": "Akhī ṣaghīrun",
-       "exampleId": "Saudara laki-lakiku kecil"
+       "exampleId": "Saudara laki-lakiku kecil",
+       "en": "brother",
+       "exampleEn": "My brother is young"
       },
       {
        "ar": "أُخْت",
@@ -431,7 +513,9 @@
        "id": "saudara perempuan",
        "exampleAr": "أُخْتِي كَبِيرَةٌ",
        "exampleLatin": "Ukhtī kabīrah",
-       "exampleId": "Saudara perempuanku besar"
+       "exampleId": "Saudara perempuanku besar",
+       "en": "sister",
+       "exampleEn": "My sister is grown up"
       },
       {
        "ar": "جَدّ",
@@ -439,7 +523,9 @@
        "id": "kakek",
        "exampleAr": "جَدِّي كَبِيرٌ",
        "exampleLatin": "Jaddī kabīrun",
-       "exampleId": "Kakekku tua"
+       "exampleId": "Kakekku tua",
+       "en": "grandfather",
+       "exampleEn": "My grandfather is old"
       },
       {
        "ar": "جَدَّة",
@@ -447,7 +533,9 @@
        "id": "nenek",
        "exampleAr": "جَدَّتِي طَيِّبَةٌ",
        "exampleLatin": "Jaddatī ṭayyibah",
-       "exampleId": "Nenekku baik hati"
+       "exampleId": "Nenekku baik hati",
+       "en": "grandmother",
+       "exampleEn": "My grandmother is kind"
       }
      ],
      "qawaid": [
@@ -456,21 +544,30 @@
        "id": "هٰذَا berarti 'ini' untuk laki-laki atau kata benda maskulin (mis. أَبٌ، كِتَابٌ). هٰذِهِ untuk perempuan atau kata benda feminin (mis. أُمٌّ، صُورَةٌ).",
        "exampleAr": "هٰذَا أَبِي",
        "exampleLatin": "Hādhā abī",
-       "exampleId": "Ini ayahku"
+       "exampleId": "Ini ayahku",
+       "titleEn": "Demonstratives هٰذَا and هٰذِهِ",
+       "en": "هٰذَا means 'this' for a male or a masculine noun (e.g. أَبٌ، كِتَابٌ). هٰذِهِ is for a female or a feminine noun (e.g. أُمٌّ، صُورَةٌ).",
+       "exampleEn": "This is my father"
       },
       {
        "titleId": "Kata tanya مَنْ untuk orang",
        "id": "مَنْ berarti 'siapa' dan dipakai untuk menanyakan orang, berbeda dengan مَا yang menanyakan benda.",
        "exampleAr": "مَنْ هٰذَا؟",
        "exampleLatin": "Man hādhā?",
-       "exampleId": "Siapa ini?"
+       "exampleId": "Siapa ini?",
+       "titleEn": "The question word مَنْ for people",
+       "en": "مَنْ means 'who' and is used to ask about people, unlike مَا which asks about things.",
+       "exampleEn": "Who is this?"
       },
       {
        "titleId": "Idhafah: menyambung dua kata benda",
        "id": "Dua kata benda bisa dirangkai: kata pertama milik kata kedua, mis. صُورَةُ عَائِلَتِي = foto keluargaku. Kata kedua kehilangan tanwin.",
        "exampleAr": "هٰذِهِ صُورَةُ عَائِلَتِي",
        "exampleLatin": "Hādhihi ṣūratu ʿā'ilatī",
-       "exampleId": "Ini foto keluargaku"
+       "exampleId": "Ini foto keluargaku",
+       "titleEn": "Idhafah: joining two nouns",
+       "en": "Two nouns can be joined: the first noun belongs to the second, e.g. صُورَةُ عَائِلَتِي = the picture of my family. The second noun loses its tanwin.",
+       "exampleEn": "This is a picture of my family"
       }
      ],
      "tadribat": [
@@ -485,7 +582,8 @@
         "جَدَّتِي",
         "أُخْتِي"
        ],
-       "answer": "أَبِي"
+       "answer": "أَبِي",
+       "promptEn": "Fill in the blank: This is ___ (my father)"
       },
       {
        "type": "fillBlank",
@@ -498,7 +596,8 @@
         "أَخِي",
         "جَدِّي"
        ],
-       "answer": "أُمِّي"
+       "answer": "أُمِّي",
+       "promptEn": "Fill in the blank: This is ___ (my mother)"
       },
       {
        "type": "translateArId",
@@ -510,7 +609,14 @@
         "Ini kakekku",
         "Ini nenekku"
        ],
-       "answer": "Ini ibuku"
+       "answer": "Ini ibuku",
+       "optionsEn": [
+        "This is my mother",
+        "This is my father",
+        "This is my grandfather",
+        "This is my grandmother"
+       ],
+       "answerEn": "This is my mother"
       },
       {
        "type": "translateArId",
@@ -522,7 +628,14 @@
         "Dari mana kamu?",
         "Di mana rumahmu?"
        ],
-       "answer": "Apakah kamu punya saudara?"
+       "answer": "Apakah kamu punya saudara?",
+       "optionsEn": [
+        "Do you have siblings?",
+        "What is your name?",
+        "Where are you from?",
+        "Where is your house?"
+       ],
+       "answerEn": "Do you have siblings?"
       },
       {
        "type": "translateIdAr",
@@ -533,7 +646,8 @@
         "أَيْنَ هٰذَا؟",
         "كَيْفَ هٰذَا؟"
        ],
-       "answer": "مَنْ هٰذَا؟"
+       "answer": "مَنْ هٰذَا؟",
+       "promptEn": "Who is this?"
       },
       {
        "type": "translateIdAr",
@@ -544,7 +658,8 @@
         "هٰذِهِ أُمِّي",
         "هٰذَا جَدِّي"
        ],
-       "answer": "هٰذِهِ صُورَةُ عَائِلَتِي"
+       "answer": "هٰذِهِ صُورَةُ عَائِلَتِي",
+       "promptEn": "This is a picture of my family."
       },
       {
        "type": "rearrange",
@@ -590,7 +705,8 @@
         "وَأُخْتٌ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Family"
     },
     {
      "id": "1-3",
@@ -601,73 +717,91 @@
        "speaker": "Ustadz",
        "ar": "صَبَاحَ الْخَيْرِ يَا فَاطِمَةُ",
        "latin": "Ṣabāḥa l-khayr yā Fāṭimah",
-       "id": "Selamat pagi, Fatimah"
+       "id": "Selamat pagi, Fatimah",
+       "en": "Good morning, Fatimah",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Fatimah",
        "ar": "صَبَاحَ النُّورِ",
        "latin": "Ṣabāḥa n-nūr",
-       "id": "Selamat pagi"
+       "id": "Selamat pagi",
+       "en": "Good morning"
       },
       {
        "speaker": "Ustadz",
        "ar": "أَيْنَ أَنْتِ؟",
        "latin": "Ayna anti?",
-       "id": "Di mana kamu?"
+       "id": "Di mana kamu?",
+       "en": "Where are you?",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَنَا فِي الْمَدْرَسَةِ",
        "latin": "Anā fī l-madrasah",
-       "id": "Aku di sekolah"
+       "id": "Aku di sekolah",
+       "en": "I am at school"
       },
       {
        "speaker": "Ustadz",
        "ar": "مَاذَا تَدْرُسِينَ؟",
        "latin": "Mādhā tadrusīna?",
-       "id": "Apa yang kamu pelajari?"
+       "id": "Apa yang kamu pelajari?",
+       "en": "What are you studying?",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَدْرُسُ اللُّغَةَ الْعَرَبِيَّةَ",
        "latin": "Adrusu l-lughata l-ʿarabiyyah",
-       "id": "Aku belajar bahasa Arab"
+       "id": "Aku belajar bahasa Arab",
+       "en": "I am studying Arabic"
       },
       {
        "speaker": "Ustadz",
        "ar": "مَا هٰذَا؟",
        "latin": "Mā hādhā?",
-       "id": "Apa ini?"
+       "id": "Apa ini?",
+       "en": "What is this?",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Fatimah",
        "ar": "هٰذَا كِتَابٌ",
        "latin": "Hādhā kitābun",
-       "id": "Ini sebuah buku"
+       "id": "Ini sebuah buku",
+       "en": "This is a book"
       },
       {
        "speaker": "Ustadz",
        "ar": "وَمَا هٰذَا؟",
        "latin": "Wa mā hādhā?",
-       "id": "Dan apa ini?"
+       "id": "Dan apa ini?",
+       "en": "And what is this?",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Fatimah",
        "ar": "هٰذَا قَلَمٌ",
        "latin": "Hādhā qalamun",
-       "id": "Ini sebuah pena"
+       "id": "Ini sebuah pena",
+       "en": "This is a pen"
       },
       {
        "speaker": "Ustadz",
        "ar": "وَمَا هٰذِهِ؟",
        "latin": "Wa mā hādhihi?",
-       "id": "Dan apa ini?"
+       "id": "Dan apa ini?",
+       "en": "And what is this?",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Fatimah",
        "ar": "هٰذِهِ مِسْطَرَةٌ",
        "latin": "Hādhihi misṭarah",
-       "id": "Ini sebuah penggaris"
+       "id": "Ini sebuah penggaris",
+       "en": "This is a ruler"
       }
      ],
      "mufrodat": [
@@ -677,7 +811,9 @@
        "id": "selamat pagi",
        "exampleAr": "صَبَاحَ الْخَيْرِ يَا أُسْتَاذُ",
        "exampleLatin": "Ṣabāḥa l-khayr yā ustādh",
-       "exampleId": "Selamat pagi, Ustadz"
+       "exampleId": "Selamat pagi, Ustadz",
+       "en": "good morning",
+       "exampleEn": "Good morning, Ustadh"
       },
       {
        "ar": "صَبَاحَ النُّورِ",
@@ -685,7 +821,9 @@
        "id": "selamat pagi (jawaban)",
        "exampleAr": "صَبَاحَ النُّورِ يَا فَاطِمَةُ",
        "exampleLatin": "Ṣabāḥa n-nūr yā Fāṭimah",
-       "exampleId": "Selamat pagi, Fatimah"
+       "exampleId": "Selamat pagi, Fatimah",
+       "en": "good morning (reply)",
+       "exampleEn": "Good morning, Fatimah"
       },
       {
        "ar": "الْمَدْرَسَة",
@@ -693,7 +831,9 @@
        "id": "sekolah",
        "exampleAr": "الْمَدْرَسَةُ كَبِيرَةٌ",
        "exampleLatin": "Al-madrasatu kabīrah",
-       "exampleId": "Sekolahnya besar"
+       "exampleId": "Sekolahnya besar",
+       "en": "school",
+       "exampleEn": "The school is big"
       },
       {
        "ar": "فِي",
@@ -701,7 +841,9 @@
        "id": "di dalam",
        "exampleAr": "الْكِتَابُ فِي الْحَقِيبَةِ",
        "exampleLatin": "Al-kitābu fī l-ḥaqībah",
-       "exampleId": "Bukunya di dalam tas"
+       "exampleId": "Bukunya di dalam tas",
+       "en": "inside",
+       "exampleEn": "The book is inside the bag"
       },
       {
        "ar": "كِتَاب",
@@ -709,7 +851,9 @@
        "id": "buku",
        "exampleAr": "هٰذَا كِتَابٌ جَدِيدٌ",
        "exampleLatin": "Hādhā kitābun jadīdun",
-       "exampleId": "Ini buku baru"
+       "exampleId": "Ini buku baru",
+       "en": "book",
+       "exampleEn": "This is a new book"
       },
       {
        "ar": "قَلَم",
@@ -717,7 +861,9 @@
        "id": "pena, pulpen",
        "exampleAr": "قَلَمِي أَحْمَرُ",
        "exampleLatin": "Qalamī aḥmaru",
-       "exampleId": "Penaku merah"
+       "exampleId": "Penaku merah",
+       "en": "pen",
+       "exampleEn": "My pen is red"
       },
       {
        "ar": "مِسْطَرَة",
@@ -725,7 +871,9 @@
        "id": "penggaris",
        "exampleAr": "الْمِسْطَرَةُ طَوِيلَةٌ",
        "exampleLatin": "Al-misṭaratu ṭawīlah",
-       "exampleId": "Penggarisnya panjang"
+       "exampleId": "Penggarisnya panjang",
+       "en": "ruler",
+       "exampleEn": "The ruler is long"
       },
       {
        "ar": "مَاذَا",
@@ -733,7 +881,9 @@
        "id": "apa (untuk bertanya kegiatan)",
        "exampleAr": "مَاذَا تَقْرَأُ؟",
        "exampleLatin": "Mādhā taqra'?",
-       "exampleId": "Apa yang kamu baca?"
+       "exampleId": "Apa yang kamu baca?",
+       "en": "what (for asking about an activity)",
+       "exampleEn": "What are you reading?"
       },
       {
        "ar": "اللُّغَة",
@@ -741,7 +891,9 @@
        "id": "bahasa",
        "exampleAr": "اللُّغَةُ الْعَرَبِيَّةُ جَمِيلَةٌ",
        "exampleLatin": "Al-lughatu l-ʿarabiyyatu jamīlah",
-       "exampleId": "Bahasa Arab itu indah"
+       "exampleId": "Bahasa Arab itu indah",
+       "en": "language",
+       "exampleEn": "Arabic is beautiful"
       },
       {
        "ar": "الْعَرَبِيَّة",
@@ -749,7 +901,9 @@
        "id": "bahasa Arab",
        "exampleAr": "أَتَعَلَّمُ الْعَرَبِيَّةَ",
        "exampleLatin": "Ataʿallamu l-ʿarabiyyah",
-       "exampleId": "Aku belajar bahasa Arab"
+       "exampleId": "Aku belajar bahasa Arab",
+       "en": "Arabic (language)",
+       "exampleEn": "I am studying Arabic"
       }
      ],
      "qawaid": [
@@ -758,21 +912,30 @@
        "id": "أَيْنَ dipakai untuk menanyakan tempat. Jawabannya biasanya memakai kata depan فِي (di dalam).",
        "exampleAr": "أَيْنَ أَنْتِ؟",
        "exampleLatin": "Ayna anti?",
-       "exampleId": "Di mana kamu?"
+       "exampleId": "Di mana kamu?",
+       "titleEn": "The question word أَيْنَ (where)",
+       "en": "أَيْنَ is used to ask about a place. The answer usually uses the preposition فِي (in/inside).",
+       "exampleEn": "Where are you?"
       },
       {
        "titleId": "Kata depan فِي (di)",
        "id": "فِي berarti 'di dalam' dan diikuti kata benda berakhiran kasrah (jar). Contoh: فِي الْمَدْرَسَةِ = di sekolah.",
        "exampleAr": "أَنَا فِي الْمَدْرَسَةِ",
        "exampleLatin": "Anā fī l-madrasah",
-       "exampleId": "Aku di sekolah"
+       "exampleId": "Aku di sekolah",
+       "titleEn": "The preposition فِي (in)",
+       "en": "فِي means 'in/inside' and is followed by a noun ending in kasrah (jar). Example: فِي الْمَدْرَسَةِ = at school.",
+       "exampleEn": "I am at school"
       },
       {
        "titleId": "Kata kerja sekarang (fi'il mudhari')",
        "id": "أَدْرُسُ berarti 'aku sedang belajar' dan تَدْرُسِينَ berarti 'kamu (perempuan) sedang belajar'. Kata kerja berubah mengikuti pelakunya.",
        "exampleAr": "أَدْرُسُ اللُّغَةَ الْعَرَبِيَّةَ",
        "exampleLatin": "Adrusu l-lughata l-ʿarabiyyah",
-       "exampleId": "Aku belajar bahasa Arab"
+       "exampleId": "Aku belajar bahasa Arab",
+       "titleEn": "Present tense verb (fi'il mudhari')",
+       "en": "أَدْرُسُ means 'I am studying' and تَدْرُسِينَ means 'you (female) are studying'. The verb changes according to its doer.",
+       "exampleEn": "I am studying Arabic"
       }
      ],
      "tadribat": [
@@ -787,7 +950,8 @@
         "عَلَى",
         "إِلَى"
        ],
-       "answer": "فِي"
+       "answer": "فِي",
+       "promptEn": "Fill in the blank: I am ___ school"
       },
       {
        "type": "fillBlank",
@@ -800,7 +964,8 @@
         "مَدْرَسَةٌ",
         "حَقِيبَةٌ"
        ],
-       "answer": "كِتَابٌ"
+       "answer": "كِتَابٌ",
+       "promptEn": "Fill in the blank: This is a ___ (book)"
       },
       {
        "type": "translateArId",
@@ -812,7 +977,14 @@
         "Di mana sekolahmu?",
         "Apa ini?"
        ],
-       "answer": "Apa yang kamu pelajari?"
+       "answer": "Apa yang kamu pelajari?",
+       "optionsEn": [
+        "What are you studying?",
+        "What is your name?",
+        "Where is your school?",
+        "What is this?"
+       ],
+       "answerEn": "What are you studying?"
       },
       {
        "type": "translateArId",
@@ -824,7 +996,14 @@
         "Aku di pasar",
         "Aku di masjid"
        ],
-       "answer": "Aku di sekolah"
+       "answer": "Aku di sekolah",
+       "optionsEn": [
+        "I am at school",
+        "I am at home",
+        "I am at the market",
+        "I am at the mosque"
+       ],
+       "answerEn": "I am at school"
       },
       {
        "type": "translateIdAr",
@@ -835,7 +1014,8 @@
         "أَهْلًا وَسَهْلًا",
         "تَشَرَّفْنَا"
        ],
-       "answer": "صَبَاحَ الْخَيْرِ"
+       "answer": "صَبَاحَ الْخَيْرِ",
+       "promptEn": "Good morning."
       },
       {
        "type": "translateIdAr",
@@ -846,7 +1026,8 @@
         "هٰذَا كِتَابٌ",
         "هٰذِهِ مَدْرَسَةٌ"
        ],
-       "answer": "هٰذِهِ مِسْطَرَةٌ"
+       "answer": "هٰذِهِ مِسْطَرَةٌ",
+       "promptEn": "This is a ruler."
       },
       {
        "type": "rearrange",
@@ -892,7 +1073,8 @@
         "الْعَرَبِيَّةَ"
        ]
       }
-     ]
+     ],
+     "titleEn": "School"
     },
     {
      "id": "1-4",
@@ -903,61 +1085,71 @@
        "speaker": "Salim",
        "ar": "أَيْنَ بَيْتُكَ يَا أَحْمَدُ؟",
        "latin": "Ayna baytuka yā Aḥmad?",
-       "id": "Di mana rumahmu, Ahmad?"
+       "id": "Di mana rumahmu, Ahmad?",
+       "en": "Where is your house, Ahmad?"
       },
       {
        "speaker": "Ahmad",
        "ar": "بَيْتِي فِي جَاكَرْتَا",
        "latin": "Baytī fī Jākartā",
-       "id": "Rumahku di Jakarta"
+       "id": "Rumahku di Jakarta",
+       "en": "My house is in Jakarta"
       },
       {
        "speaker": "Salim",
        "ar": "هَلْ بَيْتُكَ كَبِيرٌ؟",
        "latin": "Hal baytuka kabīrun?",
-       "id": "Apakah rumahmu besar?"
+       "id": "Apakah rumahmu besar?",
+       "en": "Is your house big?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، بَيْتِي كَبِيرٌ",
        "latin": "Naʿam, baytī kabīrun",
-       "id": "Ya, rumahku besar"
+       "id": "Ya, rumahku besar",
+       "en": "Yes, my house is big"
       },
       {
        "speaker": "Salim",
        "ar": "كَمْ غُرْفَةً فِي بَيْتِكَ؟",
        "latin": "Kam ghurfatan fī baytika?",
-       "id": "Berapa kamar di rumahmu?"
+       "id": "Berapa kamar di rumahmu?",
+       "en": "How many rooms are in your house?"
       },
       {
        "speaker": "Ahmad",
        "ar": "فِي بَيْتِي أَرْبَعُ غُرَفٍ",
        "latin": "Fī baytī arbaʿu ghurafin",
-       "id": "Di rumahku ada empat kamar"
+       "id": "Di rumahku ada empat kamar",
+       "en": "There are four rooms in my house"
       },
       {
        "speaker": "Salim",
        "ar": "وَأَيْنَ الْمَطْبَخُ؟",
        "latin": "Wa ayna l-maṭbakh?",
-       "id": "Dan di mana dapurnya?"
+       "id": "Dan di mana dapurnya?",
+       "en": "And where is the kitchen?"
       },
       {
        "speaker": "Ahmad",
        "ar": "الْمَطْبَخُ قَرِيبٌ مِنَ الْحَمَّامِ",
        "latin": "Al-maṭbakhu qarībun mina l-ḥammām",
-       "id": "Dapur dekat dengan kamar mandi"
+       "id": "Dapur dekat dengan kamar mandi",
+       "en": "The kitchen is close to the bathroom"
       },
       {
        "speaker": "Salim",
        "ar": "مَا هٰذَا؟",
        "latin": "Mā hādhā?",
-       "id": "Apa ini?"
+       "id": "Apa ini?",
+       "en": "What is this?"
       },
       {
        "speaker": "Ahmad",
        "ar": "هٰذَا بَابُ الْبَيْتِ",
        "latin": "Hādhā bābu l-bayt",
-       "id": "Ini pintu rumah"
+       "id": "Ini pintu rumah",
+       "en": "This is the door of the house"
       }
      ],
      "mufrodat": [
@@ -967,7 +1159,9 @@
        "id": "rumah",
        "exampleAr": "بَيْتِي قَرِيبٌ مِنَ الْمَسْجِدِ",
        "exampleLatin": "Baytī qarībun mina l-masjid",
-       "exampleId": "Rumahku dekat dengan masjid"
+       "exampleId": "Rumahku dekat dengan masjid",
+       "en": "house",
+       "exampleEn": "My house is close to the mosque"
       },
       {
        "ar": "كَبِير",
@@ -975,7 +1169,9 @@
        "id": "besar",
        "exampleAr": "الْبَيْتُ كَبِيرٌ",
        "exampleLatin": "Al-baytu kabīrun",
-       "exampleId": "Rumahnya besar"
+       "exampleId": "Rumahnya besar",
+       "en": "big",
+       "exampleEn": "His house is big"
       },
       {
        "ar": "غُرْفَة",
@@ -983,7 +1179,9 @@
        "id": "kamar, ruangan",
        "exampleAr": "غُرْفَتِي نَظِيفَةٌ",
        "exampleLatin": "Ghurfatī naẓīfah",
-       "exampleId": "Kamarku bersih"
+       "exampleId": "Kamarku bersih",
+       "en": "room",
+       "exampleEn": "My room is clean"
       },
       {
        "ar": "مَطْبَخ",
@@ -991,7 +1189,9 @@
        "id": "dapur",
        "exampleAr": "الْمَطْبَخُ وَاسِعٌ",
        "exampleLatin": "Al-maṭbakhu wāsiʿun",
-       "exampleId": "Dapurnya luas"
+       "exampleId": "Dapurnya luas",
+       "en": "kitchen",
+       "exampleEn": "The kitchen is spacious"
       },
       {
        "ar": "حَمَّام",
@@ -999,7 +1199,9 @@
        "id": "kamar mandi",
        "exampleAr": "الْحَمَّامُ نَظِيفٌ",
        "exampleLatin": "Al-ḥammāmu naẓīfun",
-       "exampleId": "Kamar mandinya bersih"
+       "exampleId": "Kamar mandinya bersih",
+       "en": "bathroom",
+       "exampleEn": "The bathroom is clean"
       },
       {
        "ar": "بَاب",
@@ -1007,7 +1209,9 @@
        "id": "pintu",
        "exampleAr": "بَابُ الْغُرْفَةِ مَفْتُوحٌ",
        "exampleLatin": "Bābu l-ghurfati maftūḥun",
-       "exampleId": "Pintu kamarnya terbuka"
+       "exampleId": "Pintu kamarnya terbuka",
+       "en": "door",
+       "exampleEn": "The door of the room is open"
       },
       {
        "ar": "نَعَم",
@@ -1015,7 +1219,9 @@
        "id": "ya (jawaban setuju)",
        "exampleAr": "نَعَمْ، هٰذَا كِتَابِي",
        "exampleLatin": "Naʿam, hādhā kitābī",
-       "exampleId": "Ya, ini bukuku"
+       "exampleId": "Ya, ini bukuku",
+       "en": "yes (agreement)",
+       "exampleEn": "Yes, this is my book"
       },
       {
        "ar": "كَمْ",
@@ -1023,7 +1229,9 @@
        "id": "berapa",
        "exampleAr": "كَمْ كِتَابًا عِنْدَكَ؟",
        "exampleLatin": "Kam kitāban ʿindaka?",
-       "exampleId": "Berapa buku yang kamu punya?"
+       "exampleId": "Berapa buku yang kamu punya?",
+       "en": "how many",
+       "exampleEn": "How many books do you have?"
       },
       {
        "ar": "قَرِيب",
@@ -1031,7 +1239,9 @@
        "id": "dekat",
        "exampleAr": "الْمَسْجِدُ قَرِيبٌ مِنَ الْبَيْتِ",
        "exampleLatin": "Al-masjidu qarībun mina l-bayt",
-       "exampleId": "Masjidnya dekat dengan rumah"
+       "exampleId": "Masjidnya dekat dengan rumah",
+       "en": "near, close",
+       "exampleEn": "The mosque is close to the house"
       },
       {
        "ar": "أَرْبَع",
@@ -1039,7 +1249,9 @@
        "id": "empat",
        "exampleAr": "عِنْدِي أَرْبَعَةُ كُتُبٍ",
        "exampleLatin": "ʿindī arbaʿatu kutubin",
-       "exampleId": "Aku punya empat buku"
+       "exampleId": "Aku punya empat buku",
+       "en": "four",
+       "exampleEn": "I have four books"
       }
      ],
      "qawaid": [
@@ -1048,21 +1260,30 @@
        "id": "Untuk bertanya tempat gunakan أَيْنَ (di mana). Jawabannya memakai فِي (di) atau قَرِيبٌ مِنْ (dekat dengan).",
        "exampleAr": "أَيْنَ بَيْتُكَ يَا أَحْمَدُ؟",
        "exampleLatin": "Ayna baytuka yā Aḥmad?",
-       "exampleId": "Di mana rumahmu, Ahmad?"
+       "exampleId": "Di mana rumahmu, Ahmad?",
+       "titleEn": "أَيْنَ + فِي for places",
+       "en": "To ask about a place use أَيْنَ (where). The answer uses فِي (in) or قَرِيبٌ مِنْ (close to).",
+       "exampleEn": "Where is your house, Ahmad?"
       },
       {
        "titleId": "Kata tanya كَمْ (berapa)",
        "id": "كَمْ dipakai untuk menanyakan jumlah. Kata benda setelahnya berakhiran -an (nasab), mis. كَمْ غُرْفَةً؟ = berapa kamar?",
        "exampleAr": "كَمْ غُرْفَةً فِي بَيْتِكَ؟",
        "exampleLatin": "Kam ghurfatan fī baytika?",
-       "exampleId": "Berapa kamar di rumahmu?"
+       "exampleId": "Berapa kamar di rumahmu?",
+       "titleEn": "The question word كَمْ (how many)",
+       "en": "كَمْ is used to ask about a quantity. The noun after it ends in -an (nasab), e.g. كَمْ غُرْفَةً؟ = how many rooms?",
+       "exampleEn": "How many rooms are in your house?"
       },
       {
        "titleId": "Kalimat dengan kata sifat (na't)",
        "id": "Kata sifat mengikuti kata benda dalam jenisnya: بَيْتٌ كَبِيرٌ (rumah besar, maskulin), مَدْرَسَةٌ كَبِيرَةٌ (sekolah besar, feminin).",
        "exampleAr": "بَيْتِي كَبِيرٌ",
        "exampleLatin": "Baytī kabīrun",
-       "exampleId": "Rumahku besar"
+       "exampleId": "Rumahku besar",
+       "titleEn": "Sentences with adjectives (na't)",
+       "en": "The adjective follows its noun in gender: بَيْتٌ كَبِيرٌ (a big house, masculine), مَدْرَسَةٌ كَبِيرَةٌ (a big school, feminine).",
+       "exampleEn": "My house is big"
       }
      ],
      "tadribat": [
@@ -1077,7 +1298,8 @@
         "قَلَمُكَ",
         "مَدْرَسَتُكَ"
        ],
-       "answer": "بَيْتُكَ"
+       "answer": "بَيْتُكَ",
+       "promptEn": "Fill in the blank: Where is ___ , Ahmad?"
       },
       {
        "type": "fillBlank",
@@ -1090,7 +1312,8 @@
         "أَقْلَامٍ",
         "مَسَاجِدَ"
        ],
-       "answer": "غُرَفٍ"
+       "answer": "غُرَفٍ",
+       "promptEn": "Fill in the blank: In my house there are four ___"
       },
       {
        "type": "translateArId",
@@ -1102,7 +1325,14 @@
         "Sekolahku di Jakarta",
         "Rumahmu di Jakarta"
        ],
-       "answer": "Rumahku di Jakarta"
+       "answer": "Rumahku di Jakarta",
+       "optionsEn": [
+        "My house is in Jakarta",
+        "My house is in Bandung",
+        "My school is in Jakarta",
+        "Your house is in Jakarta"
+       ],
+       "answerEn": "My house is in Jakarta"
       },
       {
        "type": "translateArId",
@@ -1114,7 +1344,14 @@
         "Kamar mandi dekat dengan pintu",
         "Dapurnya besar"
        ],
-       "answer": "Dapur dekat dengan kamar mandi"
+       "answer": "Dapur dekat dengan kamar mandi",
+       "optionsEn": [
+        "The kitchen is close to the bathroom",
+        "The kitchen is inside the house",
+        "The bathroom is close to the door",
+        "The kitchen is big"
+       ],
+       "answerEn": "The kitchen is close to the bathroom"
       },
       {
        "type": "translateIdAr",
@@ -1125,7 +1362,8 @@
         "أَيْنَ غُرْفَتُكَ؟",
         "هَلْ بَيْتُكَ كَبِيرٌ؟"
        ],
-       "answer": "كَمْ غُرْفَةً فِي بَيْتِكَ؟"
+       "answer": "كَمْ غُرْفَةً فِي بَيْتِكَ؟",
+       "promptEn": "How many rooms are in your house?"
       },
       {
        "type": "translateIdAr",
@@ -1136,7 +1374,8 @@
         "أَيْنَ بَيْتُكَ؟",
         "كَمْ بَيْتًا لَكَ؟"
        ],
-       "answer": "هَلْ بَيْتُكَ كَبِيرٌ؟"
+       "answer": "هَلْ بَيْتُكَ كَبِيرٌ؟",
+       "promptEn": "Is your house big?"
       },
       {
        "type": "rearrange",
@@ -1187,7 +1426,8 @@
         "الْحَمَّامِ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Home"
     },
     {
      "id": "1-5",
@@ -1198,67 +1438,78 @@
        "speaker": "Ahmad",
        "ar": "مَا هٰذَا يَا فَاطِمَةُ؟",
        "latin": "Mā hādhā yā Fāṭimah?",
-       "id": "Apa ini, Fatimah?"
+       "id": "Apa ini, Fatimah?",
+       "en": "What is this, Fatimah?"
       },
       {
        "speaker": "Fatimah",
        "ar": "هٰذَا خُبْزٌ",
        "latin": "Hādhā khubzun",
-       "id": "Ini roti"
+       "id": "Ini roti",
+       "en": "This is bread"
       },
       {
        "speaker": "Ahmad",
        "ar": "وَمَا هٰذَا؟",
        "latin": "Wa mā hādhā?",
-       "id": "Dan apa ini?"
+       "id": "Dan apa ini?",
+       "en": "And what is this?"
       },
       {
        "speaker": "Fatimah",
        "ar": "هٰذَا أَرُزٌّ",
        "latin": "Hādhā aruzzun",
-       "id": "Ini nasi"
+       "id": "Ini nasi",
+       "en": "This is rice"
       },
       {
        "speaker": "Ahmad",
        "ar": "أُحِبُّ الْأَرُزَّ كَثِيرًا",
        "latin": "Uḥibbu l-aruzza kathīran",
-       "id": "Aku sangat suka nasi"
+       "id": "Aku sangat suka nasi",
+       "en": "I really like rice"
       },
       {
        "speaker": "Fatimah",
        "ar": "وَهٰذَا حَسَاءٌ",
        "latin": "Wa hādhā ḥasā'un",
-       "id": "Dan ini sup"
+       "id": "Dan ini sup",
+       "en": "And this is soup"
       },
       {
        "speaker": "Ahmad",
        "ar": "مَا هٰذِهِ؟",
        "latin": "Mā hādhihi?",
-       "id": "Apa ini?"
+       "id": "Apa ini?",
+       "en": "What is this?"
       },
       {
        "speaker": "Fatimah",
        "ar": "هٰذِهِ فَاكِهَةٌ",
        "latin": "Hādhihi fākihah",
-       "id": "Ini buah"
+       "id": "Ini buah",
+       "en": "This is fruit"
       },
       {
        "speaker": "Ahmad",
        "ar": "مَا اسْمُ هٰذِهِ الْفَاكِهَةِ؟",
        "latin": "Mā smu hādhihi l-fākihah?",
-       "id": "Apa nama buah ini?"
+       "id": "Apa nama buah ini?",
+       "en": "What is the name of this fruit?"
       },
       {
        "speaker": "Fatimah",
        "ar": "اسْمُهَا مَوْزٌ",
        "latin": "Ismuhā mawzun",
-       "id": "Namanya pisang"
+       "id": "Namanya pisang",
+       "en": "Its name is banana"
       },
       {
        "speaker": "Ahmad",
        "ar": "الطَّعَامُ لَذِيذٌ",
        "latin": "Aṭ-ṭaʿāmu ladhdhīdhun",
-       "id": "Makanannya lezat"
+       "id": "Makanannya lezat",
+       "en": "The food is delicious"
       }
      ],
      "mufrodat": [
@@ -1268,7 +1519,9 @@
        "id": "makanan",
        "exampleAr": "الطَّعَامُ فِي الْمَطْبَخِ",
        "exampleLatin": "Aṭ-ṭaʿāmu fī l-maṭbakh",
-       "exampleId": "Makanannya ada di dapur"
+       "exampleId": "Makanannya ada di dapur",
+       "en": "food",
+       "exampleEn": "The food is in the kitchen"
       },
       {
        "ar": "خُبْز",
@@ -1276,7 +1529,9 @@
        "id": "roti",
        "exampleAr": "الْخُبْزُ طَازَجٌ",
        "exampleLatin": "Al-khubzu ṭāzijun",
-       "exampleId": "Rotinya segar"
+       "exampleId": "Rotinya segar",
+       "en": "bread",
+       "exampleEn": "The bread is fresh"
       },
       {
        "ar": "أَرُزّ",
@@ -1284,7 +1539,9 @@
        "id": "nasi",
        "exampleAr": "الْأَرُزُّ مِنْ إِنْدُونِيسِيَّا",
        "exampleLatin": "Al-aruzzu min Indūnīsiyyā",
-       "exampleId": "Nasi berasal dari Indonesia"
+       "exampleId": "Nasi berasal dari Indonesia",
+       "en": "rice",
+       "exampleEn": "Rice comes from Indonesia"
       },
       {
        "ar": "حَسَاء",
@@ -1292,7 +1549,9 @@
        "id": "sup",
        "exampleAr": "الْحَسَاءُ حَارٌّ",
        "exampleLatin": "Al-ḥasā'u ḥārr",
-       "exampleId": "Supnya pedas"
+       "exampleId": "Supnya pedas",
+       "en": "soup",
+       "exampleEn": "The soup is spicy"
       },
       {
        "ar": "فَاكِهَة",
@@ -1300,7 +1559,9 @@
        "id": "buah",
        "exampleAr": "الْفَاكِهَةُ طَيِّبَةٌ",
        "exampleLatin": "Al-fākihatu ṭayyibah",
-       "exampleId": "Buahnya enak"
+       "exampleId": "Buahnya enak",
+       "en": "fruit",
+       "exampleEn": "The fruit is tasty"
       },
       {
        "ar": "مَوْز",
@@ -1308,7 +1569,9 @@
        "id": "pisang",
        "exampleAr": "الْمَوْزُ أَصْفَرُ",
        "exampleLatin": "Al-mawzu aṣfaru",
-       "exampleId": "Pisangnya berwarna kuning"
+       "exampleId": "Pisangnya berwarna kuning",
+       "en": "banana",
+       "exampleEn": "The banana is yellow"
       },
       {
        "ar": "أُحِبُّ",
@@ -1316,7 +1579,9 @@
        "id": "saya suka",
        "exampleAr": "أُحِبُّ الْخُبْزَ",
        "exampleLatin": "Uḥibbu l-khubz",
-       "exampleId": "Aku suka roti"
+       "exampleId": "Aku suka roti",
+       "en": "I like",
+       "exampleEn": "I like bread"
       },
       {
        "ar": "كَثِيرًا",
@@ -1324,7 +1589,9 @@
        "id": "sangat, banyak",
        "exampleAr": "أُحِبُّ الْفَاكِهَةَ كَثِيرًا",
        "exampleLatin": "Uḥibbu l-fākihata kathīran",
-       "exampleId": "Aku sangat suka buah"
+       "exampleId": "Aku sangat suka buah",
+       "en": "very, a lot",
+       "exampleEn": "I really like fruit"
       },
       {
        "ar": "اسْم",
@@ -1332,7 +1599,9 @@
        "id": "nama",
        "exampleAr": "اسْمُ أَبِي أَحْمَدُ",
        "exampleLatin": "Ismu abī Aḥmad",
-       "exampleId": "Nama ayahku Ahmad"
+       "exampleId": "Nama ayahku Ahmad",
+       "en": "name",
+       "exampleEn": "My father's name is Ahmad"
       },
       {
        "ar": "لَذِيذ",
@@ -1340,7 +1609,9 @@
        "id": "lezat, enak",
        "exampleAr": "الْخُبْزُ لَذِيذٌ",
        "exampleLatin": "Al-khubzu ladhdhīdhun",
-       "exampleId": "Rotinya lezat"
+       "exampleId": "Rotinya lezat",
+       "en": "delicious, tasty",
+       "exampleEn": "The bread is delicious"
       }
      ],
      "qawaid": [
@@ -1349,21 +1620,30 @@
        "id": "أُحِبُّ berarti 'saya suka/mencintai'. Kata benda sesudahnya berakhiran -a (nasab), contoh: أُحِبُّ الْأَرُزَّ = aku suka nasi.",
        "exampleAr": "أُحِبُّ الْأَرُزَّ كَثِيرًا",
        "exampleLatin": "Uḥibbu l-aruzza kathīran",
-       "exampleId": "Aku sangat suka nasi"
+       "exampleId": "Aku sangat suka nasi",
+       "titleEn": "أُحِبُّ + noun (I like ...)",
+       "en": "أُحِبُّ means 'I like/love'. The noun after it ends in -a (nasab), e.g. أُحِبُّ الْأَرُزَّ = I like rice.",
+       "exampleEn": "I really like rice"
       },
       {
        "titleId": "Kata sifat (na't) mengikuti kata benda",
        "id": "Kata sifat mengikuti kata benda dalam jenisnya: الطَّعَامُ لَذِيذٌ (makanan lezat, maskulin) dan الْفَاكِهَةُ لَذِيذَةٌ (buah lezat, feminin).",
        "exampleAr": "الطَّعَامُ لَذِيذٌ",
        "exampleLatin": "Aṭ-ṭaʿāmu ladhdhīdhun",
-       "exampleId": "Makanannya lezat"
+       "exampleId": "Makanannya lezat",
+       "titleEn": "Adjectives (na't) follow the noun",
+       "en": "The adjective follows its noun in gender: الطَّعَامُ لَذِيذٌ (the food is delicious, masculine) and الْفَاكِهَةُ لَذِيذَةٌ (the fruit is delicious, feminine).",
+       "exampleEn": "The food is delicious"
       },
       {
        "titleId": "Menanyakan nama benda: مَا اسْمُ ...؟",
        "id": "Untuk menanyakan nama sesuatu gunakan مَا اسْمُ ...؟ (apa nama ...?). Jawabannya: اسْمُهُ (namanya, maskulin) atau اسْمُهَا (namanya, feminin).",
        "exampleAr": "مَا اسْمُ هٰذِهِ الْفَاكِهَةِ؟",
        "exampleLatin": "Mā smu hādhihi l-fākihah?",
-       "exampleId": "Apa nama buah ini?"
+       "exampleId": "Apa nama buah ini?",
+       "titleEn": "Asking the name of a thing: مَا اسْمُ ...؟",
+       "en": "To ask the name of something use مَا اسْمُ ...؟ (what is the name of ...?). The answer: اسْمُهُ (its name, masculine) or اسْمُهَا (its name, feminine).",
+       "exampleEn": "What is the name of this fruit?"
       }
      ],
      "tadribat": [
@@ -1378,7 +1658,8 @@
         "الْحَسَاءَ",
         "الْفَاكِهَةَ"
        ],
-       "answer": "الْأَرُزَّ"
+       "answer": "الْأَرُزَّ",
+       "promptEn": "Fill in the blank: I really like ___"
       },
       {
        "type": "fillBlank",
@@ -1391,7 +1672,8 @@
         "أَرُزٌّ",
         "حَسَاءٌ"
        ],
-       "answer": "فَاكِهَةٌ"
+       "answer": "فَاكِهَةٌ",
+       "promptEn": "Fill in the blank: This is ___ (fruit)"
       },
       {
        "type": "translateArId",
@@ -1403,7 +1685,14 @@
         "Aku makan nasi",
         "Nasi itu enak"
        ],
-       "answer": "Aku sangat suka nasi"
+       "answer": "Aku sangat suka nasi",
+       "optionsEn": [
+        "I really like rice",
+        "I like bread",
+        "I eat rice",
+        "The rice is tasty"
+       ],
+       "answerEn": "I really like rice"
       },
       {
        "type": "translateArId",
@@ -1415,7 +1704,14 @@
         "Apa nama makanan ini?",
         "Di mana buah ini?"
        ],
-       "answer": "Apa nama buah ini?"
+       "answer": "Apa nama buah ini?",
+       "optionsEn": [
+        "What is the name of this fruit?",
+        "What is this?",
+        "What is the name of this food?",
+        "Where is this fruit?"
+       ],
+       "answerEn": "What is the name of this fruit?"
       },
       {
        "type": "translateIdAr",
@@ -1426,7 +1722,8 @@
         "هٰذَا حَسَاءٌ",
         "هٰذِهِ فَاكِهَةٌ"
        ],
-       "answer": "هٰذَا خُبْزٌ"
+       "answer": "هٰذَا خُبْزٌ",
+       "promptEn": "This is bread."
       },
       {
        "type": "translateIdAr",
@@ -1437,7 +1734,8 @@
         "الْفَاكِهَةُ لَذِيذَةٌ",
         "الْخُبْزُ حَارٌّ"
        ],
-       "answer": "الطَّعَامُ لَذِيذٌ"
+       "answer": "الطَّعَامُ لَذِيذٌ",
+       "promptEn": "The food is delicious."
       },
       {
        "type": "rearrange",
@@ -1488,9 +1786,11 @@
         "الْفَاكِهَةِ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Food"
     }
-   ]
+   ],
+   "titleEn": "Level 1 — Introductions & Daily Life"
   },
   {
    "id": 2,
@@ -1506,61 +1806,76 @@
        "speaker": "Fatimah",
        "ar": "أَنَا فِي السُّوقِ الْيَوْمَ",
        "latin": "Anā fī s-sūqi l-yawm",
-       "id": "Hari ini aku di pasar"
+       "id": "Hari ini aku di pasar",
+       "en": "Today I am at the market"
       },
       {
        "speaker": "Penjual",
        "ar": "السَّلَامُ عَلَيْكُمْ، تَفَضَّلِي",
        "latin": "As-salāmu ʿalaikum, tafaḍḍalī",
-       "id": "Semoga keselamatan, silakan"
+       "id": "Semoga keselamatan, silakan",
+       "en": "Peace be upon you, please come in",
+       "speakerEn": "Vendor"
       },
       {
        "speaker": "Fatimah",
        "ar": "وَعَلَيْكُمُ السَّلَامُ. بِكَمْ هٰذَا التُّفَّاحُ؟",
        "latin": "Wa ʿalaikumus-salām. Bikam hādhā t-tuffāḥ?",
-       "id": "Dan semoga keselamatan. Berapa harga apel ini?"
+       "id": "Dan semoga keselamatan. Berapa harga apel ini?",
+       "en": "And peace be upon you too. How much is this apple?"
       },
       {
        "speaker": "Penjual",
        "ar": "الْكِيلُو بِعَشَرَةِ آلَافِ رُوبِيَّة",
        "latin": "Al-kīlū biʿasharati ālāfi rūbiyyah",
-       "id": "Satu kilo sepuluh ribu rupiah"
+       "id": "Satu kilo sepuluh ribu rupiah",
+       "en": "One kilo is ten thousand rupiah",
+       "speakerEn": "Vendor"
       },
       {
        "speaker": "Fatimah",
        "ar": "هٰذَا غَالٍ جِدًّا",
        "latin": "Hādhā ghālin jiddan",
-       "id": "Ini sangat mahal"
+       "id": "Ini sangat mahal",
+       "en": "This is very expensive"
       },
       {
        "speaker": "Penjual",
        "ar": "فَهٰذَا الْبُرْتُقَالُ أَرْخَصُ",
        "latin": "Fa-hādhā l-burtuqāl arkhaṣ",
-       "id": "Maka jeruk ini lebih murah"
+       "id": "Maka jeruk ini lebih murah",
+       "en": "Then these oranges are cheaper",
+       "speakerEn": "Vendor"
       },
       {
        "speaker": "Fatimah",
        "ar": "كَمْ ثَمَنُ الْبُرْتُقَالِ؟",
        "latin": "Kam thamanu l-burtuqāl?",
-       "id": "Berapa harga jeruk?"
+       "id": "Berapa harga jeruk?",
+       "en": "How much are the oranges?"
       },
       {
        "speaker": "Penjual",
        "ar": "ثَمَنُهُ ثَمَانِيَةُ آلَافٍ لِلْكِيلُو",
        "latin": "Thamanuhu thamāniyatu ālāfin lil-kīlū",
-       "id": "Harganya delapan ribu per kilo"
+       "id": "Harganya delapan ribu per kilo",
+       "en": "They are eight thousand per kilo",
+       "speakerEn": "Vendor"
       },
       {
        "speaker": "Fatimah",
        "ar": "جَيِّدٌ. آخُذُ كِيلُوَيْنِ",
        "latin": "Jayyid. Ākhudhu kīlawayni",
-       "id": "Bagus. Aku ambil dua kilo"
+       "id": "Bagus. Aku ambil dua kilo",
+       "en": "Good. I will take two kilos"
       },
       {
        "speaker": "Penjual",
        "ar": "حَسَنًا، تَفَضَّلِي",
        "latin": "Ḥasanan, tafaḍḍalī",
-       "id": "Baiklah, silakan"
+       "id": "Baiklah, silakan",
+       "en": "Alright, here you go",
+       "speakerEn": "Vendor"
       }
      ],
      "mufrodat": [
@@ -1570,7 +1885,9 @@
        "id": "pasar",
        "exampleAr": "السُّوقُ قَرِيبٌ مِنَ الْبَيْتِ",
        "exampleLatin": "As-sūqu qarībun mina l-bayt",
-       "exampleId": "Pasarnya dekat dengan rumah"
+       "exampleId": "Pasarnya dekat dengan rumah",
+       "en": "market",
+       "exampleEn": "The market is close to the house"
       },
       {
        "ar": "تُفَّاح",
@@ -1578,7 +1895,9 @@
        "id": "apel",
        "exampleAr": "التُّفَّاحُ لَذِيذٌ",
        "exampleLatin": "At-tuffāḥu ladhdhīdhun",
-       "exampleId": "Apelnya lezat"
+       "exampleId": "Apelnya lezat",
+       "en": "apple",
+       "exampleEn": "The apple is delicious"
       },
       {
        "ar": "بُرْتُقَال",
@@ -1586,7 +1905,9 @@
        "id": "jeruk",
        "exampleAr": "الْبُرْتُقَالُ أَصْفَرُ",
        "exampleLatin": "Al-burtuqālu aṣfaru",
-       "exampleId": "Jeruknya berwarna kuning"
+       "exampleId": "Jeruknya berwarna kuning",
+       "en": "orange",
+       "exampleEn": "The orange is yellow"
       },
       {
        "ar": "ثَمَن",
@@ -1594,7 +1915,9 @@
        "id": "harga",
        "exampleAr": "ثَمَنُ الْكِتَابِ غَالٍ",
        "exampleLatin": "Thamanu l-kitābi ghālin",
-       "exampleId": "Harga bukunya mahal"
+       "exampleId": "Harga bukunya mahal",
+       "en": "price",
+       "exampleEn": "The price of the book is expensive"
       },
       {
        "ar": "غَالٍ",
@@ -1602,7 +1925,9 @@
        "id": "mahal",
        "exampleAr": "هٰذَا الْقَمِيصُ غَالٍ",
        "exampleLatin": "Hādhā l-qamīṣu ghālin",
-       "exampleId": "Kemeja ini mahal"
+       "exampleId": "Kemeja ini mahal",
+       "en": "expensive",
+       "exampleEn": "This shirt is expensive"
       },
       {
        "ar": "أَرْخَص",
@@ -1610,7 +1935,9 @@
        "id": "lebih murah",
        "exampleAr": "هٰذَا الْكِتَابُ أَرْخَصُ مِنْ ذٰلِكَ",
        "exampleLatin": "Hādhā l-kitābu arkhaṣu min dhālika",
-       "exampleId": "Buku ini lebih murah daripada itu"
+       "exampleId": "Buku ini lebih murah daripada itu",
+       "en": "cheaper",
+       "exampleEn": "This book is cheaper than that one"
       },
       {
        "ar": "كِيلُو",
@@ -1618,7 +1945,9 @@
        "id": "kilo",
        "exampleAr": "كِيلُو الْأَرُزِّ بِعَشَرَةِ آلَافٍ",
        "exampleLatin": "Kīlū l-aruzzi biʿasharati ālāfin",
-       "exampleId": "Satu kilo nasi sepuluh ribu"
+       "exampleId": "Satu kilo nasi sepuluh ribu",
+       "en": "kilo",
+       "exampleEn": "One kilo of rice is ten thousand"
       },
       {
        "ar": "رُوبِيَّة",
@@ -1626,7 +1955,9 @@
        "id": "rupiah",
        "exampleAr": "هٰذَا بِخَمْسَةِ آلَافِ رُوبِيَّة",
        "exampleLatin": "Hādhā bikhamsati ālāfi rūbiyyah",
-       "exampleId": "Ini lima ribu rupiah"
+       "exampleId": "Ini lima ribu rupiah",
+       "en": "rupiah",
+       "exampleEn": "This is five thousand rupiah"
       },
       {
        "ar": "آخُذُ",
@@ -1634,7 +1965,9 @@
        "id": "aku mengambil",
        "exampleAr": "آخُذُ الْكِتَابَ مِنَ الْمَكْتَبَةِ",
        "exampleLatin": "Ākhudhu l-kitāba mina l-maktabah",
-       "exampleId": "Aku mengambil buku dari perpustakaan"
+       "exampleId": "Aku mengambil buku dari perpustakaan",
+       "en": "I take",
+       "exampleEn": "I take a book from the library"
       },
       {
        "ar": "جِدًّا",
@@ -1642,7 +1975,9 @@
        "id": "sangat",
        "exampleAr": "الْبَيْتُ كَبِيرٌ جِدًّا",
        "exampleLatin": "Al-baytu kabīrun jiddan",
-       "exampleId": "Rumahnya sangat besar"
+       "exampleId": "Rumahnya sangat besar",
+       "en": "very",
+       "exampleEn": "His house is very big"
       }
      ],
      "qawaid": [
@@ -1651,21 +1986,30 @@
        "id": "بِكَمْ berarti 'berapa harganya?'. Jawaban harga memakai بِ (dengan/seharga), mis. بِعَشَرَةِ آلَافِ رُوبِيَّة = seharga sepuluh ribu rupiah.",
        "exampleAr": "بِكَمْ هٰذَا التُّفَّاحُ؟",
        "exampleLatin": "Bikam hādhā t-tuffāḥ?",
-       "exampleId": "Berapa harga apel ini?"
+       "exampleId": "Berapa harga apel ini?",
+       "titleEn": "بِكَمْ to ask the price",
+       "en": "بِكَمْ means 'how much is it?'. The price answer uses بِ (with/for), e.g. بِعَشَرَةِ آلَافِ رُوبِيَّة = for ten thousand rupiah.",
+       "exampleEn": "How much is this apple?"
       },
       {
        "titleId": "Angka 3–10 + kata benda jamak",
        "id": "Untuk angka 3 sampai 10, kata bendanya berbentuk jamak: عَشَرَةُ آلَافٍ (sepuluh ribu), ثَمَانِيَةُ آلَافٍ (delapan ribu).",
        "exampleAr": "الْكِيلُو بِعَشَرَةِ آلَافِ رُوبِيَّة",
        "exampleLatin": "Al-kīlū biʿasharati ālāfi rūbiyyah",
-       "exampleId": "Satu kilo sepuluh ribu rupiah"
+       "exampleId": "Satu kilo sepuluh ribu rupiah",
+       "titleEn": "Numbers 3–10 + plural noun",
+       "en": "For numbers 3 to 10, the noun takes the plural form: عَشَرَةُ آلَافٍ (ten thousand), ثَمَانِيَةُ آلَافٍ (eight thousand).",
+       "exampleEn": "One kilo is ten thousand rupiah"
       },
       {
        "titleId": "Bentuk perbandingan أَفْعَل",
        "id": "أَرْخَصُ berarti 'lebih murah', bentuk perbandingan dari رَخِيصٌ (murah). Pola ini dipakai untuk membandingkan: أَكْبَرُ (lebih besar), أَقْرَبُ (lebih dekat).",
        "exampleAr": "فَهٰذَا الْبُرْتُقَالُ أَرْخَصُ",
        "exampleLatin": "Fa-hādhā l-burtuqāl arkhaṣ",
-       "exampleId": "Maka jeruk ini lebih murah"
+       "exampleId": "Maka jeruk ini lebih murah",
+       "titleEn": "The comparative form أَفْعَل",
+       "en": "أَرْخَصُ means 'cheaper', the comparative form of رَخِيصٌ (cheap). This pattern is used for comparing: أَكْبَرُ (bigger), أَقْرَبُ (closer).",
+       "exampleEn": "Then these oranges are cheaper"
       }
      ],
      "tadribat": [
@@ -1680,7 +2024,8 @@
         "الْخُبْزُ",
         "الْأَرُزُّ"
        ],
-       "answer": "التُّفَّاحُ"
+       "answer": "التُّفَّاحُ",
+       "promptEn": "Fill in the blank: How much is this ___?"
       },
       {
        "type": "fillBlank",
@@ -1693,7 +2038,8 @@
         "كُتُبٍ",
         "أَقْلَامٍ"
        ],
-       "answer": "آلَافٍ"
+       "answer": "آلَافٍ",
+       "promptEn": "Fill in the blank: Its price is eight ___"
       },
       {
        "type": "translateArId",
@@ -1705,7 +2051,14 @@
         "Ini sangat enak",
         "Ini sangat bagus"
        ],
-       "answer": "Ini sangat mahal"
+       "answer": "Ini sangat mahal",
+       "optionsEn": [
+        "This is very expensive",
+        "This is very cheap",
+        "This is very tasty",
+        "This is very good"
+       ],
+       "answerEn": "This is very expensive"
       },
       {
        "type": "translateArId",
@@ -1717,7 +2070,14 @@
         "Aku suka jeruk",
         "Aku beli apel"
        ],
-       "answer": "Aku ambil dua kilo"
+       "answer": "Aku ambil dua kilo",
+       "optionsEn": [
+        "I will take two kilos",
+        "I will take one kilo",
+        "I like oranges",
+        "I buy apples"
+       ],
+       "answerEn": "I will take two kilos"
       },
       {
        "type": "translateIdAr",
@@ -1728,7 +2088,8 @@
         "كَمْ كِيلُو عِنْدَكَ؟",
         "أَيْنَ السُّوقُ؟"
        ],
-       "answer": "كَمْ ثَمَنُ الْبُرْتُقَالِ؟"
+       "answer": "كَمْ ثَمَنُ الْبُرْتُقَالِ؟",
+       "promptEn": "How much are the oranges?"
       },
       {
        "type": "translateIdAr",
@@ -1739,7 +2100,8 @@
         "أَهْلًا وَسَهْلًا",
         "مَعَ السَّلَامَةِ"
        ],
-       "answer": "تَفَضَّلِي"
+       "answer": "تَفَضَّلِي",
+       "promptEn": "Please, go ahead."
       },
       {
        "type": "rearrange",
@@ -1790,7 +2152,8 @@
         "آلَافٍ"
        ]
       }
-     ]
+     ],
+     "titleEn": "At the Market"
     },
     {
      "id": "2-2",
@@ -1801,61 +2164,71 @@
        "speaker": "Salim",
        "ar": "كَيْفَ تَذْهَبُ إِلَى الْمَدْرَسَةِ؟",
        "latin": "Kayfa tadhhabu ilā l-madrasah?",
-       "id": "Bagaimana kamu pergi ke sekolah?"
+       "id": "Bagaimana kamu pergi ke sekolah?",
+       "en": "How do you go to school?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَذْهَبُ بِالسَّيَّارَةِ",
        "latin": "Adhhabu bis-sayyārah",
-       "id": "Aku pergi dengan mobil"
+       "id": "Aku pergi dengan mobil",
+       "en": "I go by car"
       },
       {
        "speaker": "Salim",
        "ar": "وَكَيْفَ تَذْهَبُ إِلَى السُّوقِ؟",
        "latin": "Wa kayfa tadhhabu ilā s-sūq?",
-       "id": "Dan bagaimana kamu pergi ke pasar?"
+       "id": "Dan bagaimana kamu pergi ke pasar?",
+       "en": "And how do you go to the market?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَذْهَبُ بِالدَّرَّاجَةِ النَّارِيَّةِ",
        "latin": "Adhhabu bid-darrājati n-nāriyyah",
-       "id": "Aku pergi dengan sepeda motor"
+       "id": "Aku pergi dengan sepeda motor",
+       "en": "I go by motorcycle"
       },
       {
        "speaker": "Salim",
        "ar": "هَلْ الْمَدْرَسَةُ بَعِيدَةٌ؟",
        "latin": "Hal al-madrasatu baʿīdah?",
-       "id": "Apakah sekolahnya jauh?"
+       "id": "Apakah sekolahnya jauh?",
+       "en": "Is the school far?"
       },
       {
        "speaker": "Ahmad",
        "ar": "لَا، الْمَدْرَسَةُ قَرِيبَةٌ",
        "latin": "Lā, al-madrasatu qarībah",
-       "id": "Tidak, sekolahnya dekat"
+       "id": "Tidak, sekolahnya dekat",
+       "en": "No, the school is near"
       },
       {
        "speaker": "Salim",
        "ar": "وَأَيْنَ مَحَطَّةُ الْحَافِلَةِ؟",
        "latin": "Wa ayna maḥaṭṭatu l-ḥāfilah?",
-       "id": "Dan di mana halte bus?"
+       "id": "Dan di mana halte bus?",
+       "en": "And where is the bus stop?"
       },
       {
        "speaker": "Ahmad",
        "ar": "مَحَطَّةُ الْحَافِلَةِ أَمَامَ الْمَسْجِدِ",
        "latin": "Maḥaṭṭatu l-ḥāfilah amāma l-masjid",
-       "id": "Halte bus di depan masjid"
+       "id": "Halte bus di depan masjid",
+       "en": "The bus stop is in front of the mosque"
       },
       {
        "speaker": "Salim",
        "ar": "هَلْ تَرْكَبُ الْحَافِلَةَ؟",
        "latin": "Hal tarkabu l-ḥāfilah?",
-       "id": "Apakah kamu naik bus?"
+       "id": "Apakah kamu naik bus?",
+       "en": "Do you take the bus?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، أَحْيَانًا",
        "latin": "Naʿam, aḥyānan",
-       "id": "Ya, kadang-kadang"
+       "id": "Ya, kadang-kadang",
+       "en": "Yes, sometimes"
       }
      ],
      "mufrodat": [
@@ -1865,7 +2238,9 @@
        "id": "bagaimana",
        "exampleAr": "كَيْفَ حَالُكَ؟",
        "exampleLatin": "Kayfa ḥāluka?",
-       "exampleId": "Bagaimana kabarmu?"
+       "exampleId": "Bagaimana kabarmu?",
+       "en": "how",
+       "exampleEn": "How are you?"
       },
       {
        "ar": "أَذْهَبُ",
@@ -1873,7 +2248,9 @@
        "id": "aku pergi",
        "exampleAr": "أَذْهَبُ إِلَى الْمَسْجِدِ",
        "exampleLatin": "Adhhabu ilā l-masjid",
-       "exampleId": "Aku pergi ke masjid"
+       "exampleId": "Aku pergi ke masjid",
+       "en": "I go",
+       "exampleEn": "I go to the mosque"
       },
       {
        "ar": "سَيَّارَة",
@@ -1881,7 +2258,9 @@
        "id": "mobil",
        "exampleAr": "السَّيَّارَةُ جَدِيدَةٌ",
        "exampleLatin": "As-sayyāratu jadīdah",
-       "exampleId": "Mobilnya baru"
+       "exampleId": "Mobilnya baru",
+       "en": "car",
+       "exampleEn": "The car is new"
       },
       {
        "ar": "دَرَّاجَة نَارِيَّة",
@@ -1889,7 +2268,9 @@
        "id": "sepeda motor",
        "exampleAr": "الدَّرَّاجَةُ النَّارِيَّةُ سَرِيعَةٌ",
        "exampleLatin": "Ad-darrājatu n-nāriyyatu sarīʿah",
-       "exampleId": "Sepeda motornya cepat"
+       "exampleId": "Sepeda motornya cepat",
+       "en": "motorcycle",
+       "exampleEn": "The motorcycle is fast"
       },
       {
        "ar": "مَحَطَّة",
@@ -1897,7 +2278,9 @@
        "id": "stasiun, halte",
        "exampleAr": "مَحَطَّةُ الْقِطَارِ بَعِيدَةٌ",
        "exampleLatin": "Maḥaṭṭatu l-qiṭāri baʿīdah",
-       "exampleId": "Stasiun keretanya jauh"
+       "exampleId": "Stasiun keretanya jauh",
+       "en": "station, stop",
+       "exampleEn": "The train station is far"
       },
       {
        "ar": "حَافِلَة",
@@ -1905,7 +2288,9 @@
        "id": "bus",
        "exampleAr": "الْحَافِلَةُ كَبِيرَةٌ",
        "exampleLatin": "Al-ḥāfilatu kabīrah",
-       "exampleId": "Busnya besar"
+       "exampleId": "Busnya besar",
+       "en": "bus",
+       "exampleEn": "The bus is big"
       },
       {
        "ar": "بَعِيد",
@@ -1913,7 +2298,9 @@
        "id": "jauh",
        "exampleAr": "الْمَدْرَسَةُ بَعِيدَةٌ مِنْ بَيْتِي",
        "exampleLatin": "Al-madrasatu baʿīdah min baytī",
-       "exampleId": "Sekolahnya jauh dari rumahku"
+       "exampleId": "Sekolahnya jauh dari rumahku",
+       "en": "far",
+       "exampleEn": "The school is far from my house"
       },
       {
        "ar": "أَمَامَ",
@@ -1921,7 +2308,9 @@
        "id": "di depan",
        "exampleAr": "الْمَسْجِدُ أَمَامَ الْمَدْرَسَةِ",
        "exampleLatin": "Al-masjidu amāma l-madrasah",
-       "exampleId": "Masjidnya di depan sekolah"
+       "exampleId": "Masjidnya di depan sekolah",
+       "en": "in front of",
+       "exampleEn": "The mosque is in front of the school"
       },
       {
        "ar": "أَحْيَانًا",
@@ -1929,7 +2318,9 @@
        "id": "kadang-kadang",
        "exampleAr": "أَذْهَبُ بِالْحَافِلَةِ أَحْيَانًا",
        "exampleLatin": "Adhhabu bil-ḥāfilah aḥyānan",
-       "exampleId": "Aku kadang-kadang pergi naik bus"
+       "exampleId": "Aku kadang-kadang pergi naik bus",
+       "en": "sometimes",
+       "exampleEn": "Sometimes I go by bus"
       },
       {
        "ar": "إِلَى",
@@ -1937,7 +2328,9 @@
        "id": "ke (arah)",
        "exampleAr": "أَذْهَبُ إِلَى السُّوقِ",
        "exampleLatin": "Adhhabu ilā s-sūq",
-       "exampleId": "Aku pergi ke pasar"
+       "exampleId": "Aku pergi ke pasar",
+       "en": "to (direction)",
+       "exampleEn": "I go to the market"
       }
      ],
      "qawaid": [
@@ -1946,21 +2339,30 @@
        "id": "كَيْفَ berarti 'bagaimana' dan dipakai untuk menanyakan cara melakukan sesuatu, mis. cara pergi ke suatu tempat.",
        "exampleAr": "كَيْفَ تَذْهَبُ إِلَى الْمَدْرَسَةِ؟",
        "exampleLatin": "Kayfa tadhhabu ilā l-madrasah?",
-       "exampleId": "Bagaimana kamu pergi ke sekolah?"
+       "exampleId": "Bagaimana kamu pergi ke sekolah?",
+       "titleEn": "كَيْفَ to ask how",
+       "en": "كَيْفَ means 'how' and is used to ask about the way of doing something, e.g. how to go to a place.",
+       "exampleEn": "How do you go to school?"
       },
       {
        "titleId": "بِ + alat transportasi",
        "id": "Untuk menyebut alat yang dipakai, gunakan بِ (dengan): بِالسَّيَّارَةِ (dengan mobil), بِالدَّرَّاجَةِ النَّارِيَّةِ (dengan sepeda motor).",
        "exampleAr": "أَذْهَبُ بِالسَّيَّارَةِ",
        "exampleLatin": "Adhhabu bis-sayyārah",
-       "exampleId": "Aku pergi dengan mobil"
+       "exampleId": "Aku pergi dengan mobil",
+       "titleEn": "بِ + means of transport",
+       "en": "To mention the means used, use بِ (by/with): بِالسَّيَّارَةِ (by car), بِالدَّرَّاجَةِ النَّارِيَّةِ (by motorcycle).",
+       "exampleEn": "I go by car"
       },
       {
        "titleId": "إِلَى untuk arah tujuan",
        "id": "إِلَى berarti 'ke' dan menunjukkan arah/tujuan: إِلَى الْمَدْرَسَةِ (ke sekolah), إِلَى السُّوقِ (ke pasar).",
        "exampleAr": "كَيْفَ تَذْهَبُ إِلَى السُّوقِ؟",
        "exampleLatin": "Wa kayfa tadhhabu ilā s-sūq?",
-       "exampleId": "Dan bagaimana kamu pergi ke pasar?"
+       "exampleId": "Dan bagaimana kamu pergi ke pasar?",
+       "titleEn": "إِلَى for direction",
+       "en": "إِلَى means 'to' and shows direction/destination: إِلَى الْمَدْرَسَةِ (to school), إِلَى السُّوقِ (to the market).",
+       "exampleEn": "And how do you go to the market?"
       }
      ],
      "tadribat": [
@@ -1975,7 +2377,8 @@
         "مِنْ",
         "إِلَى"
        ],
-       "answer": "بِ"
+       "answer": "بِ",
+       "promptEn": "Fill in the blank: I go ___ car"
       },
       {
        "type": "fillBlank",
@@ -1988,7 +2391,8 @@
         "بِ",
         "عَنْ"
        ],
-       "answer": "إِلَى"
+       "answer": "إِلَى",
+       "promptEn": "Fill in the blank: How do you go ___ school?"
       },
       {
        "type": "translateArId",
@@ -2000,7 +2404,14 @@
         "Aku pergi dengan bus",
         "Aku pergi dengan sepeda"
        ],
-       "answer": "Aku pergi dengan sepeda motor"
+       "answer": "Aku pergi dengan sepeda motor",
+       "optionsEn": [
+        "I go by motorcycle",
+        "I go by car",
+        "I go by bus",
+        "I go by bicycle"
+       ],
+       "answerEn": "I go by motorcycle"
       },
       {
        "type": "translateArId",
@@ -2012,7 +2423,14 @@
         "Halte bus dekat masjid",
         "Masjid di depan halte bus"
        ],
-       "answer": "Halte bus di depan masjid"
+       "answer": "Halte bus di depan masjid",
+       "optionsEn": [
+        "The bus stop is in front of the mosque",
+        "The bus stop is behind the mosque",
+        "The bus stop is near the mosque",
+        "The mosque is in front of the bus stop"
+       ],
+       "answerEn": "The bus stop is in front of the mosque"
       },
       {
        "type": "translateIdAr",
@@ -2023,7 +2441,8 @@
         "مَاذَا تَذْهَبُ؟",
         "كَمْ تَذْهَبُ؟"
        ],
-       "answer": "كَيْفَ تَذْهَبُ إِلَى الْمَدْرَسَةِ؟"
+       "answer": "كَيْفَ تَذْهَبُ إِلَى الْمَدْرَسَةِ؟",
+       "promptEn": "How do you go to school?"
       },
       {
        "type": "translateIdAr",
@@ -2034,7 +2453,8 @@
         "أَيْنَ الْمَدْرَسَةُ؟",
         "كَيْفَ الْمَدْرَسَةُ؟"
        ],
-       "answer": "هَلْ الْمَدْرَسَةُ بَعِيدَةٌ؟"
+       "answer": "هَلْ الْمَدْرَسَةُ بَعِيدَةٌ؟",
+       "promptEn": "Is the school far?"
       },
       {
        "type": "rearrange",
@@ -2090,7 +2510,8 @@
         "الْمَسْجِدِ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Transportation"
     },
     {
      "id": "2-3",
@@ -2101,61 +2522,77 @@
        "speaker": "Dokter",
        "ar": "مَا بِكَ يَا أَحْمَدُ؟",
        "latin": "Mā bika yā Aḥmad?",
-       "id": "Ada apa denganmu, Ahmad?"
+       "id": "Ada apa denganmu, Ahmad?",
+       "en": "What is wrong with you, Ahmad?",
+       "speakerEn": "Doctor"
       },
       {
        "speaker": "Ahmad",
        "ar": "عِنْدِي صُدَاعٌ شَدِيدٌ",
        "latin": "ʿindī ṣudāʿun shadīd",
-       "id": "Aku sakit kepala yang parah"
+       "id": "Aku sakit kepala yang parah",
+       "en": "I have a severe headache"
       },
       {
        "speaker": "Dokter",
        "ar": "هَلْ عِنْدَكَ حُمَّى؟",
        "latin": "Hal ʿindaka ḥummā?",
-       "id": "Apakah kamu demam?"
+       "id": "Apakah kamu demam?",
+       "en": "Do you have a fever?",
+       "speakerEn": "Doctor"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، عِنْدِي حُمَّى أَيْضًا",
        "latin": "Naʿam, ʿindī ḥummā ayḍan",
-       "id": "Ya, aku juga demam"
+       "id": "Ya, aku juga demam",
+       "en": "Yes, I have a fever too"
       },
       {
        "speaker": "Dokter",
        "ar": "اِفْتَحْ فَمَكَ مِنْ فَضْلِكَ",
        "latin": "Iftaḥ famaka min faḍlika",
-       "id": "Tolong buka mulutmu"
+       "id": "Tolong buka mulutmu",
+       "en": "Please open your mouth",
+       "speakerEn": "Doctor"
       },
       {
        "speaker": "Dokter",
        "ar": "عِنْدَكَ زُكَامٌ",
        "latin": "ʿindaka zukām",
-       "id": "Kamu terkena flu"
+       "id": "Kamu terkena flu",
+       "en": "You have the flu",
+       "speakerEn": "Doctor"
       },
       {
        "speaker": "Ahmad",
        "ar": "مَاذَا أَفْعَلُ يَا طَبِيبُ؟",
        "latin": "Mādhā afʿalu yā ṭabīb?",
-       "id": "Apa yang harus kulakukan, Dokter?"
+       "id": "Apa yang harus kulakukan, Dokter?",
+       "en": "What should I do, Doctor?"
       },
       {
        "speaker": "Dokter",
        "ar": "اِسْتَرِحْ فِي الْبَيْتِ وَاشْرَبِ الْمَاءَ",
        "latin": "Istariḥ fī l-bayt wa-shrabi l-mā'",
-       "id": "Beristirahatlah di rumah dan minumlah air"
+       "id": "Beristirahatlah di rumah dan minumlah air",
+       "en": "Rest at home and drink water",
+       "speakerEn": "Doctor"
       },
       {
        "speaker": "Ahmad",
        "ar": "هَلْ آكُلُ الْفَاكِهَةَ؟",
        "latin": "Hal ākulu l-fākihah?",
-       "id": "Apakah aku boleh makan buah?"
+       "id": "Apakah aku boleh makan buah?",
+       "en": "May I eat fruit?"
       },
       {
        "speaker": "Dokter",
        "ar": "نَعَمْ، كُلِ الْفَاكِهَةَ وَاشْرَبِ الْمَاءَ كَثِيرًا",
        "latin": "Naʿam, kuli l-fākihah wa-shrabi l-mā'a kathīran",
-       "id": "Ya, makanlah buah dan minumlah air banyak-banyak"
+       "id": "Ya, makanlah buah dan minumlah air banyak-banyak",
+       "en": "Yes, eat fruit and drink plenty of water",
+       "speakerEn": "Doctor"
       }
      ],
      "mufrodat": [
@@ -2165,7 +2602,9 @@
        "id": "dokter",
        "exampleAr": "الطَّبِيبُ فِي الْمُسْتَشْفَى",
        "exampleLatin": "Aṭ-ṭabību fī l-mustashfā",
-       "exampleId": "Dokternya ada di rumah sakit"
+       "exampleId": "Dokternya ada di rumah sakit",
+       "en": "doctor",
+       "exampleEn": "The doctor is at the hospital"
       },
       {
        "ar": "صُدَاع",
@@ -2173,7 +2612,9 @@
        "id": "sakit kepala",
        "exampleAr": "عِنْدِي صُدَاعٌ الْيَوْمَ",
        "exampleLatin": "ʿindī ṣudāʿun al-yawm",
-       "exampleId": "Hari ini aku sakit kepala"
+       "exampleId": "Hari ini aku sakit kepala",
+       "en": "headache",
+       "exampleEn": "Today I have a headache"
       },
       {
        "ar": "حُمَّى",
@@ -2181,7 +2622,9 @@
        "id": "demam",
        "exampleAr": "حُمَّى الْيَوْمِ عَالِيَةٌ",
        "exampleLatin": "Ḥummā l-yawmi ʿāliyah",
-       "exampleId": "Demam hari ini tinggi"
+       "exampleId": "Demam hari ini tinggi",
+       "en": "fever",
+       "exampleEn": "The fever is high today"
       },
       {
        "ar": "زُكَام",
@@ -2189,7 +2632,9 @@
        "id": "flu, pilek",
        "exampleAr": "الزُّكَامُ شَائِعٌ فِي الشِّتَاءِ",
        "exampleLatin": "Az-zukāmu shā'iʿun fī sh-shitā'",
-       "exampleId": "Flu biasa terjadi di musim dingin"
+       "exampleId": "Flu biasa terjadi di musim dingin",
+       "en": "flu",
+       "exampleEn": "The flu commonly occurs in winter"
       },
       {
        "ar": "شَدِيد",
@@ -2197,7 +2642,9 @@
        "id": "parah, kuat",
        "exampleAr": "الْبَرْدُ شَدِيدٌ الْيَوْمَ",
        "exampleLatin": "Al-bardu shadīdun al-yawm",
-       "exampleId": "Dinginnya parah hari ini"
+       "exampleId": "Dinginnya parah hari ini",
+       "en": "severe, strong",
+       "exampleEn": "The cold is severe today"
       },
       {
        "ar": "مَاء",
@@ -2205,7 +2652,9 @@
        "id": "air",
        "exampleAr": "الْمَاءُ بَارِدٌ",
        "exampleLatin": "Al-mā'u bāridun",
-       "exampleId": "Airnya dingin"
+       "exampleId": "Airnya dingin",
+       "en": "water",
+       "exampleEn": "The water is cold"
       },
       {
        "ar": "فَم",
@@ -2213,7 +2662,9 @@
        "id": "mulut",
        "exampleAr": "فَمِي صَغِيرٌ",
        "exampleLatin": "Famī ṣaghīrun",
-       "exampleId": "Mulutku kecil"
+       "exampleId": "Mulutku kecil",
+       "en": "mouth",
+       "exampleEn": "My mouth is small"
       },
       {
        "ar": "اِفْتَحْ",
@@ -2221,7 +2672,9 @@
        "id": "bukalah (perintah)",
        "exampleAr": "اِفْتَحِ الْبَابَ مِنْ فَضْلِكَ",
        "exampleLatin": "Iftaḥi l-bāba min faḍlika",
-       "exampleId": "Tolong buka pintunya"
+       "exampleId": "Tolong buka pintunya",
+       "en": "open (command)",
+       "exampleEn": "Please open the door"
       },
       {
        "ar": "اِسْتَرِحْ",
@@ -2229,7 +2682,9 @@
        "id": "beristirahatlah (perintah)",
        "exampleAr": "اِسْتَرِحْ بَعْدَ الْعَمَلِ",
        "exampleLatin": "Istariḥ baʿda l-ʿamal",
-       "exampleId": "Beristirahatlah setelah bekerja"
+       "exampleId": "Beristirahatlah setelah bekerja",
+       "en": "rest (command)",
+       "exampleEn": "Rest after working"
       },
       {
        "ar": "عِنْدَ",
@@ -2237,7 +2692,9 @@
        "id": "pada, punya",
        "exampleAr": "عِنْدِي كِتَابٌ جَمِيلٌ",
        "exampleLatin": "ʿindī kitābun jamīlun",
-       "exampleId": "Aku punya buku yang indah"
+       "exampleId": "Aku punya buku yang indah",
+       "en": "at, have",
+       "exampleEn": "I have a beautiful book"
       }
      ],
      "qawaid": [
@@ -2246,21 +2703,30 @@
        "id": "عِنْدَ + akhiran menunjukkan kepemilikan: عِنْدِي (aku punya), عِنْدَكَ (kamu punya). Dipakai juga untuk keadaan: عِنْدِي صُدَاعٌ = aku sakit kepala.",
        "exampleAr": "عِنْدِي صُدَاعٌ شَدِيدٌ",
        "exampleLatin": "ʿindī ṣudāʿun shadīd",
-       "exampleId": "Aku sakit kepala yang parah"
+       "exampleId": "Aku sakit kepala yang parah",
+       "titleEn": "عِنْدِي / عِنْدَكَ for 'to have'",
+       "en": "عِنْدَ + suffix shows possession: عِنْدِي (I have), عِنْدَكَ (you have). It is also used for conditions: عِنْدِي صُدَاعٌ = I have a headache.",
+       "exampleEn": "I have a severe headache"
       },
       {
        "titleId": "Kata perintah (fi'il amr)",
        "id": "Perintah untuk satu orang laki-laki: اِفْتَحْ (bukalah), اِسْتَرِحْ (beristirahatlah), كُلْ (makanlah), اِشْرَبْ (minumlah). Sebelum kata ber-ال, huruf akhir mendapat kasrah: كُلِ الْفَاكِهَةَ.",
        "exampleAr": "اِسْتَرِحْ فِي الْبَيْتِ وَاشْرَبِ الْمَاءَ",
        "exampleLatin": "Istariḥ fī l-bayt wa-shrabi l-mā'",
-       "exampleId": "Beristirahatlah di rumah dan minumlah air"
+       "exampleId": "Beristirahatlah di rumah dan minumlah air",
+       "titleEn": "Command verb (fi'il amr)",
+       "en": "Command for one male: اِفْتَحْ (open), اِسْتَرِحْ (rest), كُلْ (eat), اِشْرَبْ (drink). Before a word with ال, the final letter takes kasrah: كُلِ الْفَاكِهَةَ.",
+       "exampleEn": "Rest at home and drink water"
       },
       {
        "titleId": "مَاذَا أَفْعَلُ؟ (apa yang harus kulakukan?)",
        "id": "مَاذَا أَفْعَلُ؟ berarti 'apa yang harus kulakukan?' — dipakai untuk meminta nasihat kepada dokter atau orang yang lebih tahu.",
        "exampleAr": "مَاذَا أَفْعَلُ يَا طَبِيبُ؟",
        "exampleLatin": "Mādhā afʿalu yā ṭabīb?",
-       "exampleId": "Apa yang harus kulakukan, Dokter?"
+       "exampleId": "Apa yang harus kulakukan, Dokter?",
+       "titleEn": "مَاذَا أَفْعَلُ؟ (what should I do?)",
+       "en": "مَاذَا أَفْعَلُ؟ means 'what should I do?' — used to ask for advice from a doctor or someone more knowledgeable.",
+       "exampleEn": "What should I do, Doctor?"
       }
      ],
      "tadribat": [
@@ -2275,7 +2741,8 @@
         "زُكَامٌ",
         "مَاءٌ"
        ],
-       "answer": "شَدِيدٌ"
+       "answer": "شَدِيدٌ",
+       "promptEn": "Fill in the blank: I have a ___ headache"
       },
       {
        "type": "fillBlank",
@@ -2288,7 +2755,8 @@
         "كِتَابٌ",
         "سَيَّارَةٌ"
        ],
-       "answer": "حُمَّى"
+       "answer": "حُمَّى",
+       "promptEn": "Fill in the blank: Do you ___ (fever)?"
       },
       {
        "type": "translateArId",
@@ -2300,7 +2768,14 @@
         "Aku terkena flu",
         "Aku sangat lelah"
        ],
-       "answer": "Aku sakit kepala yang parah"
+       "answer": "Aku sakit kepala yang parah",
+       "optionsEn": [
+        "I have a severe headache",
+        "I have a fever",
+        "I have the flu",
+        "I am very tired"
+       ],
+       "answerEn": "I have a severe headache"
       },
       {
        "type": "translateArId",
@@ -2312,7 +2787,14 @@
         "Makanlah buah",
         "Pergilah ke sekolah"
        ],
-       "answer": "Beristirahatlah di rumah dan minumlah air"
+       "answer": "Beristirahatlah di rumah dan minumlah air",
+       "optionsEn": [
+        "Rest at home and drink water",
+        "Please open your mouth",
+        "Eat fruit",
+        "Go to school"
+       ],
+       "answerEn": "Rest at home and drink water"
       },
       {
        "type": "translateIdAr",
@@ -2323,7 +2805,8 @@
         "مَا بِكَ؟",
         "أَيْنَ الطَّبِيبُ؟"
        ],
-       "answer": "هَلْ عِنْدَكَ حُمَّى؟"
+       "answer": "هَلْ عِنْدَكَ حُمَّى؟",
+       "promptEn": "Do you have a fever?"
       },
       {
        "type": "translateIdAr",
@@ -2334,7 +2817,8 @@
         "كَيْفَ أَفْعَلُ؟",
         "أَيْنَ أَذْهَبُ؟"
        ],
-       "answer": "مَاذَا أَفْعَلُ يَا طَبِيبُ؟"
+       "answer": "مَاذَا أَفْعَلُ يَا طَبِيبُ؟",
+       "promptEn": "What should I do, Doctor?"
       },
       {
        "type": "rearrange",
@@ -2380,7 +2864,8 @@
         "كَثِيرًا"
        ]
       }
-     ]
+     ],
+     "titleEn": "Health"
     },
     {
      "id": "2-4",
@@ -2391,73 +2876,85 @@
        "speaker": "Salim",
        "ar": "هَلْ تَلْعَبُ كُرَةَ الْقَدَمِ يَا أَحْمَدُ؟",
        "latin": "Hal talʿabu kurata l-qadam yā Aḥmad?",
-       "id": "Apakah kamu bermain sepak bola, Ahmad?"
+       "id": "Apakah kamu bermain sepak bola, Ahmad?",
+       "en": "Do you play football, Ahmad?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، أَلْعَبُ كُرَةَ الْقَدَمِ كُلَّ يَوْمٍ",
        "latin": "Naʿam, alʿabu kurata l-qadam kulla yawm",
-       "id": "Ya, aku bermain sepak bola setiap hari"
+       "id": "Ya, aku bermain sepak bola setiap hari",
+       "en": "Yes, I play football every day"
       },
       {
        "speaker": "Salim",
        "ar": "أَيْنَ تَلْعَبُ؟",
        "latin": "Ayna talʿabu?",
-       "id": "Di mana kamu bermain?"
+       "id": "Di mana kamu bermain?",
+       "en": "Where do you play?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَلْعَبُ فِي الْمَلْعَبِ",
        "latin": "Alʿabu fī l-malʿab",
-       "id": "Aku bermain di lapangan"
+       "id": "Aku bermain di lapangan",
+       "en": "I play at the field"
       },
       {
        "speaker": "Salim",
        "ar": "مَعَ مَنْ تَلْعَبُ؟",
        "latin": "Maʿa man talʿabu?",
-       "id": "Dengan siapa kamu bermain?"
+       "id": "Dengan siapa kamu bermain?",
+       "en": "Who do you play with?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَلْعَبُ مَعَ أَصْدِقَائِي",
        "latin": "Alʿabu maʿa aṣdiqā'ī",
-       "id": "Aku bermain dengan teman-temanku"
+       "id": "Aku bermain dengan teman-temanku",
+       "en": "I play with my friends"
       },
       {
        "speaker": "Salim",
        "ar": "هَلْ صَدِيقُكَ يَلْعَبُ مَعَكَ؟",
        "latin": "Hal ṣadīquka yalʿabu maʿaka?",
-       "id": "Apakah temanmu bermain bersamamu?"
+       "id": "Apakah temanmu bermain bersamamu?",
+       "en": "Does your friend play with you?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، صَدِيقِي أَحْمَدُ يَلْعَبُ مَعِي",
        "latin": "Naʿam, ṣadīqī Aḥmad yalʿabu maʿī",
-       "id": "Ya, temanku Ahmad bermain denganku"
+       "id": "Ya, temanku Ahmad bermain denganku",
+       "en": "Yes, my friend Ahmad plays with me"
       },
       {
        "speaker": "Salim",
        "ar": "وَهَلْ تَسْبَحُ؟",
        "latin": "Wa hal tasbaḥu?",
-       "id": "Dan apakah kamu berenang?"
+       "id": "Dan apakah kamu berenang?",
+       "en": "And do you swim?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، أَسْبَحُ فِي الْمَسْبَحِ يَوْمَ الْجُمُعَةِ",
        "latin": "Naʿam, asbaḥu fī l-masbaḥ yawma l-jumuʿah",
-       "id": "Ya, aku berenang di kolam renang pada hari Jumat"
+       "id": "Ya, aku berenang di kolam renang pada hari Jumat",
+       "en": "Yes, I swim in the pool on Friday"
       },
       {
        "speaker": "Salim",
        "ar": "مَا رِيَاضَتُكَ الْمُفَضَّلَةُ؟",
        "latin": "Mā riyāḍatuka l-mufaḍḍalah?",
-       "id": "Apa olahraga favoritmu?"
+       "id": "Apa olahraga favoritmu?",
+       "en": "What is your favorite sport?"
       },
       {
        "speaker": "Ahmad",
        "ar": "الْمُفَضَّلَةُ عِنْدِي كُرَةُ الْقَدَمِ",
        "latin": "Al-mufaḍḍalah ʿindī kuratu l-qadam",
-       "id": "Favoritku sepak bola"
+       "id": "Favoritku sepak bola",
+       "en": "My favorite is football"
       }
      ],
      "mufrodat": [
@@ -2467,7 +2964,9 @@
        "id": "sepak bola",
        "exampleAr": "كُرَةُ الْقَدَمِ شَائِعَةٌ فِي الْعَالَمِ",
        "exampleLatin": "Kuratu l-qadami shā'iʿah fī l-ʿālam",
-       "exampleId": "Sepak bola populer di dunia"
+       "exampleId": "Sepak bola populer di dunia",
+       "en": "football",
+       "exampleEn": "Football is popular in the world"
       },
       {
        "ar": "أَلْعَبُ",
@@ -2475,7 +2974,9 @@
        "id": "aku bermain",
        "exampleAr": "أَلْعَبُ الشِّطْرَنْجَ مَعَ أَخِي",
        "exampleLatin": "Alʿabu sh-shṭranj maʿa akhī",
-       "exampleId": "Aku bermain catur dengan saudaraku"
+       "exampleId": "Aku bermain catur dengan saudaraku",
+       "en": "I play",
+       "exampleEn": "I play chess with my brother"
       },
       {
        "ar": "مَلْعَب",
@@ -2483,7 +2984,9 @@
        "id": "lapangan",
        "exampleAr": "الْمَلْعَبُ وَاسِعٌ",
        "exampleLatin": "Al-malʿabu wāsiʿun",
-       "exampleId": "Lapangannya luas"
+       "exampleId": "Lapangannya luas",
+       "en": "field",
+       "exampleEn": "The field is spacious"
       },
       {
        "ar": "مَعَ",
@@ -2491,7 +2994,9 @@
        "id": "dengan, bersama",
        "exampleAr": "أَذْهَبُ إِلَى السُّوقِ مَعَ أُمِّي",
        "exampleLatin": "Adhhabu ilā s-sūq maʿa ummī",
-       "exampleId": "Aku pergi ke pasar bersama ibuku"
+       "exampleId": "Aku pergi ke pasar bersama ibuku",
+       "en": "with",
+       "exampleEn": "I go to the market with my mother"
       },
       {
        "ar": "صَدِيق",
@@ -2499,7 +3004,9 @@
        "id": "teman (laki-laki)",
        "exampleAr": "صَدِيقِي طَيِّبٌ",
        "exampleLatin": "Ṣadīqī ṭayyibun",
-       "exampleId": "Temanku baik hati"
+       "exampleId": "Temanku baik hati",
+       "en": "friend (male)",
+       "exampleEn": "My friend is kind"
       },
       {
        "ar": "أَسْبَحُ",
@@ -2507,7 +3014,9 @@
        "id": "aku berenang",
        "exampleAr": "أَسْبَحُ فِي الْبَحْرِ",
        "exampleLatin": "Asbaḥu fī l-baḥr",
-       "exampleId": "Aku berenang di laut"
+       "exampleId": "Aku berenang di laut",
+       "en": "I swim",
+       "exampleEn": "I swim in the sea"
       },
       {
        "ar": "مَسْبَح",
@@ -2515,7 +3024,9 @@
        "id": "kolam renang",
        "exampleAr": "الْمَسْبَحُ نَظِيفٌ",
        "exampleLatin": "Al-masbaḥu naẓīfun",
-       "exampleId": "Kolam renangnya bersih"
+       "exampleId": "Kolam renangnya bersih",
+       "en": "swimming pool",
+       "exampleEn": "The swimming pool is clean"
       },
       {
        "ar": "رِيَاضَة",
@@ -2523,7 +3034,9 @@
        "id": "olahraga",
        "exampleAr": "الرِّيَاضَةُ مُفِيدَةٌ لِلصِّحَّةِ",
        "exampleLatin": "Ar-riyāḍatu mufīdah liṣ-ṣiḥḥah",
-       "exampleId": "Olahraga itu baik untuk kesehatan"
+       "exampleId": "Olahraga itu baik untuk kesehatan",
+       "en": "sport",
+       "exampleEn": "Sport is good for health"
       },
       {
        "ar": "مُفَضَّل",
@@ -2531,7 +3044,9 @@
        "id": "favorit",
        "exampleAr": "هٰذَا طَعَامِي الْمُفَضَّلُ",
        "exampleLatin": "Hādhā ṭaʿāmī l-mufaḍḍal",
-       "exampleId": "Ini makanan favoritku"
+       "exampleId": "Ini makanan favoritku",
+       "en": "favorite",
+       "exampleEn": "This is my favorite food"
       },
       {
        "ar": "كُلَّ يَوْمٍ",
@@ -2539,7 +3054,9 @@
        "id": "setiap hari",
        "exampleAr": "أَقْرَأُ الْقُرْآنَ كُلَّ يَوْمٍ",
        "exampleLatin": "Aqra'u l-Qur'āna kulla yawm",
-       "exampleId": "Aku membaca Al-Qur'an setiap hari"
+       "exampleId": "Aku membaca Al-Qur'an setiap hari",
+       "en": "every day",
+       "exampleEn": "I read the Qur'an every day"
       }
      ],
      "qawaid": [
@@ -2548,21 +3065,30 @@
        "id": "أَلْعَبُ (aku bermain) dan تَلْعَبُ (kamu bermain) adalah bentuk kata kerja sekarang. Awal kata berubah sesuai pelaku: أ- untuk aku, ت- untuk kamu.",
        "exampleAr": "أَلْعَبُ كُرَةَ الْقَدَمِ كُلَّ يَوْمٍ",
        "exampleLatin": "Naʿam, alʿabu kurata l-qadam kulla yawm",
-       "exampleId": "Ya, aku bermain sepak bola setiap hari"
+       "exampleId": "Ya, aku bermain sepak bola setiap hari",
+       "titleEn": "Present verb with different doers",
+       "en": "أَلْعَبُ (I play) and تَلْعَبُ (you play) are present-tense verb forms. The beginning of the word changes according to the doer: أ- for I, ت- for you.",
+       "exampleEn": "Yes, I play football every day"
       },
       {
        "titleId": "مَعَ (dengan, bersama)",
        "id": "مَعَ berarti 'dengan' atau 'bersama': مَعَ أَصْدِقَائِي (bersama teman-temanku), مَعَكَ (denganmu), مَعِي (denganku).",
        "exampleAr": "أَلْعَبُ مَعَ أَصْدِقَائِي",
        "exampleLatin": "Alʿabu maʿa aṣdiqā'ī",
-       "exampleId": "Aku bermain dengan teman-temanku"
+       "exampleId": "Aku bermain dengan teman-temanku",
+       "titleEn": "مَعَ (with)",
+       "en": "مَعَ means 'with': مَعَ أَصْدِقَائِي (with my friends), مَعَكَ (with you), مَعِي (with me).",
+       "exampleEn": "I play with my friends"
       },
       {
        "titleId": "Keterangan waktu: كُلَّ يَوْمٍ، يَوْمَ الْجُمُعَةِ",
        "id": "كُلَّ يَوْمٍ berarti 'setiap hari' dan يَوْمَ الْجُمُعَةِ berarti 'pada hari Jumat' — keduanya adalah keterangan waktu (zharf zaman).",
        "exampleAr": "أَسْبَحُ فِي الْمَسْبَحِ يَوْمَ الْجُمُعَةِ",
        "exampleLatin": "Naʿam, asbaḥu fī l-masbaḥ yawma l-jumuʿah",
-       "exampleId": "Ya, aku berenang di kolam renang pada hari Jumat"
+       "exampleId": "Ya, aku berenang di kolam renang pada hari Jumat",
+       "titleEn": "Time adverbs: كُلَّ يَوْمٍ، يَوْمَ الْجُمُعَةِ",
+       "en": "كُلَّ يَوْمٍ means 'every day' and يَوْمَ الْجُمُعَةِ means 'on Friday' — both are time adverbs (zharf zaman).",
+       "exampleEn": "Yes, I swim in the pool on Friday"
       }
      ],
      "tadribat": [
@@ -2577,7 +3103,8 @@
         "الْحَافِلَةَ",
         "الْمَاءَ"
        ],
-       "answer": "كُرَةَ الْقَدَمِ"
+       "answer": "كُرَةَ الْقَدَمِ",
+       "promptEn": "Fill in the blank: I play ___ every day"
       },
       {
        "type": "fillBlank",
@@ -2590,7 +3117,8 @@
         "الْمَدْرَسَةِ",
         "السُّوقِ"
        ],
-       "answer": "الْمَسْبَحِ"
+       "answer": "الْمَسْبَحِ",
+       "promptEn": "Fill in the blank: I swim in the ___"
       },
       {
        "type": "translateArId",
@@ -2602,7 +3130,14 @@
         "Aku berenang dengan temanku",
         "Aku bermain setiap hari"
        ],
-       "answer": "Aku bermain dengan teman-temanku"
+       "answer": "Aku bermain dengan teman-temanku",
+       "optionsEn": [
+        "I play with my friends",
+        "I play at the field",
+        "I swim with my friend",
+        "I play every day"
+       ],
+       "answerEn": "I play with my friends"
       },
       {
        "type": "translateArId",
@@ -2614,7 +3149,14 @@
         "Di mana kamu berolahraga?",
         "Kapan kamu bermain?"
        ],
-       "answer": "Apa olahraga favoritmu?"
+       "answer": "Apa olahraga favoritmu?",
+       "optionsEn": [
+        "What is your favorite sport?",
+        "What is your game?",
+        "Where do you exercise?",
+        "When do you play?"
+       ],
+       "answerEn": "What is your favorite sport?"
       },
       {
        "type": "translateIdAr",
@@ -2625,7 +3167,8 @@
         "هَلْ تَلْعَبُ فِي الْمَلْعَبِ؟",
         "أَيْنَ تَلْعَبُ؟"
        ],
-       "answer": "هَلْ تَلْعَبُ كُرَةَ الْقَدَمِ؟"
+       "answer": "هَلْ تَلْعَبُ كُرَةَ الْقَدَمِ؟",
+       "promptEn": "Do you play football?"
       },
       {
        "type": "translateIdAr",
@@ -2636,7 +3179,8 @@
         "مَاذَا تَلْعَبُ؟",
         "مَنْ مَعَكَ؟"
        ],
-       "answer": "مَعَ مَنْ تَلْعَبُ؟"
+       "answer": "مَعَ مَنْ تَلْعَبُ؟",
+       "promptEn": "Who do you play with?"
       },
       {
        "type": "rearrange",
@@ -2702,7 +3246,8 @@
         "الْجُمُعَةِ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Sports"
     },
     {
      "id": "2-5",
@@ -2713,61 +3258,71 @@
        "speaker": "Khadijah",
        "ar": "مَتَى تَسْتَيْقِظِينَ يَا فَاطِمَةُ؟",
        "latin": "Matā tastaqīẓīna yā Fāṭimah?",
-       "id": "Kapan kamu bangun, Fatimah?"
+       "id": "Kapan kamu bangun, Fatimah?",
+       "en": "When do you wake up, Fatimah?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَسْتَيْقِظُ فِي السَّادِسَةِ صَبَاحًا",
        "latin": "Astaqīẓu fī s-sādisati ṣabāḥan",
-       "id": "Aku bangun jam enam pagi"
+       "id": "Aku bangun jam enam pagi",
+       "en": "I wake up at six in the morning"
       },
       {
        "speaker": "Khadijah",
        "ar": "مَاذَا تَفْعَلِينَ بَعْدَ ذٰلِكَ؟",
        "latin": "Mādhā tafʿalīna baʿda dhālika?",
-       "id": "Apa yang kamu lakukan setelah itu?"
+       "id": "Apa yang kamu lakukan setelah itu?",
+       "en": "What do you do after that?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أُصَلِّي ثُمَّ أَفْطُرُ",
        "latin": "Uṣallī thumma afṭuru",
-       "id": "Aku salat lalu sarapan"
+       "id": "Aku salat lalu sarapan",
+       "en": "I pray, then I have breakfast"
       },
       {
        "speaker": "Khadijah",
        "ar": "وَمَتَى تَذْهَبِينَ إِلَى الْعَمَلِ؟",
        "latin": "Wa matā tadhhabīna ilā l-ʿamal?",
-       "id": "Dan kapan kamu pergi bekerja?"
+       "id": "Dan kapan kamu pergi bekerja?",
+       "en": "And when do you go to work?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَذْهَبُ إِلَى الْعَمَلِ فِي السَّابِعَةِ",
        "latin": "Adhhabu ilā l-ʿamal fī s-sābiʿah",
-       "id": "Aku pergi bekerja jam tujuh"
+       "id": "Aku pergi bekerja jam tujuh",
+       "en": "I go to work at seven"
       },
       {
        "speaker": "Khadijah",
        "ar": "مَاذَا تَأْكُلِينَ فِي الْغَدَاءِ؟",
        "latin": "Mādhā ta'kulīna fī l-ghadā'?",
-       "id": "Apa yang kamu makan saat makan siang?"
+       "id": "Apa yang kamu makan saat makan siang?",
+       "en": "What do you eat at lunch?"
       },
       {
        "speaker": "Fatimah",
        "ar": "آكُلُ الْأَرُزَّ وَالسَّمَكَ",
        "latin": "Ākulu l-aruzza was-samak",
-       "id": "Aku makan nasi dan ikan"
+       "id": "Aku makan nasi dan ikan",
+       "en": "I eat rice and fish"
       },
       {
        "speaker": "Khadijah",
        "ar": "وَمَتَى تَرْجِعِينَ إِلَى الْبَيْتِ؟",
        "latin": "Wa matā tarjiʿīna ilā l-bayt?",
-       "id": "Dan kapan kamu pulang ke rumah?"
+       "id": "Dan kapan kamu pulang ke rumah?",
+       "en": "And when do you return home?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَرْجِعُ إِلَى الْبَيْتِ فِي الْعَاشِرَةِ مَسَاءً",
        "latin": "Arjiʿu ilā l-bayt fī l-ʿāshirah masā'an",
-       "id": "Aku pulang ke rumah jam sepuluh malam"
+       "id": "Aku pulang ke rumah jam sepuluh malam",
+       "en": "I return home at ten at night"
       }
      ],
      "mufrodat": [
@@ -2777,7 +3332,9 @@
        "id": "kapan",
        "exampleAr": "مَتَى تَرْجِعُ إِلَى الْبَيْتِ؟",
        "exampleLatin": "Matā tarjiʿu ilā l-bayt?",
-       "exampleId": "Kapan kamu pulang ke rumah?"
+       "exampleId": "Kapan kamu pulang ke rumah?",
+       "en": "when",
+       "exampleEn": "When do you return home?"
       },
       {
        "ar": "أَسْتَيْقِظُ",
@@ -2785,7 +3342,9 @@
        "id": "aku bangun",
        "exampleAr": "أَسْتَيْقِظُ مُبَكِّرًا",
        "exampleLatin": "Astaqīẓu mubakkiran",
-       "exampleId": "Aku bangun pagi-pagi"
+       "exampleId": "Aku bangun pagi-pagi",
+       "en": "I wake up",
+       "exampleEn": "I wake up early"
       },
       {
        "ar": "السَّادِسَة",
@@ -2793,7 +3352,9 @@
        "id": "keenam, jam enam",
        "exampleAr": "السَّاعَةُ السَّادِسَةُ صَبَاحًا",
        "exampleLatin": "As-sāʿatu s-sādisatu ṣabāḥan",
-       "exampleId": "Jam enam pagi"
+       "exampleId": "Jam enam pagi",
+       "en": "sixth, six o'clock",
+       "exampleEn": "Six in the morning"
       },
       {
        "ar": "صَبَاحًا",
@@ -2801,7 +3362,9 @@
        "id": "pada pagi hari",
        "exampleAr": "أَقْرَأُ كُلَّ صَبَاحٍ",
        "exampleLatin": "Aqra'u kulla ṣabāḥin",
-       "exampleId": "Aku membaca setiap pagi"
+       "exampleId": "Aku membaca setiap pagi",
+       "en": "in the morning",
+       "exampleEn": "I read every morning"
       },
       {
        "ar": "أُصَلِّي",
@@ -2809,7 +3372,9 @@
        "id": "aku salat",
        "exampleAr": "أُصَلِّي فِي الْمَسْجِدِ",
        "exampleLatin": "Uṣallī fī l-masjid",
-       "exampleId": "Aku salat di masjid"
+       "exampleId": "Aku salat di masjid",
+       "en": "I pray",
+       "exampleEn": "I pray at the mosque"
       },
       {
        "ar": "ثُمَّ",
@@ -2817,7 +3382,9 @@
        "id": "lalu, kemudian",
        "exampleAr": "آكُلُ ثُمَّ أَذْهَبُ",
        "exampleLatin": "Ākulu thumma adhhabu",
-       "exampleId": "Aku makan lalu pergi"
+       "exampleId": "Aku makan lalu pergi",
+       "en": "then, afterwards",
+       "exampleEn": "I eat, then I go"
       },
       {
        "ar": "أَفْطُرُ",
@@ -2825,7 +3392,9 @@
        "id": "aku sarapan",
        "exampleAr": "أَفْطُرُ مَعَ عَائِلَتِي",
        "exampleLatin": "Afṭuru maʿa ʿā'ilatī",
-       "exampleId": "Aku sarapan bersama keluargaku"
+       "exampleId": "Aku sarapan bersama keluargaku",
+       "en": "I have breakfast",
+       "exampleEn": "I have breakfast with my family"
       },
       {
        "ar": "الْعَمَل",
@@ -2833,7 +3402,9 @@
        "id": "pekerjaan, kerja",
        "exampleAr": "الْعَمَلُ مُهِمٌّ",
        "exampleLatin": "Al-ʿamalu muhimmun",
-       "exampleId": "Pekerjaan itu penting"
+       "exampleId": "Pekerjaan itu penting",
+       "en": "work",
+       "exampleEn": "That work is important"
       },
       {
        "ar": "الْغَدَاء",
@@ -2841,7 +3412,9 @@
        "id": "makan siang",
        "exampleAr": "الْغَدَاءُ جَاهِزٌ",
        "exampleLatin": "Al-ghadā'u jāhizun",
-       "exampleId": "Makan siangnya sudah siap"
+       "exampleId": "Makan siangnya sudah siap",
+       "en": "lunch",
+       "exampleEn": "Lunch is ready"
       },
       {
        "ar": "أَرْجِعُ",
@@ -2849,7 +3422,9 @@
        "id": "aku pulang",
        "exampleAr": "أَرْجِعُ مِنَ الْعَمَلِ فِي الْمَسَاءِ",
        "exampleLatin": "Arjiʿu mina l-ʿamal fī l-masā'",
-       "exampleId": "Aku pulang kerja di sore hari"
+       "exampleId": "Aku pulang kerja di sore hari",
+       "en": "I return",
+       "exampleEn": "I return from work in the afternoon"
       },
       {
        "ar": "مَسَاءً",
@@ -2857,7 +3432,9 @@
        "id": "pada malam hari",
        "exampleAr": "أَنَامُ مَسَاءً",
        "exampleLatin": "Anāmu masā'an",
-       "exampleId": "Aku tidur di malam hari"
+       "exampleId": "Aku tidur di malam hari",
+       "en": "at night",
+       "exampleEn": "I sleep at night"
       }
      ],
      "qawaid": [
@@ -2866,21 +3443,30 @@
        "id": "مَتَى berarti 'kapan' dan dipakai untuk menanyakan waktu suatu kegiatan.",
        "exampleAr": "مَتَى تَسْتَيْقِظِينَ يَا فَاطِمَةُ؟",
        "exampleLatin": "Matā tastaqīẓīna yā Fāṭimah?",
-       "exampleId": "Kapan kamu bangun, Fatimah?"
+       "exampleId": "Kapan kamu bangun, Fatimah?",
+       "titleEn": "مَتَى to ask when",
+       "en": "مَتَى means 'when' and is used to ask about the time of an activity.",
+       "exampleEn": "When do you wake up, Fatimah?"
       },
       {
        "titleId": "فِي + waktu untuk menyebut jam",
        "id": "Untuk menyebut jam, gunakan فِي + السَّاعَةُ: فِي السَّادِسَةِ (pada jam enam). Tambahkan صَبَاحًا (pagi) atau مَسَاءً (malam).",
        "exampleAr": "أَسْتَيْقِظُ فِي السَّادِسَةِ صَبَاحًا",
        "exampleLatin": "Astaqīẓu fī s-sādisati ṣabāḥan",
-       "exampleId": "Aku bangun jam enam pagi"
+       "exampleId": "Aku bangun jam enam pagi",
+       "titleEn": "فِي + time to tell the clock",
+       "en": "To tell the clock, use فِي + السَّاعَةُ: فِي السَّادِسَةِ (at six o'clock). Add صَبَاحًا (morning) or مَسَاءً (evening).",
+       "exampleEn": "I wake up at six in the morning"
       },
       {
        "titleId": "ثُمَّ untuk urutan kegiatan",
        "id": "ثُمَّ berarti 'lalu/kemudian' dan menghubungkan dua kegiatan yang berurutan: أُصَلِّي ثُمَّ أَفْطُرُ (aku salat lalu sarapan).",
        "exampleAr": "أُصَلِّي ثُمَّ أَفْطُرُ",
        "exampleLatin": "Uṣallī thumma afṭuru",
-       "exampleId": "Aku salat lalu sarapan"
+       "exampleId": "Aku salat lalu sarapan",
+       "titleEn": "ثُمَّ for sequence of actions",
+       "en": "ثُمَّ means 'then/afterwards' and connects two consecutive actions: أُصَلِّي ثُمَّ أَفْطُرُ (I pray, then I have breakfast).",
+       "exampleEn": "I pray, then I have breakfast"
       }
      ],
      "tadribat": [
@@ -2895,7 +3481,8 @@
         "الْمَسْجِدِ",
         "السُّوقِ"
        ],
-       "answer": "السَّادِسَةِ"
+       "answer": "السَّادِسَةِ",
+       "promptEn": "Fill in the blank: I wake up at ___ in the morning"
       },
       {
        "type": "fillBlank",
@@ -2908,7 +3495,8 @@
         "مِنْ",
         "عِنْدَ"
        ],
-       "answer": "ثُمَّ"
+       "answer": "ثُمَّ",
+       "promptEn": "Fill in the blank: I pray ___ breakfast"
       },
       {
        "type": "translateArId",
@@ -2920,7 +3508,14 @@
         "Aku tidur jam enam malam",
         "Aku pergi jam enam pagi"
        ],
-       "answer": "Aku bangun jam enam pagi"
+       "answer": "Aku bangun jam enam pagi",
+       "optionsEn": [
+        "I wake up at six in the morning",
+        "I wake up at seven in the morning",
+        "I sleep at six at night",
+        "I go at six in the morning"
+       ],
+       "answerEn": "I wake up at six in the morning"
       },
       {
        "type": "translateArId",
@@ -2932,7 +3527,14 @@
         "Aku suka nasi dan ikan",
         "Aku makan saat makan siang"
        ],
-       "answer": "Aku makan nasi dan ikan"
+       "answer": "Aku makan nasi dan ikan",
+       "optionsEn": [
+        "I eat rice and fish",
+        "I eat bread and milk",
+        "I like rice and fish",
+        "I eat at lunch"
+       ],
+       "answerEn": "I eat rice and fish"
       },
       {
        "type": "translateIdAr",
@@ -2943,7 +3545,8 @@
         "مَاذَا تَفْعَلِينَ؟",
         "كَمْ تَسْتَيْقِظِينَ؟"
        ],
-       "answer": "مَتَى تَسْتَيْقِظِينَ يَا فَاطِمَةُ؟"
+       "answer": "مَتَى تَسْتَيْقِظِينَ يَا فَاطِمَةُ؟",
+       "promptEn": "When do you wake up, Fatimah?"
       },
       {
        "type": "translateIdAr",
@@ -2954,7 +3557,8 @@
         "أَرْجِعُ إِلَى الْعَمَلِ فِي السَّابِعَةِ",
         "أَسْتَيْقِظُ فِي السَّادِسَةِ صَبَاحًا"
        ],
-       "answer": "أَرْجِعُ إِلَى الْبَيْتِ فِي الْعَاشِرَةِ مَسَاءً"
+       "answer": "أَرْجِعُ إِلَى الْبَيْتِ فِي الْعَاشِرَةِ مَسَاءً",
+       "promptEn": "I return home at ten at night."
       },
       {
        "type": "rearrange",
@@ -3010,9 +3614,11 @@
         "السَّابِعَةِ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Daily Routine"
     }
-   ]
+   ],
+   "titleEn": "Level 2 — Market, Transportation, Health, Sports & Routine"
   },
   {
    "id": 3,
@@ -3028,61 +3634,71 @@
        "speaker": "Salim",
        "ar": "إِلَى أَيْنَ تُرِيدُ أَنْ تُسَافِرَ يَا أَحْمَدُ؟",
        "latin": "Ilā ayna turīdu an tusāfira yā Aḥmad?",
-       "id": "Ke mana kamu ingin bepergian, Ahmad?"
+       "id": "Ke mana kamu ingin bepergian, Ahmad?",
+       "en": "Where do you want to travel, Ahmad?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أُرِيدُ أَنْ أُسَافِرَ إِلَى مَكَّةَ",
        "latin": "Urīdu an usāfira ilā Makkah",
-       "id": "Aku ingin bepergian ke Makkah"
+       "id": "Aku ingin bepergian ke Makkah",
+       "en": "I want to travel to Makkah"
       },
       {
        "speaker": "Salim",
        "ar": "مَا شَاءَ اللهُ. مَتَى تُسَافِرُ؟",
        "latin": "Mā shā' Allāh. Matā tusāfiru?",
-       "id": "Masya Allah. Kapan kamu pergi?"
+       "id": "Masya Allah. Kapan kamu pergi?",
+       "en": "Masha Allah. When are you going?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أُسَافِرُ فِي الشَّهْرِ الْقَادِمِ",
        "latin": "Usāfiru fī sh-shahri l-qādim",
-       "id": "Aku pergi bulan depan"
+       "id": "Aku pergi bulan depan",
+       "en": "I am going next month"
       },
       {
        "speaker": "Salim",
        "ar": "كَيْفَ تُسَافِرُ؟ بِالطَّائِرَةِ؟",
        "latin": "Kayfa tusāfiru? Biṭ-ṭā'irah?",
-       "id": "Bagaimana kamu pergi? Naik pesawat?"
+       "id": "Bagaimana kamu pergi? Naik pesawat?",
+       "en": "How are you going? By plane?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، أُسَافِرُ بِالطَّائِرَةِ",
        "latin": "Naʿam, usāfiru biṭ-ṭā'irah",
-       "id": "Ya, aku pergi naik pesawat"
+       "id": "Ya, aku pergi naik pesawat",
+       "en": "Yes, I am going by plane"
       },
       {
        "speaker": "Salim",
        "ar": "أَيْنَ تَسْكُنُ فِي مَكَّةَ؟",
        "latin": "Ayna taskunu fī Makkah?",
-       "id": "Di mana kamu tinggal di Makkah?"
+       "id": "Di mana kamu tinggal di Makkah?",
+       "en": "Where do you stay in Makkah?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَسْكُنُ فِي فُنْدُقٍ قَرِيبٍ مِنَ الْمَسْجِدِ الْحَرَامِ",
        "latin": "Askunu fī funduqin qarībin mina l-masjidi l-ḥarām",
-       "id": "Aku tinggal di hotel dekat Masjidil Haram"
+       "id": "Aku tinggal di hotel dekat Masjidil Haram",
+       "en": "I stay at a hotel near Masjidil Haram"
       },
       {
        "speaker": "Salim",
        "ar": "مَاذَا تَزُورُ هُنَاكَ؟",
        "latin": "Mādhā tazūru hunāka?",
-       "id": "Apa yang kamu kunjungi di sana?"
+       "id": "Apa yang kamu kunjungi di sana?",
+       "en": "What do you visit there?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَزُورُ الْكَعْبَةَ وَأُصَلِّي فِيهَا",
        "latin": "Azūru l-kaʿbah wa-uṣallī fīhā",
-       "id": "Aku mengunjungi Ka'bah dan salat di sana"
+       "id": "Aku mengunjungi Ka'bah dan salat di sana",
+       "en": "I visit the Ka'bah and pray there"
       }
      ],
      "mufrodat": [
@@ -3092,7 +3708,9 @@
        "id": "aku bepergian",
        "exampleAr": "أُسَافِرُ إِلَى بَالِي كُلَّ سَنَةٍ",
        "exampleLatin": "Usāfiru ilā Bālī kulla sanah",
-       "exampleId": "Aku bepergian ke Bali setiap tahun"
+       "exampleId": "Aku bepergian ke Bali setiap tahun",
+       "en": "I travel",
+       "exampleEn": "I travel to Bali every year"
       },
       {
        "ar": "أُرِيدُ",
@@ -3100,7 +3718,9 @@
        "id": "aku ingin",
        "exampleAr": "أُرِيدُ كِتَابًا جَدِيدًا",
        "exampleLatin": "Urīdu kitāban jadīdan",
-       "exampleId": "Aku ingin buku baru"
+       "exampleId": "Aku ingin buku baru",
+       "en": "I want",
+       "exampleEn": "I want a new book"
       },
       {
        "ar": "أَنْ",
@@ -3108,7 +3728,9 @@
        "id": "untuk, agar (penghubung)",
        "exampleAr": "أُرِيدُ أَنْ أَتَعَلَّمَ الْعَرَبِيَّةَ",
        "exampleLatin": "Urīdu an ataʿallama l-ʿarabiyyah",
-       "exampleId": "Aku ingin belajar bahasa Arab"
+       "exampleId": "Aku ingin belajar bahasa Arab",
+       "en": "to, in order to (connector)",
+       "exampleEn": "I want to study Arabic"
       },
       {
        "ar": "مَكَّة",
@@ -3116,7 +3738,9 @@
        "id": "Makkah",
        "exampleAr": "مَكَّةُ مَدِينَةٌ مُقَدَّسَةٌ",
        "exampleLatin": "Makkatu madīnatun muqaddasah",
-       "exampleId": "Makkah kota yang suci"
+       "exampleId": "Makkah kota yang suci",
+       "en": "Makkah",
+       "exampleEn": "Makkah is a sacred city"
       },
       {
        "ar": "الشَّهْر",
@@ -3124,7 +3748,9 @@
        "id": "bulan (penanggalan)",
        "exampleAr": "الشَّهْرُ الْقَادِمُ شَهْرُ رَمَضَانَ",
        "exampleLatin": "Ash-shahru l-qādimu shahru Ramaḍān",
-       "exampleId": "Bulan depan adalah bulan Ramadan"
+       "exampleId": "Bulan depan adalah bulan Ramadan",
+       "en": "month (calendar)",
+       "exampleEn": "Next month is the month of Ramadan"
       },
       {
        "ar": "قَادِم",
@@ -3132,7 +3758,9 @@
        "id": "yang akan datang",
        "exampleAr": "فِي الْأُسْبُوعِ الْقَادِمِ",
        "exampleLatin": "Fī l-usbūʿi l-qādim",
-       "exampleId": "Pada minggu yang akan datang"
+       "exampleId": "Pada minggu yang akan datang",
+       "en": "next, coming",
+       "exampleEn": "Next week"
       },
       {
        "ar": "طَائِرَة",
@@ -3140,7 +3768,9 @@
        "id": "pesawat",
        "exampleAr": "الطَّائِرَةُ سَرِيعَةٌ",
        "exampleLatin": "Aṭ-ṭā'iratu sarīʿah",
-       "exampleId": "Pesawatnya cepat"
+       "exampleId": "Pesawatnya cepat",
+       "en": "plane",
+       "exampleEn": "The plane is fast"
       },
       {
        "ar": "أَسْكُنُ",
@@ -3148,7 +3778,9 @@
        "id": "aku tinggal",
        "exampleAr": "أَسْكُنُ فِي جَاكَرْتَا",
        "exampleLatin": "Askunu fī Jākartā",
-       "exampleId": "Aku tinggal di Jakarta"
+       "exampleId": "Aku tinggal di Jakarta",
+       "en": "I stay",
+       "exampleEn": "I live in Jakarta"
       },
       {
        "ar": "فُنْدُق",
@@ -3156,7 +3788,9 @@
        "id": "hotel",
        "exampleAr": "الْفُنْدُقُ قَرِيبٌ مِنَ الْبَحْرِ",
        "exampleLatin": "Al-funduqu qarībun mina l-baḥr",
-       "exampleId": "Hotelnya dekat dengan laut"
+       "exampleId": "Hotelnya dekat dengan laut",
+       "en": "hotel",
+       "exampleEn": "The hotel is close to the sea"
       },
       {
        "ar": "أَزُورُ",
@@ -3164,7 +3798,9 @@
        "id": "aku mengunjungi",
        "exampleAr": "أَزُورُ جَدَّتِي فِي الْعِيدِ",
        "exampleLatin": "Azūru jaddatī fī l-ʿīd",
-       "exampleId": "Aku mengunjungi nenekku pada hari raya"
+       "exampleId": "Aku mengunjungi nenekku pada hari raya",
+       "en": "I visit",
+       "exampleEn": "I visit my grandmother on the holiday"
       }
      ],
      "qawaid": [
@@ -3173,21 +3809,30 @@
        "id": "Untuk menyatakan keinginan: أُرِيدُ (aku ingin) diikuti أَنْ lalu kata kerja. Contoh: أُرِيدُ أَنْ أُسَافِرَ = aku ingin bepergian.",
        "exampleAr": "أُرِيدُ أَنْ أُسَافِرَ إِلَى مَكَّةَ",
        "exampleLatin": "Urīdu an usāfira ilā Makkah",
-       "exampleId": "Aku ingin bepergian ke Makkah"
+       "exampleId": "Aku ingin bepergian ke Makkah",
+       "titleEn": "أُرِيدُ أَنْ + verb (want to do ...)",
+       "en": "To express a wish: أُرِيدُ (I want) followed by أَنْ then a verb. Example: أُرِيدُ أَنْ أُسَافِرَ = I want to travel.",
+       "exampleEn": "I want to travel to Makkah"
       },
       {
        "titleId": "بِ + alat untuk cara bepergian",
        "id": "Cara bepergian disebut dengan بِ + alat: بِالطَّائِرَةِ (naik pesawat), بِالسَّفِينَةِ (naik kapal).",
        "exampleAr": "أُسَافِرُ بِالطَّائِرَةِ",
        "exampleLatin": "Naʿam, usāfiru biṭ-ṭā'irah",
-       "exampleId": "Ya, aku pergi naik pesawat"
+       "exampleId": "Ya, aku pergi naik pesawat",
+       "titleEn": "بِ + means for traveling",
+       "en": "The way of traveling is expressed with بِ + means: بِالطَّائِرَةِ (by plane), بِالسَّفِينَةِ (by ship).",
+       "exampleEn": "Yes, I am going by plane"
       },
       {
        "titleId": "Kata sifat ber-ال (na't ma'rifah)",
        "id": "الشَّهْرُ الْقَادِمُ = bulan yang akan datang. Kata benda dan kata sifat sama-sama ber-ال. Kata sifat juga bisa tanpa ال setelah kata tak tentu: فُنْدُقٌ قَرِيبٌ.",
        "exampleAr": "أُسَافِرُ فِي الشَّهْرِ الْقَادِمِ",
        "exampleLatin": "Usāfiru fī sh-shahri l-qādim",
-       "exampleId": "Aku pergi bulan depan"
+       "exampleId": "Aku pergi bulan depan",
+       "titleEn": "Adjective with ال (na't ma'rifah)",
+       "en": "الشَّهْرُ الْقَادِمُ = the coming month. Both the noun and the adjective take ال. The adjective can also come without ال after an indefinite noun: فُنْدُقٌ قَرِيبٌ.",
+       "exampleEn": "I am going next month"
       }
      ],
      "tadribat": [
@@ -3202,7 +3847,8 @@
         "آكُلَ",
         "أَذْهَبَ"
        ],
-       "answer": "أُسَافِرَ"
+       "answer": "أُسَافِرَ",
+       "promptEn": "Fill in the blank: I want to ___ to Makkah"
       },
       {
        "type": "fillBlank",
@@ -3215,7 +3861,8 @@
         "مَكْتَبٍ",
         "مَلْعَبٍ"
        ],
-       "answer": "فُنْدُقٍ"
+       "answer": "فُنْدُقٍ",
+       "promptEn": "Fill in the blank: I stay at a ___ near the mosque"
       },
       {
        "type": "translateArId",
@@ -3227,7 +3874,14 @@
         "Aku pergi ke Makkah",
         "Aku suka Makkah"
        ],
-       "answer": "Aku ingin bepergian ke Makkah"
+       "answer": "Aku ingin bepergian ke Makkah",
+       "optionsEn": [
+        "I want to travel to Makkah",
+        "I want to live in Makkah",
+        "I go to Makkah",
+        "I like Makkah"
+       ],
+       "answerEn": "I want to travel to Makkah"
       },
       {
        "type": "translateArId",
@@ -3239,7 +3893,14 @@
         "Hotelnya dekat Masjidil Haram",
         "Aku pergi ke hotel"
        ],
-       "answer": "Aku tinggal di hotel dekat Masjidil Haram"
+       "answer": "Aku tinggal di hotel dekat Masjidil Haram",
+       "optionsEn": [
+        "I stay at a hotel near Masjidil Haram",
+        "I live in a house near the mosque",
+        "The hotel is near Masjidil Haram",
+        "I go to the hotel"
+       ],
+       "answerEn": "I stay at a hotel near Masjidil Haram"
       },
       {
        "type": "translateIdAr",
@@ -3250,7 +3911,8 @@
         "كَيْفَ تُسَافِرُ؟",
         "أَيْنَ تَسْكُنُ؟"
        ],
-       "answer": "إِلَى أَيْنَ تُرِيدُ أَنْ تُسَافِرَ؟"
+       "answer": "إِلَى أَيْنَ تُرِيدُ أَنْ تُسَافِرَ؟",
+       "promptEn": "Where do you want to travel?"
       },
       {
        "type": "translateIdAr",
@@ -3261,7 +3923,8 @@
         "كَمْ تُسَافِرُ؟",
         "مَاذَا تُسَافِرُ؟"
        ],
-       "answer": "مَتَى تُسَافِرُ؟"
+       "answer": "مَتَى تُسَافِرُ؟",
+       "promptEn": "When are you going?"
       },
       {
        "type": "rearrange",
@@ -3322,7 +3985,8 @@
         "الْقَادِمِ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Travel"
     },
     {
      "id": "3-2",
@@ -3333,61 +3997,71 @@
        "speaker": "Salim",
        "ar": "مَا عَمَلُكَ يَا أَحْمَدُ؟",
        "latin": "Mā ʿamaluka yā Aḥmad?",
-       "id": "Apa pekerjaanmu, Ahmad?"
+       "id": "Apa pekerjaanmu, Ahmad?",
+       "en": "What is your job, Ahmad?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَنَا مُهَنْدِسٌ",
        "latin": "Anā muhandis",
-       "id": "Aku seorang insinyur"
+       "id": "Aku seorang insinyur",
+       "en": "I am an engineer"
       },
       {
        "speaker": "Salim",
        "ar": "أَيْنَ تَعْمَلُ؟",
        "latin": "Ayna taʿmalu?",
-       "id": "Di mana kamu bekerja?"
+       "id": "Di mana kamu bekerja?",
+       "en": "Where do you work?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَعْمَلُ فِي شَرِكَةٍ كَبِيرَةٍ",
        "latin": "Aʿmalu fī sharikatin kabīrah",
-       "id": "Aku bekerja di perusahaan besar"
+       "id": "Aku bekerja di perusahaan besar",
+       "en": "I work at a big company"
       },
       {
        "speaker": "Salim",
        "ar": "مَاذَا تَفْعَلُ فِي الشَّرِكَةِ؟",
        "latin": "Mādhā tafʿalu fī sh-sharikah?",
-       "id": "Apa yang kamu lakukan di perusahaan?"
+       "id": "Apa yang kamu lakukan di perusahaan?",
+       "en": "What do you do at the company?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أُدِيرُ مَشْرُوعَاتٍ كَبِيرَةً",
        "latin": "Udīru mashrūʿātin kabīrah",
-       "id": "Aku mengelola proyek-proyek besar"
+       "id": "Aku mengelola proyek-proyek besar",
+       "en": "I manage big projects"
       },
       {
        "speaker": "Salim",
        "ar": "وَهَلْ تُحِبُّ عَمَلَكَ؟",
        "latin": "Wa hal tuḥibbu ʿamalaka?",
-       "id": "Dan apakah kamu suka pekerjaanmu?"
+       "id": "Dan apakah kamu suka pekerjaanmu?",
+       "en": "And do you like your job?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، أُحِبُّ عَمَلِي كَثِيرًا",
        "latin": "Naʿam, uḥibbu ʿamalī kathīran",
-       "id": "Ya, aku sangat suka pekerjaanku"
+       "id": "Ya, aku sangat suka pekerjaanku",
+       "en": "Yes, I really like my job"
       },
       {
        "speaker": "Salim",
        "ar": "مَتَى تَبْدَأُ الْعَمَلَ؟",
        "latin": "Matā tabda'u l-ʿamal?",
-       "id": "Kapan kamu mulai bekerja?"
+       "id": "Kapan kamu mulai bekerja?",
+       "en": "When do you start working?"
       },
       {
        "speaker": "Ahmad",
        "ar": "أَبْدَأُ الْعَمَلَ فِي الثَّامِنَةِ صَبَاحًا",
        "latin": "Abda'u l-ʿamal fī th-thāminah ṣabāḥan",
-       "id": "Aku mulai bekerja jam delapan pagi"
+       "id": "Aku mulai bekerja jam delapan pagi",
+       "en": "I start working at eight in the morning"
       }
      ],
      "mufrodat": [
@@ -3397,7 +4071,9 @@
        "id": "pekerjaan",
        "exampleAr": "عَمَلِي فِي مَكْتَبٍ كَبِيرٍ",
        "exampleLatin": "ʿamalī fī maktabin kabīr",
-       "exampleId": "Pekerjaanku di kantor besar"
+       "exampleId": "Pekerjaanku di kantor besar",
+       "en": "job, work",
+       "exampleEn": "My job is at a big office"
       },
       {
        "ar": "مُهَنْدِس",
@@ -3405,7 +4081,9 @@
        "id": "insinyur",
        "exampleAr": "الْمُهَنْدِسُ يَبْنِي الْجُسُورَ",
        "exampleLatin": "Al-muhandisu yabnī l-jusūr",
-       "exampleId": "Insinyur membangun jembatan"
+       "exampleId": "Insinyur membangun jembatan",
+       "en": "engineer",
+       "exampleEn": "Engineers build bridges"
       },
       {
        "ar": "أَعْمَلُ",
@@ -3413,7 +4091,9 @@
        "id": "aku bekerja",
        "exampleAr": "أَعْمَلُ مِنَ الصَّبَاحِ إِلَى الْمَسَاءِ",
        "exampleLatin": "Aʿmalu mina ṣ-ṣabāḥ ilā l-masā'",
-       "exampleId": "Aku bekerja dari pagi sampai sore"
+       "exampleId": "Aku bekerja dari pagi sampai sore",
+       "en": "I work",
+       "exampleEn": "I work from morning until evening"
       },
       {
        "ar": "شَرِكَة",
@@ -3421,7 +4101,9 @@
        "id": "perusahaan",
        "exampleAr": "الشَّرِكَةُ كَبِيرَةٌ",
        "exampleLatin": "Ash-sharikatu kabīrah",
-       "exampleId": "Perusahaannya besar"
+       "exampleId": "Perusahaannya besar",
+       "en": "company",
+       "exampleEn": "The company is big"
       },
       {
        "ar": "مَشْرُوع",
@@ -3429,7 +4111,9 @@
        "id": "proyek",
        "exampleAr": "هٰذَا مَشْرُوعٌ مُهِمٌّ",
        "exampleLatin": "Hādhā mashrūʿun muhimmun",
-       "exampleId": "Ini proyek yang penting"
+       "exampleId": "Ini proyek yang penting",
+       "en": "project",
+       "exampleEn": "This is an important project"
       },
       {
        "ar": "أُدِيرُ",
@@ -3437,7 +4121,9 @@
        "id": "aku mengelola",
        "exampleAr": "أُدِيرُ مَكْتَبًا صَغِيرًا",
        "exampleLatin": "Udīru maktaban ṣaghīran",
-       "exampleId": "Aku mengelola kantor kecil"
+       "exampleId": "Aku mengelola kantor kecil",
+       "en": "I manage",
+       "exampleEn": "I manage a small office"
       },
       {
        "ar": "أَبْدَأُ",
@@ -3445,7 +4131,9 @@
        "id": "aku mulai",
        "exampleAr": "أَبْدَأُ الدِّرَاسَةَ فِي السَّبْتَمْبَر",
        "exampleLatin": "Abda'u d-dirāsah fī s-sabtambar",
-       "exampleId": "Aku mulai belajar pada bulan September"
+       "exampleId": "Aku mulai belajar pada bulan September",
+       "en": "I start",
+       "exampleEn": "I start studying in September"
       },
       {
        "ar": "الثَّامِنَة",
@@ -3453,7 +4141,9 @@
        "id": "kedelapan, jam delapan",
        "exampleAr": "السَّاعَةُ الثَّامِنَةُ مَسَاءً",
        "exampleLatin": "As-sāʿatu th-thāminatu masā'an",
-       "exampleId": "Jam delapan malam"
+       "exampleId": "Jam delapan malam",
+       "en": "eighth, eight o'clock",
+       "exampleEn": "Eight in the evening"
       },
       {
        "ar": "أُحِبُّ",
@@ -3461,7 +4151,9 @@
        "id": "aku suka",
        "exampleAr": "أُحِبُّ عَمَلِي",
        "exampleLatin": "Uḥibbu ʿamalī",
-       "exampleId": "Aku suka pekerjaanku"
+       "exampleId": "Aku suka pekerjaanku",
+       "en": "I like",
+       "exampleEn": "I like my job"
       }
      ],
      "qawaid": [
@@ -3470,21 +4162,30 @@
        "id": "Untuk menyebut profesi: أَنَا + nama profesi. أَنَا مُهَنْدِسٌ = aku seorang insinyur. Profesi lain: طَبِيبٌ (dokter), مُدَرِّسٌ (guru), تَاجِرٌ (pedagang).",
        "exampleAr": "أَنَا مُهَنْدِسٌ",
        "exampleLatin": "Anā muhandis",
-       "exampleId": "Aku seorang insinyur"
+       "exampleId": "Aku seorang insinyur",
+       "titleEn": "Profession names as khabar",
+       "en": "To state a profession: أَنَا + profession name. أَنَا مُهَنْدِسٌ = I am an engineer. Other professions: طَبِيبٌ (doctor), مُدَرِّسٌ (teacher), تَاجِرٌ (merchant).",
+       "exampleEn": "I am an engineer"
       },
       {
        "titleId": "فِي + tempat bekerja",
        "id": "Tempat bekerja disebut dengan فِي: أَعْمَلُ فِي شَرِكَةٍ = aku bekerja di sebuah perusahaan.",
        "exampleAr": "أَعْمَلُ فِي شَرِكَةٍ كَبِيرَةٍ",
        "exampleLatin": "Aʿmalu fī sharikatin kabīrah",
-       "exampleId": "Aku bekerja di perusahaan besar"
+       "exampleId": "Aku bekerja di perusahaan besar",
+       "titleEn": "فِي + place of work",
+       "en": "The place of work is expressed with فِي: أَعْمَلُ فِي شَرِكَةٍ = I work at a company.",
+       "exampleEn": "I work at a big company"
       },
       {
        "titleId": "مَاذَا تَفْعَلُ؟ (apa yang kamu lakukan?)",
        "id": "مَاذَا تَفْعَلُ؟ menanyakan kegiatan. Jawab dengan kata kerja: أُدِيرُ مَشْرُوعَاتٍ = aku mengelola proyek-proyek.",
        "exampleAr": "مَاذَا تَفْعَلُ فِي الشَّرِكَةِ؟",
        "exampleLatin": "Mādhā tafʿalu fī sh-sharikah?",
-       "exampleId": "Apa yang kamu lakukan di perusahaan?"
+       "exampleId": "Apa yang kamu lakukan di perusahaan?",
+       "titleEn": "مَاذَا تَفْعَلُ؟ (what do you do?)",
+       "en": "مَاذَا تَفْعَلُ؟ asks about an activity. Answer with a verb: أُدِيرُ مَشْرُوعَاتٍ = I manage projects.",
+       "exampleEn": "What do you do at the company?"
       }
      ],
      "tadribat": [
@@ -3499,7 +4200,8 @@
         "عَمَلٌ",
         "مَشْرُوعٌ"
        ],
-       "answer": "مُهَنْدِسٌ"
+       "answer": "مُهَنْدِسٌ",
+       "promptEn": "Fill in the blank: I am a(n) ___"
       },
       {
        "type": "fillBlank",
@@ -3512,7 +4214,8 @@
         "مَدْرَسَةٍ",
         "مَلْعَبٍ"
        ],
-       "answer": "شَرِكَةٍ"
+       "answer": "شَرِكَةٍ",
+       "promptEn": "Fill in the blank: I work at a big ___"
       },
       {
        "type": "translateArId",
@@ -3524,7 +4227,14 @@
         "Aku seorang guru",
         "Aku seorang pedagang"
        ],
-       "answer": "Aku seorang insinyur"
+       "answer": "Aku seorang insinyur",
+       "optionsEn": [
+        "I am an engineer",
+        "I am a doctor",
+        "I am a teacher",
+        "I am a merchant"
+       ],
+       "answerEn": "I am an engineer"
       },
       {
        "type": "translateArId",
@@ -3536,7 +4246,14 @@
         "Pekerjaanku besar",
         "Aku bekerja sangat banyak"
        ],
-       "answer": "Aku sangat suka pekerjaanku"
+       "answer": "Aku sangat suka pekerjaanku",
+       "optionsEn": [
+        "I really like my job",
+        "I like my company",
+        "My job is big",
+        "I work a lot"
+       ],
+       "answerEn": "I really like my job"
       },
       {
        "type": "translateIdAr",
@@ -3547,7 +4264,8 @@
         "أَيْنَ تَعْمَلُ؟",
         "مَتَى تَبْدَأُ الْعَمَلَ؟"
        ],
-       "answer": "مَا عَمَلُكَ يَا أَحْمَدُ؟"
+       "answer": "مَا عَمَلُكَ يَا أَحْمَدُ؟",
+       "promptEn": "What is your job, Ahmad?"
       },
       {
        "type": "translateIdAr",
@@ -3558,7 +4276,8 @@
         "مَاذَا تَعْمَلُ؟",
         "مَنْ يَعْمَلُ؟"
        ],
-       "answer": "أَيْنَ تَعْمَلُ؟"
+       "answer": "أَيْنَ تَعْمَلُ؟",
+       "promptEn": "Where do you work?"
       },
       {
        "type": "rearrange",
@@ -3619,7 +4338,8 @@
         "صَبَاحًا"
        ]
       }
-     ]
+     ],
+     "titleEn": "Work"
     },
     {
      "id": "3-3",
@@ -3630,61 +4350,71 @@
        "speaker": "Khadijah",
        "ar": "مَاذَا تَفْعَلِينَ فِي الْمَسَاءِ يَا فَاطِمَةُ؟",
        "latin": "Mādhā tafʿalīna fī l-masā' yā Fāṭimah?",
-       "id": "Apa yang kamu lakukan di malam hari, Fatimah?"
+       "id": "Apa yang kamu lakukan di malam hari, Fatimah?",
+       "en": "What do you do at night, Fatimah?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أُشَاهِدُ التِّلْفَازَ مَعَ عَائِلَتِي",
        "latin": "Ushāhidu t-tilfāz maʿa ʿā'ilatī",
-       "id": "Aku menonton televisi bersama keluargaku"
+       "id": "Aku menonton televisi bersama keluargaku",
+       "en": "I watch television with my family"
       },
       {
        "speaker": "Khadijah",
        "ar": "مَاذَا تُشَاهِدِينَ؟",
        "latin": "Mādhā tushāhidīna?",
-       "id": "Apa yang kamu tonton?"
+       "id": "Apa yang kamu tonton?",
+       "en": "What do you watch?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أُشَاهِدُ الْأَخْبَارَ ثُمَّ الْفِلْمَ",
        "latin": "Ushāhidu l-akhbār thumma l-film",
-       "id": "Aku menonton berita lalu film"
+       "id": "Aku menonton berita lalu film",
+       "en": "I watch the news, then a film"
       },
       {
        "speaker": "Khadijah",
        "ar": "هَلْ تَقْرَئِينَ الْجَرِيدَةَ؟",
        "latin": "Hal taqra'īna l-jarīdah?",
-       "id": "Apakah kamu membaca koran?"
+       "id": "Apakah kamu membaca koran?",
+       "en": "Do you read the newspaper?"
       },
       {
        "speaker": "Fatimah",
        "ar": "نَعَمْ، أَقْرَأُ الْجَرِيدَةَ كُلَّ صَبَاحٍ",
        "latin": "Naʿam, aqra'u l-jarīdah kulla ṣabāḥ",
-       "id": "Ya, aku membaca koran setiap pagi"
+       "id": "Ya, aku membaca koran setiap pagi",
+       "en": "Yes, I read the newspaper every morning"
       },
       {
        "speaker": "Khadijah",
        "ar": "وَمَاذَا تَقْرَئِينَ فِي الْجَرِيدَةِ؟",
        "latin": "Wa mādhā taqra'īna fī l-jarīdah?",
-       "id": "Dan apa yang kamu baca di koran?"
+       "id": "Dan apa yang kamu baca di koran?",
+       "en": "And what do you read in the newspaper?"
       },
       {
        "speaker": "Fatimah",
        "ar": "أَقْرَأُ الْأَخْبَارَ وَالْمَقَالَاتِ",
        "latin": "Aqra'u l-akhbār wal-maqālāt",
-       "id": "Aku membaca berita dan artikel-artikel"
+       "id": "Aku membaca berita dan artikel-artikel",
+       "en": "I read news and articles"
       },
       {
        "speaker": "Khadijah",
        "ar": "هَلْ تَسْتَمِعِينَ إِلَى الرَّادْيُو؟",
        "latin": "Hal tastamiʿīna ilā r-rādyū?",
-       "id": "Apakah kamu mendengarkan radio?"
+       "id": "Apakah kamu mendengarkan radio?",
+       "en": "Do you listen to the radio?"
       },
       {
        "speaker": "Fatimah",
        "ar": "نَعَمْ، أَسْتَمِعُ إِلَى الرَّادْيُو فِي السَّيَّارَةِ",
        "latin": "Naʿam, astamiʿu ilā r-rādyū fī s-sayyārah",
-       "id": "Ya, aku mendengarkan radio di mobil"
+       "id": "Ya, aku mendengarkan radio di mobil",
+       "en": "Yes, I listen to the radio in the car"
       }
      ],
      "mufrodat": [
@@ -3694,7 +4424,9 @@
        "id": "aku menonton",
        "exampleAr": "أُشَاهِدُ الْفِلْمَ مَعَ أَصْدِقَائِي",
        "exampleLatin": "Ushāhidu l-filma maʿa aṣdiqā'ī",
-       "exampleId": "Aku menonton film bersama teman-temanku"
+       "exampleId": "Aku menonton film bersama teman-temanku",
+       "en": "I watch",
+       "exampleEn": "I watch films with my friends"
       },
       {
        "ar": "التِّلْفَاز",
@@ -3702,7 +4434,9 @@
        "id": "televisi",
        "exampleAr": "التِّلْفَازُ فِي غُرْفَةِ الْجُلُوسِ",
        "exampleLatin": "At-tilfāzu fī ghurfati l-julūs",
-       "exampleId": "Televisinya ada di ruang tamu"
+       "exampleId": "Televisinya ada di ruang tamu",
+       "en": "television",
+       "exampleEn": "The television is in the living room"
       },
       {
        "ar": "الْأَخْبَار",
@@ -3710,7 +4444,9 @@
        "id": "berita",
        "exampleAr": "الْأَخْبَارُ مُهِمَّةٌ كُلَّ يَوْمٍ",
        "exampleLatin": "Al-akhbāru muhimmah kulla yawm",
-       "exampleId": "Berita itu penting setiap hari"
+       "exampleId": "Berita itu penting setiap hari",
+       "en": "news",
+       "exampleEn": "The news is important every day"
       },
       {
        "ar": "فِلْم",
@@ -3718,7 +4454,9 @@
        "id": "film",
        "exampleAr": "الْفِلْمُ جَمِيلٌ",
        "exampleLatin": "Al-filmu jamīlun",
-       "exampleId": "Filmnya bagus"
+       "exampleId": "Filmnya bagus",
+       "en": "film",
+       "exampleEn": "The film is good"
       },
       {
        "ar": "أَقْرَأُ",
@@ -3726,7 +4464,9 @@
        "id": "aku membaca",
        "exampleAr": "أَقْرَأُ كِتَابًا كُلَّ أُسْبُوعٍ",
        "exampleLatin": "Aqra'u kitāban kulla usbūʿ",
-       "exampleId": "Aku membaca satu buku setiap minggu"
+       "exampleId": "Aku membaca satu buku setiap minggu",
+       "en": "I read",
+       "exampleEn": "I read one book every week"
       },
       {
        "ar": "الْجَرِيدَة",
@@ -3734,7 +4474,9 @@
        "id": "koran",
        "exampleAr": "الْجَرِيدَةُ عَلَى الطَّاوِلَةِ",
        "exampleLatin": "Al-jarīdatu ʿalā ṭ-ṭāwilah",
-       "exampleId": "Korannya ada di atas meja"
+       "exampleId": "Korannya ada di atas meja",
+       "en": "newspaper",
+       "exampleEn": "The newspaper is on the table"
       },
       {
        "ar": "مَقَال",
@@ -3742,7 +4484,9 @@
        "id": "artikel",
        "exampleAr": "قَرَأْتُ مَقَالًا مُفِيدًا",
        "exampleLatin": "Qara'tu maqālan mufīdan",
-       "exampleId": "Aku membaca artikel yang bermanfaat"
+       "exampleId": "Aku membaca artikel yang bermanfaat",
+       "en": "article",
+       "exampleEn": "I read a useful article"
       },
       {
        "ar": "أَسْتَمِعُ",
@@ -3750,7 +4494,9 @@
        "id": "aku mendengarkan",
        "exampleAr": "أَسْتَمِعُ إِلَى الْقُرْآنِ كَثِيرًا",
        "exampleLatin": "Astamiʿu ilā l-Qur'āni kathīran",
-       "exampleId": "Aku sering mendengarkan Al-Qur'an"
+       "exampleId": "Aku sering mendengarkan Al-Qur'an",
+       "en": "I listen",
+       "exampleEn": "I often listen to the Qur'an"
       },
       {
        "ar": "الرَّادْيُو",
@@ -3758,7 +4504,9 @@
        "id": "radio",
        "exampleAr": "الرَّادْيُو قَدِيمٌ",
        "exampleLatin": "Ar-rādyū qadīmun",
-       "exampleId": "Radionya tua"
+       "exampleId": "Radionya tua",
+       "en": "radio",
+       "exampleEn": "The radio is old"
       },
       {
        "ar": "صَبَاح",
@@ -3766,7 +4514,9 @@
        "id": "pagi",
        "exampleAr": "كُلَّ صَبَاحٍ أَشْرَبُ الشَّايَ",
        "exampleLatin": "Kulla ṣabāḥin ashrabu sh-shāy",
-       "exampleId": "Setiap pagi aku minum teh"
+       "exampleId": "Setiap pagi aku minum teh",
+       "en": "morning",
+       "exampleEn": "Every morning I drink tea"
       }
      ],
      "qawaid": [
@@ -3775,21 +4525,30 @@
        "id": "أُشَاهِدُ (menonton), أَقْرَأُ (membaca), أَسْتَمِعُ (mendengarkan). Bentuk perempuan: تُشَاهِدِينَ، تَقْرَئِينَ، تَسْتَمِعِينَ.",
        "exampleAr": "أُشَاهِدُ الْأَخْبَارَ ثُمَّ الْفِلْمَ",
        "exampleLatin": "Ushāhidu l-akhbār thumma l-film",
-       "exampleId": "Aku menonton berita lalu film"
+       "exampleId": "Aku menonton berita lalu film",
+       "titleEn": "Media verbs: to watch, to read, to listen",
+       "en": "أُشَاهِدُ (I watch), أَقْرَأُ (I read), أَسْتَمِعُ (I listen). Female forms: تُشَاهِدِينَ، تَقْرَئِينَ، تَسْتَمِعِينَ.",
+       "exampleEn": "I watch the news, then a film"
       },
       {
        "titleId": "أَسْتَمِعُ إِلَى (mendengarkan ...)",
        "id": "Kata kerja 'mendengarkan' diikuti إِلَى: أَسْتَمِعُ إِلَى الرَّادْيُو = aku mendengarkan radio.",
        "exampleAr": "أَسْتَمِعُ إِلَى الرَّادْيُو فِي السَّيَّارَةِ",
        "exampleLatin": "Naʿam, astamiʿu ilā r-rādyū fī s-sayyārah",
-       "exampleId": "Ya, aku mendengarkan radio di mobil"
+       "exampleId": "Ya, aku mendengarkan radio di mobil",
+       "titleEn": "أَسْتَمِعُ إِلَى (to listen to ...)",
+       "en": "The verb 'to listen' is followed by إِلَى: أَسْتَمِعُ إِلَى الرَّادْيُو = I listen to the radio.",
+       "exampleEn": "Yes, I listen to the radio in the car"
       },
       {
        "titleId": "كُلَّ صَبَاحٍ (setiap pagi)",
        "id": "كُلَّ + waktu = setiap ...: كُلَّ صَبَاحٍ (setiap pagi), كُلَّ يَوْمٍ (setiap hari), كُلَّ أُسْبُوعٍ (setiap minggu).",
        "exampleAr": "أَقْرَأُ الْجَرِيدَةَ كُلَّ صَبَاحٍ",
        "exampleLatin": "Naʿam, aqra'u l-jarīdah kulla ṣabāḥ",
-       "exampleId": "Ya, aku membaca koran setiap pagi"
+       "exampleId": "Ya, aku membaca koran setiap pagi",
+       "titleEn": "كُلَّ صَبَاحٍ (every morning)",
+       "en": "كُلَّ + time = every ...: كُلَّ صَبَاحٍ (every morning), كُلَّ يَوْمٍ (every day), كُلَّ أُسْبُوعٍ (every week).",
+       "exampleEn": "Yes, I read the newspaper every morning"
       }
      ],
      "tadribat": [
@@ -3804,7 +4563,8 @@
         "الرَّادْيُو",
         "الْمَقَالَاتِ"
        ],
-       "answer": "التِّلْفَازَ"
+       "answer": "التِّلْفَازَ",
+       "promptEn": "Fill in the blank: I watch ___ with my family"
       },
       {
        "type": "fillBlank",
@@ -3817,7 +4577,8 @@
         "يَوْمٍ",
         "شَهْرٍ"
        ],
-       "answer": "صَبَاحٍ"
+       "answer": "صَبَاحٍ",
+       "promptEn": "Fill in the blank: I read the newspaper every ___"
       },
       {
        "type": "translateArId",
@@ -3829,7 +4590,14 @@
         "Aku membaca berita dan artikel",
         "Aku mendengarkan radio"
        ],
-       "answer": "Aku menonton berita lalu film"
+       "answer": "Aku menonton berita lalu film",
+       "optionsEn": [
+        "I watch the news, then the film",
+        "I watch the film, then the news",
+        "I read news and articles",
+        "I listen to the radio"
+       ],
+       "answerEn": "I watch the news, then the film"
       },
       {
        "type": "translateArId",
@@ -3841,7 +4609,14 @@
         "Aku mendengarkan radio di rumah",
         "Aku membaca koran di mobil"
        ],
-       "answer": "Aku mendengarkan radio di mobil"
+       "answer": "Aku mendengarkan radio di mobil",
+       "optionsEn": [
+        "I listen to the radio in the car",
+        "I watch TV in the car",
+        "I listen to the radio at home",
+        "I read the newspaper in the car"
+       ],
+       "answerEn": "I listen to the radio in the car"
       },
       {
        "type": "translateIdAr",
@@ -3852,7 +4627,8 @@
         "مَاذَا تَقْرَئِينَ؟",
         "أَيْنَ الْجَرِيدَةُ؟"
        ],
-       "answer": "هَلْ تَقْرَئِينَ الْجَرِيدَةَ؟"
+       "answer": "هَلْ تَقْرَئِينَ الْجَرِيدَةَ؟",
+       "promptEn": "Do you read the newspaper?"
       },
       {
        "type": "translateIdAr",
@@ -3863,7 +4639,8 @@
         "مَاذَا تَسْتَمِعِينَ؟",
         "مَاذَا تَفْعَلِينَ؟"
        ],
-       "answer": "مَاذَا تُشَاهِدِينَ؟"
+       "answer": "مَاذَا تُشَاهِدِينَ؟",
+       "promptEn": "What do you watch?"
       },
       {
        "type": "rearrange",
@@ -3919,7 +4696,8 @@
         "صَبَاحٍ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Media"
     },
     {
      "id": "3-4",
@@ -3930,61 +4708,75 @@
        "speaker": "Salim",
        "ar": "السَّلَامُ عَلَيْكُمْ يَا أُسْتَاذُ",
        "latin": "As-salāmu ʿalaikum yā ustādh",
-       "id": "Semoga keselamatan, Ustadz"
+       "id": "Semoga keselamatan, Ustadz",
+       "en": "Peace be upon you, Ustadh"
       },
       {
        "speaker": "Ustadz",
        "ar": "وَعَلَيْكُمُ السَّلَامُ وَرَحْمَةُ اللهِ",
        "latin": "Wa ʿalaikumus-salāmu wa-raḥmatu llāh",
-       "id": "Dan semoga keselamatan dan rahmat Allah"
+       "id": "Dan semoga keselamatan dan rahmat Allah",
+       "en": "And peace and the mercy of Allah be upon you",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Salim",
        "ar": "كَيْفَ حَالُكَ الْيَوْمَ؟",
        "latin": "Kayfa ḥāluka l-yawm?",
-       "id": "Bagaimana kabarmu hari ini?"
+       "id": "Bagaimana kabarmu hari ini?",
+       "en": "How are you today?"
       },
       {
        "speaker": "Ustadz",
        "ar": "أَنَا بِخَيْرٍ، وَالْحَمْدُ لِلَّهِ. وَأَنْتَ؟",
        "latin": "Anā bikhayrin, wal-ḥamdu lillāh. Wa anta?",
-       "id": "Aku baik, alhamdulillah. Dan kamu?"
+       "id": "Aku baik, alhamdulillah. Dan kamu?",
+       "en": "I am fine, alhamdulillah. And you?",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Salim",
        "ar": "أَنَا بِخَيْرٍ أَيْضًا",
        "latin": "Anā bikhayrin ayḍan",
-       "id": "Aku juga baik"
+       "id": "Aku juga baik",
+       "en": "I am fine too"
       },
       {
        "speaker": "Salim",
        "ar": "هٰذِهِ هَدِيَّةٌ لَكَ يَا أُسْتَاذُ",
        "latin": "Hādhihi hadiyyatun laka yā ustādh",
-       "id": "Ini hadiah untukmu, Ustadz"
+       "id": "Ini hadiah untukmu, Ustadz",
+       "en": "This is a gift for you, Ustadh"
       },
       {
        "speaker": "Ustadz",
        "ar": "شُكْرًا جَزِيلًا. مَا هٰذِهِ الْهَدِيَّةُ؟",
        "latin": "Shukran jazīlan. Mā hādhihi l-hadiyyah?",
-       "id": "Terima kasih banyak. Hadiah apa ini?"
+       "id": "Terima kasih banyak. Hadiah apa ini?",
+       "en": "Thank you very much. What gift is this?",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Salim",
        "ar": "هٰذِهِ سَاعَةٌ جَمِيلَةٌ",
        "latin": "Hādhihi sāʿatun jamīlah",
-       "id": "Ini jam tangan yang indah"
+       "id": "Ini jam tangan yang indah",
+       "en": "This is a beautiful watch"
       },
       {
        "speaker": "Ustadz",
        "ar": "مَا أَجْمَلَهَا! شُكْرًا يَا سَالِمُ",
        "latin": "Mā ajmalahā! Shukran yā Sālim",
-       "id": "Alangkah indahnya! Terima kasih, Salim"
+       "id": "Alangkah indahnya! Terima kasih, Salim",
+       "en": "How beautiful! Thank you, Salim",
+       "speakerEn": "Ustadh"
       },
       {
        "speaker": "Salim",
        "ar": "الْعَفْوُ يَا أُسْتَاذُ",
        "latin": "Al-ʿafwu yā ustādh",
-       "id": "Sama-sama, Ustadz"
+       "id": "Sama-sama, Ustadz",
+       "en": "You are welcome, Ustadh"
       }
      ],
      "mufrodat": [
@@ -3994,7 +4786,9 @@
        "id": "ustadz, guru",
        "exampleAr": "الْأُسْتَاذُ يُعَلِّمُنَا الْعَرَبِيَّةَ",
        "exampleLatin": "Al-ustādhu yuʿallimunā l-ʿarabiyyah",
-       "exampleId": "Ustadz mengajari kami bahasa Arab"
+       "exampleId": "Ustadz mengajari kami bahasa Arab",
+       "en": "ustadh, teacher",
+       "exampleEn": "The ustadh teaches us Arabic"
       },
       {
        "ar": "رَحْمَة",
@@ -4002,7 +4796,9 @@
        "id": "rahmat",
        "exampleAr": "رَحْمَةُ اللهِ وَاسِعَةٌ",
        "exampleLatin": "Raḥmatu llāhi wāsiʿah",
-       "exampleId": "Rahmat Allah itu luas"
+       "exampleId": "Rahmat Allah itu luas",
+       "en": "mercy",
+       "exampleEn": "The mercy of Allah is vast"
       },
       {
        "ar": "حَال",
@@ -4010,7 +4806,9 @@
        "id": "keadaan, kabar",
        "exampleAr": "حَالُ عَائِلَتِي جَيِّدٌ",
        "exampleLatin": "Ḥālu ʿā'ilatī jayyid",
-       "exampleId": "Keadaan keluargaku baik"
+       "exampleId": "Keadaan keluargaku baik",
+       "en": "state, news",
+       "exampleEn": "My family is in a good state"
       },
       {
        "ar": "بِخَيْر",
@@ -4018,7 +4816,9 @@
        "id": "baik-baik",
        "exampleAr": "أَنَا بِخَيْرٍ وَالْحَمْدُ لِلَّهِ",
        "exampleLatin": "Anā bikhayrin wal-ḥamdu lillāh",
-       "exampleId": "Aku baik-baik saja, alhamdulillah"
+       "exampleId": "Aku baik-baik saja, alhamdulillah",
+       "en": "fine, well",
+       "exampleEn": "I am fine, alhamdulillah"
       },
       {
        "ar": "الْحَمْدُ لِلَّهِ",
@@ -4026,7 +4826,9 @@
        "id": "segala puji bagi Allah",
        "exampleAr": "الْحَمْدُ لِلَّهِ عَلَى كُلِّ حَالٍ",
        "exampleLatin": "Al-ḥamdu lillāh ʿalā kulli ḥāl",
-       "exampleId": "Segala puji bagi Allah dalam segala keadaan"
+       "exampleId": "Segala puji bagi Allah dalam segala keadaan",
+       "en": "all praise be to Allah",
+       "exampleEn": "All praise be to Allah in every situation"
       },
       {
        "ar": "هَدِيَّة",
@@ -4034,7 +4836,9 @@
        "id": "hadiah",
        "exampleAr": "الْهَدِيَّةُ مِنْ صَدِيقِي",
        "exampleLatin": "Al-hadiyyatu min ṣadīqī",
-       "exampleId": "Hadiahnya dari temanku"
+       "exampleId": "Hadiahnya dari temanku",
+       "en": "gift",
+       "exampleEn": "The gift is from my friend"
       },
       {
        "ar": "لَكَ",
@@ -4042,7 +4846,9 @@
        "id": "untukmu (laki-laki)",
        "exampleAr": "هٰذَا الْكِتَابُ لَكَ",
        "exampleLatin": "Hādhā l-kitābu laka",
-       "exampleId": "Buku ini untukmu"
+       "exampleId": "Buku ini untukmu",
+       "en": "for you (male)",
+       "exampleEn": "This book is for you"
       },
       {
        "ar": "شُكْرًا",
@@ -4050,7 +4856,9 @@
        "id": "terima kasih",
        "exampleAr": "شُكْرًا عَلَى الْمُسَاعَدَةِ",
        "exampleLatin": "Shukran ʿalā l-musāʿadah",
-       "exampleId": "Terima kasih atas bantuannya"
+       "exampleId": "Terima kasih atas bantuannya",
+       "en": "thank you",
+       "exampleEn": "Thank you for your help"
       },
       {
        "ar": "سَاعَة",
@@ -4058,7 +4866,9 @@
        "id": "jam, jam tangan",
        "exampleAr": "سَاعَتِي جَدِيدَةٌ",
        "exampleLatin": "Sāʿatī jadīdah",
-       "exampleId": "Jam tanganku baru"
+       "exampleId": "Jam tanganku baru",
+       "en": "watch",
+       "exampleEn": "My watch is new"
       },
       {
        "ar": "جَمِيل",
@@ -4066,7 +4876,9 @@
        "id": "indah, bagus",
        "exampleAr": "الْمَدِينَةُ جَمِيلَةٌ",
        "exampleLatin": "Al-madīnatu jamīlah",
-       "exampleId": "Kotanya indah"
+       "exampleId": "Kotanya indah",
+       "en": "beautiful",
+       "exampleEn": "The city is beautiful"
       },
       {
        "ar": "الْعَفْو",
@@ -4074,7 +4886,9 @@
        "id": "sama-sama (jawaban terima kasih)",
        "exampleAr": "الْعَفْوُ يَا أُخِي",
        "exampleLatin": "Al-ʿafwu yā ukhiyy",
-       "exampleId": "Sama-sama, saudaraku"
+       "exampleId": "Sama-sama, saudaraku",
+       "en": "you are welcome (reply to thanks)",
+       "exampleEn": "You are welcome, my brother"
       }
      ],
      "qawaid": [
@@ -4083,21 +4897,30 @@
        "id": "كَيْفَ حَالُكَ؟ = bagaimana kabarmu? (laki-laki). Untuk perempuan: كَيْفَ حَالُكِ؟ Jawaban: أَنَا بِخَيْرٍ (aku baik-baik saja).",
        "exampleAr": "كَيْفَ حَالُكَ الْيَوْمَ؟",
        "exampleLatin": "Kayfa ḥāluka l-yawm?",
-       "exampleId": "Bagaimana kabarmu hari ini?"
+       "exampleId": "Bagaimana kabarmu hari ini?",
+       "titleEn": "Greeting asking about one's state: كَيْفَ حَالُكَ؟",
+       "en": "كَيْفَ حَالُكَ؟ = how are you? (male). For a female: كَيْفَ حَالُكِ؟ Answer: أَنَا بِخَيْرٍ (I am fine).",
+       "exampleEn": "How are you today?"
       },
       {
        "titleId": "لَـ + kata ganti (untuk ...)",
        "id": "لَـ berarti 'untuk' dan bisa disambung kata ganti: لَكَ (untukmu), لِي (untukku), لَهُ (untuknya).",
        "exampleAr": "هٰذِهِ هَدِيَّةٌ لَكَ يَا أُسْتَاذُ",
        "exampleLatin": "Hādhihi hadiyyatun laka yā ustādh",
-       "exampleId": "Ini hadiah untukmu, Ustadz"
+       "exampleId": "Ini hadiah untukmu, Ustadz",
+       "titleEn": "لَـ + pronoun (for ...)",
+       "en": "لَـ means 'for' and can be joined to pronouns: لَكَ (for you), لِي (for me), لَهُ (for him).",
+       "exampleEn": "This is a gift for you, Ustadh"
       },
       {
        "titleId": "Ungkapan terima kasih",
        "id": "شُكْرًا (terima kasih), شُكْرًا جَزِيلًا (terima kasih banyak). Jawabannya: الْعَفْوُ (sama-sama).",
        "exampleAr": "شُكْرًا جَزِيلًا. مَا هٰذِهِ الْهَدِيَّةُ؟",
        "exampleLatin": "Shukran jazīlan. Mā hādhihi l-hadiyyah?",
-       "exampleId": "Terima kasih banyak. Hadiah apa ini?"
+       "exampleId": "Terima kasih banyak. Hadiah apa ini?",
+       "titleEn": "Expressions of thanks",
+       "en": "شُكْرًا (thank you), شُكْرًا جَزِيلًا (thank you very much). The reply: الْعَفْوُ (you are welcome).",
+       "exampleEn": "Thank you very much. What gift is this?"
       }
      ],
      "tadribat": [
@@ -4112,7 +4935,8 @@
         "بَيْتُكَ",
         "عَمَلُكَ"
        ],
-       "answer": "حَالُكَ"
+       "answer": "حَالُكَ",
+       "promptEn": "Fill in the blank: How are ___ today?"
       },
       {
        "type": "fillBlank",
@@ -4125,7 +4949,8 @@
         "لَهَا",
         "لَنَا"
        ],
-       "answer": "لَكَ"
+       "answer": "لَكَ",
+       "promptEn": "Fill in the blank: This is a gift ___ , Ustadh"
       },
       {
        "type": "translateArId",
@@ -4137,7 +4962,14 @@
         "Di mana kamu hari ini?",
         "Apa kabar keluargamu?"
        ],
-       "answer": "Bagaimana kabarmu hari ini?"
+       "answer": "Bagaimana kabarmu hari ini?",
+       "optionsEn": [
+        "How are you today?",
+        "What is your name today?",
+        "Where are you today?",
+        "How is your family?"
+       ],
+       "answerEn": "How are you today?"
       },
       {
        "type": "translateArId",
@@ -4149,7 +4981,14 @@
         "Selamat datang",
         "Terima kasih sedikit"
        ],
-       "answer": "Terima kasih banyak"
+       "answer": "Terima kasih banyak",
+       "optionsEn": [
+        "Thank you very much",
+        "You are welcome",
+        "Welcome",
+        "Thank you a little"
+       ],
+       "answerEn": "Thank you very much"
       },
       {
        "type": "translateIdAr",
@@ -4160,7 +4999,8 @@
         "أَهْلًا يَا سَالِمُ",
         "تَفَضَّلْ يَا سَالِمُ"
        ],
-       "answer": "شُكْرًا يَا سَالِمُ"
+       "answer": "شُكْرًا يَا سَالِمُ",
+       "promptEn": "Thank you, Salim."
       },
       {
        "type": "translateIdAr",
@@ -4171,7 +5011,8 @@
         "هٰذَا هَدِيَّةٌ لَكَ",
         "هٰذِهِ هَدِيَّةٌ مِنْكَ"
        ],
-       "answer": "هٰذِهِ هَدِيَّةٌ لَكَ يَا أُسْتَاذُ"
+       "answer": "هٰذِهِ هَدِيَّةٌ لَكَ يَا أُسْتَاذُ",
+       "promptEn": "This is a gift for you, Ustadh."
       },
       {
        "type": "rearrange",
@@ -4217,7 +5058,8 @@
         "لَكَ"
        ]
       }
-     ]
+     ],
+     "titleEn": "Social Interaction"
     },
     {
      "id": "3-5",
@@ -4228,61 +5070,71 @@
        "speaker": "Khadijah",
        "ar": "مَا الْعَادَاتُ فِي إِنْدُونِيسِيَّا يَا أَحْمَدُ؟",
        "latin": "Mā l-ʿādātu fī Indūnīsiyyā yā Aḥmad?",
-       "id": "Apa kebiasaan-kebiasaan di Indonesia, Ahmad?"
+       "id": "Apa kebiasaan-kebiasaan di Indonesia, Ahmad?",
+       "en": "What are the customs in Indonesia, Ahmad?"
       },
       {
        "speaker": "Ahmad",
        "ar": "مِنَ الْعَادَاتِ الْحَسَنَةِ إِكْرَامُ الضَّيْفِ",
        "latin": "Mina l-ʿādāti l-ḥasanati ikrāmu ḍ-ḍayf",
-       "id": "Di antara kebiasaan baik adalah memuliakan tamu"
+       "id": "Di antara kebiasaan baik adalah memuliakan tamu",
+       "en": "Among the good customs is honoring guests"
       },
       {
        "speaker": "Khadijah",
        "ar": "وَمَا هٰذِهِ الْعَادَةُ؟",
        "latin": "Wa mā hādhihi l-ʿādah?",
-       "id": "Dan apa kebiasaan ini?"
+       "id": "Dan apa kebiasaan ini?",
+       "en": "And what is this custom?"
       },
       {
        "speaker": "Ahmad",
        "ar": "إِذَا جَاءَ الضَّيْفُ نُقَدِّمُ لَهُ الشَّايَ",
        "latin": "Idhā jā'a ḍ-ḍayfu nuqaddimu lahu sh-shāy",
-       "id": "Jika tamu datang, kami menyajikan teh untuknya"
+       "id": "Jika tamu datang, kami menyajikan teh untuknya",
+       "en": "When a guest comes, we serve him tea"
       },
       {
        "speaker": "Khadijah",
        "ar": "هٰذِهِ عَادَةٌ جَمِيلَةٌ",
        "latin": "Hādhihi ʿādah jamīlah",
-       "id": "Ini kebiasaan yang indah"
+       "id": "Ini kebiasaan yang indah",
+       "en": "This is a beautiful custom"
       },
       {
        "speaker": "Ahmad",
        "ar": "وَفِي الْعِيدِ نَزُورُ الْأَقَارِبَ",
        "latin": "Wa fī l-ʿīdi nazūru l-aqārib",
-       "id": "Dan pada hari raya kami mengunjungi kerabat"
+       "id": "Dan pada hari raya kami mengunjungi kerabat",
+       "en": "And on the holiday we visit relatives"
       },
       {
        "speaker": "Khadijah",
        "ar": "وَمَاذَا تَأْكُلُونَ فِي الْعِيدِ؟",
        "latin": "Wa mādhā ta'kulūna fī l-ʿīd?",
-       "id": "Dan apa yang kalian makan pada hari raya?"
+       "id": "Dan apa yang kalian makan pada hari raya?",
+       "en": "And what do you eat on the holiday?"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَأْكُلُ الْكَعْكَةَ وَالْحَلْوَى",
        "latin": "Na'kulu l-kaʿkah wal-ḥalwā",
-       "id": "Kami makan kue dan manisan"
+       "id": "Kami makan kue dan manisan",
+       "en": "We eat cakes and sweets"
       },
       {
        "speaker": "Khadijah",
        "ar": "مَا أَجْمَلَ الْعَادَاتِ الْإِنْدُونِيسِيَّةَ!",
        "latin": "Mā ajmala l-ʿādāti l-indūnīsiyyah!",
-       "id": "Alangkah indahnya kebiasaan-kebiasaan Indonesia!"
+       "id": "Alangkah indahnya kebiasaan-kebiasaan Indonesia!",
+       "en": "How beautiful are the customs of Indonesia!"
       },
       {
        "speaker": "Ahmad",
        "ar": "نَعَمْ، وَالْحَمْدُ لِلَّهِ",
        "latin": "Naʿam, wal-ḥamdu lillāh",
-       "id": "Ya, alhamdulillah"
+       "id": "Ya, alhamdulillah",
+       "en": "Yes, alhamdulillah"
       }
      ],
      "mufrodat": [
@@ -4292,7 +5144,9 @@
        "id": "kebiasaan",
        "exampleAr": "الْعَادَاتُ تَخْتَلِفُ مِنْ بَلَدٍ إِلَى بَلَدٍ",
        "exampleLatin": "Al-ʿādātu takhtalifu min baladin ilā balad",
-       "exampleId": "Kebiasaan berbeda dari satu negara ke negara lain"
+       "exampleId": "Kebiasaan berbeda dari satu negara ke negara lain",
+       "en": "custom, habit",
+       "exampleEn": "Customs differ from one country to another"
       },
       {
        "ar": "إِكْرَام",
@@ -4300,7 +5154,9 @@
        "id": "memuliakan, penghormatan",
        "exampleAr": "إِكْرَامُ الضَّيْفِ مِنَ الْإِسْلَامِ",
        "exampleLatin": "Ikrāmu ḍ-ḍayfi mina l-Islām",
-       "exampleId": "Memuliakan tamu termasuk ajaran Islam"
+       "exampleId": "Memuliakan tamu termasuk ajaran Islam",
+       "en": "honoring",
+       "exampleEn": "Honoring guests is part of the teachings of Islam"
       },
       {
        "ar": "ضَيْف",
@@ -4308,7 +5164,9 @@
        "id": "tamu",
        "exampleAr": "الضَّيْفُ جَاءَ مِنْ بَعِيدٍ",
        "exampleLatin": "Aḍ-ḍayfu jā'a min baʿīd",
-       "exampleId": "Tamu itu datang dari jauh"
+       "exampleId": "Tamu itu datang dari jauh",
+       "en": "guest",
+       "exampleEn": "The guest came from far away"
       },
       {
        "ar": "عِيد",
@@ -4316,7 +5174,9 @@
        "id": "hari raya",
        "exampleAr": "الْعِيدُ يَوْمٌ سَعِيدٌ",
        "exampleLatin": "Al-ʿīdu yawmun saʿīd",
-       "exampleId": "Hari raya adalah hari yang bahagia"
+       "exampleId": "Hari raya adalah hari yang bahagia",
+       "en": "holiday, festival",
+       "exampleEn": "The holiday is a happy day"
       },
       {
        "ar": "أَقَارِب",
@@ -4324,7 +5184,9 @@
        "id": "kerabat-kerabat",
        "exampleAr": "أَزُورُ الْأَقَارِبَ فِي الْعِيدِ",
        "exampleLatin": "Azūru l-aqāriba fī l-ʿīd",
-       "exampleId": "Aku mengunjungi kerabat pada hari raya"
+       "exampleId": "Aku mengunjungi kerabat pada hari raya",
+       "en": "relatives",
+       "exampleEn": "I visit relatives on the holiday"
       },
       {
        "ar": "نُقَدِّمُ",
@@ -4332,7 +5194,9 @@
        "id": "kami menyajikan",
        "exampleAr": "نُقَدِّمُ الْقَهْوَةَ لِلضَّيْفِ",
        "exampleLatin": "Nuqaddimu l-qahwah liḍ-ḍayf",
-       "exampleId": "Kami menyajikan kopi untuk tamu"
+       "exampleId": "Kami menyajikan kopi untuk tamu",
+       "en": "we serve",
+       "exampleEn": "We serve coffee to the guest"
       },
       {
        "ar": "نَأْكُلُ",
@@ -4340,7 +5204,9 @@
        "id": "kami makan",
        "exampleAr": "نَأْكُلُ الطَّعَامَ مَعًا",
        "exampleLatin": "Na'kulu ṭ-ṭaʿāma maʿan",
-       "exampleId": "Kami makan makanan bersama-sama"
+       "exampleId": "Kami makan makanan bersama-sama",
+       "en": "we eat",
+       "exampleEn": "We eat food together"
       },
       {
        "ar": "كَعْكَة",
@@ -4348,7 +5214,9 @@
        "id": "kue",
        "exampleAr": "الْكَعْكَةُ حُلْوَةٌ",
        "exampleLatin": "Al-kaʿkatu ḥulwah",
-       "exampleId": "Kuenya manis"
+       "exampleId": "Kuenya manis",
+       "en": "cake",
+       "exampleEn": "The cake is sweet"
       },
       {
        "ar": "حَلْوَى",
@@ -4356,7 +5224,9 @@
        "id": "manisan",
        "exampleAr": "الْحَلْوَى مُفَضَّلَةٌ عِنْدَ الْأَطْفَالِ",
        "exampleLatin": "Al-ḥalwā mufaḍḍalah ʿinda l-aṭfāl",
-       "exampleId": "Manisan disukai anak-anak"
+       "exampleId": "Manisan disukai anak-anak",
+       "en": "sweets",
+       "exampleEn": "Children like sweets"
       },
       {
        "ar": "الشَّاي",
@@ -4364,7 +5234,9 @@
        "id": "teh",
        "exampleAr": "الشَّايُ حَارٌّ",
        "exampleLatin": "Ash-shāyu ḥārr",
-       "exampleId": "Tehnya panas"
+       "exampleId": "Tehnya panas",
+       "en": "tea",
+       "exampleEn": "The tea is hot"
       }
      ],
      "qawaid": [
@@ -4373,21 +5245,30 @@
        "id": "مَا الْعَادَاتُ فِي إِنْدُونِيسِيَّا؟ = apa kebiasaan-kebiasaan di Indonesia? Pola: مَا + kata benda untuk bertanya tentang sesuatu.",
        "exampleAr": "مَا الْعَادَاتُ فِي إِنْدُونِيسِيَّا يَا أَحْمَدُ؟",
        "exampleLatin": "Mā l-ʿādātu fī Indūnīsiyyā yā Aḥmad?",
-       "exampleId": "Apa kebiasaan-kebiasaan di Indonesia, Ahmad?"
+       "exampleId": "Apa kebiasaan-kebiasaan di Indonesia, Ahmad?",
+       "titleEn": "مَا + noun to ask about culture",
+       "en": "مَا الْعَادَاتُ فِي إِنْدُونِيسِيَّا؟ = what are the customs in Indonesia? Pattern: مَا + noun to ask about something.",
+       "exampleEn": "What are the customs in Indonesia, Ahmad?"
       },
       {
        "titleId": "إِذَا (jika) — kalimat syarat",
        "id": "إِذَا berarti 'jika'. Kalimat syarat: إِذَا جَاءَ الضَّيْفُ نُقَدِّمُ لَهُ الشَّايَ = jika tamu datang, kami menyajikan teh untuknya.",
        "exampleAr": "إِذَا جَاءَ الضَّيْفُ نُقَدِّمُ لَهُ الشَّايَ",
        "exampleLatin": "Idhā jā'a ḍ-ḍayfu nuqaddimu lahu sh-shāy",
-       "exampleId": "Jika tamu datang, kami menyajikan teh untuknya"
+       "exampleId": "Jika tamu datang, kami menyajikan teh untuknya",
+       "titleEn": "إِذَا (if) — conditional sentence",
+       "en": "إِذَا means 'if'. Conditional sentence: إِذَا جَاءَ الضَّيْفُ نُقَدِّمُ لَهُ الشَّايَ = if a guest comes, we serve him tea.",
+       "exampleEn": "When a guest comes, we serve him tea"
       },
       {
        "titleId": "Ungkapan kagum: مَا أَجْمَلَ ...!",
        "id": "مَا أَجْمَلَ ...! berarti 'alangkah indahnya ...!' — ungkapan kekaguman. Contoh: مَا أَجْمَلَ الْعَادَاتِ الْإِنْدُونِيسِيَّةَ!",
        "exampleAr": "مَا أَجْمَلَ الْعَادَاتِ الْإِنْدُونِيسِيَّةَ!",
        "exampleLatin": "Mā ajmala l-ʿādāti l-indūnīsiyyah!",
-       "exampleId": "Alangkah indahnya kebiasaan-kebiasaan Indonesia!"
+       "exampleId": "Alangkah indahnya kebiasaan-kebiasaan Indonesia!",
+       "titleEn": "Exclamation of admiration: مَا أَجْمَلَ ...!",
+       "en": "مَا أَجْمَلَ ...! means 'how beautiful ... is!' — an expression of admiration. Example: مَا أَجْمَلَ الْعَادَاتِ الْإِنْدُونِيسِيَّةَ!",
+       "exampleEn": "How beautiful are the customs of Indonesia!"
       }
      ],
      "tadribat": [
@@ -4402,7 +5283,8 @@
         "الْكَعْكَةُ",
         "الْحَلْوَى"
        ],
-       "answer": "الضَّيْفُ"
+       "answer": "الضَّيْفُ",
+       "promptEn": "Fill in the blank: If a ___ comes, we serve him tea"
       },
       {
        "type": "fillBlank",
@@ -4415,7 +5297,8 @@
         "الشَّايَ",
         "الْعِيدَ"
        ],
-       "answer": "الْكَعْكَةَ"
+       "answer": "الْكَعْكَةَ",
+       "promptEn": "Fill in the blank: We eat ___ and sweets"
       },
       {
        "type": "translateArId",
@@ -4427,7 +5310,14 @@
         "Tamu datang membawa teh",
         "Kami menyajikan teh untuk keluarga"
        ],
-       "answer": "Jika tamu datang, kami menyajikan teh untuknya"
+       "answer": "Jika tamu datang, kami menyajikan teh untuknya",
+       "optionsEn": [
+        "When a guest comes, we serve him tea",
+        "When a guest comes, we eat cake",
+        "The guest came bringing tea",
+        "We serve tea to the family"
+       ],
+       "answerEn": "When a guest comes, we serve him tea"
       },
       {
        "type": "translateArId",
@@ -4439,7 +5329,14 @@
         "Ini hadiah yang indah",
         "Ini teh yang enak"
        ],
-       "answer": "Ini kebiasaan yang indah"
+       "answer": "Ini kebiasaan yang indah",
+       "optionsEn": [
+        "This is a beautiful custom",
+        "This is a bad custom",
+        "This is a beautiful gift",
+        "This is tasty tea"
+       ],
+       "answerEn": "This is a beautiful custom"
       },
       {
        "type": "translateIdAr",
@@ -4450,7 +5347,8 @@
         "مَاذَا تَأْكُلُونَ فِي الْبَيْتِ؟",
         "أَيْنَ تَأْكُلُونَ؟"
        ],
-       "answer": "مَاذَا تَأْكُلُونَ فِي الْعِيدِ؟"
+       "answer": "مَاذَا تَأْكُلُونَ فِي الْعِيدِ؟",
+       "promptEn": "What do you eat on the holiday?"
       },
       {
        "type": "translateIdAr",
@@ -4461,7 +5359,8 @@
         "وَفِي الْعِيدِ نُقَدِّمُ الشَّايَ",
         "وَفِي الْعِيدِ نَزُورُ الضَّيْفَ"
        ],
-       "answer": "وَفِي الْعِيدِ نَزُورُ الْأَقَارِبَ"
+       "answer": "وَفِي الْعِيدِ نَزُورُ الْأَقَارِبَ",
+       "promptEn": "And on the holiday we visit relatives."
       },
       {
        "type": "rearrange",
@@ -4507,9 +5406,11 @@
         "وَالْحَلْوَى"
        ]
       }
-     ]
+     ],
+     "titleEn": "Culture"
     }
-   ]
+   ],
+   "titleEn": "Level 3 — Travel, Work, Media, Social Interaction & Culture"
   }
  ]
 }

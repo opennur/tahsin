@@ -185,15 +185,6 @@ private fun QuestionCard(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        if (state.translation.isNotBlank()) {
-            Spacer(modifier = Modifier.height(6.dp))
-            AyahText(
-                state.translation,
-                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                maxLines = 2,
-            )
-        }
-
         Spacer(modifier = Modifier.height(12.dp))
         AyahText(questionText, style = AyahTypography.Heading2)
         Spacer(modifier = Modifier.height(10.dp))
@@ -214,6 +205,11 @@ private fun QuestionCard(
                 onClick = { onAnswer(option) },
                 enabled = !answered,
                 modifier = Modifier.fillMaxWidth(),
+                // Opsi lebih besar & ramah baca: kata Arab memakai font mushaf.
+                textStyle = AyahTypography.Button.copy(
+                    fontSize = 18.sp,
+                    fontFamily = if (state.mode == AyatQuizMode.COMPLETE) fontFamily else null,
+                ),
             )
             Spacer(modifier = Modifier.height(6.dp))
         }

@@ -28,6 +28,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lughoh_content_l1 import LEVELS as LEVELS_L1  # noqa: E402
 from lughoh_content_l2 import LEVELS as LEVELS_L2  # noqa: E402
 from lughoh_content_l3 import LEVELS as LEVELS_L3  # noqa: E402
+from lughoh_en import (  # noqa: E402
+    LEVEL_EN,
+    LESSON_EN,
+    TEXTS,
+    SPEAKER_EN,
+    FILL_PROMPT_EN,
+    TRANSLATE_AR_ID_EN,
+    TRANSLATE_ID_AR_EN,
+)
 
 SCHEMA_VERSION = 1
 
@@ -302,6 +311,114 @@ def validate_levels(levels: list[dict], expect_sequence: bool = True) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Terjemahan Inggris (inject + validasi kelengkapan)
+# ---------------------------------------------------------------------------
+def check_en_text(val, path: str) -> bool:
+    """Teks Inggris untuk teks Indonesia murni — tidak boleh memuat Arab."""
+    if val is None or not str(val).strip():
+        err(f"{path}: terjemahan EN kosong")
+        return False
+    if ARABIC_ANY.search(str(val)):
+        err(f"{path}: teks Inggris mengandung huruf Arab → {val!r}")
+        return False
+    return True
+
+
+def inject_en(levels: list[dict]) -> None:
+    """Sisipkan field `en`/`promptEn`/`optionsEn`/`answerEn` ke konten, lalu
+    validasi: SEMUA teks Indonesia WAJIB punya terjemahan Inggris (kalau
+    tidak, build gagal). Kunci = teks Indonesia (lihat tools/lughoh_en.py)."""
+    for lv in levels:
+        lp = f"Level {lv.get('id')}"
+        if lv.get("titleId") in LEVEL_EN:
+            lv["titleEn"] = LEVEL_EN[lv["titleId"]]
+        else:
+            err(f"{lp}: titleId tanpa terjemahan EN → {lv.get('titleId')!r}")
+        for no, lesson in enumerate(lv["lessons"], start=1):
+            path = f"L{lv.get('id')}-{no}"
+            if lesson.get("titleId") in LESSON_EN:
+                lesson["titleEn"] = LESSON_EN[lesson["titleId"]]
+            else:
+                err(f"{path}: titleId tanpa terjemahan EN → {lesson.get('titleId')!r}")
+            for i, line in enumerate(lesson.get("muhadatsah", [])):
+                key = str(line.get("id", "")).strip()
+                if key in TEXTS:
+                    line["en"] = TEXTS[key]
+                    check_en_text(line["en"], f"{path}.muhadatsah[{i}].en")
+                else:
+                    err(f"{path}.muhadatsah[{i}]: id tanpa terjemahan EN → {key!r}")
+                # Pembicara: nama orang tidak diterjemahkan; label peran wajib
+                # punya padanan EN kalau ada di peta.
+                sp = str(line.get("speaker", "")).strip()
+                if sp in SPEAKER_EN:
+                    line["speakerEn"] = SPEAKER_EN[sp]
+                    check_en_text(line["speakerEn"], f"{path}.muhadatsah[{i}].speakerEn")
+            for i, w in enumerate(lesson.get("mufrodat", [])):
+                wp = f"{path}.mufrodat[{i}]"
+                key = str(w.get("id", "")).strip()
+                if key in TEXTS:
+                    w["en"] = TEXTS[key]
+                    check_en_text(w["en"], f"{wp}.en")
+                else:
+                    err(f"{wp}: id tanpa terjemahan EN → {key!r}")
+                ex = str(w.get("exampleId", "")).strip()
+                if ex in TEXTS:
+                    w["exampleEn"] = TEXTS[ex]
+                    check_en_text(w["exampleEn"], f"{wp}.exampleEn")
+                else:
+                    err(f"{wp}: exampleId tanpa terjemahan EN → {ex!r}")
+            for i, g in enumerate(lesson.get("qawaid", [])):
+                gp = f"{path}.qawaid[{i}]"
+                tkey = str(g.get("titleId", "")).strip()
+                if tkey in TEXTS:
+                    g["titleEn"] = TEXTS[tkey]
+                else:
+                    err(f"{gp}: titleId tanpa terjemahan EN → {tkey!r}")
+                key = str(g.get("id", "")).strip()
+                if key in TEXTS:
+                    g["en"] = TEXTS[key]
+                else:
+                    err(f"{gp}: id tanpa terjemahan EN → {key!r}")
+                ex = str(g.get("exampleId", "")).strip()
+                if ex in TEXTS:
+                    g["exampleEn"] = TEXTS[ex]
+                    check_en_text(g["exampleEn"], f"{gp}.exampleEn")
+                else:
+                    err(f"{gp}: exampleId tanpa terjemahan EN → {ex!r}")
+            for i, ex in enumerate(lesson.get("tadribat", [])):
+                tp = f"{path}.tadribat[{i}]"
+                etype = ex.get("type")
+                if etype == "fillBlank":
+                    key = str(ex.get("promptId", "")).strip()
+                    if key in FILL_PROMPT_EN:
+                        ex["promptEn"] = FILL_PROMPT_EN[key]
+                        check_en_text(ex["promptEn"], f"{tp}.promptEn")
+                    else:
+                        err(f"{tp}: promptId tanpa terjemahan EN → {key!r}")
+                elif etype == "translateArId":
+                    key = str(ex.get("promptAr", "")).strip()
+                    if key in TRANSLATE_AR_ID_EN:
+                        opts_en, ans_en = TRANSLATE_AR_ID_EN[key]
+                        for j, o in enumerate(opts_en):
+                            check_en_text(o, f"{tp}.optionsEn[{j}]")
+                        ex["optionsEn"] = opts_en
+                        ex["answerEn"] = ans_en
+                        check_en_text(ex["answerEn"], f"{tp}.answerEn")
+                        if ans_en not in opts_en:
+                            err(f"{tp}: answerEn tidak ada di optionsEn → {ans_en!r}")
+                    else:
+                        err(f"{tp}: promptAr tanpa terjemahan EN → {key!r}")
+                elif etype == "translateIdAr":
+                    key = str(ex.get("promptId", "")).strip()
+                    if key in TRANSLATE_ID_AR_EN:
+                        ex["promptEn"] = TRANSLATE_ID_AR_EN[key]
+                        check_en_text(ex["promptEn"], f"{tp}.promptEn")
+                    else:
+                        err(f"{tp}: promptId tanpa terjemahan EN → {key!r}")
+                # rearrange: kata Arab, tidak perlu terjemahan
+
+
+# ---------------------------------------------------------------------------
 # Emit
 # ---------------------------------------------------------------------------
 def emit(levels: list[dict], out: Path) -> None:
@@ -339,6 +456,7 @@ def main() -> int:
             levels = [lv for lv in levels if lv["id"] == level_filter]
             check_only = True  # jangan menulis file parsial saat filter aktif
     validate_levels(levels, expect_sequence=level_filter is None)
+    inject_en(levels)  # terjemahan EN + validasi kelengkapan (gagal = build stop)
 
     n_lessons = sum(len(lv["lessons"]) for lv in levels)
     if ERRORS:

@@ -18,6 +18,11 @@ sumber mana pun.
 
 - Bahasa pengantar konten: **Indonesia** (per spesifikasi: terjemahan ID).
   Krom UI (judul seksi, tombol, label) tetap bilingual ID/EN lewat `AppStrings`.
+- **Terjemahan Inggris**: setiap teks Indonesia WAJIB punya terjemahan EN.
+  Terjemahan ditulis di `tools/lughoh_en.py` (kunci = teks Indonesia), lalu
+  `build_lughoh.py` menyisipkannya sebagai field `*En` saat build. Kalau ada
+  satu teks tanpa terjemahan, build GAGAL (integritas konten — materi
+  keagamaan tidak boleh salah/nyasar).
 - Arab ditulis dengan **harakat penuh** (fathah/dammah/kasrah/tanwin/sukun)
   agar ramah pemula. Alif di awal kata memakai hamza duduk/berdiri sesuai kaidah.
 - Transliterasi Latin konsisten:
@@ -36,6 +41,7 @@ sumber mana pun.
     {
       "id": 1,                                   // int, 1-based, unik
       "titleId": "Level 1 — Perkenalan & Kehidupan Sehari-hari",
+      "titleEn": "Level 1 — Introductions & Daily Life",  // WAJIB
       "titleAr": "المُسْتَوَى الأَوَّل",
       "lessons": [ ... ]
     }
@@ -49,6 +55,7 @@ sumber mana pun.
 {
   "id": "1-1",                                   // "<levelId>-<lessonNo>", unik
   "titleId": "Perkenalan Diri",
+  "titleEn": "Self-Introduction",               // WAJIB
   "titleAr": "التَّعْرِيفُ بِالنَّفْسِ",
 
   "muhadatsah": [                                // 8–10 baris dialog
@@ -56,7 +63,8 @@ sumber mana pun.
       "speaker": "Ahmad",                        // label ID
       "ar": "مَا اسْمُكَ؟",                       // Arab berharakat
       "latin": "Mā ismuka?",                     // transliterasi
-      "id": "Siapa namamu?"                      // terjemahan Indonesia
+      "id": "Siapa namamu?",                      // terjemahan Indonesia
+      "en": "What is your name?"                 // WAJIB
     }
   ],
 
@@ -65,19 +73,24 @@ sumber mana pun.
       "ar": "اِسْم",
       "latin": "ism",
       "id": "nama",
+      "en": "name",                              // WAJIB
       "exampleAr": "مَا اسْمُكَ؟",
       "exampleLatin": "Mā ismuka?",
-      "exampleId": "Siapa namamu?"
+      "exampleId": "Siapa namamu?",
+      "exampleEn": "What is your name?"          // WAJIB
     }
   ],
 
   "qawaid": [                                    // 2–3 kaidah tata bahasa
     {
       "titleId": "Kata tanya مَا",
+      "titleEn": "The question word مَا",        // WAJIB (boleh memuat istilah Arab)
       "id": "Kata tanya مَا dipakai untuk bertanya tentang nama atau benda. Contoh dari dialog:",
+      "en": "مَا is used to ask about a name or a thing. Example from the dialogue:",  // WAJIB
       "exampleAr": "مَا اسْمُكَ؟",                // WAJIB muncul di dialog
       "exampleLatin": "Mā ismuka?",
-      "exampleId": "Siapa namamu?"
+      "exampleId": "Siapa namamu?",
+      "exampleEn": "What is your name?"          // WAJIB
     }
   ],
 
@@ -98,6 +111,7 @@ sumber mana pun.
 {
   "type": "fillBlank",
   "promptId": "Isilah titik-titik: Siapa ___?",
+  "promptEn": "Fill in the blank: What ___?",   // WAJIB
   "promptAr": "مَا ____؟",
   "promptLatin": "Mā ____?",
   "options": ["اسْمُكَ", "بَيْتُكَ", "كِتَابُكَ", "قَلَمُكَ"],
@@ -105,7 +119,7 @@ sumber mana pun.
 }
 ```
 
-**translateArId** — terjemahkan Arab → Indonesia (pilih terjemahan):
+**translateArId** — terjemahkan Arab → Inggris/Indonesia (pilih terjemahan):
 
 ```jsonc
 {
@@ -113,16 +127,19 @@ sumber mana pun.
   "promptAr": "مَا اسْمُكَ؟",
   "promptLatin": "Mā ismuka?",
   "options": ["Siapa namamu?", "Apa kabarmu?", "Dari mana kamu?", "Di mana rumahmu?"],
-  "answer": "Siapa namamu?"
+  "answer": "Siapa namamu?",
+  "optionsEn": ["What is your name?", "How are you?", "Where are you from?", "Where is your house?"],  // WAJIB
+  "answerEn": "What is your name?"              // WAJIB, harus ∈ optionsEn
 }
 ```
 
-**translateIdAr** — terjemahkan Indonesia → Arab (pilih kalimat Arab):
+**translateIdAr** — terjemahkan Inggris/Indonesia → Arab (pilih kalimat Arab):
 
 ```jsonc
 {
   "type": "translateIdAr",
   "promptId": "Senang berkenalan.",
+  "promptEn": "Nice to meet you.",              // WAJIB
   "options": ["تَشَرَّفْنَا", "أَهْلًا وَسَهْلًا", "مَعَ السَّلَامَةِ", "صَبَاحَ الْخَيْرِ"],
   "answer": "تَشَرَّفْنَا"
 }
@@ -159,6 +176,14 @@ sumber mana pun.
 8. `translateArId` / `translateIdAr`: options ≥ 3 & unik; answer ∈ options.
 9. `rearrange`: `answer` == urutan `ar` dari `words`; kata tidak duplikat.
 10. Tiap lesson punya ≥ 1 tadribat untuk keempat jenis (total ≥ 4, target 8).
+11. **Terjemahan EN (kelengkapan wajib)**: SEMUA `titleId`, `id`, `exampleId`
+    (level/lesson/muhadatsah/mufrodat/qawaid), `promptId` (fillBlank,
+    translateIdAr), serta `options`/`answer` (translateArId) WAJIB punya
+    pasangan EN (`titleEn`, `en`, `exampleEn`, `promptEn`, `optionsEn`,
+    `answerEn`) — diambil dari `tools/lughoh_en.py`, kalau ada yang hilang
+    build gagal. Field EN untuk teks Indonesia murni tidak boleh memuat huruf
+    Arab; `answerEn` harus ∈ `optionsEn`. (Judul/penjelasan qawaid boleh
+    memuat istilah Arab, mis. `Kata tanya مَا`.)
 
 Normalisasi Arab = buang harakat `\u064B-\u0652`, `\u0670` + seragamkan
 hamza/alif (sama seperti `ArabicNormalizer` di aplikasi).

@@ -209,11 +209,14 @@ Python scripts and bundled into the APK — re-run them when content changes:
 ```bash
 python3 tools/build_vocab.py       # 589 curated words → assets/quran/vocab.json
 python3 tools/build_lughoh.py      # 15 Learn Arabic lessons → assets/lughoh/lessons.json
-                                   #   (10 validation rules; --level N for per-level check)
+                                   #   (11 validation rules; --level N for per-level check)
 ```
 
 - `tools/lughoh-schema.md` — schema & validation rules for the Learn Arabic data
   (vocab words must appear in the dialogue, grammar examples from the dialogue, etc.).
+- `tools/lughoh_en.py` — ENGLISH translations of every Indonesian text (must be
+  complete: the build fails if any is missing). Material & tadribat follow the
+  app language (ID/EN).
 - `tools/curate_vocab.py`, `tools/vocab_roots.py` — word curation & root analysis.
 - `tools/scrape_dreambig.py`, `tools/dreambig_levels.py` — legacy Dream BIG
   pipeline (level + YouTube transcript era). **No longer used** since Dream BIG

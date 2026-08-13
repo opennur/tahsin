@@ -11,6 +11,7 @@ import com.tahsin.app.data.lughoh.LughohCatalog
 import com.tahsin.app.data.lughoh.LughohEngine
 import com.tahsin.app.data.lughoh.LughohLesson
 import com.tahsin.app.data.lughoh.LughohRepository
+import com.tahsin.app.data.lughoh.LughohEngine.forLanguage
 import com.tahsin.app.data.lughoh.RearrangeExercise
 import com.tahsin.app.data.lughoh.WordChip
 import com.tahsin.app.util.AppLanguage
@@ -37,6 +38,7 @@ enum class LughohMode { HOME, LESSON, EXERCISES }
 data class LughohLessonUi(
     val id: String,
     val titleId: String,
+    val titleEn: String = "",
     val titleAr: String,
 )
 
@@ -44,6 +46,7 @@ data class LughohLessonUi(
 data class LughohLevelUi(
     val id: Int,
     val titleId: String,
+    val titleEn: String = "",
     val titleAr: String,
     val lessons: List<LughohLessonUi>,
 )
@@ -98,6 +101,9 @@ class LughohViewModel(
     private val progressMutex = Mutex()
     private val random = Random.Default
 
+    /** Sesi mentah (tanpa resolusi bahasa) — untuk re-resolusi saat bahasa ganti. */
+    private var rawSession: List<Exercise> = emptyList()
+
     private var catalog: LughohCatalog = LughohCatalog(schemaVersion = 0, levels = emptyList())
     private var stats: LughohStats = LughohStats()
 
@@ -142,7 +148,9 @@ class LughohViewModel(
     fun startRandomExercises() {
         val s = _state.value
         val allLessons = catalog.levels.flatMap { it.lessons }
-        val session = LughohEngine.buildRandomSession(allLessons, LughohEngine.SESSION_SIZE, random)
+        rawSession = LughohEngine.buildRandomSession(allLessons, LughohEngine.SESSION_SIZE, random)
+        // Resolusi bahasa: opsi/prompt mengikuti bahasa aktif (ID atau EN).
+        val session = rawSession.map { it.forLanguage(s.language, random) }
         if (session.isEmpty()) return
         val first = session.first()
         _state.update {
@@ -268,15 +276,32 @@ class LughohViewModel(
     fun restartExercises() = startRandomExercises()
 
     /**
-     * Sinkronkan bahasa terbaru dari pengaturan (VM di-cache per Activity).
-     * Konten pelajaran bersifat data (Arab + Indonesia, tanpa teks EN), jadi
-     * yang ikut bahasa hanyalah string UI — dipanggil setiap layar terbuka.
+     * Sinkronkan bahasa terbaru dari pengaturan (VM di-cache per Activity) —
+     * dipanggil setiap layar terbuka. Materi memakai teks id/en sesuai bahasa.
+     * Sesi arcade di-resolusi ulang ke bahasa baru: dari latihan BELUM
+     * terjawab (kalau yang sekarang sudah dinilai, biarkan — skor sudah
+     * dihitung dan umpan balik jangan berubah).
      */
     fun refreshLanguage() {
         val lang = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
             ?: AppLanguage.ID
-        if (_state.value.language == lang) return
-        _state.update { it.copy(language = lang) }
+        val s = _state.value
+        if (s.language == lang) return
+        val reResolveFrom = if (s.selected == null && s.correct == null) 0 else s.exerciseIndex + 1
+        val reResolve = s.mode == LughohMode.EXERCISES && !s.exercisesDone &&
+            reResolveFrom < rawSession.size
+        _state.update {
+            it.copy(
+                language = lang,
+                session = if (reResolve) {
+                    rawSession.mapIndexed { i, ex ->
+                        if (i >= reResolveFrom) ex.forLanguage(lang, random) else it.session.getOrNull(i) ?: ex
+                    }
+                } else {
+                    it.session
+                },
+            )
+        }
     }
 
     /** Kembali ke halaman awal (dari hasil sesi). */
@@ -287,11 +312,13 @@ class LughohViewModel(
             LughohLevelUi(
                 id = level.id,
                 titleId = level.titleId,
+                titleEn = level.titleEn,
                 titleAr = level.titleAr,
                 lessons = level.lessons.map { lesson ->
                     LughohLessonUi(
                         id = lesson.id,
                         titleId = lesson.titleId,
+                        titleEn = lesson.titleEn,
                         titleAr = lesson.titleAr,
                     )
                 },

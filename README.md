@@ -207,11 +207,14 @@ di-bundle ke APK — jalankan ulang saat konten diubah:
 ```bash
 python3 tools/build_vocab.py       # 589 kata terkurasi → assets/quran/vocab.json
 python3 tools/build_lughoh.py      # 15 pelajaran Belajar Arab → assets/lughoh/lessons.json
-                                   #   (validasi 10 aturan; --level N untuk cek per level)
+                                   #   (validasi 11 aturan; --level N untuk cek per level)
 ```
 
 - `tools/lughoh-schema.md` — skema & aturan validasi data Belajar Arab
   (mufrodat harus muncul di dialog, contoh qawa'id dari dialog, dst.).
+- `tools/lughoh_en.py` — terjemahan INGGRIS semua teks Indonesia (wajib
+  lengkap: kalau ada yang hilang, build gagal). Materi & tadribat tampil
+  dalam bahasa aplikasi (ID/EN).
 - `tools/curate_vocab.py`, `tools/vocab_roots.py` — kurasi & analisis akar kata.
 - `tools/scrape_dreambig.py`, `tools/dreambig_levels.py` — pipeline lama
   Dream BIG (era level + transkrip YouTube). **Tidak lagi dipakai** sejak

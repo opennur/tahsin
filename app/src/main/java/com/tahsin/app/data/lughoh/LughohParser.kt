@@ -33,12 +33,14 @@ object LughohParser {
     private data class LevelJson(
         val id: Int = 0,
         val titleId: String? = null,
+        val titleEn: String? = null,
         val titleAr: String? = null,
         val lessons: List<LessonJson>? = null,
     ) {
         fun toLevel() = LughohLevel(
             id = id,
             titleId = titleId.orEmpty(),
+            titleEn = titleEn.orEmpty(),
             titleAr = titleAr.orEmpty(),
             lessons = lessons.orEmpty().map { it.toLesson() },
         )
@@ -47,6 +49,7 @@ object LughohParser {
     private data class LessonJson(
         val id: String? = null,
         val titleId: String? = null,
+        val titleEn: String? = null,
         val titleAr: String? = null,
         val muhadatsah: List<LineJson>? = null,
         val mufrodat: List<VocabJson>? = null,
@@ -56,6 +59,7 @@ object LughohParser {
         fun toLesson() = LughohLesson(
             id = id.orEmpty(),
             titleId = titleId.orEmpty(),
+            titleEn = titleEn.orEmpty(),
             titleAr = titleAr.orEmpty(),
             muhadatsah = muhadatsah.orEmpty().map { it.toLine() },
             mufrodat = mufrodat.orEmpty().map { it.toVocab() },
@@ -66,15 +70,19 @@ object LughohParser {
 
     private data class LineJson(
         val speaker: String? = null,
+        val speakerEn: String? = null,
         val ar: String? = null,
         val latin: String? = null,
         val id: String? = null,
+        val en: String? = null,
     ) {
         fun toLine() = DialogueLine(
             speaker = speaker.orEmpty(),
+            speakerEn = speakerEn.orEmpty(),
             ar = ar.orEmpty(),
             latin = latin.orEmpty(),
             id = id.orEmpty(),
+            en = en.orEmpty(),
         )
     }
 
@@ -82,33 +90,43 @@ object LughohParser {
         val ar: String? = null,
         val latin: String? = null,
         val id: String? = null,
+        val en: String? = null,
         val exampleAr: String? = null,
         val exampleLatin: String? = null,
         val exampleId: String? = null,
+        val exampleEn: String? = null,
     ) {
         fun toVocab() = VocabWord(
             ar = ar.orEmpty(),
             latin = latin.orEmpty(),
             id = id.orEmpty(),
+            en = en.orEmpty(),
             exampleAr = exampleAr.orEmpty(),
             exampleLatin = exampleLatin.orEmpty(),
             exampleId = exampleId.orEmpty(),
+            exampleEn = exampleEn.orEmpty(),
         )
     }
 
     private data class GrammarJson(
         val titleId: String? = null,
+        val titleEn: String? = null,
         val id: String? = null,
+        val en: String? = null,
         val exampleAr: String? = null,
         val exampleLatin: String? = null,
         val exampleId: String? = null,
+        val exampleEn: String? = null,
     ) {
         fun toRule() = GrammarRule(
             titleId = titleId.orEmpty(),
+            titleEn = titleEn.orEmpty(),
             id = id.orEmpty(),
+            en = en.orEmpty(),
             exampleAr = exampleAr.orEmpty(),
             exampleLatin = exampleLatin.orEmpty(),
             exampleId = exampleId.orEmpty(),
+            exampleEn = exampleEn.orEmpty(),
         )
     }
 
@@ -122,10 +140,13 @@ object LughohParser {
     private data class ExerciseJson(
         val type: String? = null,
         val promptId: String? = null,
+        val promptEn: String? = null,
         val promptAr: String? = null,
         val promptLatin: String? = null,
         val options: List<String>? = null,
+        val optionsEn: List<String>? = null,
         val answer: JsonElement? = null,
+        val answerEn: String? = null,
         val words: List<WordChipJson>? = null,
     ) {
         /**
@@ -140,6 +161,7 @@ object LughohParser {
                     val ans = answer.asStringOrNull() ?: return@runCatching null
                     FillBlankExercise(
                         promptId = promptId.orEmpty(),
+                        promptEn = promptEn.orEmpty(),
                         promptAr = promptAr.orEmpty(),
                         promptLatin = promptLatin.orEmpty(),
                         options = options.orEmpty(),
@@ -152,13 +174,16 @@ object LughohParser {
                         promptAr = promptAr.orEmpty(),
                         promptLatin = promptLatin.orEmpty(),
                         options = options.orEmpty(),
+                        optionsEn = optionsEn.orEmpty(),
                         answer = ans,
+                        answerEn = answerEn.orEmpty(),
                     )
                 }
                 "translateIdAr" -> {
                     val ans = answer.asStringOrNull() ?: return@runCatching null
                     TranslateIdArExercise(
                         promptId = promptId.orEmpty(),
+                        promptEn = promptEn.orEmpty(),
                         options = options.orEmpty(),
                         answer = ans,
                     )

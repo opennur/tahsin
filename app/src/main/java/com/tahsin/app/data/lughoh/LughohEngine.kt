@@ -1,5 +1,6 @@
 package com.tahsin.app.data.lughoh
 
+import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.ArabicNormalizer
 import kotlin.random.Random
 
@@ -44,6 +45,26 @@ object LughohEngine {
             is RearrangeExercise -> return false // bukan latihan pilihan
         }
         return normalizeChoice(answer) == normalizeChoice(selected)
+    }
+
+    /**
+     * Salin latihan dengan teks yang tampil dalam [lang]: opsi & jawaban
+     * untuk pilihan ganda, prompt untuk isi-titik/terjemah. Teks EN kosong →
+     * fallback teks Indonesia (konten lama / belum diterjemahkan). Opsi EN
+     * diacak agar posisi tidak dihafal (ID vs EN urutannya beda).
+     */
+    fun Exercise.forLanguage(lang: AppLanguage, random: Random = Random.Default): Exercise = when (this) {
+        is FillBlankExercise ->
+            if (lang == AppLanguage.EN && promptEn.isNotBlank()) copy(promptId = promptEn) else this
+        is TranslateArIdExercise ->
+            if (lang == AppLanguage.EN && optionsEn.isNotEmpty() && answerEn.isNotBlank()) {
+                copy(options = optionsEn.shuffled(random), answer = answerEn)
+            } else {
+                this
+            }
+        is TranslateIdArExercise ->
+            if (lang == AppLanguage.EN && promptEn.isNotBlank()) copy(promptId = promptEn) else this
+        is RearrangeExercise -> this // kata Arab, bahasa tidak relevan
     }
 
     /**

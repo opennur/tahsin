@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tahsin.app.theme.AyahColors
@@ -50,6 +51,7 @@ fun AyahButton(
     variant: AyahButtonVariant = AyahButtonVariant.Primary,
     enabled: Boolean = true,
     size: AyahButtonSize = AyahButtonSize.Default,
+    textStyle: TextStyle? = null,
 ) {
     val minHeight = if (size == AyahButtonSize.Small) 32.dp else 40.dp
     val hPadding = if (size == AyahButtonSize.Small) 12.dp else 16.dp
@@ -101,8 +103,8 @@ fun AyahButton(
     ) {
         BasicText(
             text = text,
-            style = AyahTypography.Button.copy(
-                fontSize = fontSize,
+            style = (textStyle ?: AyahTypography.Button).copy(
+                fontSize = textStyle?.fontSize ?: fontSize,
                 color = if (enabled) contentColor else contentColor.copy(alpha = 0.5f),
             ),
         )

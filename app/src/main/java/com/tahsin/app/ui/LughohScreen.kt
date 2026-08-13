@@ -55,6 +55,7 @@ import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahCard
 import com.tahsin.app.ui.components.AyahLoadingView
 import com.tahsin.app.ui.components.AyahText
+import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.FontStore
 
 /**
@@ -80,6 +81,7 @@ fun LughohScreen(
             state.mode == LughohMode.HOME -> LughohHomeView(
                 state = state,
                 strings = strings,
+                language = state.language,
                 onBack = onBack,
                 onStart = viewModel::startRandomExercises,
                 onOpenLesson = viewModel::openLesson,
@@ -106,6 +108,10 @@ fun LughohScreen(
     }
 }
 
+/** Pilih teks sesuai bahasa: EN jika tersedia, selain itu fallback ID. */
+private fun textOf(language: AppLanguage, id: String, en: String): String =
+    if (language == AppLanguage.EN && en.isNotBlank()) en else id
+
 // ---------------------------------------------------------------------------
 // Halaman awal: kartu latihan acak + browser materi
 // ---------------------------------------------------------------------------
@@ -114,6 +120,7 @@ fun LughohScreen(
 private fun LughohHomeView(
     state: LughohUiState,
     strings: Strings,
+    language: AppLanguage,
     onBack: () -> Unit,
     onStart: () -> Unit,
     onOpenLesson: (String) -> Unit,
@@ -187,9 +194,10 @@ private fun LughohHomeView(
         } else {
             state.levels.forEach { level ->
                 LevelSection(
-                    titleId = level.titleId,
+                    titleId = textOf(language, level.titleId, level.titleEn),
                     titleAr = level.titleAr,
                     lessons = level.lessons,
+                    language = language,
                     onOpenLesson = onOpenLesson,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -204,6 +212,7 @@ private fun LevelSection(
     titleId: String,
     titleAr: String,
     lessons: List<LughohLessonUi>,
+    language: AppLanguage,
     onOpenLesson: (String) -> Unit,
 ) {
     AyahCard {
@@ -222,7 +231,11 @@ private fun LevelSection(
             )
             Spacer(modifier = Modifier.height(8.dp))
             lessons.forEach { lesson ->
-                LessonRow(lesson = lesson, onClick = { onOpenLesson(lesson.id) })
+                LessonRow(
+                    lesson = lesson,
+                    language = language,
+                    onClick = { onOpenLesson(lesson.id) },
+                )
                 Spacer(modifier = Modifier.height(6.dp))
             }
         }
@@ -232,6 +245,7 @@ private fun LevelSection(
 @Composable
 private fun LessonRow(
     lesson: LughohLessonUi,
+    language: AppLanguage,
     onClick: () -> Unit,
 ) {
     Row(
@@ -250,7 +264,7 @@ private fun LessonRow(
         Spacer(modifier = Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
             AyahText(
-                lesson.titleId,
+                textOf(language, lesson.titleId, lesson.titleEn),
                 style = AyahTypography.Body2.copy(fontWeight = FontWeight.Medium),
             )
             AyahText(
@@ -292,7 +306,7 @@ private fun LughohLessonView(
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 AyahText(
-                    lesson.titleId,
+                    textOf(state.language, lesson.titleId, lesson.titleEn),
                     style = AyahTypography.Heading1,
                 )
                 AyahText(
@@ -311,7 +325,7 @@ private fun LughohLessonView(
         SectionHeader(strings.lughohSectionMuhadatsah)
         AyahCard {
             lesson.muhadatsah.forEachIndexed { index, line ->
-                DialogueRow(line = line, arabicFamily = arabicFamily)
+                DialogueRow(line = line, language = state.language, arabicFamily = arabicFamily)
                 if (index < lesson.muhadatsah.lastIndex) Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -321,7 +335,7 @@ private fun LughohLessonView(
         // 2. Mufrodat
         SectionHeader(strings.lughohSectionMufrodat)
         lesson.mufrodat.forEach { word ->
-            VocabCard(word = word, arabicFamily = arabicFamily)
+            VocabCard(word = word, language = state.language, arabicFamily = arabicFamily)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
@@ -330,7 +344,7 @@ private fun LughohLessonView(
         // 3. Qawa'id
         SectionHeader(strings.lughohSectionQawaid)
         lesson.qawaid.forEach { rule ->
-            GrammarCard(rule = rule, arabicFamily = arabicFamily)
+            GrammarCard(rule = rule, language = state.language, arabicFamily = arabicFamily)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
@@ -348,10 +362,10 @@ private fun SectionHeader(text: String) {
 }
 
 @Composable
-private fun DialogueRow(line: DialogueLine, arabicFamily: FontFamily) {
+private fun DialogueRow(line: DialogueLine, language: AppLanguage, arabicFamily: FontFamily) {
     Column {
         AyahText(
-            line.speaker,
+            textOf(language, line.speaker, line.speakerEn),
             style = AyahTypography.Caption.copy(
                 color = AyahColors.Primary,
                 fontWeight = FontWeight.SemiBold,
@@ -373,19 +387,19 @@ private fun DialogueRow(line: DialogueLine, arabicFamily: FontFamily) {
             ),
         )
         AyahText(
-            line.id,
+            textOf(language, line.id, line.en),
             style = AyahTypography.Body2,
         )
     }
 }
 
 @Composable
-private fun VocabCard(word: VocabWord, arabicFamily: FontFamily) {
+private fun VocabCard(word: VocabWord, language: AppLanguage, arabicFamily: FontFamily) {
     AyahCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 AyahText(
-                    word.id,
+                    textOf(language, word.id, word.en),
                     style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
                 )
                 AyahText(
@@ -407,7 +421,7 @@ private fun VocabCard(word: VocabWord, arabicFamily: FontFamily) {
         }
         Spacer(modifier = Modifier.height(8.dp))
         AyahText(
-            "— ${word.exampleId}",
+            "— ${textOf(language, word.exampleId, word.exampleEn)}",
             style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
         AyahText(
@@ -429,15 +443,15 @@ private fun VocabCard(word: VocabWord, arabicFamily: FontFamily) {
 }
 
 @Composable
-private fun GrammarCard(rule: GrammarRule, arabicFamily: FontFamily) {
+private fun GrammarCard(rule: GrammarRule, language: AppLanguage, arabicFamily: FontFamily) {
     AyahCard {
         AyahText(
-            rule.titleId,
+            textOf(language, rule.titleId, rule.titleEn),
             style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
         )
         Spacer(modifier = Modifier.height(4.dp))
         AyahText(
-            rule.id,
+            textOf(language, rule.id, rule.en),
             style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -457,7 +471,7 @@ private fun GrammarCard(rule: GrammarRule, arabicFamily: FontFamily) {
             ),
         )
         AyahText(
-            rule.exampleId,
+            textOf(language, rule.exampleId, rule.exampleEn),
             style = AyahTypography.Caption,
         )
     }

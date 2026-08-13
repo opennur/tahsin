@@ -16,6 +16,7 @@ data class LughohLevel(
     val titleId: String,
     val titleAr: String,
     val lessons: List<LughohLesson>,
+    val titleEn: String = "",
 )
 
 /** Satu pelajaran: dialog, kosakata, tata bahasa, dan latihan. */
@@ -27,14 +28,17 @@ data class LughohLesson(
     val mufrodat: List<VocabWord>,
     val qawaid: List<GrammarRule>,
     val tadribat: List<Exercise>,
+    val titleEn: String = "",
 )
 
-/** Satu baris dialog: pembicara + Arab berharakat + transliterasi + arti ID. */
+/** Satu baris dialog: pembicara + Arab berharakat + transliterasi + arti. */
 data class DialogueLine(
     val speaker: String,
     val ar: String,
     val latin: String,
     val id: String,
+    val en: String = "",
+    val speakerEn: String = "",
 )
 
 /** Satu kata kosakata baru (dari percakapan) + contoh kalimat. */
@@ -45,6 +49,8 @@ data class VocabWord(
     val exampleAr: String,
     val exampleLatin: String,
     val exampleId: String,
+    val en: String = "",
+    val exampleEn: String = "",
 )
 
 /** Satu kaidah tata bahasa; contohnya selalu diambil dari dialog. */
@@ -54,6 +60,9 @@ data class GrammarRule(
     val exampleAr: String,
     val exampleLatin: String,
     val exampleId: String,
+    val titleEn: String = "",
+    val en: String = "",
+    val exampleEn: String = "",
 )
 
 /** Jenis latihan (tadribat) — semuanya tap-based. */
@@ -71,6 +80,7 @@ data class FillBlankExercise(
     val promptLatin: String,
     val options: List<String>,
     val answer: String,
+    val promptEn: String = "",
 ) : Exercise {
     override val type: ExerciseType = ExerciseType.FILL_BLANK
 
@@ -79,21 +89,24 @@ data class FillBlankExercise(
     val displayPromptLatin: String get() = promptLatin.replace("____", "⋯⋯")
 }
 
-/** Terjemahkan Arab → Indonesia: pilih terjemahan yang benar. */
+/** Terjemahkan Arab → Inggris/Indonesia: pilih terjemahan yang benar. */
 data class TranslateArIdExercise(
     val promptAr: String,
     val promptLatin: String,
     val options: List<String>,
     val answer: String,
+    val optionsEn: List<String> = emptyList(),
+    val answerEn: String = "",
 ) : Exercise {
     override val type: ExerciseType = ExerciseType.TRANSLATE_AR_ID
 }
 
-/** Terjemahkan Indonesia → Arab: pilih kalimat Arab yang benar. */
+/** Terjemahkan Inggris/Indonesia → Arab: pilih kalimat Arab yang benar. */
 data class TranslateIdArExercise(
     val promptId: String,
     val options: List<String>,
     val answer: String,
+    val promptEn: String = "",
 ) : Exercise {
     override val type: ExerciseType = ExerciseType.TRANSLATE_ID_AR
 }
