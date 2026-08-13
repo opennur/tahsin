@@ -28,12 +28,16 @@ import com.tahsin.app.util.AudioDownloader
 import com.tahsin.app.util.DownloadProgress
 import com.tahsin.app.util.DownloadService
 import com.tahsin.app.util.FontStore
+import com.tahsin.app.util.Gamification
+import com.tahsin.app.util.GamificationHub
+import com.tahsin.app.util.ReadingStats
 import com.tahsin.app.util.AyahStats
 import com.tahsin.app.util.PlaySource
 import com.tahsin.app.util.ReadingStatsStore
 import com.tahsin.app.util.Reciter
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
+import com.tahsin.app.widget.StreakReminderAlarm
 import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -81,6 +85,8 @@ sealed interface TahsinUiState {
         val audioSpeed: Float = 1.0f,
         /** Notifikasi harian "Ayah of the Day" (toggle di drawer). */
         val ayahOfDayEnabled: Boolean = true,
+        /** Pengingat harian untuk menjaga streak (toggle di Pengaturan). */
+        val streakReminderEnabled: Boolean = false,
         /** Sedang memutar audio (untuk tombol Dengar/Stop). */
         /** Audio ayat sedang diputar (tombol Dengar/Stop di footer). */
         val isAudioPlaying: Boolean = false,
@@ -130,6 +136,7 @@ data class SettingsUiState(
     val reciter: Reciter = Reciter.MINSHAWY,
     val audioSpeed: Float = 1.0f,
     val ayahOfDayEnabled: Boolean = true,
+    val streakReminderEnabled: Boolean = false,
     val isDownloading: Boolean = false,
     val downloadDone: Int = 0,
     val downloadTotal: Int = 0,
@@ -162,6 +169,7 @@ class TahsinViewModel(
             reciter = settings.reciter,
             audioSpeed = settings.audioSpeed,
             ayahOfDayEnabled = settings.ayahOfDayEnabled,
+            streakReminderEnabled = settings.streakReminderEnabled,
         ),
     )
     val settingsState: StateFlow<SettingsUiState> = _settingsState.asStateFlow()
@@ -214,6 +222,7 @@ class TahsinViewModel(
                 reciter = settings.reciter,
                 audioSpeed = settings.audioSpeed,
                 ayahOfDayEnabled = settings.ayahOfDayEnabled,
+                streakReminderEnabled = settings.streakReminderEnabled,
                 showSwipeHint = !settings.swipeHintDismissed,
             )
         } catch (e: Exception) {
@@ -378,6 +387,15 @@ class TahsinViewModel(
         settings.ayahOfDayEnabled = next
         _settingsState.update { it.copy(ayahOfDayEnabled = next) }
         updateReady { it.copy(ayahOfDayEnabled = next) }
+    }
+
+    /** Nyalakan/matikan pengingat streak harian (toggle di Pengaturan). */
+    fun toggleStreakReminder() {
+        val next = !settings.streakReminderEnabled
+        settings.streakReminderEnabled = next
+        _settingsState.update { it.copy(streakReminderEnabled = next) }
+        updateReady { it.copy(streakReminderEnabled = next) }
+        if (next) StreakReminderAlarm.scheduleDaily(app) else StreakReminderAlarm.cancel(app)
     }
 
     // ---- mic / STT ----
@@ -615,6 +633,14 @@ class TahsinViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             statsStore.record(surahNumber, ayahNumber, aligned, words)
             val updated = statsStore.statsFor(surahNumber, ayahNumber)
+            // XP untuk bacaan yang baik: skor 0..100 dari proporsi kata benar.
+            val score = ReadingStats.scoreOf(aligned)
+            val xp = when {
+                score >= 90 -> Gamification.XP_AYAH_PERFECT
+                score >= 70 -> Gamification.XP_AYAH_GOOD
+                else -> 0
+            }
+            if (xp > 0) GamificationHub.award(app, xp)
             val cur = currentReady() ?: return@launch
             if (cur.surahNumber == surahNumber && cur.ayah?.number == ayahNumber) {
                 updateReady { it.copy(ayahStats = updated) }
@@ -980,6 +1006,7 @@ class TahsinViewModel(
             reciter = s.reciter,
             audioSpeed = s.audioSpeed,
             ayahOfDayEnabled = s.ayahOfDayEnabled,
+            streakReminderEnabled = s.streakReminderEnabled,
             isDownloading = s.isDownloading,
             downloadDone = s.downloadDone,
             downloadTotal = s.downloadTotal,

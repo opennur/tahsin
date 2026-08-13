@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,6 +35,8 @@ import com.tahsin.app.ui.components.AyahButton
 import com.tahsin.app.ui.components.AyahButtonVariant
 import com.tahsin.app.ui.components.AyahCard
 import com.tahsin.app.ui.components.AyahText
+import com.tahsin.app.ui.components.GoalProgressBar
+import com.tahsin.app.util.Achievements
 
 /**
  * Layar statistik keseluruhan: angka gabungan semua challenge (Tahsin,
@@ -125,6 +128,57 @@ fun StatsScreen(
                             value = "${state.wordsMastered}",
                             modifier = Modifier.weight(1f),
                         )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // ---- Ringkasan gamification (XP/level/streak/badge) ----
+                    AyahCard(modifier = Modifier.fillMaxWidth()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                AyahText(
+                                    strings.homeLevelLine.format(state.level, state.xp),
+                                    style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
+                                )
+                                AyahText(
+                                    strings.homeStreakLine.format(state.streak),
+                                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                AyahText(
+                                    strings.homeGoalLine.format(state.todayXp, state.dailyGoalXp),
+                                    style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                GoalProgressBar(
+                                    fraction = state.todayXp.toFloat() / state.dailyGoalXp,
+                                )
+                            }
+                            val latestKey = state.latestBadgeKey
+                            if (latestKey != null) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column(horizontalAlignment = Alignment.End) {
+                                    AyahText(
+                                        strings.badgesCount.format(state.badgesCount, Achievements.ALL.size),
+                                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                                    )
+                                    val badge = Achievements.byKey(latestKey)
+                                    AyahText(
+                                        "${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, state.language)}",
+                                        style = AyahTypography.Body2.copy(
+                                            color = AyahColors.TextPrimary,
+                                            fontWeight = FontWeight.Medium,
+                                            textAlign = TextAlign.End,
+                                        ),
+                                    )
+                                }
+                            } else {
+                                AyahText(
+                                    strings.badgesCount.format(state.badgesCount, Achievements.ALL.size),
+                                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

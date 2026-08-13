@@ -17,6 +17,8 @@ sealed interface AppScreen {
     data object AudioManager : AppScreen
     data object DreamBig : AppScreen
     data object Lughoh : AppScreen
+    data object AyatQuiz : AppScreen
+    data object Badges : AppScreen
     data object Settings : AppScreen
 
     /** Tag unik per layar (dipakai rememberSaveable untuk rotasi layar). */
@@ -34,6 +36,8 @@ sealed interface AppScreen {
             "AudioManager" -> AudioManager
             "DreamBig" -> DreamBig
             "Lughoh" -> Lughoh
+            "AyatQuiz" -> AyatQuiz
+            "Badges" -> Badges
             "Settings" -> Settings
             else -> Home
         }

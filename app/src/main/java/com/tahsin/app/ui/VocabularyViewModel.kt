@@ -13,6 +13,8 @@ import com.tahsin.app.data.vocab.VocabQuizQuestion
 import com.tahsin.app.data.vocab.VocabularyEngine
 import com.tahsin.app.data.vocab.VocabularyRepository
 import com.tahsin.app.util.AppLanguage
+import com.tahsin.app.util.Gamification
+import com.tahsin.app.util.GamificationHub
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.util.TahsinAudioPlayer
 import com.tahsin.app.util.VocabularyStatsStore
@@ -63,6 +65,7 @@ data class VocabUiState(
  * dan pemutaran audio ([TahsinAudioPlayer]).
  */
 class VocabularyViewModel(
+    private val app: Context,
     private val repository: VocabularyRepository,
     private val store: VocabularyStatsStore,
     private val settings: SettingsStore,
@@ -151,6 +154,10 @@ class VocabularyViewModel(
                     )
                     val cards = stored.cards + (entry.key to updated)
                     store.write(stored.copy(cards = cards, daily = newDaily))
+                    // Kata baru dikuasai pertama kali (correctCount 0 → 1) = XP kata dikuasai.
+                    if (remembered && wasNew) {
+                        GamificationHub.award(app, Gamification.XP_WORD_MASTERED)
+                    }
                     _state.update {
                         it.copy(
                             flipped = false,
@@ -226,6 +233,11 @@ class VocabularyViewModel(
                 quizTotal = it.quizTotal + 1,
             )
         }
+        if (correct) {
+            viewModelScope.launch(Dispatchers.IO) {
+                GamificationHub.award(app, Gamification.XP_QUIZ_CORRECT)
+            }
+        }
     }
 
     fun nextQuiz() {
@@ -245,6 +257,7 @@ fun vocabularyViewModelFactory(context: Context): ViewModelProvider.Factory = vi
     initializer {
         val app = context.applicationContext
         VocabularyViewModel(
+            app = app,
             repository = VocabularyRepository(app),
             store = VocabularyStatsStore(app),
             settings = SettingsStore(app),

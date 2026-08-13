@@ -57,6 +57,24 @@ Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
   tata bahasa. Latihan berupa **sesi acak tak terbatas** (8 soal dari seluruh
   pelajaran, urutan opsi diacak) dengan rekor skor; materi tetap bisa dibaca
   lewat browser level/pelajaran. Konten 100% orisinal (tanpa salinan kitab).
+- 🎮 **XP, Level & Streak**: setiap aktivitas belajar memberi XP — bacaan
+  Tahsin (skor ≥70: 5 XP, ≥90: 10 XP), jawaban benar kuis (2 XP), kata
+  kosakata baru dikuasai (10 XP), ronde Dream BIG (15 XP), sesi Belajar Arab
+  (10 XP). Level naik dengan kurva kuadratik (`√(XP/100)`), **streak hari
+  beruntun** dihitung per hari kalender, dan **target harian 50 XP** tampil
+  dengan progress bar di beranda & Statistik. Naik level, capaian streak
+  (3/7/14/30 hari), atau badge baru dirayakan lewat dialog + getar.
+- 🏅 **Penghargaan (badges)**: **13 lencana** — langkah pertama, streak 3/7,
+  level 2/5, 10 percobaan bacaan, bacaan sempurna (90+), 50/100 kata
+  dikuasai, ronde Dream BIG sempurna, 10 ronde, 5 sesi Arab, tamat satu surah
+  (semua ayat pernah dibaca). Layar daftar diraih/terkunci dari menu utama;
+  badge terbaru tampil di beranda & Statistik.
+- 🎯 **Kuis Ayat** (menu Kuis Ayat): dua mode pilihan ganda dari seluruh
+  mushaf — **Lengkapi Ayat** (kata mana yang melengkapi ayat ini?) dan
+  **Tebak Surah** (ayat ini dari surah apa?) — pengecoh dari kata dalam
+  surah yang sama / nama surah lain; skor + XP per jawaban benar.
+- 🔥 **Pengingat streak** (opsional, menu Pengaturan): notifikasi harian jam
+  18:00 bila target harian belum tercapai — streak tidak putus diam-diam.
 - 👆 **Gesture**: **geser layar** (mushaf, terjemahan, maupun background) ke
   kanan/kiri untuk ganti ayat (RTL: kanan = ayat berikutnya); petunjuk geser bisa
   ditutup permanen lewat tombol ✕.
@@ -132,17 +150,24 @@ app/src/main/java/com/tahsin/app/
 │                   #   lama (era level/transkrip) = dead code yang dipertahankan
 ├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 pelajaran orisinal
 │                   #   → assets/lughoh/lessons.json; sesi latihan acak)
+├── data/ayatquiz/  # AyatQuiz (Lengkapi Ayat) + SurahQuiz (Tebak Surah) —
+│                   #   kuis pilihan ganda dari seluruh mushaf (murni, teruji)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen/VM, AudioManagerScreen/VM, StatsScreen/VM
 │                   #   (statistik gabungan semua challenge), SearchScreen/VM,
 │                   #   TajwidQuizScreen/VM, VocabularyScreen/VM,
 │                   #   DreamBigScreen/VM (arcade), LughohScreen/VM (arcade),
+│                   #   AyatQuizScreen/VM (Kuis Ayat), BadgesScreen/VM
+│                   #   (penghargaan), GamificationViewModel (header beranda),
 │                   #   SettingsScreen (dark mode, bahasa, unduh semua)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + alarm harian/notifikasi
+│                   #   + StreakReminderReceiver (pengingat streak, opsional)
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
 │                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
+│                   #   Achievements (katalog 13 badge + evaluator murni),
+│                   #   GamificationStore/Hub/Events (XP, level, streak, perayaan),
 │                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
 │                   #   Reciter (qari' everyayah + kecepatan audio 0.5×–1.25×),
 │                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
@@ -228,8 +253,11 @@ Test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
 (pemilihan ayat harian: batas index, lintas surah, determinisme), mesin
 **Kosakata** (`VocabularyEngine`: SRS + quiz), **Dream BIG** (`DreamBigGame`:
 ronde acak + bintang), **Belajar Arab** (`LughohParser`/`LughohEngine`: sesi
-acak, acak opsi, susun kata), dan semua *progress store* (`ReadingStatsStore`,
-`VocabularyStatsStore`, `DreamBigProgressStore`, `LughohProgressStore`):
+acak, acak opsi, susun kata), **Kuis Ayat** (`AyatQuiz`/`SurahQuiz`: soal
+Lengkapi Ayat & Tebak Surah), sistem **gamification** (`GamificationStore`:
+level/streak/todayXp; `Achievements`: katalog badge & evaluator unlock), dan
+semua *progress store* (`ReadingStatsStore`, `VocabularyStatsStore`,
+`DreamBigProgressStore`, `LughohProgressStore`):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon

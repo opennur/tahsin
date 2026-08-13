@@ -5,12 +5,16 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -88,5 +92,27 @@ fun AyahErrorView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         AyahButton(text = "🔄 Coba Lagi", onClick = onRetry)
+    }
+}
+
+/** Progress bar determinate (tanpa Material 3) untuk target harian dll. */
+@Composable
+fun GoalProgressBar(
+    fraction: Float,
+    modifier: Modifier = Modifier,
+) {
+    val clamped = fraction.coerceIn(0f, 1f)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(8.dp)
+            .background(AyahColors.SurfaceVariant, RoundedCornerShape(4.dp)),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(clamped)
+                .height(8.dp)
+                .background(AyahColors.Primary, RoundedCornerShape(4.dp)),
+        )
     }
 }

@@ -11,6 +11,8 @@ import com.tahsin.app.data.tajwid.QuizQuestion
 import com.tahsin.app.data.tajwid.TajwidQuiz
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.ArabicNormalizer
+import com.tahsin.app.util.Gamification
+import com.tahsin.app.util.GamificationHub
 import com.tahsin.app.util.SearchableAyah
 import com.tahsin.app.util.SettingsStore
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +45,7 @@ data class TajwidQuizState(
  * satu kata ber-hukum, tanya "hukum apa pada kata ini?" dengan 4 opsi.
  */
 class TajwidQuizViewModel(
-    app: Context,
+    private val app: Context,
     private val repository: QuranRepository,
     private val settings: SettingsStore,
 ) : ViewModel() {
@@ -111,6 +113,11 @@ class TajwidQuizViewModel(
                 correctCount = it.correctCount + if (correct) 1 else 0,
                 totalCount = it.totalCount + 1,
             )
+        }
+        if (correct) {
+            viewModelScope.launch(Dispatchers.IO) {
+                GamificationHub.award(app, Gamification.XP_QUIZ_CORRECT)
+            }
         }
     }
 

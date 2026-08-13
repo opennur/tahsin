@@ -19,6 +19,8 @@ import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTheme
 import com.tahsin.app.ui.AppStrings
 import com.tahsin.app.ui.AudioManagerScreen
+import com.tahsin.app.ui.AyatQuizScreen
+import com.tahsin.app.ui.BadgesScreen
 import com.tahsin.app.ui.DreamBigScreen
 import com.tahsin.app.ui.HomeScreen
 import com.tahsin.app.ui.LughohScreen
@@ -31,11 +33,14 @@ import com.tahsin.app.ui.TahsinViewModel
 import com.tahsin.app.ui.TajwidQuizScreen
 import com.tahsin.app.ui.VocabularyScreen
 import com.tahsin.app.ui.components.BackgroundPromptDialog
+import com.tahsin.app.ui.components.CelebrationDialog
 import com.tahsin.app.ui.components.DownloadNoticeDialog
 import com.tahsin.app.ui.navigation.AppScreen
 import com.tahsin.app.ui.tahsinViewModelFactory
+import com.tahsin.app.util.GamificationEvents
 import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.widget.AyahOfTheDayAlarm
+import com.tahsin.app.widget.StreakReminderAlarm
 
 class MainActivity : ComponentActivity() {
 
@@ -64,6 +69,10 @@ class MainActivity : ComponentActivity() {
         // Alarm harian (widget & notifikasi) tetap jalan meski user tak pernah
         // menambah widget — cukup pernah membuka aplikasi.
         AyahOfTheDayAlarm.scheduleDaily(this)
+        // Pengingat streak (toggle di Pengaturan; receiver mengecek sendiri).
+        if (SettingsStore(this).streakReminderEnabled) {
+            StreakReminderAlarm.scheduleDaily(this)
+        }
         // Portal & layar lain ikut mode gelap sejak awal (bukan nunggu Tahsin dimuat).
         AyahColors.isDark = SettingsStore(this).darkMode
         target = readTarget(intent)
@@ -116,6 +125,8 @@ class MainActivity : ComponentActivity() {
                         onOpenAudioManager = { push(AppScreen.AudioManager) },
                         onOpenDreamBig = { push(AppScreen.DreamBig) },
                         onOpenLughoh = { push(AppScreen.Lughoh) },
+                        onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
+                        onOpenBadges = { push(AppScreen.Badges) },
                         onOpenSettings = { push(AppScreen.Settings) },
                         settings = settingsState,
                     )
@@ -149,6 +160,8 @@ class MainActivity : ComponentActivity() {
                     )
                     AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
                     AppScreen.Lughoh -> LughohScreen(onBack = { pop() })
+                    AppScreen.AyatQuiz -> AyatQuizScreen(onBack = { pop() })
+                    AppScreen.Badges -> BadgesScreen(onBack = { pop() })
                     AppScreen.Settings -> SettingsScreen(
                         onBack = { pop() },
                         settings = settingsState,
@@ -159,6 +172,7 @@ class MainActivity : ComponentActivity() {
                         onSetReciter = tahsinViewModel::setReciter,
                         onSetSpeed = tahsinViewModel::setAudioSpeed,
                         onToggleAyahOfDay = tahsinViewModel::toggleAyahOfDay,
+                        onToggleStreakReminder = tahsinViewModel::toggleStreakReminder,
                         onDownloadAll = tahsinViewModel::downloadAllAudio,
                     )
                 }
@@ -176,6 +190,32 @@ class MainActivity : ComponentActivity() {
                     BackgroundPromptDialog(
                         strings = strings,
                         onSetBackgroundAllowed = tahsinViewModel::setBackgroundDownloadAllowed,
+                    )
+                }
+
+                // Dialog perayaan gamification (naik level / streak / badge)
+                // — diposting dari thread mana pun, dikonsumsi di sini.
+                val celebration by GamificationEvents.event.collectAsStateWithLifecycle()
+                LaunchedEffect(celebration) {
+                    if (celebration != null) {
+                        val vibrator = context.getSystemService(android.content.Context.VIBRATOR_SERVICE)
+                                as? android.os.Vibrator
+                        runCatching {
+                            vibrator?.vibrate(
+                                android.os.VibrationEffect.createOneShot(
+                                    250,
+                                    android.os.VibrationEffect.DEFAULT_AMPLITUDE,
+                                ),
+                            )
+                        }
+                    }
+                }
+                celebration?.let { event ->
+                    CelebrationDialog(
+                        event = event,
+                        strings = strings,
+                        language = settingsState.language,
+                        onDismiss = { GamificationEvents.consume() },
                     )
                 }
             }

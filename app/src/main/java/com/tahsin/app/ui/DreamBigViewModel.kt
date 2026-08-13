@@ -13,6 +13,8 @@ import com.tahsin.app.data.vocab.VocabularyRepository
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.DreamBigProgressStore
 import com.tahsin.app.util.DreamBigStats
+import com.tahsin.app.util.Gamification
+import com.tahsin.app.util.GamificationHub
 import com.tahsin.app.util.SettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,6 +65,7 @@ data class DreamBigUiState(
  * tanpa unlock; rekor skor & streak tersimpan di [DreamBigProgressStore].
  */
 class DreamBigViewModel(
+    private val app: Context,
     private val vocabRepository: VocabularyRepository,
     private val progressStore: DreamBigProgressStore,
     settings: SettingsStore,
@@ -195,7 +198,9 @@ class DreamBigViewModel(
             val updated = progressMutex.withLock {
                 // Baca + tulis di IO: store.read() menyentuh disk.
                 withContext(Dispatchers.IO) {
-                    progressStore.read().withRound(q.score, q.bestStreak).also { progressStore.write(it) }
+                    val updatedStats = progressStore.read().withRound(q.score, q.bestStreak).also { progressStore.write(it) }
+                    GamificationHub.award(app, Gamification.XP_DREAM_BIG_ROUND)
+                    updatedStats
                 }
             }
             stats = updated
@@ -217,6 +222,7 @@ fun dreamBigViewModelFactory(context: Context): ViewModelProvider.Factory = view
     initializer {
         val app = context.applicationContext
         DreamBigViewModel(
+            app = app,
             vocabRepository = VocabularyRepository(app),
             progressStore = DreamBigProgressStore(app),
             settings = SettingsStore(app),

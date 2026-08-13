@@ -10,6 +10,8 @@ import com.tahsin.app.data.dreambig.DreamBigGame
 import com.tahsin.app.data.lughoh.LughohEngine
 import com.tahsin.app.util.AppLanguage
 import com.tahsin.app.util.DreamBigProgressStore
+import com.tahsin.app.util.Gamification
+import com.tahsin.app.util.GamificationStore
 import com.tahsin.app.util.LughohProgressStore
 import com.tahsin.app.util.ReadingStatsStore
 import com.tahsin.app.util.SettingsStore
@@ -38,6 +40,14 @@ data class StatsState(
     val dreamBigBest: Int = 0,
     val lughohRounds: Int = 0,
     val lughohBest: Int = 0,
+    // Ringkasan ekonomi game
+    val xp: Int = 0,
+    val level: Int = 1,
+    val streak: Int = 0,
+    val todayXp: Int = 0,
+    val dailyGoalXp: Int = Gamification.DAILY_GOAL_XP,
+    val badgesCount: Int = 0,
+    val latestBadgeKey: String? = null,
 )
 
 /**
@@ -50,6 +60,7 @@ class StatsViewModel(
     private val vocabStatsStore: VocabularyStatsStore,
     private val dreamBigStore: DreamBigProgressStore,
     private val lughohStore: LughohProgressStore,
+    private val gamificationStore: GamificationStore,
     private val settings: SettingsStore,
 ) : ViewModel() {
 
@@ -64,6 +75,8 @@ class StatsViewModel(
             val vocab = vocabStatsStore.read()
             val dream = dreamBigStore.read()
             val lughoh = lughohStore.read()
+            val gamification = gamificationStore.read()
+            val today = java.time.LocalDate.now().toEpochDay()
             val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
                 ?: AppLanguage.ID
 
@@ -85,6 +98,12 @@ class StatsViewModel(
                 dreamBigBest = dream.bestScore,
                 lughohRounds = lughoh.roundsPlayed,
                 lughohBest = lughoh.bestScore,
+                xp = gamification.xp,
+                level = Gamification.levelFor(gamification.xp),
+                streak = gamification.streak,
+                todayXp = Gamification.todayXpFor(gamification, today),
+                badgesCount = gamification.badges.size,
+                latestBadgeKey = gamification.badges.lastOrNull(),
             )
         }
     }
@@ -99,6 +118,7 @@ fun statsViewModelFactory(context: Context): ViewModelProvider.Factory = viewMod
             vocabStatsStore = VocabularyStatsStore(app),
             dreamBigStore = DreamBigProgressStore(app),
             lughohStore = LughohProgressStore(app),
+            gamificationStore = GamificationStore(app),
             settings = SettingsStore(app),
         )
     }

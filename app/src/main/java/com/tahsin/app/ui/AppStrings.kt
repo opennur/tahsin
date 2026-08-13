@@ -46,6 +46,7 @@ data class Strings(
     val sectionSpeed: String,
     val audioReciterLabel: String,
     val sectionDaily: String,
+    val sectionStreakReminder: String,
     val menuStats: String,
     val menuQuiz: String,
     val menuAudio: String,
@@ -123,6 +124,13 @@ data class Strings(
     val quizRuleLabel: String,
     val quizLoading: String,
     val quizNoData: String,
+    // Kuis Ayat (Lengkapi Ayat & Tebak Surah)
+    val menuAyatQuiz: String,
+    val ayatQuizTitle: String,
+    val ayatQuizModeComplete: String,
+    val ayatQuizModeSurah: String,
+    val ayatQuizCompleteQuestion: String,
+    val ayatQuizSurahQuestion: String,
     // Kosa kata
     val menuVocab: String,
     // Materi Dream BIG
@@ -193,6 +201,26 @@ data class Strings(
     val lughohScore: String,
     val lughohRestart: String,
     val lughohBackToHome: String,
+    // Penghargaan (badge)
+    val menuBadges: String,
+    val badgesTitle: String,
+    val badgesSubtitle: String,
+    val badgesLoading: String,
+    val badgesCount: String,
+    val badgesLocked: String,
+    val badgesEarned: String,
+    // Gamification header (Home & ringkasan statistik)
+    val homeLevelLine: String,
+    val homeStreakLine: String,
+    val homeBadgeLabel: String,
+    val homeGoalLine: String,
+    // Perayaan gamification
+    val celebrateLevelUpTitle: String,
+    val celebrateLevelUpBody: String,
+    val celebrateStreakTitle: String,
+    val celebrateStreakBody: String,
+    val celebrateBadgeTitle: String,
+    val celebrateBadgeBody: String,
 )
 
 object AppStrings {
@@ -239,6 +267,7 @@ object AppStrings {
         sectionSpeed = "Kecepatan Audio",
         audioReciterLabel = "Qari'",
         sectionDaily = "Ayah of the Day",
+        sectionStreakReminder = "Streak Reminder",
         menuStats = "📊 Statistik",
         menuQuiz = "📝 Kuis",
         menuAudio = "🎵 Kelola Audio",
@@ -313,6 +342,12 @@ object AppStrings {
         quizRuleLabel = "Hukum",
         quizLoading = "Menyiapkan soal…",
         quizNoData = "Gagal menyiapkan soal. Coba lagi.",
+        menuAyatQuiz = "🎯 Kuis Ayat",
+        ayatQuizTitle = "🎯 Kuis Ayat",
+        ayatQuizModeComplete = "Lengkapi Ayat",
+        ayatQuizModeSurah = "Tebak Surah",
+        ayatQuizCompleteQuestion = "Kata mana yang melengkapi ayat ini?",
+        ayatQuizSurahQuestion = "Ayat ini dari surah apa?",
         menuVocab = "📖 Kosakata",
         menuDreamBig = "🎬 Dream BIG",
         dreamBigTitle = "🎬 Dream BIG",
@@ -381,6 +416,24 @@ object AppStrings {
         lughohScore = "Skor: %d/%d",
         lughohRestart = "🔄 Sesi Baru",
         lughohBackToHome = "← Kembali",
+        // Penghargaan (badge)
+        menuBadges = "🏅 Penghargaan",
+        badgesTitle = "🏅 Penghargaan",
+        badgesSubtitle = "Raih lencana dengan rutin berlatih — setiap aktivitas bernilai XP.",
+        badgesLoading = "Memeriksa lencana…",
+        badgesCount = "%d/%d lencana diraih",
+        badgesLocked = "Terkunci",
+        badgesEarned = "Diraih",
+        homeLevelLine = "Level %d · %d XP",
+        homeStreakLine = "🔥 %d hari beruntun",
+        homeBadgeLabel = "Badge terbaru:",
+        homeGoalLine = "🎯 Target harian: %d/%d XP",
+        celebrateLevelUpTitle = "🎉 Naik Level!",
+        celebrateLevelUpBody = "Selamat! Kamu sekarang di Level %d.",
+        celebrateStreakTitle = "🔥 Streak!",
+        celebrateStreakBody = "%d hari beruntun — pertahankan!",
+        celebrateBadgeTitle = "🏅 Badge Baru!",
+        celebrateBadgeBody = "Kamu meraih badge: %s",
     )
 
     val English = Strings(
@@ -420,6 +473,7 @@ object AppStrings {
         sectionSpeed = "Audio Speed",
         audioReciterLabel = "Reciter",
         sectionDaily = "Ayah of the Day",
+        sectionStreakReminder = "Streak Reminder",
         menuStats = "📊 Stats",
         menuQuiz = "📝 Quiz",
         menuAudio = "🎵 Audio",
@@ -495,6 +549,12 @@ object AppStrings {
         quizRuleLabel = "Rule",
         quizLoading = "Preparing question…",
         quizNoData = "Failed to prepare a question. Try again.",
+        menuAyatQuiz = "🎯 Ayah Quiz",
+        ayatQuizTitle = "🎯 Ayah Quiz",
+        ayatQuizModeComplete = "Complete",
+        ayatQuizModeSurah = "Guess Surah",
+        ayatQuizCompleteQuestion = "Which word completes this ayah?",
+        ayatQuizSurahQuestion = "Which surah is this ayah from?",
         menuVocab = "📖 Vocabulary",
         menuDreamBig = "🎬 Dream BIG",
         dreamBigTitle = "🎬 Dream BIG",
@@ -563,5 +623,95 @@ object AppStrings {
         lughohScore = "Score: %d/%d",
         lughohRestart = "🔄 New Session",
         lughohBackToHome = "← Back",
+        // Penghargaan (badge)
+        menuBadges = "🏅 Badges",
+        badgesTitle = "🏅 Badges",
+        badgesSubtitle = "Earn badges by practicing regularly — every activity is worth XP.",
+        badgesLoading = "Checking badges…",
+        badgesCount = "%d/%d badges earned",
+        badgesLocked = "Locked",
+        badgesEarned = "Earned",
+        homeLevelLine = "Level %d · %d XP",
+        homeStreakLine = "🔥 %d-day streak",
+        homeBadgeLabel = "Latest badge:",
+        homeGoalLine = "🎯 Daily goal: %d/%d XP",
+        celebrateLevelUpTitle = "🎉 Level Up!",
+        celebrateLevelUpBody = "Congrats! You're now Level %d.",
+        celebrateStreakTitle = "🔥 Streak!",
+        celebrateStreakBody = "%d-day streak — keep it up!",
+        celebrateBadgeTitle = "🏅 New Badge!",
+        celebrateBadgeBody = "You earned the badge: %s",
     )
+
+    /** Judul badge terjemahan — key = [com.tahsin.app.util.BadgeDef.key]. */
+    fun badgeTitle(key: String, lang: AppLanguage): String = when (lang) {
+        AppLanguage.ID -> when (key) {
+            "first-step" -> "Langkah Pertama"
+            "streak-3" -> "Konsisten"
+            "streak-7" -> "Rajin"
+            "level-2" -> "Pembelajar"
+            "level-5" -> "Cendekia"
+            "tahsin-10" -> "Tekun Berlatih"
+            "tahsin-perfect" -> "Bacaan Sempurna"
+            "vocab-50" -> "Pengumpul Kata"
+            "vocab-100" -> "Ahli Kosakata"
+            "dream-perfect" -> "Mimpi Besar"
+            "dream-10" -> "Pemain Tangguh"
+            "lughoh-5" -> "Poliglot Pemula"
+            "surah-complete" -> "Penuntas Surah"
+            else -> key
+        }
+        AppLanguage.EN -> when (key) {
+            "first-step" -> "First Step"
+            "streak-3" -> "Consistent"
+            "streak-7" -> "Diligent"
+            "level-2" -> "Learner"
+            "level-5" -> "Scholar"
+            "tahsin-10" -> "Dedicated Reciter"
+            "tahsin-perfect" -> "Perfect Recitation"
+            "vocab-50" -> "Word Collector"
+            "vocab-100" -> "Vocabulary Master"
+            "dream-perfect" -> "Big Dreamer"
+            "dream-10" -> "Seasoned Player"
+            "lughoh-5" -> "Budding Polyglot"
+            "surah-complete" -> "Surah Finisher"
+            else -> key
+        }
+    }
+
+    /** Deskripsi badge terjemahan — key = [com.tahsin.app.util.BadgeDef.key]. */
+    fun badgeDesc(key: String, lang: AppLanguage): String = when (lang) {
+        AppLanguage.ID -> when (key) {
+            "first-step" -> "Raih XP pertamamu."
+            "streak-3" -> "Aktif 3 hari berturut-turut."
+            "streak-7" -> "Aktif 7 hari berturut-turut."
+            "level-2" -> "Capai level 2."
+            "level-5" -> "Capai level 5."
+            "tahsin-10" -> "Selesaikan 10 percobaan bacaan."
+            "tahsin-perfect" -> "Baca satu ayat dengan skor 90+."
+            "vocab-50" -> "Kuasai 50 kata kosakata."
+            "vocab-100" -> "Kuasai 100 kata kosakata."
+            "dream-perfect" -> "Skor sempurna dalam satu ronde Dream BIG."
+            "dream-10" -> "Mainkan 10 ronde Dream BIG."
+            "lughoh-5" -> "Selesaikan 5 sesi Belajar Arab."
+            "surah-complete" -> "Tamatkan satu surah: semua ayatnya pernah dibaca."
+            else -> ""
+        }
+        AppLanguage.EN -> when (key) {
+            "first-step" -> "Earn your first XP."
+            "streak-3" -> "Stay active 3 days in a row."
+            "streak-7" -> "Stay active 7 days in a row."
+            "level-2" -> "Reach level 2."
+            "level-5" -> "Reach level 5."
+            "tahsin-10" -> "Complete 10 recitation attempts."
+            "tahsin-perfect" -> "Recite one ayah with a 90+ score."
+            "vocab-50" -> "Master 50 vocabulary words."
+            "vocab-100" -> "Master 100 vocabulary words."
+            "dream-perfect" -> "Score a perfect round in Dream BIG."
+            "dream-10" -> "Play 10 Dream BIG rounds."
+            "lughoh-5" -> "Finish 5 Learn Arabic sessions."
+            "surah-complete" -> "Complete a surah: every ayah read at least once."
+            else -> ""
+        }
+    }
 }

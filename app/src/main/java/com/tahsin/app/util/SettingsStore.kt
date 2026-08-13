@@ -58,6 +58,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean("ayah_of_day_enabled", true)
         set(value) = prefs.edit().putBoolean("ayah_of_day_enabled", value).apply()
 
+    /** Pengingat harian untuk menjaga streak (default mati — opsional). */
+    var streakReminderEnabled: Boolean
+        get() = prefs.getBoolean("streak_reminder_enabled", false)
+        set(value) = prefs.edit().putBoolean("streak_reminder_enabled", value).apply()
+
     /** Qari' (perawi) audio ayat aktif (default Minshawy Murattal). */
     var reciterSlug: String
         get() = prefs.getString("reciter_slug", Reciter.MINSHAWY.slug) ?: Reciter.MINSHAWY.slug

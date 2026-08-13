@@ -61,6 +61,7 @@ fun SettingsScreen(
     onSetReciter: (Reciter) -> Unit,
     onSetSpeed: (Float) -> Unit,
     onToggleAyahOfDay: () -> Unit,
+    onToggleStreakReminder: () -> Unit,
     onDownloadAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -194,6 +195,21 @@ fun SettingsScreen(
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
                     onToggleAyahOfDay()
+                },
+            )
+
+            // ---- Pengingat streak ----
+            SettingRow(
+                label = "🔥 ${strings.sectionStreakReminder}",
+                checked = settings.streakReminderEnabled,
+                onCheckedChange = {
+                    if (!settings.streakReminderEnabled && Build.VERSION.SDK_INT >= 33 &&
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                        PackageManager.PERMISSION_GRANTED
+                    ) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    onToggleStreakReminder()
                 },
             )
 

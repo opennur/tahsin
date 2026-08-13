@@ -14,6 +14,8 @@ import com.tahsin.app.data.lughoh.LughohRepository
 import com.tahsin.app.data.lughoh.RearrangeExercise
 import com.tahsin.app.data.lughoh.WordChip
 import com.tahsin.app.util.AppLanguage
+import com.tahsin.app.util.Gamification
+import com.tahsin.app.util.GamificationHub
 import com.tahsin.app.util.LughohProgressStore
 import com.tahsin.app.util.LughohStats
 import com.tahsin.app.util.SettingsStore
@@ -84,6 +86,7 @@ data class LughohUiState(
  * dibaca lewat browser level/pelajaran. Rekor tersimpan di [LughohProgressStore].
  */
 class LughohViewModel(
+    private val app: Context,
     private val repository: LughohRepository,
     private val progressStore: LughohProgressStore,
     settings: SettingsStore,
@@ -251,7 +254,9 @@ class LughohViewModel(
         viewModelScope.launch {
             val updated = progressMutex.withLock {
                 withContext(Dispatchers.IO) {
-                    progressStore.read().withRound(score).also { progressStore.write(it) }
+                    val updatedStats = progressStore.read().withRound(score).also { progressStore.write(it) }
+                    GamificationHub.award(app, Gamification.XP_LUGHOH_SESSION)
+                    updatedStats
                 }
             }
             stats = updated
@@ -287,6 +292,7 @@ fun lughohViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
     initializer {
         val app = context.applicationContext
         LughohViewModel(
+            app = app,
             repository = LughohRepository(app),
             progressStore = LughohProgressStore(app),
             settings = SettingsStore(app),

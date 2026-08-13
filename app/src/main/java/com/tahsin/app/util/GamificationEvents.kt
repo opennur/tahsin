@@ -1,0 +1,38 @@
+package com.tahsin.app.util
+
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+/** Jenis perayaan gamification (dialog global). */
+enum class CelebrationType { LEVEL_UP, STREAK_MILESTONE, BADGE_EARNED }
+
+/** Satu perayaan yang akan ditampilkan sebagai dialog global. */
+data class CelebrationEvent(
+    val type: CelebrationType,
+    val level: Int = 0,
+    val streak: Int = 0,
+    val badgeKey: String = "",
+)
+
+/**
+ * Event bus ringan untuk perayaan gamification — tanpa DI, pola sama seperti
+ * [DownloadProgress]. [GamificationHub] memposting saat naik level / streak
+ * milestone / badge baru; MainActivity mengonsumsi dan menampilkan dialog.
+ * StateFlow hanya menyimpan event TERBARU: cukup karena perayaan dibaca
+ * segera; event lama yang tertimpa tidak lagi relevan.
+ */
+object GamificationEvents {
+
+    private val _event = MutableStateFlow<CelebrationEvent?>(null)
+    val event: StateFlow<CelebrationEvent?> = _event.asStateFlow()
+
+    fun post(e: CelebrationEvent) {
+        _event.value = e
+    }
+
+    /** Tandai dialog sudah ditutup user. */
+    fun consume() {
+        _event.value = null
+    }
+}

@@ -60,6 +60,16 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <!-- Pengingat streak harian (jam 18:00) + reschedule saat boot -->
+        <receiver
+            android:name=".widget.StreakReminderReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.tahsin.app.action.STREAK_REMINDER" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

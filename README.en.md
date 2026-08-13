@@ -57,6 +57,25 @@ and the **Learn Arabic** course (Durusul Lughoh-style methodology).
   Practice is an **endless random session** (8 questions drawn from all lessons,
   shuffled options) with a best-score record; the material can still be browsed
   via the level/lesson browser. 100% original content (no copied book material).
+- 🎮 **XP, Level & Streak**: every learning activity earns XP — Tahsin
+  recitation (score ≥70: 5 XP, ≥90: 10 XP), correct quiz answers (2 XP),
+  newly mastered vocabulary words (10 XP), Dream BIG rounds (15 XP), Learn
+  Arabic sessions (10 XP). Levels follow a quadratic curve (`√(XP/100)`), a
+  **daily streak** is tracked per calendar day, and a **50 XP daily goal**
+  shows a progress bar on Home & Stats. Level-ups, streak milestones
+  (3/7/14/30 days), and new badges are celebrated with a dialog + vibration.
+- 🏅 **Badges**: **13 achievements** — first step, 3/7-day streaks, levels
+  2/5, 10 recitation attempts, perfect recitation (90+), 50/100 mastered
+  words, perfect Dream BIG round, 10 rounds, 5 Arabic sessions, completing a
+  surah (every ayah read once). A gallery screen shows earned/locked badges;
+  the latest badge appears on Home & Stats.
+- 🎯 **Ayah Quiz** (Ayah Quiz menu): two multiple-choice modes over the whole
+  mushaf — **Complete the Ayah** (which word completes this ayah?) and
+  **Guess the Surah** (which surah is this ayah from?) — distractors drawn
+  from words in the same surah / other surah names; score + XP per correct
+  answer.
+- 🔥 **Streak reminder** (optional, Settings menu): daily 18:00 notification
+  when today's goal isn't reached yet — so your streak never silently dies.
 - 👆 **Gestures**: **swipe** (mushaf, translation, or background) left/right to
   change ayah (RTL: right = next ayah); the swipe hint can be dismissed
   permanently with the ✕ button.
@@ -134,17 +153,24 @@ app/src/main/java/com/tahsin/app/
 │                   #   (level/transcript era) = dead code kept on purpose
 ├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 original lessons
 │                   #   → assets/lughoh/lessons.json; random practice sessions)
+├── data/ayatquiz/  # AyatQuiz (Complete the Ayah) + SurahQuiz (Guess the Surah)
+│                   #   — MCQs over the whole mushaf (pure, unit-tested)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen/VM, AudioManagerScreen/VM, StatsScreen/VM
 │                   #   (aggregate statistics across all challenges),
 │                   #   SearchScreen/VM, TajwidQuizScreen/VM, VocabularyScreen/VM,
 │                   #   DreamBigScreen/VM (arcade), LughohScreen/VM (arcade),
+│                   #   AyatQuizScreen/VM (Ayah Quiz), BadgesScreen/VM (badges),
+│                   #   GamificationViewModel (Home header),
 │                   #   SettingsScreen (dark mode, language, download all)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + daily alarm/notification
+│                   #   + StreakReminderReceiver (optional streak reminder)
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (per-ayah reading history, JSON filesDir),
 │                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
+│                   #   Achievements (13-badge catalog + pure evaluator),
+│                   #   GamificationStore/Hub/Events (XP, level, streak, celebrations),
 │                   #   AyahSearch (normalized Arabic + translation search),
 │                   #   Reciter (everyayah reciters + 0.5×–1.25× audio speed),
 │                   #   AyahOfTheDayManager (daily ayah selection + cache)
@@ -230,7 +256,10 @@ Pure JVM tests for `TajwidEngine`, `TranscriptAligner` (Levenshtein),
 (daily ayah selection: index boundaries, cross-surah mapping, determinism),
 the **Vocabulary** engine (`VocabularyEngine`: SRS + quiz), **Dream BIG**
 (`DreamBigGame`: random rounds + stars), **Learn Arabic** (`LughohParser`/
-`LughohEngine`: random sessions, option shuffling, word arrangement), and all
+`LughohEngine`: random sessions, option shuffling, word arrangement), the
+**Ayah Quiz** (`AyatQuiz`/`SurahQuiz`: Complete-the-Ayah & Guess-the-Surah),
+the **gamification** system (`GamificationStore`: level/streak/todayXp;
+`Achievements`: badge catalog & unlock evaluator), and all
 *progress stores* (`ReadingStatsStore`, `VocabularyStatsStore`,
 `DreamBigProgressStore`, `LughohProgressStore`):
 
