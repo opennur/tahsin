@@ -116,23 +116,22 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 4: Materi Dream BIG (penuh)
-        HomeMenuCard(
-            text = strings.menuDreamBig,
-            onClick = onOpenDreamBig,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        // Baris 4: Dream BIG + Belajar Arab (dua kartu setengah)
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.menuDreamBig,
+                onClick = onOpenDreamBig,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.menuLughoh,
+                onClick = onOpenLughoh,
+                modifier = Modifier.weight(1f),
+            )
+        }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 5: Belajar Arab (penuh)
-        HomeMenuCard(
-            text = strings.menuLughoh,
-            onClick = onOpenLughoh,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Baris 6: Pengaturan (penuh, disorot)
+        // Baris 5: Pengaturan (penuh, disorot)
         HomeMenuCard(
             text = strings.menuSettings,
             onClick = onOpenSettings,

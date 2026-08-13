@@ -7,26 +7,16 @@ import com.tahsin.app.util.AppLanguage
 import kotlin.random.Random
 
 /**
- * Aturan main game "Dream BIG" — murni JVM, tanpa Context, bisa di-unit-test.
- * Satu level = satu ronde kuis kosakata (10 soal) dari kolam kata level itu.
+ * Aturan main game "Dream BIG" (mode arcade) — murni JVM, tanpa Context,
+ * bisa di-unit-test. Satu ronde = 10 soal kuis kosakata yang DIACAK dari
+ * seluruh kosakata terkurasi — tanpa level/unlock, bisa dimainkan terus.
  */
 object DreamBigGame {
 
     /** Jumlah soal per ronde. */
-    const val QUESTIONS_PER_LEVEL = 10
+    const val QUESTIONS_PER_ROUND = 10
 
-    /** Skor minimum untuk dianggap lulus (bintang ≥ 1). */
-    const val PASS_SCORE = 4
-
-    /** Petakan kunci level → entri terkurasi (kunci hilang/arti kosong dilewati). */
-    fun wordsFor(level: DreamBigLevel, entries: List<VocabEntry>): List<VocabEntry> {
-        val byKey = entries.associateBy { it.key }
-        return level.wordKeys.mapNotNull { key ->
-            byKey[key]?.takeIf { it.meaningId.isNotBlank() && it.meaningEn.isNotBlank() }
-        }
-    }
-
-    /** Ambil [count] target unik dari kolam (urutan acak deterministik via [random]). */
+    /** Ambil [count] target unik dari kolam (urutan acak via [random]). */
     fun pickTargets(pool: List<VocabEntry>, count: Int, random: Random): List<VocabEntry> =
         pool.shuffled(random).take(count)
 
@@ -53,11 +43,4 @@ object DreamBigGame {
             else -> 0
         }
     }
-
-    /**
-     * Level [day] terbuka bila day == 1, atau day-1 sudah selesai
-     * (ada di [completedDays]).
-     */
-    fun unlocked(day: Int, completedDays: Set<Int>): Boolean =
-        day <= 1 || (day - 1) in completedDays
 }

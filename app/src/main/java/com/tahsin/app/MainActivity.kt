@@ -123,6 +123,7 @@ class MainActivity : ComponentActivity() {
                         viewModel = tahsinViewModel,
                         onOpenSearch = { push(AppScreen.Search) },
                         onOpenSettings = { push(AppScreen.Settings) },
+                        onBack = { pop() },
                         target = target,
                         onTargetConsumed = { target = null },
                     )
@@ -134,9 +135,6 @@ class MainActivity : ComponentActivity() {
                     )
                     AppScreen.Stats -> StatsScreen(
                         onBack = { pop() },
-                        onOpenAyah = { s, a ->
-                            target = OpenTarget(s, a, targetDelivery++)
-                        },
                     )
                     AppScreen.Search -> SearchScreen(
                         onBack = { pop() },
@@ -145,7 +143,10 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                     AppScreen.Quiz -> TajwidQuizScreen(onBack = { pop() })
-                    AppScreen.AudioManager -> AudioManagerScreen(onBack = { pop() })
+                    AppScreen.AudioManager -> AudioManagerScreen(
+                        onBack = { pop() },
+                        onDownloadAll = tahsinViewModel::downloadAllAudio,
+                    )
                     AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
                     AppScreen.Lughoh -> LughohScreen(onBack = { pop() })
                     AppScreen.Settings -> SettingsScreen(

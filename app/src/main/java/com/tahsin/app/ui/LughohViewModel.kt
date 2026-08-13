@@ -14,8 +14,8 @@ import com.tahsin.app.data.lughoh.LughohRepository
 import com.tahsin.app.data.lughoh.RearrangeExercise
 import com.tahsin.app.data.lughoh.WordChip
 import com.tahsin.app.util.AppLanguage
-import com.tahsin.app.util.LughohProgress
 import com.tahsin.app.util.LughohProgressStore
+import com.tahsin.app.util.LughohStats
 import com.tahsin.app.util.SettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,34 +29,33 @@ import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 /** Mode layar "Belajar Arab". */
-enum class LughohMode { LEVELS, LESSON, EXERCISES }
+enum class LughohMode { HOME, LESSON, EXERCISES }
 
-/** Satu baris pelajaran di daftar (state tampilan). */
+/** Satu baris pelajaran di daftar materi (state tampilan). */
 data class LughohLessonUi(
     val id: String,
     val titleId: String,
     val titleAr: String,
-    val completed: Boolean,
 )
 
-/** Satu level di daftar + progres pelajaran yang sudah tuntas. */
+/** Satu level di daftar materi. */
 data class LughohLevelUi(
     val id: Int,
     val titleId: String,
     val titleAr: String,
     val lessons: List<LughohLessonUi>,
-) {
-    val completedCount: Int get() = lessons.count { it.completed }
-}
+)
 
 /** State layar Belajar Arab. */
 data class LughohUiState(
     val loading: Boolean = true,
     val language: AppLanguage = AppLanguage.ID,
-    val mode: LughohMode = LughohMode.LEVELS,
+    val mode: LughohMode = LughohMode.HOME,
     val levels: List<LughohLevelUi> = emptyList(),
+    /** Statistik arcade tersimpan (rekor & jumlah sesi). */
+    val stats: LughohStats = LughohStats(),
     val lesson: LughohLesson? = null,
-    // Sesi tadribat
+    // Sesi tadribat acak
     val exerciseIndex: Int = 0,
     val selected: String? = null,
     val correct: Boolean? = null,
@@ -79,9 +78,9 @@ data class LughohUiState(
 }
 
 /**
- * Belajar Bahasa Arab (metodologi ala Durusul Lughoh): 3 level × 5 pelajaran,
- * tiap pelajaran punya dialog, kosakata, tata bahasa, dan latihan. Progres =
- * pelajaran yang tadribat-nya sudah dituntaskan ([LughohProgressStore]).
+ * Belajar Bahasa Arab (arcade): sesi latihan acak dari seluruh pelajaran —
+ * bisa dimainkan terus; materi (dialog/kosakata/tata bahasa) tetap bisa
+ * dibaca lewat browser level/pelajaran. Rekor tersimpan di [LughohProgressStore].
  */
 class LughohViewModel(
     private val repository: LughohRepository,
@@ -96,7 +95,7 @@ class LughohViewModel(
     private val random = Random.Default
 
     private var catalog: LughohCatalog = LughohCatalog(schemaVersion = 0, levels = emptyList())
-    private var progress: LughohProgress = LughohProgress()
+    private var stats: LughohStats = LughohStats()
     private var activeLessonId = ""
     private var exercises: List<Exercise> = emptyList()
 
@@ -104,16 +103,17 @@ class LughohViewModel(
         viewModelScope.launch {
             val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
                 ?: AppLanguage.ID
-            val (cat, prog) = withContext(Dispatchers.IO) {
+            val (cat, st) = withContext(Dispatchers.IO) {
                 repository.catalog() to progressStore.read()
             }
             catalog = cat
-            progress = prog
+            stats = st
             _state.update {
                 it.copy(
                     loading = false,
                     language = language,
-                    levels = toLevelUi(cat, prog),
+                    levels = toLevelUi(cat),
+                    stats = st,
                 )
             }
         }
@@ -121,7 +121,7 @@ class LughohViewModel(
 
     // ---- Navigasi ----
 
-    /** Buka detail pelajaran [lessonId] dari daftar. */
+    /** Buka detail pelajaran [lessonId] (materi saja, tanpa latihan). */
     fun openLesson(lessonId: String) {
         val lesson = catalog.levels.asSequence()
             .flatMap { it.lessons.asSequence() }
@@ -130,19 +130,23 @@ class LughohViewModel(
         _state.update { it.copy(mode = LughohMode.LESSON, lesson = lesson) }
     }
 
-    /** Kembali ke daftar level/pelajaran. */
-    fun backToLevels() {
-        _state.update { it.copy(mode = LughohMode.LEVELS, lesson = null) }
+    /** Kembali ke halaman awal (arcade + browser materi). */
+    fun backToHome() {
+        _state.update { it.copy(mode = LughohMode.HOME, lesson = null) }
     }
 
-    // ---- Sesi latihan ----
+    // ---- Sesi latihan acak ----
 
-    /** Mulai sesi tadribat pelajaran aktif. */
-    fun startExercises() {
-        val lesson = _state.value.lesson ?: return
-        exercises = lesson.tadribat
-        if (exercises.isEmpty()) return
-        val first = exercises.first()
+    /** Mulai sesi latihan acak: [LughohEngine.SESSION_SIZE] latihan dari semua pelajaran. */
+    fun startRandomExercises() {
+        val s = _state.value
+        val allLessons = catalog.levels.flatMap { it.lessons }
+        val session = LughohEngine.buildRandomSession(allLessons, LughohEngine.SESSION_SIZE, random)
+        if (session.isEmpty()) return
+        // activeLessonId dipakai sebagai wadah sesi (bukan materi).
+        activeLessonId = "random"
+        exercises = session
+        val first = session.first()
         _state.update {
             it.copy(
                 mode = LughohMode.EXERCISES,
@@ -154,7 +158,7 @@ class LughohViewModel(
                 } else emptyList(),
                 rearrangeTapped = emptyList(),
                 score = 0,
-                total = exercises.size,
+                total = session.size,
                 exercisesDone = false,
             )
         }
@@ -176,11 +180,7 @@ class LughohViewModel(
         }
     }
 
-    /**
-     * Ketuk kata (indeks di [LughohUiState.rearrangeShown]) pada latihan
-     * menyusun: tambah/hapus dari jawaban. Indeks, bukan kata, supaya aman
-     * untuk kata yang sama muncul dua kali.
-     */
+    /** Ketuk kata (indeks di [LughohUiState.rearrangeShown]) pada latihan menyusun. */
     fun tapRearrangeChip(index: Int) {
         val s = _state.value
         val ex = s.exercise as? RearrangeExercise ?: return
@@ -212,7 +212,7 @@ class LughohViewModel(
         }
     }
 
-    /** Latihan berikutnya; latihan terakhir → tandai pelajaran selesai. */
+    /** Latihan berikutnya; latihan terakhir → simpan statistik + hasil. */
     fun next() {
         val s = _state.value
         if (s.correct == null) return // belum dinilai / double-tap
@@ -235,48 +235,43 @@ class LughohViewModel(
         }
     }
 
-    /** Semua latihan selesai → simpan progres pelajaran (IO + mutex). */
+    /** Semua latihan selesai → simpan statistik sesi (IO + mutex). */
     private fun finishExercises() {
-        val lessonId = activeLessonId
+        val s = _state.value
         viewModelScope.launch {
             val updated = progressMutex.withLock {
                 withContext(Dispatchers.IO) {
-                    progressStore.read().withCompleted(lessonId).also { progressStore.write(it) }
+                    progressStore.read().withRound(s.score).also { progressStore.write(it) }
                 }
             }
-            progress = updated
+            stats = updated
             _state.update {
-                it.copy(exercisesDone = true, levels = toLevelUi(catalog, updated))
+                it.copy(exercisesDone = true, stats = updated)
             }
         }
     }
 
-    /** Ulangi sesi tadribat yang barusan selesai. */
-    fun restartExercises() = startExercises()
+    /** Ulangi sesi latihan acak. */
+    fun restartExercises() = startRandomExercises()
 
-    /** Kembali ke detail pelajaran (dari hasil latihan). */
-    fun backToLesson() {
-        _state.update { it.copy(mode = LughohMode.LESSON, correct = null, exercisesDone = false) }
-    }
+    /** Kembali ke halaman awal (dari hasil sesi). */
+    fun backToLesson() = backToHome()
 
-    private fun toLevelUi(
-        catalog: LughohCatalog,
-        progress: LughohProgress,
-    ): List<LughohLevelUi> = catalog.levels.map { level ->
-        LughohLevelUi(
-            id = level.id,
-            titleId = level.titleId,
-            titleAr = level.titleAr,
-            lessons = level.lessons.map { lesson ->
-                LughohLessonUi(
-                    id = lesson.id,
-                    titleId = lesson.titleId,
-                    titleAr = lesson.titleAr,
-                    completed = progress.isCompleted(lesson.id),
-                )
-            },
-        )
-    }
+    private fun toLevelUi(catalog: LughohCatalog): List<LughohLevelUi> =
+        catalog.levels.map { level ->
+            LughohLevelUi(
+                id = level.id,
+                titleId = level.titleId,
+                titleAr = level.titleAr,
+                lessons = level.lessons.map { lesson ->
+                    LughohLessonUi(
+                        id = lesson.id,
+                        titleId = lesson.titleId,
+                        titleAr = lesson.titleAr,
+                    )
+                },
+            )
+        }
 }
 
 /** Factory manual DI (tanpa Hilt) — pola sama seperti fitur lain. */

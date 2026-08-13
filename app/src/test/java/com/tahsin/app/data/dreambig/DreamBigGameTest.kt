@@ -4,33 +4,17 @@ import com.tahsin.app.data.vocab.VocabEntry
 import com.tahsin.app.util.AppLanguage
 import kotlin.random.Random
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Tes aturan main game Dream BIG (murni JVM). */
+/** Tes aturan main game Dream BIG (arcade, murni JVM). */
 class DreamBigGameTest {
 
     private fun entry(key: String, meaning: String, freq: Int = 1) = VocabEntry(
         key = key, word = key, translit = "t", meaningId = meaning, meaningEn = "en:$meaning",
         freq = freq,
     )
-
-    private fun level(vararg keys: String) = DreamBigLevel(day = 1, title = "Day 1", wordKeys = keys.toList())
-
-    // ---- wordsFor ----
-
-    @Test
-    fun `wordsFor - kunci terpetakan, hilang atau arti kosong dilewati`() {
-        val entries = listOf(
-            entry("من", "dari"),
-            entry("قال", "berkata"),
-            entry("skeleton", ""), // arti kosong → dilewati
-        )
-        val words = DreamBigGame.wordsFor(level("من", "قال", "missing", "skeleton"), entries)
-        assertEquals(listOf("من", "قال"), words.map { it.key })
-    }
 
     // ---- pickTargets ----
 
@@ -45,6 +29,14 @@ class DreamBigGameTest {
         assertEquals(10, a.size)
         assertEquals(10, a.distinct().size)
         assertTrue(a.all { it in pool })
+    }
+
+    @Test
+    fun `pickTargets - bekerja di seluruh kolam (tanpa level)`() {
+        val pool = (1..589).map { entry("k$it", "arti$it") }
+        val a = DreamBigGame.pickTargets(pool, DreamBigGame.QUESTIONS_PER_ROUND, Random(7))
+        assertEquals(DreamBigGame.QUESTIONS_PER_ROUND, a.size)
+        assertEquals(a.size, a.distinct().size)
     }
 
     // ---- question ----
@@ -84,16 +76,5 @@ class DreamBigGameTest {
         assertEquals(0, DreamBigGame.stars(3, 10))
         assertEquals(0, DreamBigGame.stars(0, 10))
         assertEquals(0, DreamBigGame.stars(0, 0)) // tidak crash
-    }
-
-    // ---- unlocked ----
-
-    @Test
-    fun `unlocked - day 1 bebas, berikutnya butuh lulus hari sebelumnya`() {
-        assertTrue(DreamBigGame.unlocked(1, emptySet()))
-        assertFalse(DreamBigGame.unlocked(2, emptySet()))
-        assertTrue(DreamBigGame.unlocked(2, setOf(1)))
-        assertTrue(DreamBigGame.unlocked(5, setOf(4)))
-        assertFalse(DreamBigGame.unlocked(5, setOf(3))) // Day 4 belum lulus
     }
 }

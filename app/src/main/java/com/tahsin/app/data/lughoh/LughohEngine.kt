@@ -10,6 +10,31 @@ import kotlin.random.Random
  */
 object LughohEngine {
 
+    /** Jumlah latihan per sesi acak (arcade). */
+    const val SESSION_SIZE = 8
+
+    /**
+     * Sesi latihan acak (arcade): ambil [count] latihan unik dari SELURUH
+     * pelajaran lalu acak urutan opsi pilihan ganda agar posisi tidak dihafal.
+     */
+    fun buildRandomSession(
+        lessons: List<LughohLesson>,
+        count: Int,
+        random: Random = Random.Default,
+    ): List<Exercise> {
+        val all = lessons.flatMap { it.tadribat }
+        if (all.isEmpty()) return emptyList()
+        return all.shuffled(random).take(count).map { shuffleOptions(it, random) }
+    }
+
+    /** Salin latihan pilihan ganda dengan urutan opsi diacak (jawaban tetap). */
+    fun shuffleOptions(exercise: Exercise, random: Random): Exercise = when (exercise) {
+        is FillBlankExercise -> exercise.copy(options = exercise.options.shuffled(random))
+        is TranslateArIdExercise -> exercise.copy(options = exercise.options.shuffled(random))
+        is TranslateIdArExercise -> exercise.copy(options = exercise.options.shuffled(random))
+        is RearrangeExercise -> exercise // kata diacak saat tampil (shuffleRearrange)
+    }
+
     /** Apakah pilihan [selected] jawaban benar untuk latihan pilihan. */
     fun isChoiceCorrect(exercise: Exercise, selected: String): Boolean {
         val answer = when (exercise) {

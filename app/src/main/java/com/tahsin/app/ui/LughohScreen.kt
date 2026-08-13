@@ -57,9 +57,9 @@ import com.tahsin.app.ui.components.AyahText
 import com.tahsin.app.util.FontStore
 
 /**
- * Fitur "📚 Belajar Arab": 3 level × 5 pelajaran ala metodologi Durusul
- * Lughoh. Alur: daftar level/pelajaran → detail (Muhadatsah, Mufrodat,
- * Qawa'id, Tadribat) → sesi latihan tap-based → hasil + progres.
+ * Fitur "📚 Belajar Arab": latihan acak tak terbatas (arcade) dari seluruh
+ * pelajaran + browser materi (Muhadatsah/Mufrodat/Qawa'id) yang tetap bisa
+ * dibaca. Alur: HOME (arcade + materi) → LESSON (baca materi) / EXERCISES.
  */
 @Composable
 fun LughohScreen(
@@ -75,29 +75,29 @@ fun LughohScreen(
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
         when {
             state.loading -> AyahLoadingView(message = strings.lughohLoading)
-            state.mode == LughohMode.LEVELS -> LughohLevelsView(
+            state.mode == LughohMode.HOME -> LughohHomeView(
                 state = state,
                 strings = strings,
                 onBack = onBack,
+                onStart = viewModel::startRandomExercises,
                 onOpenLesson = viewModel::openLesson,
             )
             state.mode == LughohMode.LESSON -> LughohLessonView(
                 state = state,
                 strings = strings,
-                onBack = viewModel::backToLevels,
-                onStartExercises = viewModel::startExercises,
+                onBack = viewModel::backToHome,
                 arabicFamily = arabicFamily,
             )
             else -> LughohExercisesView(
                 state = state,
                 strings = strings,
-                onBack = viewModel::backToLesson,
+                onBack = viewModel::backToHome,
                 onAnswer = viewModel::answerChoice,
                 onTapChip = viewModel::tapRearrangeChip,
                 onCheckRearrange = viewModel::checkRearrange,
                 onNext = viewModel::next,
                 onRestart = viewModel::restartExercises,
-                onBackToLesson = viewModel::backToLesson,
+                onBackToHome = viewModel::backToHome,
                 arabicFamily = arabicFamily,
             )
         }
@@ -105,14 +105,15 @@ fun LughohScreen(
 }
 
 // ---------------------------------------------------------------------------
-// Daftar level & pelajaran
+// Halaman awal: kartu latihan acak + browser materi
 // ---------------------------------------------------------------------------
 
 @Composable
-private fun LughohLevelsView(
+private fun LughohHomeView(
     state: LughohUiState,
     strings: Strings,
     onBack: () -> Unit,
+    onStart: () -> Unit,
     onOpenLesson: (String) -> Unit,
 ) {
     Column(
@@ -142,6 +143,40 @@ private fun LughohLevelsView(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // ---- Kartu arcade: latihan acak ----
+        AyahCard(modifier = Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    AyahText(
+                        strings.lughohStartRandom,
+                        style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    AyahText(
+                        strings.lughohBestScore.format(
+                            state.stats.bestScore,
+                            LughohEngine.SESSION_SIZE,
+                        ),
+                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                    )
+                    AyahText(
+                        strings.lughohSessionsPlayed.format(state.stats.roundsPlayed),
+                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                    )
+                }
+                AyahButton(text = "▶", variant = AyahButtonVariant.Outline, onClick = onStart)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // ---- Browser materi ----
+        AyahText(
+            strings.lughohMaterialTitle,
+            style = AyahTypography.Heading2,
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+
         if (state.levels.isEmpty()) {
             AyahText(
                 strings.lughohEmpty,
@@ -152,9 +187,7 @@ private fun LughohLevelsView(
                 LevelSection(
                     titleId = level.titleId,
                     titleAr = level.titleAr,
-                    progress = "${level.completedCount}/${level.lessons.size}",
                     lessons = level.lessons,
-                    strings = strings,
                     onOpenLesson = onOpenLesson,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -168,36 +201,28 @@ private fun LughohLevelsView(
 private fun LevelSection(
     titleId: String,
     titleAr: String,
-    progress: String,
     lessons: List<LughohLessonUi>,
-    strings: Strings,
     onOpenLesson: (String) -> Unit,
 ) {
     AyahCard {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                AyahText(
-                    titleId,
-                    style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
-                )
-                AyahText(
-                    titleAr,
-                    style = AyahTypography.ArabicWord.copy(
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 14.sp,
-                        color = AyahColors.TextSecondary,
-                    ),
-                )
-            }
+        Column {
             AyahText(
-                "$progress ${strings.lughohCompleted}",
-                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                titleId,
+                style = AyahTypography.Body1.copy(fontWeight = FontWeight.SemiBold),
             )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        lessons.forEach { lesson ->
-            LessonRow(lesson = lesson, strings = strings, onClick = { onOpenLesson(lesson.id) })
-            Spacer(modifier = Modifier.height(6.dp))
+            AyahText(
+                titleAr,
+                style = AyahTypography.ArabicWord.copy(
+                    fontFamily = FontFamily.Serif,
+                    fontSize = 14.sp,
+                    color = AyahColors.TextSecondary,
+                ),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            lessons.forEach { lesson ->
+                LessonRow(lesson = lesson, onClick = { onOpenLesson(lesson.id) })
+                Spacer(modifier = Modifier.height(6.dp))
+            }
         }
     }
 }
@@ -205,7 +230,6 @@ private fun LevelSection(
 @Composable
 private fun LessonRow(
     lesson: LughohLessonUi,
-    strings: Strings,
     onClick: () -> Unit,
 ) {
     Row(
@@ -218,7 +242,7 @@ private fun LessonRow(
             .padding(horizontal = 12.dp, vertical = 10.dp),
     ) {
         AyahText(
-            if (lesson.completed) "✅" else "📖",
+            "📖",
             style = AyahTypography.Body1,
         )
         Spacer(modifier = Modifier.width(10.dp))
@@ -240,7 +264,7 @@ private fun LessonRow(
 }
 
 // ---------------------------------------------------------------------------
-// Detail pelajaran: Muhadatsah, Mufrodat, Qawa'id, Tadribat
+// Detail materi pelajaran: Muhadatsah, Mufrodat, Qawa'id
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -248,7 +272,6 @@ private fun LughohLessonView(
     state: LughohUiState,
     strings: Strings,
     onBack: () -> Unit,
-    onStartExercises: () -> Unit,
     arabicFamily: FontFamily,
 ) {
     val lesson = state.lesson ?: return
@@ -307,23 +330,6 @@ private fun LughohLessonView(
         lesson.qawaid.forEach { rule ->
             GrammarCard(rule = rule, arabicFamily = arabicFamily)
             Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 4. Tadribat
-        SectionHeader(strings.lughohSectionTadribat)
-        AyahCard {
-            AyahText(
-                strings.lughohTadribatHint,
-                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            AyahButton(
-                text = strings.lughohStartExercises,
-                onClick = onStartExercises,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -456,7 +462,7 @@ private fun GrammarCard(rule: GrammarRule, arabicFamily: FontFamily) {
 }
 
 // ---------------------------------------------------------------------------
-// Sesi latihan (tadribat)
+// Sesi latihan acak (tadribat)
 // ---------------------------------------------------------------------------
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -470,7 +476,7 @@ private fun LughohExercisesView(
     onCheckRearrange: () -> Unit,
     onNext: () -> Unit,
     onRestart: () -> Unit,
-    onBackToLesson: () -> Unit,
+    onBackToHome: () -> Unit,
     arabicFamily: FontFamily,
 ) {
     Column(
@@ -494,7 +500,7 @@ private fun LughohExercisesView(
         }
 
         if (state.exercisesDone) {
-            ExerciseResult(state = state, strings = strings, onRestart = onRestart, onBackToLesson = onBackToLesson)
+            ExerciseResult(state = state, strings = strings, onRestart = onRestart, onBackToHome = onBackToHome)
             return
         }
 
@@ -808,13 +814,13 @@ private fun ExerciseOption(
     }
 }
 
-/** Hasil sesi latihan: skor + aksi ulangi / kembali ke materi. */
+/** Hasil sesi latihan: skor + rekor + aksi ulangi / kembali. */
 @Composable
 private fun ExerciseResult(
     state: LughohUiState,
     strings: Strings,
     onRestart: () -> Unit,
-    onBackToLesson: () -> Unit,
+    onBackToHome: () -> Unit,
 ) {
     Spacer(modifier = Modifier.height(24.dp))
     AyahCard {
@@ -829,8 +835,8 @@ private fun ExerciseResult(
         )
         Spacer(modifier = Modifier.height(6.dp))
         AyahText(
-            strings.lughohLessonCompleted,
-            style = AyahTypography.Body2.copy(color = AyahColors.Success),
+            strings.lughohBestScore.format(state.stats.bestScore, state.total),
+            style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
         Spacer(modifier = Modifier.height(14.dp))
         AyahButton(
@@ -841,8 +847,8 @@ private fun ExerciseResult(
         )
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = strings.lughohBackToLesson,
-            onClick = onBackToLesson,
+            text = strings.lughohBackToHome,
+            onClick = onBackToHome,
             modifier = Modifier.fillMaxWidth(),
         )
     }

@@ -115,6 +115,7 @@ private fun IndeterminateBar() {
 @Composable
 fun AudioManagerScreen(
     onBack: () -> Unit,
+    onDownloadAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -223,6 +224,13 @@ fun AudioManagerScreen(
                     AyahText(
                         strings.audioNoDownload,
                         style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    // Belum ada audio sama sekali → tawarkan unduh semua (qari' aktif).
+                    AyahButton(
+                        text = strings.audioDownloadAllCta.format(state.reciterLabel),
+                        onClick = onDownloadAll,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }

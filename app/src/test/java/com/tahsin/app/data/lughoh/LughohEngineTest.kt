@@ -107,4 +107,65 @@ class LughohEngineTest {
         // Di luar panjang jawaban.
         assertFalse(LughohEngine.isChipAtPositionCorrect(rearrange, correct[0], 99))
     }
+
+    // ---- Sesi acak (arcade) ----
+
+    private fun lessonOf(id: String, vararg exercises: Exercise) = LughohLesson(
+        id = id,
+        titleId = id,
+        titleAr = id,
+        muhadatsah = emptyList(),
+        mufrodat = emptyList(),
+        qawaid = emptyList(),
+        tadribat = exercises.toList(),
+    )
+
+    private fun answerOf(ex: Exercise): String = when (ex) {
+        is FillBlankExercise -> ex.answer
+        is TranslateArIdExercise -> ex.answer
+        is TranslateIdArExercise -> ex.answer
+        is RearrangeExercise -> ex.answer.joinToString(" ")
+    }
+
+    @Test
+    fun `sesi acak - jumlah sesuai, unik, jawaban berasal dari seluruh pelajaran`() {
+        val lessons = (1..5).map { n -> lessonOf("L$n", fillBlank, translate) }
+        val session = LughohEngine.buildRandomSession(lessons, 8, Random(3))
+        assertEquals(8, session.size)
+        assertEquals(8, session.distinct().size)
+        val poolAnswers = lessons.flatMap { it.tadribat }.map { answerOf(it) }
+        // Opsi diacak → latihan sesi adalah salinan, jadi cocokkan lewat jawaban.
+        assertTrue(session.all { answerOf(it) in poolAnswers })
+    }
+
+    @Test
+    fun `sesi acak - count melebihi kolam berarti ambil semua, pelajaran kosong berarti kosong`() {
+        val lessons = listOf(lessonOf("L1", fillBlank, translate, rearrange))
+        assertEquals(3, LughohEngine.buildRandomSession(lessons, 99, Random(1)).size)
+        assertEquals(0, LughohEngine.buildRandomSession(emptyList(), 8, Random(1)).size)
+    }
+
+    @Test
+    fun `sesi acak - deterministik per random (seed sama hasil sama)`() {
+        val lessons = (1..5).map { n -> lessonOf("L$n", fillBlank, translate, rearrange) }
+        val a = LughohEngine.buildRandomSession(lessons, 8, Random(42))
+        val b = LughohEngine.buildRandomSession(lessons, 8, Random(42))
+        assertEquals(a, b)
+    }
+
+    @Test
+    fun `acak opsi - jawaban tetap, isi opsi sama, urutan bisa berubah`() {
+        val shuffled = LughohEngine.shuffleOptions(fillBlank, Random(9)) as FillBlankExercise
+        assertEquals(fillBlank.answer, shuffled.answer)
+        assertEquals(fillBlank.options.toSet(), shuffled.options.toSet())
+        assertTrue(
+            fillBlank.options != shuffled.options ||
+                fillBlank.options.zip(shuffled.options).any { it.first != it.second },
+        )
+    }
+
+    @Test
+    fun `acak opsi - latihan menyusun kata tidak diubah`() {
+        assertEquals(rearrange, LughohEngine.shuffleOptions(rearrange, Random(5)))
+    }
 }

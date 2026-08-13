@@ -96,6 +96,8 @@ fun TahsinScreen(
     onOpenSearch: () -> Unit = {},
     /** Buka layar Pengaturan (ikon ⚙ di header). */
     onOpenSettings: () -> Unit = {},
+    /** Kembali ke layar sebelumnya (tombol ← di header). */
+    onBack: () -> Unit = {},
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     target: OpenTarget? = null,
     /** Dipanggil setelah [target] dikirim ke ViewModel — target hanya dipakai sekali. */
@@ -156,6 +158,7 @@ fun TahsinScreen(
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onOpenSearch = onOpenSearch,
             onOpenSettings = onOpenSettings,
+            onBack = onBack,
             modifier = modifier,
         )
     }
@@ -177,6 +180,7 @@ private fun TahsinContent(
     onToggleAudioPlayback: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val ayah = state.ayah
@@ -243,9 +247,16 @@ private fun TahsinContent(
         ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ---- Header: judul + pencarian + pengaturan (⚙) ----
+        // ---- Header: kembali + judul + pencarian + pengaturan (⚙) ----
         // Mode gelap & bahasa kini di layar Pengaturan (bukan drawer).
         Row(verticalAlignment = Alignment.CenterVertically) {
+            AyahButton(
+                text = "←",
+                variant = AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                onClick = onBack,
+            )
+            Spacer(modifier = Modifier.width(10.dp))
             AyahText(
                 strings.appTitle,
                 style = AyahTypography.Heading1,

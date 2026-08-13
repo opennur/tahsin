@@ -3,13 +3,12 @@ package com.tahsin.app.util
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.nio.file.Files
 
-/** Tes penyimpanan progres Belajar Arab — file di direktori temp. */
+/** Tes penyimpanan statistik arcade Belajar Arab — file di direktori temp. */
 class LughohProgressStoreTest {
 
     private lateinit var dir: File
@@ -29,32 +28,36 @@ class LughohProgressStoreTest {
     private fun store() = LughohProgressStore(file)
 
     @Test
-    fun `read - file belum ada - progres default kosong`() {
+    fun `read - file belum ada - statistik default kosong`() {
         val p = store().read()
-        assertTrue(p.completedLessonIds.isEmpty())
-        assertFalse(p.isCompleted("1-1"))
+        assertEquals(0, p.bestScore)
+        assertEquals(0, p.roundsPlayed)
     }
 
     @Test
     fun `write & read - roundtrip lintas instance`() {
-        store().write(LughohProgress(completedLessonIds = setOf("1-1", "2-3")))
-        val p = store().read()
-        assertEquals(setOf("1-1", "2-3"), p.completedLessonIds)
-        assertTrue(p.isCompleted("2-3"))
-        assertFalse(p.isCompleted("3-5"))
+        store().write(LughohStats(bestScore = 7, roundsPlayed = 4))
+        assertEquals(LughohStats(bestScore = 7, roundsPlayed = 4), store().read())
         assertFalse(file.readText().isBlank())
     }
 
     @Test
-    fun `withCompleted - menambah tanpa menghapus yang lain`() {
-        val p = LughohProgress(completedLessonIds = setOf("1-1")).withCompleted("1-2").withCompleted("1-1")
-        assertEquals(setOf("1-1", "1-2"), p.completedLessonIds)
+    fun `withRound - skor terbaik & jumlah sesi bertambah`() {
+        val p = LughohStats().withRound(6).withRound(9).withRound(5)
+        assertEquals(9, p.bestScore)
+        assertEquals(3, p.roundsPlayed)
+    }
+
+    @Test
+    fun `read - file lama format pelajaran selesai dibaca sebagai default`() {
+        // File era pelajaran: {"completedLessonIds":["1-1"]} — field tak dikenal diabaikan.
+        file.writeText("""{"completedLessonIds":["1-1","2-3"]}""")
+        assertEquals(LughohStats(), store().read())
     }
 
     @Test
     fun `read - file rusak - default (tidak crash)`() {
         file.writeText("bukan json{{{")
-        val p = store().read()
-        assertTrue(p.completedLessonIds.isEmpty())
+        assertEquals(LughohStats(), store().read())
     }
 }

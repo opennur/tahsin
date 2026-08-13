@@ -5,21 +5,24 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
 
-/** Progres fitur "Belajar Arab": id pelajaran yang sudah dituntaskan. */
-data class LughohProgress(
-    val completedLessonIds: Set<String> = emptySet(),
+/** Statistik mode arcade "Belajar Arab": rekor & jumlah sesi latihan acak. */
+data class LughohStats(
+    val bestScore: Int = 0,
+    val roundsPlayed: Int = 0,
 ) {
-    fun isCompleted(lessonId: String): Boolean = lessonId in completedLessonIds
-
-    fun withCompleted(lessonId: String): LughohProgress =
-        copy(completedLessonIds = completedLessonIds + lessonId)
+    /** Gabungkan hasil satu sesi latihan (skor terbaik, sesi +1). */
+    fun withRound(score: Int): LughohStats = copy(
+        bestScore = maxOf(bestScore, score),
+        roundsPlayed = roundsPlayed + 1,
+    )
 }
 
 /**
- * Penyimpanan persisten progres Belajar Arab.
- * Format: satu file JSON di `filesDir/lughoh-progress.json` ([LughohProgress]).
+ * Penyimpanan persisten statistik Belajar Arab (arcade).
+ * Format: satu file JSON di `filesDir/lughoh-progress.json` ([LughohStats]).
  * Tanpa Room — konsisten dengan arsitektur proyek (Gson + filesDir, pola
- * [DreamBigProgressStore]). Ditulis atomik (temp → rename).
+ * [DreamBigProgressStore]). Ditulis atomik (temp → rename). File lama berisi
+ * `completedLessonIds` (era pelajaran selesai) dibaca sebagai default.
  */
 class LughohProgressStore internal constructor(private val file: File) {
 
@@ -28,22 +31,22 @@ class LughohProgressStore internal constructor(private val file: File) {
     )
 
     private val gson = Gson()
-    private val progressType = object : TypeToken<LughohProgress>() {}.type
+    private val statsType = object : TypeToken<LughohStats>() {}.type
 
-    /** Keadaan saat ini; file rusak/kosong → default (progres kosong). */
-    fun read(): LughohProgress = synchronized(this) {
+    /** Keadaan saat ini; file rusak/kosong → default (semua 0). */
+    fun read(): LughohStats = synchronized(this) {
         runCatching {
-            if (!file.exists()) LughohProgress()
-            else gson.fromJson<LughohProgress>(file.readText(), progressType) ?: LughohProgress()
-        }.getOrDefault(LughohProgress())
+            if (!file.exists()) LughohStats()
+            else gson.fromJson<LughohStats>(file.readText(), statsType) ?: LughohStats()
+        }.getOrDefault(LughohStats())
     }
 
     /** Simpan keadaan penuh (atomik: temp → rename). */
-    fun write(progress: LughohProgress) {
+    fun write(stats: LughohStats) {
         synchronized(this) {
             runCatching {
                 val tmp = File(file.parentFile, "${file.name}.tmp")
-                tmp.writeText(gson.toJson(progress))
+                tmp.writeText(gson.toJson(stats))
                 if (!tmp.renameTo(file)) {
                     // rename gagal (mis. file tujuan ada di sistem lain) — fallback.
                     if (file.exists()) file.delete()
