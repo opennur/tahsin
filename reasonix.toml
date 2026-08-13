@@ -5,3 +5,6 @@
 [sandbox]
 bash = "off"
 network = true
+
+[permissions]
+allow = ["Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && sed -n '1,60p' app/src/main/java/com/tahsin/app/ui/OpenTarget.kt 2>/dev/null; echo \"===AppStrings===\"; grep -n \"val appTitle\\|val subtitle\\|val menuVocab\\|val menuStats\\|val menuQuiz\\|val menuAudio\\|val menuDownloadAll\\|val settingsTitle\\|val sectionMenu\\|val search\" app/src/main/java/com/tahsin/app/ui/AppStrings.kt | head -30", "Bash=cd /data/data/com.termux/files/home/AyahOfTheDay && grep -rn \"data class OpenTarget\" app/src/main/java/ ; echo \"===\"; grep -n \"^fun TahsinScreen\" app/src/main/java/com/tahsin/app/ui/TahsinScreen.kt; sed -n \"$(grep -n '^fun TahsinScreen' app/src/main/java/com/tahsin/app/ui/TahsinScreen.kt | cut -d: -f1),+25p\" app/src/main/java/com/tahsin/app/ui/TahsinScreen.kt"]

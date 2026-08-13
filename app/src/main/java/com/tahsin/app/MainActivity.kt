@@ -6,18 +6,33 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTheme
+import com.tahsin.app.ui.AppStrings
 import com.tahsin.app.ui.AudioManagerScreen
+import com.tahsin.app.ui.HomeScreen
 import com.tahsin.app.ui.OpenTarget
 import com.tahsin.app.ui.SearchScreen
+import com.tahsin.app.ui.SettingsScreen
 import com.tahsin.app.ui.StatsScreen
 import com.tahsin.app.ui.TahsinScreen
+import com.tahsin.app.ui.TahsinViewModel
 import com.tahsin.app.ui.TajwidQuizScreen
 import com.tahsin.app.ui.VocabularyScreen
+import com.tahsin.app.ui.components.BackgroundPromptDialog
+import com.tahsin.app.ui.components.DownloadNoticeDialog
+import com.tahsin.app.ui.navigation.AppScreen
+import com.tahsin.app.ui.tahsinViewModelFactory
+import com.tahsin.app.util.SettingsStore
 import com.tahsin.app.widget.AyahOfTheDayAlarm
 
 class MainActivity : ComponentActivity() {
@@ -28,15 +43,16 @@ class MainActivity : ComponentActivity() {
         const val EXTRA_TARGET_AYAH = "target_ayah"
     }
 
-    /** Target buka (surah, ayat 1-based) — state Compose agar onNewIntent ikut recompose. */
+    /**
+     * Target buka (surah, ayat 1-based) — dari widget/notifikasi maupun layar
+     * sekunder (statistik/pencarian/kosakata). Dikonsumsi layar Tahsin sekali
+     * lewat [TahsinScreen.onTargetConsumed], jadi tidak terkirim ulang saat
+     * Tahsin dibuka lagi dari portal.
+     */
     private var target by mutableStateOf<OpenTarget?>(null)
 
     /** Counter pengiriman target: naik tiap deep link valid → key LaunchedEffect unik. */
     private var targetDelivery = 0L
-
-    /** Target buka ayat dari layar sekunder (statistik/pencarian) — dikonsumsi
-     * saat deep link widget/notifikasi baru datang (onNewIntent). */
-    private var pendingOpenTarget by mutableStateOf<OpenTarget?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,53 +62,113 @@ class MainActivity : ComponentActivity() {
         // Alarm harian (widget & notifikasi) tetap jalan meski user tak pernah
         // menambah widget — cukup pernah membuka aplikasi.
         AyahOfTheDayAlarm.scheduleDaily(this)
+        // Portal & layar lain ikut mode gelap sejak awal (bukan nunggu Tahsin dimuat).
+        AyahColors.isDark = SettingsStore(this).darkMode
         target = readTarget(intent)
         setContent {
             AyahTheme {
-                var showAudioManager by remember { mutableStateOf(false) }
-                var showStats by remember { mutableStateOf(false) }
-                var showSearch by remember { mutableStateOf(false) }
-                var showQuiz by remember { mutableStateOf(false) }
-                var showVocab by remember { mutableStateOf(false) }
-                // Tombol back sistem kembali ke layar utama (bukan menutup aplikasi).
-                BackHandler(enabled = showAudioManager || showStats || showSearch || showQuiz || showVocab) {
-                    showAudioManager = false
-                    showStats = false
-                    showSearch = false
-                    showQuiz = false
-                    showVocab = false
+                // ViewModel bersama (scope activity): setelan dipakai portal,
+                // layar Tahsin, dan layar Pengaturan — satu sumber kebenaran.
+                val context = LocalContext.current
+                val tahsinViewModel: TahsinViewModel = viewModel(factory = tahsinViewModelFactory(context))
+                val settingsState by tahsinViewModel.settingsState.collectAsStateWithLifecycle()
+
+                // Back stack layar: Home selalu di dasar; layar lain di-push/pop.
+                // Disimpan lewat rememberSaveable agar rotasi tidak melompat ke Home.
+                val stackSaver = listSaver<List<AppScreen>, String>(
+                    save = { it.map { s -> s.tag } },
+                    restore = { tags -> tags.map { AppScreen.fromTag(it) } },
+                )
+                var stack by rememberSaveable(stateSaver = stackSaver) {
+                    mutableStateOf(listOf<AppScreen>(AppScreen.Home))
                 }
-                when {
-                    showAudioManager -> AudioManagerScreen(onBack = { showAudioManager = false })
-                    showStats -> StatsScreen(
-                        onBack = { showStats = false },
+
+                fun push(screen: AppScreen) {
+                    // Jangan menumpuk layar yang sama di puncak (mis. double-tap kartu).
+                    if (stack.last() != screen) stack = stack + screen
+                }
+
+                fun pop() {
+                    if (stack.size > 1) stack = stack.dropLast(1)
+                }
+
+                // Deep link (widget/notifikasi) & target dari layar sekunder:
+                // pastikan Tahsin ada di puncak tumpukan dengan target terbaru
+                // (Tahsin yang lama diganti, sisanya dipertahankan).
+                LaunchedEffect(target) {
+                    target?.let {
+                        stack = stack.filterNot { s -> s == AppScreen.Tahsin } + AppScreen.Tahsin
+                    }
+                }
+
+                // Tombol back sistem = pop satu layar; di Home keluar aplikasi.
+                BackHandler(enabled = stack.size > 1) { pop() }
+
+                when (val current = stack.last()) {
+                    AppScreen.Home -> HomeScreen(
+                        onOpenTahsin = { push(AppScreen.Tahsin) },
+                        onOpenVocab = { push(AppScreen.Vocab) },
+                        onOpenQuiz = { push(AppScreen.Quiz) },
+                        onOpenStats = { push(AppScreen.Stats) },
+                        onOpenSearch = { push(AppScreen.Search) },
+                        onOpenAudioManager = { push(AppScreen.AudioManager) },
+                        onOpenSettings = { push(AppScreen.Settings) },
+                        settings = settingsState,
+                    )
+                    AppScreen.Tahsin -> TahsinScreen(
+                        viewModel = tahsinViewModel,
+                        onOpenSearch = { push(AppScreen.Search) },
+                        onOpenSettings = { push(AppScreen.Settings) },
+                        target = target,
+                        onTargetConsumed = { target = null },
+                    )
+                    AppScreen.Vocab -> VocabularyScreen(
+                        onBack = { pop() },
                         onOpenAyah = { s, a ->
-                            pendingOpenTarget = OpenTarget(s, a, targetDelivery++)
-                            showStats = false
+                            target = OpenTarget(s, a, targetDelivery++)
                         },
                     )
-                    showSearch -> SearchScreen(
-                        onBack = { showSearch = false },
+                    AppScreen.Stats -> StatsScreen(
+                        onBack = { pop() },
                         onOpenAyah = { s, a ->
-                            pendingOpenTarget = OpenTarget(s, a, targetDelivery++)
-                            showSearch = false
+                            target = OpenTarget(s, a, targetDelivery++)
                         },
                     )
-                    showQuiz -> TajwidQuizScreen(onBack = { showQuiz = false })
-                    showVocab -> VocabularyScreen(
-                        onBack = { showVocab = false },
+                    AppScreen.Search -> SearchScreen(
+                        onBack = { pop() },
                         onOpenAyah = { s, a ->
-                            pendingOpenTarget = OpenTarget(s, a, targetDelivery++)
-                            showVocab = false
+                            target = OpenTarget(s, a, targetDelivery++)
                         },
                     )
-                    else -> TahsinScreen(
-                        onOpenAudioManager = { showAudioManager = true },
-                        onOpenStats = { showStats = true },
-                        onOpenSearch = { showSearch = true },
-                        onOpenQuiz = { showQuiz = true },
-                        onOpenVocab = { showVocab = true },
-                        target = pendingOpenTarget ?: target,
+                    AppScreen.Quiz -> TajwidQuizScreen(onBack = { pop() })
+                    AppScreen.AudioManager -> AudioManagerScreen(onBack = { pop() })
+                    AppScreen.Settings -> SettingsScreen(
+                        onBack = { pop() },
+                        settings = settingsState,
+                        onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
+                        onToggleFlowMode = tahsinViewModel::toggleFlowMode,
+                        onToggleDarkMode = tahsinViewModel::toggleDarkMode,
+                        onSetLanguage = tahsinViewModel::setLanguage,
+                        onSetReciter = tahsinViewModel::setReciter,
+                        onSetSpeed = tahsinViewModel::setAudioSpeed,
+                        onToggleAyahOfDay = tahsinViewModel::toggleAyahOfDay,
+                        onDownloadAll = tahsinViewModel::downloadAllAudio,
+                    )
+                }
+
+                // Dialog unduhan global — bisa dipicu dari Tahsin (tombol Dengar)
+                // maupun Pengaturan (Unduh Semua), tampil di layar mana pun.
+                val strings = AppStrings.of(settingsState.language)
+                if (settingsState.showDownloadNotice) {
+                    DownloadNoticeDialog(
+                        strings = strings,
+                        onDismiss = tahsinViewModel::dismissDownloadNotice,
+                    )
+                }
+                if (settingsState.showBackgroundPrompt) {
+                    BackgroundPromptDialog(
+                        strings = strings,
+                        onSetBackgroundAllowed = tahsinViewModel::setBackgroundDownloadAllowed,
                     )
                 }
             }
@@ -102,9 +178,8 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        // Deep link baru (widget/notifikasi) menang atas target layar sekunder
-        // yang belum sempat dipakai — biar ketukan widget tidak diabaikan.
-        pendingOpenTarget = null
+        // Deep link baru (widget/notifikasi) menggantikan target lama yang
+        // belum sempat dipakai — biar ketukan widget tidak diabaikan.
         target = readTarget(intent)
     }
 

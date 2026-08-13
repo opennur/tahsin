@@ -120,6 +120,23 @@ data class OpenTarget(
     val deliveryId: Long,
 )
 
+/** State setelan ringkas lintas layar — tidak bergantung data mushaf. Dipakai
+ * portal Home & layar Pengaturan; disinkronkan dari [TahsinUiState.Ready]. */
+data class SettingsUiState(
+    val language: AppLanguage = AppLanguage.ID,
+    val darkMode: Boolean = false,
+    val tajwidColor: Boolean = true,
+    val flowMode: Boolean = false,
+    val reciter: Reciter = Reciter.MINSHAWY,
+    val audioSpeed: Float = 1.0f,
+    val ayahOfDayEnabled: Boolean = true,
+    val isDownloading: Boolean = false,
+    val downloadDone: Int = 0,
+    val downloadTotal: Int = 0,
+    val showDownloadNotice: Boolean = false,
+    val showBackgroundPrompt: Boolean = false,
+)
+
 class TahsinViewModel(
     private val app: Context,
     private val repository: QuranRepository,
@@ -133,6 +150,21 @@ class TahsinViewModel(
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
     val uiState: StateFlow<TahsinUiState> = _uiState.asStateFlow()
+
+    /** State setelan lintas layar (portal Home & Pengaturan) — diinisialisasi
+     * dari penyimpanan, lalu disinkronkan via [syncSettings] tiap state berubah. */
+    private val _settingsState = MutableStateFlow(
+        SettingsUiState(
+            language = currentLanguage(),
+            darkMode = settings.darkMode,
+            tajwidColor = settings.tajwidColor,
+            flowMode = settings.flowMode,
+            reciter = settings.reciter,
+            audioSpeed = settings.audioSpeed,
+            ayahOfDayEnabled = settings.ayahOfDayEnabled,
+        ),
+    )
+    val settingsState: StateFlow<SettingsUiState> = _settingsState.asStateFlow()
 
     /** Unduhan aktif per surah (mendukung beberapa surah sekaligus). */
     private val activeDownloads = java.util.concurrent.ConcurrentHashMap<Int, Job>()
@@ -187,6 +219,7 @@ class TahsinViewModel(
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: "Gagal memuat mushaf.")
         }
+        syncSettings()
         // Unduh font default (Utsmani/Amiri) otomatis kalau file belum ada.
         val activeFont = ArabicFont.UTSMANI
         if (activeFont.downloadUrl != null && !fontStore.fileExists(activeFont)) {
@@ -204,7 +237,7 @@ class TahsinViewModel(
     /** Tutup petunjuk geser (persisten — tidak muncul lagi setelah restart). */
     fun dismissSwipeHint() {
         settings.swipeHintDismissed = true
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showSwipeHint = false) }
+        updateReady { it.copy(showSwipeHint = false) }
     }
 
     // ---- navigasi surah/ayat ----
@@ -221,7 +254,7 @@ class TahsinViewModel(
     private fun navigateToSurah(number: Int) {
         settings.surahNumber = number
         settings.ayahIndex = 0
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+        updateReady { it.copy(
             surahNumber = number,
             ayahIndex = 0,
             loadingSurah = true,
@@ -262,7 +295,7 @@ class TahsinViewModel(
         val index = s.ayahIndex.coerceIn(0, (surah.ayahs.size - 1).coerceAtLeast(0))
         if (index != s.ayahIndex) settings.ayahIndex = index
         val ayah = surah.ayahs.getOrNull(index)
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+        updateReady { it.copy(
             loadingSurah = false,
             surahs = it.surahs.map { x -> if (x.number == surah.number) surah else x },
             ayahIndex = index,
@@ -303,7 +336,7 @@ class TahsinViewModel(
         settings.ayahIndex = index
         val s = currentReady() ?: return
         val ayahNumber = index + 1 // nomor ayat 1-based
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+        updateReady { it.copy(
             ayahIndex = index,
             ayahStats = null,
             transcript = "",
@@ -339,11 +372,12 @@ class TahsinViewModel(
         }
     }
 
-    /** Nyalakan/matikan notifikasi harian "Ayah of the Day" (toggle di drawer). */
+    /** Nyalakan/matikan notifikasi harian "Ayah of the Day" (toggle di Pengaturan). */
     fun toggleAyahOfDay() {
         val next = !settings.ayahOfDayEnabled
         settings.ayahOfDayEnabled = next
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(ayahOfDayEnabled = next) }
+        _settingsState.update { it.copy(ayahOfDayEnabled = next) }
+        updateReady { it.copy(ayahOfDayEnabled = next) }
     }
 
     // ---- mic / STT ----
@@ -362,7 +396,7 @@ class TahsinViewModel(
 
     private fun startListeningSession(words: List<String>) {
         autoAdvanceHandled = false
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+        updateReady { it.copy(
             listening = true,
             transcript = "",
             alignedWords = emptyList(),
@@ -379,26 +413,26 @@ class TahsinViewModel(
             }
             override fun onError(message: String) {
                 autoAdvanceHandled = true
-                _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+                updateReady { it.copy(
                     listening = false,
                     message = message,
                 ) }
             }
 
             override fun onListeningChanged(listening: Boolean) {
-                _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(listening = listening) }
+                updateReady { it.copy(listening = listening) }
             }
         })
     }
 
     // ---- mode flow (muroja'ah): lanjut otomatis kalau satu ayat selesai benar ----
 
-    /** Aktifkan/nonaktifkan mode flow. */
+    /** Aktifkan/nonaktifkan mode flow. Persisten walau Tahsin belum siap. */
     fun toggleFlowMode() {
-        val s = currentReady() ?: return
-        val next = !s.flowMode
+        val next = !settings.flowMode
         settings.flowMode = next
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(flowMode = next) }
+        _settingsState.update { it.copy(flowMode = next) }
+        updateReady { it.copy(flowMode = next) }
     }
 
     // ---- qari' & kecepatan audio ----
@@ -406,14 +440,16 @@ class TahsinViewModel(
     /** Ganti qari' (perawi) audio ayat; berlaku untuk unduhan & pemutaran berikutnya. */
     fun setReciter(reciter: Reciter) {
         settings.reciterSlug = reciter.slug
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(reciter = reciter) }
+        _settingsState.update { it.copy(reciter = reciter) }
+        updateReady { it.copy(reciter = reciter) }
     }
 
     /** Ganti kecepatan pemutaran; langsung berlaku kalau sedang memutar. */
     fun setAudioSpeed(speed: Float) {
         settings.audioSpeed = speed
         audioPlayer.applySpeed(speed)
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(audioSpeed = settings.audioSpeed) }
+        _settingsState.update { it.copy(audioSpeed = settings.audioSpeed) }
+        updateReady { it.copy(audioSpeed = settings.audioSpeed) }
     }
 
     /**
@@ -598,7 +634,7 @@ class TahsinViewModel(
                     rules = rulesFor(w.index, words),
                 )
             }
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+        updateReady { it.copy(
             transcript = text,
             alignedWords = aligned,
             issues = issues,
@@ -618,23 +654,23 @@ class TahsinViewModel(
         val s = currentReady() ?: return
         val words = s.ayah?.words ?: return
         if (index < 0 || index !in words.indices) {
-            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+            updateReady { it.copy(
                 selectedWordIndex = null,
                 selectedWordRules = emptyList(),
             ) }
             return
         }
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+        updateReady { it.copy(
             selectedWordIndex = index,
             selectedWordRules = rulesFor(index, words),
         ) }
     }
 
     fun toggleTajwidColor() {
-        val s = currentReady() ?: return
-        val next = !s.tajwidColor
+        val next = !settings.tajwidColor
         settings.tajwidColor = next
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(tajwidColor = next) }
+        _settingsState.update { it.copy(tajwidColor = next) }
+        updateReady { it.copy(tajwidColor = next) }
     }
 
     // ---- audio: unduh per surah (progress di footer, multi-surah) ----
@@ -644,7 +680,7 @@ class TahsinViewModel(
         val surah = s.surah ?: return
         if (surah.ayahs.isEmpty() || s.ayah == null) return
         if (!downloader.isSurahAudioComplete(surah)) {
-            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = true) }
+            updateReady { it.copy(showDownloadNotice = true) }
         }
         startSurahDownloadIfNeeded(surah) { playAyahNow() }
     }
@@ -728,7 +764,7 @@ class TahsinViewModel(
     /** Tanya dulu (sekali) atau langsung nyalakan service sesuai keputusan tersimpan. */
     private fun maybePromptBackground() {
         when (settings.backgroundDownloadAllowed) {
-            null -> _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showBackgroundPrompt = true) }
+            null -> updateReady { it.copy(showBackgroundPrompt = true) }
             true -> ensureBackgroundService()
             false -> Unit
         }
@@ -742,7 +778,7 @@ class TahsinViewModel(
     /** Jawaban prompt izin unduhan latar belakang. */
     fun setBackgroundDownloadAllowed(allowed: Boolean) {
         settings.backgroundDownloadAllowed = allowed
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showBackgroundPrompt = false) }
+        updateReady { it.copy(showBackgroundPrompt = false) }
         if (allowed) ensureBackgroundService()
     }
 
@@ -774,7 +810,7 @@ class TahsinViewModel(
         if (ayah.words.getOrNull(idx) == null) return
         val surah = s.surah ?: return
         if (!downloader.isSurahAudioComplete(surah)) {
-            _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = true) }
+            updateReady { it.copy(showDownloadNotice = true) }
         }
         startSurahDownloadIfNeeded(surah) { playWordNow(idx) }
     }
@@ -820,7 +856,7 @@ class TahsinViewModel(
 
     /** Tutup popup keterangan unduhan. */
     fun dismissDownloadNotice() {
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(showDownloadNotice = false) }
+        updateReady { it.copy(showDownloadNotice = false) }
     }
 
     /** Unduh audio SEMUA surah (isi surah dimuat dari cache/equran.id). */
@@ -887,21 +923,21 @@ class TahsinViewModel(
     // ---- preferensi font & tema ----
 
     fun toggleDarkMode() {
-        val s = currentReady() ?: return
-        val next = !s.darkMode
+        val next = !settings.darkMode
         AyahColors.isDark = next
         settings.darkMode = next
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(darkMode = next) }
+        _settingsState.update { it.copy(darkMode = next) }
+        updateReady { it.copy(darkMode = next) }
     }
 
     // ---- pesan & helper ----
 
     fun showMessage(msg: String) {
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(message = msg) }
+        updateReady { it.copy(message = msg) }
     }
 
     fun clearMessage() {
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(message = null) }
+        updateReady { it.copy(message = null) }
     }
 
     // ---- bahasa ----
@@ -910,12 +946,13 @@ class TahsinViewModel(
     private fun currentLanguage(): AppLanguage =
         AppLanguage.entries.firstOrNull { it.code == settings.languageCode } ?: AppLanguage.ID
 
-    /** Ganti bahasa aplikasi & terjemahan; muat ulang isi surah aktif. */
+    /** Ganti bahasa aplikasi & terjemahan; muat ulang isi surah aktif kalau sudah siap. */
     fun setLanguage(lang: AppLanguage) {
         if (lang == currentLanguage()) return
         settings.languageCode = lang.code
+        _settingsState.update { it.copy(language = lang) }
         val s = currentReady() ?: return
-        _uiState.update { (it as? TahsinUiState.Ready ?: return).copy(
+        updateReady { it.copy(
             language = lang,
             loadingSurah = true,
             message = null,
@@ -929,6 +966,26 @@ class TahsinViewModel(
     private fun updateReady(transform: (TahsinUiState.Ready) -> TahsinUiState.Ready) {
         val current = _uiState.value as? TahsinUiState.Ready ?: return
         _uiState.value = transform(current)
+        syncSettings()
+    }
+
+    /** Sinkronkan [settingsState] dari state mushaf terbaru. */
+    private fun syncSettings() {
+        val s = currentReady() ?: return
+        _settingsState.value = SettingsUiState(
+            language = s.language,
+            darkMode = s.darkMode,
+            tajwidColor = s.tajwidColor,
+            flowMode = s.flowMode,
+            reciter = s.reciter,
+            audioSpeed = s.audioSpeed,
+            ayahOfDayEnabled = s.ayahOfDayEnabled,
+            isDownloading = s.isDownloading,
+            downloadDone = s.downloadDone,
+            downloadTotal = s.downloadTotal,
+            showDownloadNotice = s.showDownloadNotice,
+            showBackgroundPrompt = s.showBackgroundPrompt,
+        )
     }
 
     override fun onCleared() {

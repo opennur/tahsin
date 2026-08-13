@@ -9,6 +9,12 @@ import com.tahsin.app.util.AppLanguage
 data class Strings(
     val appTitle: String,
     val subtitle: String,
+    /** Subjudul portal (layar utama). */
+    val homeSubtitle: String,
+    /** Label kartu menu "Tahsin" di portal. */
+    val menuTahsin: String,
+    /** Label kartu menu "Pengaturan" di portal. */
+    val menuSettings: String,
     val legendCorrect: String,
     val legendWrong: String,
     val legendReading: String,
@@ -44,7 +50,6 @@ data class Strings(
     val menuQuiz: String,
     val menuAudio: String,
     val menuDownloadAll: String,
-    val closeDrawerHint: String,
     val swipeHint: String,
     val credit: String,
     val downloadNoticeTitle: String,
@@ -162,6 +167,9 @@ object AppStrings {
     val Indonesian = Strings(
         appTitle = "Tahsin Qur'an",
         subtitle = "Setiap kata dicek langsung.",
+        homeSubtitle = "Pilih menu untuk mulai belajar.",
+        menuTahsin = "🕌 Tahsin",
+        menuSettings = "⚙️ Pengaturan",
         legendCorrect = "benar",
         legendWrong = "salah",
         legendReading = "dibaca",
@@ -197,7 +205,6 @@ object AppStrings {
         menuQuiz = "📝 Kuis",
         menuAudio = "🎵 Kelola Audio",
         menuDownloadAll = "📥 Unduh Semua",
-        closeDrawerHint = "Ketuk di luar drawer untuk menutup.",
         swipeHint = "Geser layar ke kiri/kanan untuk ganti ayat",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Mengunduh audio…",
@@ -304,6 +311,9 @@ object AppStrings {
     val English = Strings(
         appTitle = "Tahsin Qur'an",
         subtitle = "Every word is checked live.",
+        homeSubtitle = "Choose a menu to start learning.",
+        menuTahsin = "🕌 Tahsin",
+        menuSettings = "⚙️ Settings",
         legendCorrect = "correct",
         legendWrong = "wrong",
         legendReading = "reading",
@@ -339,7 +349,6 @@ object AppStrings {
         menuQuiz = "📝 Quiz",
         menuAudio = "🎵 Audio",
         menuDownloadAll = "📥 Download All",
-        closeDrawerHint = "Tap outside the drawer to close.",
         swipeHint = "Swipe the screen left/right to change ayah",
         credit = "Made with ❤️ by Lutfian Dwi Cahyono",
         downloadNoticeTitle = "Downloading audio…",
