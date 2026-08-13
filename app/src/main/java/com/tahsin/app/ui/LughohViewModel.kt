@@ -56,6 +56,7 @@ data class LughohUiState(
     val stats: LughohStats = LughohStats(),
     val lesson: LughohLesson? = null,
     // Sesi tadribat acak
+    val session: List<Exercise> = emptyList(),
     val exerciseIndex: Int = 0,
     val selected: String? = null,
     val correct: Boolean? = null,
@@ -65,8 +66,8 @@ data class LughohUiState(
     val total: Int = 0,
     val exercisesDone: Boolean = false,
 ) {
-    /** Latihan yang sedang tampil (null kalau sesi habis). */
-    val exercise: Exercise? get() = lesson?.tadribat?.getOrNull(exerciseIndex)
+    /** Latihan yang sedang tampil (dari sesi acak; null kalau sesi habis). */
+    val exercise: Exercise? get() = session.getOrNull(exerciseIndex)
 
     /** Apakah jawaban sudah lengkap sehingga bisa diperiksa/dinilai. */
     val answerReady: Boolean
@@ -96,8 +97,6 @@ class LughohViewModel(
 
     private var catalog: LughohCatalog = LughohCatalog(schemaVersion = 0, levels = emptyList())
     private var stats: LughohStats = LughohStats()
-    private var activeLessonId = ""
-    private var exercises: List<Exercise> = emptyList()
 
     init {
         viewModelScope.launch {
@@ -126,7 +125,6 @@ class LughohViewModel(
         val lesson = catalog.levels.asSequence()
             .flatMap { it.lessons.asSequence() }
             .firstOrNull { it.id == lessonId } ?: return
-        activeLessonId = lessonId
         _state.update { it.copy(mode = LughohMode.LESSON, lesson = lesson) }
     }
 
@@ -143,13 +141,11 @@ class LughohViewModel(
         val allLessons = catalog.levels.flatMap { it.lessons }
         val session = LughohEngine.buildRandomSession(allLessons, LughohEngine.SESSION_SIZE, random)
         if (session.isEmpty()) return
-        // activeLessonId dipakai sebagai wadah sesi (bukan materi).
-        activeLessonId = "random"
-        exercises = session
         val first = session.first()
         _state.update {
             it.copy(
                 mode = LughohMode.EXERCISES,
+                session = session,
                 exerciseIndex = 0,
                 selected = null,
                 correct = null,
@@ -212,15 +208,16 @@ class LughohViewModel(
         }
     }
 
-    /** Latihan berikutnya; latihan terakhir → simpan statistik + hasil. */
+    /** Latihan berikutnya; latihan terakhir → tandai selesai lalu simpan statistik. */
     fun next() {
         val s = _state.value
+        if (s.exercisesDone) return
         if (s.correct == null) return // belum dinilai / double-tap
         val nextIndex = s.exerciseIndex + 1
         if (nextIndex >= s.total) {
-            finishExercises()
+            finishExercises(s)
         } else {
-            val nextEx = exercises[nextIndex]
+            val nextEx = s.session.getOrNull(nextIndex) ?: return
             _state.update {
                 it.copy(
                     exerciseIndex = nextIndex,
@@ -235,19 +232,30 @@ class LughohViewModel(
         }
     }
 
-    /** Semua latihan selesai → simpan statistik sesi (IO + mutex). */
-    private fun finishExercises() {
-        val s = _state.value
+    /**
+     * Sesi selesai: transisi ke hasil dilakukan SINKRON (sebelum IO) supaya
+     * double-tap tidak menulis statistik dua kali; coroutine hanya menyimpan
+     * skor lalu memperbarui rekor di state.
+     */
+    private fun finishExercises(s: LughohUiState) {
+        val score = s.score
+        _state.update {
+            it.copy(
+                exercisesDone = true,
+                session = emptyList(),
+                exerciseIndex = 0,
+                selected = null,
+                correct = null,
+            )
+        }
         viewModelScope.launch {
             val updated = progressMutex.withLock {
                 withContext(Dispatchers.IO) {
-                    progressStore.read().withRound(s.score).also { progressStore.write(it) }
+                    progressStore.read().withRound(score).also { progressStore.write(it) }
                 }
             }
             stats = updated
-            _state.update {
-                it.copy(exercisesDone = true, stats = updated)
-            }
+            _state.update { it.copy(stats = updated) }
         }
     }
 

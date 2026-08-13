@@ -43,16 +43,17 @@ class DreamBigProgressStore internal constructor(private val file: File) {
         }.getOrDefault(DreamBigStats())
     }
 
-    /** Simpan keadaan penuh (atomik: temp → rename). */
+    /** Simpan keadaan penuh (atomik: temp → rename, fallback tulis langsung). */
     fun write(stats: DreamBigStats) {
         synchronized(this) {
             runCatching {
                 val tmp = File(file.parentFile, "${file.name}.tmp")
                 tmp.writeText(gson.toJson(stats))
                 if (!tmp.renameTo(file)) {
-                    // rename gagal (mis. file tujuan ada di sistem lain) — fallback.
-                    if (file.exists()) file.delete()
-                    tmp.renameTo(file)
+                    // rename gagal (mis. file tujuan ada di sistem lain) — fallback
+                    // tulis langsung; file temp dibersihkan supaya tidak nyangkut.
+                    file.writeText(gson.toJson(stats))
+                    tmp.delete()
                 }
             }
         }

@@ -176,7 +176,21 @@ class DreamBigViewModel(
         }
     }
 
+    /**
+     * Ronde selesai: transisi ke layar hasil dilakukan SINKRON (sebelum IO)
+     * supaya double-tap tidak menulis statistik dua kali dan tombol back
+     * tidak bisa ditimpa coroutine — coroutine hanya menyimpan rekor.
+     */
     private fun finishRound(q: DreamBigQuizUi) {
+        _state.update {
+            it.copy(
+                mode = DreamBigMode.RESULT,
+                quiz = null,
+                resultScore = q.score,
+                resultStars = DreamBigGame.stars(q.score, q.total),
+                resultBestStreak = q.bestStreak,
+            )
+        }
         viewModelScope.launch {
             val updated = progressMutex.withLock {
                 // Baca + tulis di IO: store.read() menyentuh disk.
@@ -185,16 +199,7 @@ class DreamBigViewModel(
                 }
             }
             stats = updated
-            _state.update {
-                it.copy(
-                    mode = DreamBigMode.RESULT,
-                    quiz = null,
-                    stats = updated,
-                    resultScore = q.score,
-                    resultStars = DreamBigGame.stars(q.score, q.total),
-                    resultBestStreak = q.bestStreak,
-                )
-            }
+            _state.update { it.copy(stats = updated) }
         }
     }
 
