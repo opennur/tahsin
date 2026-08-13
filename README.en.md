@@ -3,7 +3,9 @@
 An Android app for **muraja'ah & Qur'an reading practice**: a mushaf in the
 original Uthmani script, real-time recitation scoring via microphone, tajwid
 letter coloring, per-ayah + per-word qari audio, and a **flow mode** for
-continuous muraja'ah without looking at the screen.
+continuous muraja'ah without looking at the screen — plus **Qur'an & Arabic
+learning tracks**: Vocabulary, Tajweed Quiz, the **Dream BIG** game (arcade),
+and the **Learn Arabic** course (Durusul Lughoh-style methodology).
 
 > ⚠️ **Honest limitations** — this app is a practice aid, **not a substitute for a teacher**.
 > STT (speech-to-text) only reads the *text* of what you say: it can catch skipped
@@ -13,30 +15,48 @@ continuous muraja'ah without looking at the screen.
 
 ## Features
 
+- 🧭 **Main menu** (home screen): every feature is opened from a menu card —
+  **Tahsin**, **Vocabulary**, **Tajweed Quiz**, **Statistics**, **Search**,
+  **Audio Manager**, **Dream BIG**, **Learn Arabic**, and **Settings**.
 - 📖 **Authentic mushaf style** — connected script, RTL layout, all 114 surahs,
   **offline by default** (Arabic + ID/EN translations bundled into the APK).
 - 🎙️ **Real-time scoring**: words turn green (correct) / red (wrong) / yellow
   (currently being read) as you recite into the microphone (SpeechRecognizer `ar-SA`).
-- 📊 **Statistics & error history** (persistent): every final recitation result is
-  stored per ayah — score (0–100), number of attempts, and the **frequently
-  wrong/missed words** (from `TranscriptAligner`). The **Statistics & History**
-  screen (⚙ drawer) shows a global summary plus "frequently wrong words" per
-  surah; tap a word to jump straight to that ayah to fix it. The main screen
-  shows a quick line "N× attempted · best score M%".
-- 🎨 **Tajwid colors** (on by default, toggleable in the drawer): mad (red),
+- 📊 **Aggregate statistics across all challenges** (persistent): the
+  **Statistics** screen aggregates all activity — Tahsin (per-ayah score 0–100
+  & attempt count), **Dream BIG** (rounds & best score), **Learn Arabic**
+  (sessions & best score), and **Vocabulary** (words mastered). Summary:
+  **Total Sessions, Best Score %, Total Rounds, Words Mastered** + a per-feature
+  breakdown. The Tahsin main screen still shows the quick line "N× attempted ·
+  best score M%".
+- 🎨 **Tajwid colors** (on by default, toggleable in Settings): mad (red),
   ghunnah (green), qalqalah (blue), ikhfa' (gray), iqlab (purple), idgham (orange),
   lam jalalah (teal).
 - 🧠 **Full tajwid engine + quiz**: on top of the existing mad wajib/jaiz and
   lam jalalah, the engine now detects **tafkhim/tarqiq** (isti'la letters & ra'),
   **mad badal/iwad/aridh lis-sukun**, and **mushaf waqaf signs** (مـ obligatory,
   لا don't stop, ج optional, صلي/قلي prefer continuing/stopping, ∴ paired) — shown
-  in the word panel & error list. **📝 Tajweed Quiz** (⚙ drawer) asks "what rule
+  in the word panel & error list. **📝 Tajweed Quiz** (Quiz menu) asks "what rule
   applies to this word?" from random words across the whole mushaf (4 multiple
   choice options, score, explanation) — for learning, not just coloring.
 - 🔁 **Flow Mode (muraja'ah)**: when an ayah is fully correct, it automatically
   advances to the next ayah and re-enables the mic; **double error sound + vibration**
   on mistakes, success beep when an ayah is completed — practice without looking
   at the screen.
+- 📖 **Qur'an Vocabulary** (Vocabulary menu): **589 curated words** from the
+  whole mushaf (VocabKey mirror) — word cards with meaning + example ayah, an
+  SRS system (new vs. due-for-review), a multiple-choice **quiz** mode, and a
+  jump straight to the example ayah.
+- 🎬 **Dream BIG** (Dream BIG menu, **arcade**): **endless** vocabulary quiz
+  rounds — 10 questions shuffled from the whole curated vocabulary every round;
+  best **score, streak, and rounds played** are persisted. No levels/unlocks,
+  keep playing.
+- 📚 **Learn Arabic** (Learn Arabic menu): a beginner Arabic course in the
+  Durusul Lughoh style — **15 original lessons** (3 levels: introductions &
+  daily life, activities, social life) with dialogue, vocabulary, and grammar.
+  Practice is an **endless random session** (8 questions drawn from all lessons,
+  shuffled options) with a best-score record; the material can still be browsed
+  via the level/lesson browser. 100% original content (no copied book material).
 - 👆 **Gestures**: **swipe** (mushaf, translation, or background) left/right to
   change ayah (RTL: right = next ayah); the swipe hint can be dismissed
   permanently with the ✕ button.
@@ -50,24 +70,25 @@ continuous muraja'ah without looking at the screen.
 - 🔍 **Word panel**: tap a word in the mushaf → tajwid rule + explanation + play
   the word audio; the button becomes **⏹ Stop** while the word is playing
   (separate from the "Listen to ayah" button — race-free).
-- 🔊 **Sample audio**: **choose a reciter** (⚙ drawer): Minshawy, Husary,
+- 🔊 **Sample audio**: **choose a reciter** (Settings menu): Minshawy, Husary,
   Husary Muallim, Abdul Basit, Alafasy, As-Sudais, Hudhaify (everyayah.com —
   ayah audio is stored per reciter in `filesDir/audio/<reciter>/`) + per-word
   audio (qurancdn wbw); **playback speed 0.5×–1.25×** for slow practice
   (applies live while playing). Downloaded in-app per surah / **all surahs**
-  (no estimate), with a **footer progress bar** + the name of the surah
-  currently downloading; background downloads (foreground service) after the
-  user grants permission.
+  (from Settings, or the "📥 Download All — Reciter" button in Audio Manager
+  when nothing is downloaded yet), with a **footer progress bar** + the name of
+  the surah currently downloading; background downloads (foreground service)
+  after the user grants permission.
 - 📂 **Downloaded-audio management**: size per surah, delete per surah / delete
   all (with confirmation), **live progress card** while a download is running,
   and a **list cache** — reopening the screen is instant with no re-scan.
-- 🌙 **Dark mode** (header button), **ID/EN language switch** (header button),
-  right drawer via ⚙ for other settings.
+- 🌙 **Dark mode** & **ID/EN language switch** via the **Settings** menu; every
+  screen has a back (←) button at the top left.
 - 🗓️ **"Ayah of the Day" widget + notification** — one ayah that changes daily
   (deterministic per date, offline from the bundled assets). The home-screen
   widget is compact: translation only; the notification shows Arabic + translation.
   Tapping the widget/notification opens the app right at that ayah; daily updates
-  via AlarmManager (+ reschedule on boot), toggleable in the settings drawer.
+  via AlarmManager (+ reschedule on boot), toggleable in the Settings menu.
 - 🔤 **Uthmani script (Amiri)** — font bundled into the APK, renders immediately
   with no download.
 
@@ -90,7 +111,7 @@ The same ayah for every user throughout the day, automatically changing tomorrow
   device restart (`BOOT_COMPLETED`).
 - **Tapping the widget/notification** opens the app right at that surah/ayah
   (deep link via Intent extras; safe to trigger repeatedly, rotation-safe).
-- **Toggle** "🗓️ Daily Notification" in the ⚙ drawer (on by default; on
+- **Toggle** "🗓️ Daily Notification" in the Settings menu (on by default; on
   Android 13+ the notification permission is requested when turning it on).
 
 ## Architecture & stack
@@ -107,15 +128,23 @@ app/src/main/java/com/tahsin/app/
 ├── data/quran/     # Surah/Ayah models + repository (asset bundle → cache → equran.id)
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (color spans)
 │                   #   + TajwidQuiz ("what rule applies to this word?" quiz)
+├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
+│                   #   (589 curated words → assets/quran/vocab.json)
+├── data/dreambig/  # DreamBigGame (arcade rounds); legacy Models/Parser/Repository
+│                   #   (level/transcript era) = dead code kept on purpose
+├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 original lessons
+│                   #   → assets/lughoh/lessons.json; random practice sessions)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
-├── ui/             # TahsinScreen, TahsinViewModel, AudioManagerScreen(+VM),
-│                   #   StatsScreen + StatsViewModel (statistics & history),
-│                   #   SearchScreen + SearchViewModel (ayah search),
-│                   #   TajwidQuizScreen + VM (tajweed rule quiz)
+├── ui/             # TahsinScreen/VM, AudioManagerScreen/VM, StatsScreen/VM
+│                   #   (aggregate statistics across all challenges),
+│                   #   SearchScreen/VM, TajwidQuizScreen/VM, VocabularyScreen/VM,
+│                   #   DreamBigScreen/VM (arcade), LughohScreen/VM (arcade),
+│                   #   SettingsScreen (dark mode, language, download all)
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + daily alarm/notification
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
 │                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
 │                   #   ReadingStatsStore (per-ayah reading history, JSON filesDir),
+│                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
 │                   #   AyahSearch (normalized Arabic + translation search),
 │                   #   Reciter (everyayah reciters + 0.5×–1.25× audio speed),
 │                   #   AyahOfTheDayManager (daily ayah selection + cache)
@@ -143,6 +172,25 @@ Output is written to `app/src/main/assets/`:
 
 Without these scripts the app still works (on-demand download + cache in
 `filesDir/`), it just needs internet the first time you open a surah/font.
+
+### Learning-content pipelines (`tools/`)
+
+The learning features' content is **authored from scratch (original)** via
+Python scripts and bundled into the APK — re-run them when content changes:
+
+```bash
+python3 tools/build_vocab.py       # 589 curated words → assets/quran/vocab.json
+python3 tools/build_lughoh.py      # 15 Learn Arabic lessons → assets/lughoh/lessons.json
+                                   #   (10 validation rules; --level N for per-level check)
+```
+
+- `tools/lughoh-schema.md` — schema & validation rules for the Learn Arabic data
+  (vocab words must appear in the dialogue, grammar examples from the dialogue, etc.).
+- `tools/curate_vocab.py`, `tools/vocab_roots.py` — word curation & root analysis.
+- `tools/scrape_dreambig.py`, `tools/dreambig_levels.py` — legacy Dream BIG
+  pipeline (level + YouTube transcript era). **No longer used** since Dream BIG
+  became arcade without levels/transcripts; the scripts and transcript assets
+  (`assets/dreambig/transcripts/`) are kept in the repo.
 
 ## Build (Termux)
 
@@ -178,9 +226,13 @@ sdkmanager "platforms;android-35"
 ### Unit tests
 
 Pure JVM tests for `TajwidEngine`, `TranscriptAligner` (Levenshtein),
-`ArabicNormalizer`, `QuranParser` (mushaf JSON parsing, extracted from
-`QuranRepository` so it can be tested without Android), and `AyahOfTheDayManager`
-(daily ayah selection: index boundaries, cross-surah mapping, determinism):
+`ArabicNormalizer`, `QuranParser` (mushaf JSON parsing), `AyahOfTheDayManager`
+(daily ayah selection: index boundaries, cross-surah mapping, determinism),
+the **Vocabulary** engine (`VocabularyEngine`: SRS + quiz), **Dream BIG**
+(`DreamBigGame`: random rounds + stars), **Learn Arabic** (`LughohParser`/
+`LughohEngine`: random sessions, option shuffling, word arrangement), and all
+*progress stores* (`ReadingStatsStore`, `VocabularyStatsStore`,
+`DreamBigProgressStore`, `LughohProgressStore`):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon
@@ -221,7 +273,7 @@ keyPassword=secret
 - `VIBRATE` — vibration on recitation errors (muraja'ah feedback).
 - `INTERNET` — audio downloads (mushaf content is bundled).
 - `POST_NOTIFICATIONS` — background-download notifications + the daily
-  "Ayah of the Day" notification (requested when enabling the drawer toggle).
+  "Ayah of the Day" notification (requested when enabling the Settings toggle).
 - `WAKE_LOCK`, `FOREGROUND_SERVICE` (+ `FOREGROUND_SERVICE_DATA_SYNC`) —
   background downloads while the screen is off, after the user grants permission
   via the prompt.
