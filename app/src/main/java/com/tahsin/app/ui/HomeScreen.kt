@@ -45,6 +45,7 @@ fun HomeScreen(
     onOpenStats: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenAudioManager: () -> Unit,
+    onOpenDreamBig: () -> Unit,
     onOpenSettings: () -> Unit,
     settings: SettingsUiState,
     modifier: Modifier = Modifier,
@@ -114,7 +115,15 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 4: Pengaturan (penuh, disorot)
+        // Baris 4: Materi Dream BIG (penuh)
+        HomeMenuCard(
+            text = strings.menuDreamBig,
+            onClick = onOpenDreamBig,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Baris 5: Pengaturan (penuh, disorot)
         HomeMenuCard(
             text = strings.menuSettings,
             onClick = onOpenSettings,

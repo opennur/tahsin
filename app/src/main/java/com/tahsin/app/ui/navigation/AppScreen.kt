@@ -15,6 +15,7 @@ sealed interface AppScreen {
     data object Stats : AppScreen
     data object Search : AppScreen
     data object AudioManager : AppScreen
+    data object DreamBig : AppScreen
     data object Settings : AppScreen
 
     /** Tag unik per layar (dipakai rememberSaveable untuk rotasi layar). */
@@ -30,6 +31,7 @@ sealed interface AppScreen {
             "Stats" -> Stats
             "Search" -> Search
             "AudioManager" -> AudioManager
+            "DreamBig" -> DreamBig
             "Settings" -> Settings
             else -> Home
         }

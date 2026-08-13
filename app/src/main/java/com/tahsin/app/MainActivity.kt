@@ -19,6 +19,7 @@ import com.tahsin.app.theme.AyahColors
 import com.tahsin.app.theme.AyahTheme
 import com.tahsin.app.ui.AppStrings
 import com.tahsin.app.ui.AudioManagerScreen
+import com.tahsin.app.ui.DreamBigScreen
 import com.tahsin.app.ui.HomeScreen
 import com.tahsin.app.ui.OpenTarget
 import com.tahsin.app.ui.SearchScreen
@@ -112,6 +113,7 @@ class MainActivity : ComponentActivity() {
                         onOpenStats = { push(AppScreen.Stats) },
                         onOpenSearch = { push(AppScreen.Search) },
                         onOpenAudioManager = { push(AppScreen.AudioManager) },
+                        onOpenDreamBig = { push(AppScreen.DreamBig) },
                         onOpenSettings = { push(AppScreen.Settings) },
                         settings = settingsState,
                     )
@@ -142,6 +144,7 @@ class MainActivity : ComponentActivity() {
                     )
                     AppScreen.Quiz -> TajwidQuizScreen(onBack = { pop() })
                     AppScreen.AudioManager -> AudioManagerScreen(onBack = { pop() })
+                    AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
                     AppScreen.Settings -> SettingsScreen(
                         onBack = { pop() },
                         settings = settingsState,
