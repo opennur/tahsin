@@ -22,7 +22,6 @@ sealed interface AppScreen {
     data object Wonders : AppScreen
     data object Favorites : AppScreen
     data object Settings : AppScreen
-
     /** Tag unik per layar (dipakai rememberSaveable untuk rotasi layar). */
     val tag: String get() = javaClass.simpleName
 

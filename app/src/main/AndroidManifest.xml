@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <!-- Reschedule alarm harian "Ayah of the Day" setelah perangkat restart -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Alarm eksak harian (notifikasi/widget); fallback ke alarm tidak eksak
+         kalau izin tidak diberikan (Android 12+). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:allowBackup="true"

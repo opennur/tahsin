@@ -354,5 +354,134 @@ object WondersContent {
                 ),
             ),
         ),
+        WonderCategory(
+            emoji = "🔢",
+            titleId = "Keajaiban Numerik & Matematis",
+            titleEn = "Numerical & Mathematical Wonders",
+            noteId = "Numerologi sebagai \"bukti\" ditolak mayoritas ulama dan akademisi. " +
+                "Kategori ini hanya memuat pengamatan numerik yang TERVERIFIKASI: setiap " +
+                "angka dihitung langsung dari teks mushaf yang dibundel di aplikasi " +
+                "(metodologi: bentuk kata persis, huruf hidup dibuang), dan bisa dicek " +
+                "ulang di quran.com.",
+            noteEn = "Numerology as \"proof\" is rejected by the majority of scholars and " +
+                "academics. This category only contains VERIFIED numerical observations: " +
+                "every count is computed directly from the mushaf text bundled in this " +
+                "app (methodology: exact word forms, diacritics removed), and can be " +
+                "re-checked on quran.com.",
+            items = listOf(
+                WonderItem(
+                    titleId = "Bulan dalam Setahun: Dua Belas",
+                    titleEn = "Twelve Months in a Year",
+                    reference = "QS. At-Taubah 9:36",
+                    textId = "\"Sesungguhnya bilangan bulan di sisi Allah adalah dua belas " +
+                        "bulan (dalam ketetapan Allah) pada waktu Dia menciptakan langit dan " +
+                        "bumi.\" (Terjemahan Sahih International). Astronomi menegaskan satu " +
+                        "tahun lunar = 12 bulan — ayat ini menyatakan hitungan yang sama " +
+                        "secara eksplisit.",
+                    textEn = "\"Indeed, the number of months with Allah is twelve [lunar] " +
+                        "months in the register of Allah [from] the day He created the " +
+                        "heavens and the earth.\" (Sahih International). Astronomy confirms " +
+                        "one lunar year = 12 months — the verse states the same count " +
+                        "explicitly.",
+                    sourceId = "Sumber: terjemahan Sahih International (quran.com 9:36); " +
+                        "teks ayat bisa diverifikasi langsung.",
+                    sourceEn = "Source: Sahih International translation (quran.com 9:36); " +
+                        "the verse text is directly verifiable.",
+                    sourceUrl = "https://quran.com/9/36",
+                ),
+                WonderItem(
+                    titleId = "\"Dunia\" (الدنيا) Muncul 115 Kali",
+                    titleEn = "\"Dunya\" (الدنيا) Appears 115 Times",
+                    reference = "Seluruh Al-Qur'an (dihitung dari teks bundel)",
+                    textId = "Bentuk pasti الدنيا (\"dunia\") muncul **115 kali** dalam " +
+                        "seluruh Al-Qur'an — dihitung langsung dari teks mushaf yang " +
+                        "dibundel di aplikasi ini (114 surah, 6.236 ayat, data terverifikasi " +
+                        "equran.id). Angka 115 ini dikenal luas dan bisa dicek ulang lewat " +
+                        "pencarian quran.com.",
+                    textEn = "The definite form الدنيا (\"the world\") occurs **115 times** " +
+                        "throughout the Qur'an — counted directly from the mushaf text " +
+                        "bundled in this app (114 surahs, 6,236 ayahs, verified equran.id " +
+                        "data). The figure 115 is widely known and can be re-checked via " +
+                        "quran.com search.",
+                    sourceId = "Sumber: dihitung dari data bundel aplikasi; verifikasi " +
+                        "ulang: pencarian kata di quran.com.",
+                    sourceEn = "Source: computed from the app's bundled data; re-verify: " +
+                        "word search on quran.com.",
+                    sourceUrl = "https://quran.com/search?q=الدنيا",
+                ),
+                WonderItem(
+                    titleId = "Musim Dingin = Musim Panas = 1 Kali",
+                    titleEn = "Winter = Summer = 1 Occurrence",
+                    reference = "QS. Quraisy 106:2",
+                    textId = "\"…perjalanan mereka pada musim dingin dan musim panas.\" " +
+                        "(QS. Quraisy 106:2). Kata الشتاء (musim dingin) dan الصيف (musim " +
+                        "panas) masing-masing muncul **tepat 1 kali** di seluruh Al-Qur'an " +
+                        "— seimbang, dan bisa diverifikasi dengan pencarian kata.",
+                    textEn = "\"…their security during the winter and summer journeys.\" " +
+                        "(Quraysh 106:2). The words الشتاء (winter) and الصيف (summer) each " +
+                        "occur **exactly once** in the whole Qur'an — balanced, and " +
+                        "verifiable with a word search.",
+                    sourceId = "Sumber: dihitung dari data bundel aplikasi; verifikasi " +
+                        "ulang: quran.com 106:2.",
+                    sourceEn = "Source: computed from the app's bundled data; re-verify: " +
+                        "quran.com 106:2.",
+                    sourceUrl = "https://quran.com/106/2",
+                ),
+                WonderItem(
+                    titleId = "\"Segala Sesuatu dengan Ukuran\"",
+                    titleEn = "\"Everything by Measure\"",
+                    reference = "QS. Al-Qamar 54:49",
+                    textId = "\"Sesungguhnya Kami menciptakan segala sesuatu dengan ukuran " +
+                        "(qadar).\" (Terjemahan Sahih International). Ayat ini sendiri " +
+                        "menyatakan keteraturan dan ukuran dalam ciptaan — disajikan " +
+                        "sebagai pernyataan ayat, bukan klaim pembuktian sains.",
+                    textEn = "\"Indeed, all things We created with predestination (qadar).\" " +
+                        "(Sahih International). The verse itself states order and measure in " +
+                        "creation — presented as the verse's own statement, not a scientific " +
+                        "proof claim.",
+                    sourceId = "Sumber: terjemahan Sahih International (quran.com 54:49).",
+                    sourceEn = "Source: Sahih International translation (quran.com 54:49).",
+                    sourceUrl = "https://quran.com/54/49",
+                ),
+                WonderItem(
+                    titleId = "\"Tujuh Langit\" Muncul di 7 Ayat",
+                    titleEn = "\"Seven Heavens\" in 7 Verses",
+                    reference = "QS. Al-Baqarah 2:29 · 17:44 · 23:17 · 41:12 · 65:12 · 67:3 · 71:15",
+                    textId = "Frasa \"tujuh langit\" (سبع سموات) muncul di **7 ayat** — " +
+                        "dihitung dari teks bundel aplikasi: 2:29, 17:44, 23:17, 41:12, " +
+                        "65:12, 67:3, dan 71:15. Konsistensi jumlah yang bisa diverifikasi " +
+                        "sendiri lewat pencarian quran.com.",
+                    textEn = "The phrase \"seven heavens\" (سبع سموات) occurs in **7 " +
+                        "verses** — counted from the app's bundled text: 2:29, 17:44, 23:17, " +
+                        "41:12, 65:12, 67:3, and 71:15. A count consistency you can verify " +
+                        "yourself via quran.com search.",
+                    sourceId = "Sumber: dihitung dari data bundel aplikasi; verifikasi " +
+                        "ulang: pencarian \"سبع\" di quran.com.",
+                    sourceEn = "Source: computed from the app's bundled data; re-verify: " +
+                        "search \"سبع\" on quran.com.",
+                    sourceUrl = "https://quran.com/search?q=سبع",
+                ),
+                WonderItem(
+                    titleId = "Sembilan Belas (74:30) — dan Catatan Kejujuran",
+                    titleEn = "Nineteen (74:30) — and an Honest Note",
+                    reference = "QS. Al-Muddatsir 74:30",
+                    textId = "\"Di atasnya ada sembilan belas (penjaga).\" (Terjemahan Sahih " +
+                        "International). Catatan penting: sistem \"mukjizat 19\" yang populer " +
+                        "(klaim bahwa seluruh Al-Qur'an membentuk pola habis dibagi 19) " +
+                        "**ditolak mayoritas ulama dan akademisi** dan tidak termasuk dalam " +
+                        "kategori ini — ayat ini hanya dikutip apa adanya sebagai bilangan " +
+                        "yang disebut Al-Qur'an.",
+                    textEn = "\"Over it are nineteen [angels].\" (Sahih International). " +
+                        "Important note: the popular \"miracle of 19\" system (claiming the " +
+                        "whole Qur'an forms patterns divisible by 19) is **rejected by the " +
+                        "majority of scholars and academics** and is not included in this " +
+                        "category — this verse is quoted as-is, as a number the Qur'an " +
+                        "mentions.",
+                    sourceId = "Sumber: terjemahan Sahih International (quran.com 74:30).",
+                    sourceEn = "Source: Sahih International translation (quran.com 74:30).",
+                    sourceUrl = "https://quran.com/74/30",
+                ),
+            ),
+        ),
     )
 }

@@ -41,7 +41,15 @@ object AyahOfTheDayAlarm {
         val nextMidnight = LocalDate.now().plusDays(1)
             .atStartOfDay(ZoneId.systemDefault())
             .toInstant().toEpochMilli()
-        am.setAndAllowWhileIdle(AlarmManager.RTC, nextMidnight, pi)
+        // Alarm eksak butuh SCHEDULE_EXACT_ALARM (Android 12+); fallback ke alarm
+        // tidak eksak (±10 menit) kalau izin tidak diberikan — aman tanpa crash.
+        val exactAllowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+            am.canScheduleExactAlarms()
+        if (exactAllowed) {
+            am.setAndAllowWhileIdle(AlarmManager.RTC, nextMidnight, pi)
+        } else {
+            am.setWindow(AlarmManager.RTC, nextMidnight, 10 * 60 * 1000L, pi)
+        }
     }
 }
 

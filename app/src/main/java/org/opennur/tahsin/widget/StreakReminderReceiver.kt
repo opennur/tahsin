@@ -44,11 +44,16 @@ object StreakReminderAlarm {
         // Lewat jam pengingat hari ini → besok.
         val trigger = if (todayAtReminder.isAfter(LocalDateTime.now())) todayAtReminder
         else todayAtReminder.plusDays(1)
-        am.setAndAllowWhileIdle(
-            AlarmManager.RTC,
-            trigger.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-            pi,
-        )
+        val triggerMs = trigger.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        // Alarm eksak butuh SCHEDULE_EXACT_ALARM (Android 12+); kalau tidak
+        // diizinkan, pakai alarm tidak eksak (±10 menit) — aman tanpa crash.
+        val exactAllowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+            am.canScheduleExactAlarms()
+        if (exactAllowed) {
+            am.setAndAllowWhileIdle(AlarmManager.RTC, triggerMs, pi)
+        } else {
+            am.setWindow(AlarmManager.RTC, triggerMs, 10 * 60 * 1000L, pi)
+        }
     }
 
     /** Batalkan alarm pengingat (saat toggle dimatikan). */
