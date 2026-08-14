@@ -1,7 +1,6 @@
 package org.opennur.tahsin.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTypography
@@ -32,19 +29,18 @@ import org.opennur.tahsin.ui.components.AyahText
 import org.opennur.tahsin.util.AppLanguage
 
 /**
- * Layar Keajaiban & Keindahan Al-Qur'an: daftar kategori (ilmiah, kabar masa
- * depan, bahasa, penjagaan teks) dengan konten statis [WondersContent] yang
- * bersumber; baris sumber bisa diketuk untuk membuka tautan verifikasi.
+ * Layar Studi Coherence (Nazm) Al-Qur'an: tema pusat Al-Qur'an, struktur 7
+ * kelompok (Farahi–Islahi), lalu untuk SETIAP surah: topik utama (amud) dan
+ * keterkaitan antar surah (nazm). Konten statis [CoherenceContent] dua bahasa.
  * Bahasa dikirim dari MainActivity (settingsState bersama, selalu segar).
  */
 @Composable
-fun WondersScreen(
+fun CoherenceScreen(
     onBack: () -> Unit,
     language: AppLanguage,
     modifier: Modifier = Modifier,
 ) {
     val strings = AppStrings.of(language)
-    val uriHandler = LocalUriHandler.current
 
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
         Column(
@@ -61,41 +57,69 @@ fun WondersScreen(
                 AyahButton(text = "←", variant = AyahButtonVariant.Outline, onClick = onBack)
                 Spacer(modifier = Modifier.width(12.dp))
                 AyahText(
-                    strings.wondersTitle,
+                    strings.coherenceTitle,
                     style = AyahTypography.Heading1,
                     modifier = Modifier.weight(1f),
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
             AyahText(
-                strings.wondersSubtitle,
+                strings.coherenceSubtitle,
                 style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ---- Kategori & item ----
-            WondersContent.categories.forEach { category ->
-                AyahText(
-                    "${category.emoji} ${textOf(language, category.titleId, category.titleEn)}",
-                    style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
-                )
-                if (category.noteId.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(2.dp))
+            // ---- Tema pusat Al-Qur'an ----
+            AyahCard(modifier = Modifier.fillMaxWidth()) {
+                Column {
                     AyahText(
-                        textOf(language, category.noteId, category.noteEn),
+                        strings.coherenceCentralTheme,
+                        style = AyahTypography.Body2.copy(
+                            color = AyahColors.Primary,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    AyahText(
+                        textOf(
+                            language,
+                            CoherenceContent.centralThemeId,
+                            CoherenceContent.centralThemeEn,
+                        ),
+                        style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AyahText(
+                        strings.coherenceMethodology,
                         style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
                     )
                 }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ---- 7 kelompok + surah per kelompok ----
+            CoherenceContent.groups.forEach { group ->
+                AyahText(
+                    "${strings.coherenceGroupLabel.format(group.number)} · ${textOf(language, group.rangeId, group.rangeEn)}",
+                    style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                AyahText(
+                    textOf(language, group.themeId, group.themeEn),
+                    style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                category.items.forEach { item ->
-                    WonderItemCard(
-                        item = item,
-                        language = language,
-                        onOpenSource = { uriHandler.openUri(item.sourceUrl) },
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
+                CoherenceContent.surahs
+                    .filter { it.group == group.number }
+                    .forEach { surah ->
+                        CoherenceSurahCard(
+                            surah = surah,
+                            language = language,
+                            nazmLabel = strings.coherenceNazmLabel,
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
                 Spacer(modifier = Modifier.height(14.dp))
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -107,47 +131,31 @@ fun WondersScreen(
 private fun textOf(language: AppLanguage, id: String, en: String): String =
     if (language == AppLanguage.EN) en else id
 
-/** Satu kartu konten: rujukan ayat, judul, teks, dan baris sumber (tautan). */
+/** Satu kartu surah: nomor + nama, topik utama (amud), keterkaitan (nazm). */
 @Composable
-private fun WonderItemCard(
-    item: WonderItem,
+private fun CoherenceSurahCard(
+    surah: CoherenceSurah,
     language: AppLanguage,
-    onOpenSource: () -> Unit,
+    nazmLabel: String,
 ) {
     AyahCard(modifier = Modifier.fillMaxWidth()) {
         Column {
             AyahText(
-                item.reference,
-                style = AyahTypography.Caption.copy(
-                    color = AyahColors.Primary,
-                    fontWeight = FontWeight.SemiBold,
-                ),
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            AyahText(
-                textOf(language, item.titleId, item.titleEn),
+                "${surah.number}. ${surah.name}",
                 style = AyahTypography.Body2.copy(
-                    color = AyahColors.TextPrimary,
+                    color = AyahColors.Primary,
                     fontWeight = FontWeight.SemiBold,
                 ),
             )
             Spacer(modifier = Modifier.height(4.dp))
             AyahText(
-                textOf(language, item.textId, item.textEn),
+                textOf(language, surah.amudId, surah.amudEn),
                 style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             AyahText(
-                textOf(language, item.sourceId, item.sourceEn),
-                style = AyahTypography.Caption.copy(
-                    color = AyahColors.Primary,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Start,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onOpenSource)
-                    .padding(vertical = 4.dp),
+                "$nazmLabel: ${textOf(language, surah.nazmId, surah.nazmEn)}",
+                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
             )
         }
     }

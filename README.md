@@ -23,7 +23,7 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 
 - 🧭 **Menu utama** (layar beranda): semua fitur dibuka lewat kartu menu —
   **Tahsin**, **Kosakata**, **Kuis Tajwid**, **Statistik**, **Dream BIG**,
-  **Belajar Arab**, **Kuis Ayat**, **Penghargaan**, **Keajaiban Al-Qur'an**,
+  **Belajar Arab**, **Kuis Ayat**, **Penghargaan**, **Studi Coherence**,
   **Ayat Favorit**, dan **Pengaturan**.
   (Pencarian ayat & Kelola Audio dipindah: 🔍 di header Tahsin, 🎵 di
   Pengaturan.)

@@ -21,6 +21,7 @@ import org.opennur.tahsin.ui.AppStrings
 import org.opennur.tahsin.ui.AudioManagerScreen
 import org.opennur.tahsin.ui.AyatQuizScreen
 import org.opennur.tahsin.ui.BadgesScreen
+import org.opennur.tahsin.ui.CoherenceScreen
 import org.opennur.tahsin.ui.DreamBigScreen
 import org.opennur.tahsin.ui.FavoritesScreen
 import org.opennur.tahsin.ui.HomeScreen
@@ -33,7 +34,6 @@ import org.opennur.tahsin.ui.TahsinScreen
 import org.opennur.tahsin.ui.TahsinViewModel
 import org.opennur.tahsin.ui.TajwidQuizScreen
 import org.opennur.tahsin.ui.VocabularyScreen
-import org.opennur.tahsin.ui.WondersScreen
 import org.opennur.tahsin.ui.components.BackgroundPromptDialog
 import org.opennur.tahsin.ui.components.CelebrationDialog
 import org.opennur.tahsin.ui.components.DownloadNoticeDialog
@@ -127,7 +127,7 @@ class MainActivity : ComponentActivity() {
                         onOpenLughoh = { push(AppScreen.Lughoh) },
                         onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
                         onOpenBadges = { push(AppScreen.Badges) },
-                        onOpenWonders = { push(AppScreen.Wonders) },
+                        onOpenCoherence = { push(AppScreen.Coherence) },
                         onOpenFavorites = { push(AppScreen.Favorites) },
                         onOpenSettings = { push(AppScreen.Settings) },
                         settings = settingsState,
@@ -170,7 +170,7 @@ class MainActivity : ComponentActivity() {
                             target = OpenTarget(s, a, targetDelivery++)
                         },
                     )
-                    AppScreen.Wonders -> WondersScreen(
+                    AppScreen.Coherence -> CoherenceScreen(
                         onBack = { pop() },
                         language = settingsState.language,
                     )

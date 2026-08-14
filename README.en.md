@@ -22,7 +22,7 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 
 - 🧭 **Main menu** (home screen): every feature is opened from a menu card —
   **Tahsin**, **Vocabulary**, **Tajweed Quiz**, **Statistics**, **Dream BIG**,
-  **Learn Arabic**, **Ayah Quiz**, **Achievements**, **Qur'an Wonders**,
+  **Learn Arabic**, **Ayah Quiz**, **Achievements**, **Coherence Study**,
   **Favorite Ayahs**, and **Settings**.
   (Ayah search & Audio Manager moved: 🔍 in the Tahsin header, 🎵 in Settings.)
 - 📖 **Page-based mushaf like the real Madani mushaf** — navigation per PAGE (604 pages,

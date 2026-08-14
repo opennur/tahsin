@@ -56,7 +56,7 @@ fun HomeScreen(
     onOpenLughoh: () -> Unit,
     onOpenAyatQuiz: () -> Unit,
     onOpenBadges: () -> Unit,
-    onOpenWonders: () -> Unit,
+    onOpenCoherence: () -> Unit,
     onOpenFavorites: () -> Unit,
     onOpenSettings: () -> Unit,
     settings: SettingsUiState,
@@ -199,11 +199,11 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 5: Keajaiban Al-Qur'an + Ayat Favorit (baru, di atas Pengaturan)
+        // Baris 5: Studi Coherence + Ayat Favorit (di atas Pengaturan)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             HomeMenuCard(
-                text = strings.menuWonders,
-                onClick = onOpenWonders,
+                text = strings.menuCoherence,
+                onClick = onOpenCoherence,
                 modifier = Modifier.weight(1f),
             )
             HomeMenuCard(
