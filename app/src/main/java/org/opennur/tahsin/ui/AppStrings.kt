@@ -239,6 +239,17 @@ data class Strings(
     val celebrateStreakBody: String,
     val celebrateBadgeTitle: String,
     val celebrateBadgeBody: String,
+    // Menu Keajaiban Al-Qur'an & Ayat Favorit (baru)
+    val menuWonders: String,
+    val menuFavorites: String,
+    val wondersTitle: String,
+    val wondersSubtitle: String,
+    val wondersSource: String,
+    val favoritesTitle: String,
+    val favoritesSubtitle: String,
+    val favoritesEmpty: String,
+    val favoritesLoading: String,
+    val favoritesOpenHint: String,
 )
 
 object AppStrings {
@@ -467,6 +478,16 @@ object AppStrings {
         celebrateStreakBody = "%d hari beruntun — pertahankan!",
         celebrateBadgeTitle = "🏅 Badge Baru!",
         celebrateBadgeBody = "Badge %s mencapai tingkat %d.",
+        menuWonders = "✨ Keajaiban Al-Qur'an",
+        menuFavorites = "⭐ Ayat Favorit",
+        wondersTitle = "Keajaiban & Keindahan Al-Qur'an",
+        wondersSubtitle = "Mukjizat ilmiah, kabar masa depan, keindahan bahasa, dan terjaganya teks — semuanya dengan sumber yang bisa diverifikasi.",
+        wondersSource = "Sumber",
+        favoritesTitle = "Ayat Favorit",
+        favoritesSubtitle = "Ayat yang kamu tandai dengan ★ di layar Tahsin.",
+        favoritesEmpty = "Belum ada ayat favorit.\nBuka layar Tahsin, pilih satu ayat, lalu ketuk ★ di header.",
+        favoritesLoading = "Memuat ayat favorit…",
+        favoritesOpenHint = "Ketuk untuk membuka di mushaf",
     )
 
     val English = Strings(
@@ -689,6 +710,16 @@ object AppStrings {
         celebrateStreakBody = "%d-day streak — keep it up!",
         celebrateBadgeTitle = "🏅 New Badge!",
         celebrateBadgeBody = "Badge %s reached tier %d.",
+        menuWonders = "✨ Qur'an Wonders",
+        menuFavorites = "⭐ Favorite Ayahs",
+        wondersTitle = "Qur'an Wonders & Beauty",
+        wondersSubtitle = "Scientific miracles, news of the future, linguistic beauty, and the preservation of the text — all with verifiable sources.",
+        wondersSource = "Source",
+        favoritesTitle = "Favorite Ayahs",
+        favoritesSubtitle = "Ayahs you marked with ★ on the Tahsin screen.",
+        favoritesEmpty = "No favorite ayahs yet.\nOpen the Tahsin screen, pick an ayah, then tap ★ in the header.",
+        favoritesLoading = "Loading favorite ayahs…",
+        favoritesOpenHint = "Tap to open in the mushaf",
     )
 
     /** Judul badge terjemahan — key = [org.opennur.tahsin.util.BadgeDef.key]. */

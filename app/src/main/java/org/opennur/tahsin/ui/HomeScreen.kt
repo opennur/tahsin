@@ -56,6 +56,8 @@ fun HomeScreen(
     onOpenLughoh: () -> Unit,
     onOpenAyatQuiz: () -> Unit,
     onOpenBadges: () -> Unit,
+    onOpenWonders: () -> Unit,
+    onOpenFavorites: () -> Unit,
     onOpenSettings: () -> Unit,
     settings: SettingsUiState,
     modifier: Modifier = Modifier,
@@ -197,7 +199,22 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 5: Pengaturan (penuh, disorot)
+        // Baris 5: Keajaiban Al-Qur'an + Ayat Favorit (baru, di atas Pengaturan)
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.menuWonders,
+                onClick = onOpenWonders,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.menuFavorites,
+                onClick = onOpenFavorites,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Baris 6: Pengaturan (penuh, disorot)
         HomeMenuCard(
             text = strings.menuSettings,
             onClick = onOpenSettings,

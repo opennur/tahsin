@@ -19,6 +19,8 @@ sealed interface AppScreen {
     data object Lughoh : AppScreen
     data object AyatQuiz : AppScreen
     data object Badges : AppScreen
+    data object Wonders : AppScreen
+    data object Favorites : AppScreen
     data object Settings : AppScreen
 
     /** Tag unik per layar (dipakai rememberSaveable untuk rotasi layar). */
@@ -38,6 +40,8 @@ sealed interface AppScreen {
             "Lughoh" -> Lughoh
             "AyatQuiz" -> AyatQuiz
             "Badges" -> Badges
+            "Wonders" -> Wonders
+            "Favorites" -> Favorites
             "Settings" -> Settings
             else -> Home
         }

@@ -23,7 +23,8 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 
 - 🧭 **Menu utama** (layar beranda): semua fitur dibuka lewat kartu menu —
   **Tahsin**, **Kosakata**, **Kuis Tajwid**, **Statistik**, **Dream BIG**,
-  **Belajar Arab**, **Kuis Ayat**, **Penghargaan**, dan **Pengaturan**.
+  **Belajar Arab**, **Kuis Ayat**, **Penghargaan**, **Keajaiban Al-Qur'an**,
+  **Ayat Favorit**, dan **Pengaturan**.
   (Pencarian ayat & Kelola Audio dipindah: 🔍 di header Tahsin, 🎵 di
   Pengaturan.)
 - 📖 **Mushaf halaman ala mushaf Madani asli** — navigasi per HALAMAN (604 halaman,
