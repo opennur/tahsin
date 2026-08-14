@@ -27,6 +27,8 @@ import org.opennur.tahsin.theme.ArabicFont
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.ui.AppStrings
 import org.opennur.tahsin.util.AppLanguage
+import org.opennur.tahsin.util.Bookmark
+import org.opennur.tahsin.util.BookmarkStore
 import org.opennur.tahsin.util.AudioDownloader
 import org.opennur.tahsin.util.DownloadProgress
 import org.opennur.tahsin.util.DownloadService
@@ -72,6 +74,8 @@ sealed interface TahsinUiState {
         /** Surah & ayat AKTIF = sasaran latihan STT (bukan navigasi). */
         val surahNumber: Int = 1,
         val ayahIndex: Int = 0,
+        /** Bookmark ayat (surah, ayah) yang disimpan pengguna. */
+        val bookmarks: Set<Bookmark> = emptySet(),
         /** Isi surah sedang dimuat (diunduh dari equran.id). */
         val loadingSurah: Boolean = false,
         val listening: Boolean = false,
@@ -120,6 +124,8 @@ sealed interface TahsinUiState {
         val showBackgroundPrompt: Boolean = false,
     ) : TahsinUiState {
         val surah: Surah? get() = surahs.find { it.number == surahNumber }
+        /** Apakah ayat aktif sedang di-bookmark. */
+        val bookmarked: Boolean get() = Bookmark(surahNumber, ayahIndex + 1) in bookmarks
         val ayah: Ayah? get() = surah?.ayahs?.getOrNull(ayahIndex)
     }
 }
@@ -175,6 +181,7 @@ class TahsinViewModel(
     private val downloader: AudioDownloader,
     private val fontStore: FontStore,
     private val statsStore: ReadingStatsStore,
+    private val bookmarkStore: BookmarkStore,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
@@ -271,6 +278,10 @@ class TahsinViewModel(
         }
         // Muat konten surah pada halaman terakhir yang dibuka (default: Al-Fatihah).
         (currentReady())?.let { ensurePageLoaded(it.pageIndex) }
+        // Muat bookmark ayat.
+        viewModelScope.launch {
+            updateReady { it.copy(bookmarks = bookmarkStore.load()) }
+        }
         // Target dari widget/notifikasi (state baru saja siap) → buka langsung.
         pendingOpenAt?.let { (s, a) -> openAt(s, a) }
     }
@@ -583,6 +594,18 @@ class TahsinViewModel(
                 updateReady { it.copy(listening = listening) }
             }
         })
+    }
+
+    // ---- bookmark ayat ----
+
+    /** Tambah/hapus bookmark untuk ayat aktif; persisten di disk. */
+    fun toggleBookmark() {
+        val s = currentReady() ?: return
+        val target = Bookmark(s.surahNumber, s.ayahIndex + 1)
+        viewModelScope.launch {
+            val updated = bookmarkStore.toggle(target)
+            updateReady { it.copy(bookmarks = updated) }
+        }
     }
 
     // ---- mode pemutaran audio (tombol di samping "Dengar") ----
@@ -1161,6 +1184,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             downloader = AudioDownloader(app, SettingsStore(app)),
             fontStore = FontStore(app),
             statsStore = ReadingStatsStore.fromContext(app),
+            bookmarkStore = BookmarkStore.fromContext(app),
         )
     }
 }

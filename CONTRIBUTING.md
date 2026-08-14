@@ -45,7 +45,7 @@ bash tools/fetch_font.sh                # font Utsmani (Amiri, SIL OFL 1.1)
    |---|---|---|
    | Mushaf (Arab + terjemahan) | `tools/fetch_quran_data.py`, `tools/fetch_font.sh` | jangan edit `assets/quran/data/*.json` manual |
    | Paginasi Madani (604 halaman + 30 juz) | `tools/build_pages.py` → `assets/quran/pages.json` | tes emas `MushafPagesTest`/`MushafPageComposerTest` |
-   | Kosakata (589 kata) | `tools/build_vocab.py` → `assets/quran/vocab.json` | `VocabKey.normalize` (Kotlin) HARUS sama persis dengan normalisasi di `build_vocab.py` |
+   | Kosakata (1.200 kata) | `tools/build_vocab.py` → `assets/quran/vocab.json` | `VocabKey.normalize` (Kotlin) HARUS sama persis dengan normalisasi di `build_vocab.py` |
    | Belajar Arab (15 pelajaran) | `tools/build_lughoh.py` + `tools/lughoh_en.py` → `assets/lughoh/lessons.json` | build GAGAL jika ada teks ID tanpa terjemahan EN; `LughohEnTest` memvalidasi hasil |
 
    Setelah regenerasi data, jalankan unit test — tes emas mengunci integritas

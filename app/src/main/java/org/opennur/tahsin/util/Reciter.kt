@@ -27,11 +27,12 @@ enum class Reciter(val slug: String, val label: String) {
 /** Pilihan kecepatan pemutaran audio (0.5×–1.25×) untuk latihan pelan-pelan. */
 object AudioSpeeds {
 
-    /** Nilai yang ditawarkan di UI, urut naik. */
-    val options: List<Float> = listOf(0.5f, 0.75f, 1.0f, 1.25f)
+    /** Rentang kecepatan yang ditawarkan (slider di Pengaturan). */
+    const val MIN = 0.25f
+    const val MAX = 2.0f
 
     /** Nilai aman dalam rentang yang didukung. */
-    fun clamp(speed: Float): Float = speed.coerceIn(0.5f, 1.25f)
+    fun clamp(speed: Float): Float = speed.coerceIn(MIN, MAX)
 
     /** Label ringkas: 0.5×, 0.75×, 1×, 1.25× (1.0 ditampilkan "1×"). */
     fun format(speed: Float): String {

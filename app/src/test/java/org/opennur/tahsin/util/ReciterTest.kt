@@ -55,22 +55,26 @@ class ReciterTest {
     // ---- kecepatan audio ----
 
     @Test
-    fun `opsi kecepatan terurut dan dalam rentang`() {
-        assertEquals(listOf(0.5f, 0.75f, 1.0f, 1.25f), AudioSpeeds.options)
+    fun `rentang kecepatan 0,25 sampai 2,0 (slider)`() {
+        assertEquals(0.25f, AudioSpeeds.MIN, 0.0001f)
+        assertEquals(2.0f, AudioSpeeds.MAX, 0.0001f)
     }
 
     @Test
-    fun `clamp membatasi ke rentang 0,5 sampai 1,25`() {
-        assertEquals(0.5f, AudioSpeeds.clamp(0.1f), 0.0001f)
-        assertEquals(1.25f, AudioSpeeds.clamp(3.0f), 0.0001f)
-        assertEquals(0.75f, AudioSpeeds.clamp(0.75f), 0.0001f)
+    fun `clamp membatasi ke rentang 0,25 sampai 2,0`() {
+        assertEquals(0.25f, AudioSpeeds.clamp(0.1f), 0.0001f)
+        assertEquals(2.0f, AudioSpeeds.clamp(3.0f), 0.0001f)
+        assertEquals(1.25f, AudioSpeeds.clamp(1.25f), 0.0001f)
+        assertEquals(0.5f, AudioSpeeds.clamp(0.5f), 0.0001f)
     }
 
     @Test
     fun `format kecepatan ringkas`() {
+        assertEquals("0.25×", AudioSpeeds.format(0.25f))
         assertEquals("0.5×", AudioSpeeds.format(0.5f))
         assertEquals("0.75×", AudioSpeeds.format(0.75f))
         assertEquals("1×", AudioSpeeds.format(1.0f))
         assertEquals("1.25×", AudioSpeeds.format(1.25f))
+        assertEquals("2×", AudioSpeeds.format(2.0f))
     }
 }

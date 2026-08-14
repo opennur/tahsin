@@ -46,7 +46,7 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
    |---|---|---|
    | Mushaf (Arabic + translations) | `tools/fetch_quran_data.py`, `tools/fetch_font.sh` | don't hand-edit `assets/quran/data/*.json` |
    | Madani pagination (604 pages + 30 juz) | `tools/build_pages.py` → `assets/quran/pages.json` | golden tests `MushafPagesTest`/`MushafPageComposerTest` |
-   | Vocabulary (589 words) | `tools/build_vocab.py` → `assets/quran/vocab.json` | `VocabKey.normalize` (Kotlin) MUST match the normalizer in `build_vocab.py` exactly |
+   | Vocabulary (1,200 words) | `tools/build_vocab.py` → `assets/quran/vocab.json` | `VocabKey.normalize` (Kotlin) MUST match the normalizer in `build_vocab.py` exactly |
    | Learn Arabic (15 lessons) | `tools/build_lughoh.py` + `tools/lughoh_en.py` → `assets/lughoh/lessons.json` | the build FAILS if any ID text lacks an EN translation; `LughohEnTest` validates the output |
 
    After regenerating data, run the unit tests — the golden tests lock the

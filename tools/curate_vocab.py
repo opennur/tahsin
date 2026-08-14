@@ -15,6 +15,7 @@ kosong, tidak menimpa yang sudah ada.
 import json
 import os
 
+from vocab_extra import VOCAB_EXTRA
 from vocab_roots import ROOTS, ROOT_MEANINGS
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -230,11 +231,13 @@ CURATED = {
 def main():
     with open(VOCAB, encoding="utf-8") as f:
         data = json.load(f)
+    # Gabung kurasi gelombang kedua & ketiga (ketiga menang kalau bentrok).
+    merged = {**CURATED_EXTRA, **CURATED, **VOCAB_EXTRA}
     filled = 0
     for e in data["entries"]:
         key = e["key"]
-        if key in CURATED:
-            translit, meaning_id, meaning_en = CURATED[key]
+        if key in merged:
+            translit, meaning_id, meaning_en = merged[key]
             e["translit"] = translit
             e["meaningId"] = meaning_id
             e["meaningEn"] = meaning_en

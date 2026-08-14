@@ -7,7 +7,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -54,7 +52,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -93,6 +90,7 @@ import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.DownloadProgress
 import org.opennur.tahsin.util.FontScales
 import org.opennur.tahsin.ui.components.AyahButton
+import org.opennur.tahsin.ui.components.AyahSlider
 import org.opennur.tahsin.ui.components.AyahButtonSize
 import org.opennur.tahsin.ui.components.AyahButtonVariant
 import org.opennur.tahsin.ui.components.AyahCard
@@ -177,6 +175,7 @@ fun TahsinScreen(
             onStopSelectedWord = viewModel::stopWordPlayback,
             onSetFontScale = viewModel::setFontScale,
             onSetAudioMode = viewModel::setAudioMode,
+            onToggleBookmark = viewModel::toggleBookmark,
             onDismissMessage = viewModel::clearMessage,
             onToggleAudioPlayback = viewModel::toggleAudioPlayback,
             onOpenSearch = onOpenSearch,
@@ -202,6 +201,7 @@ private fun TahsinContent(
     onStopSelectedWord: () -> Unit,
     onSetFontScale: (Float) -> Unit,
     onSetAudioMode: (AudioPlaybackMode) -> Unit,
+    onToggleBookmark: () -> Unit,
     onDismissMessage: () -> Unit,
     onToggleAudioPlayback: () -> Unit,
     onOpenSearch: () -> Unit,
@@ -238,6 +238,13 @@ private fun TahsinContent(
             AyahButton(text = "←", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onBack)
             Spacer(modifier = Modifier.width(8.dp))
             AyahText(strings.appTitle, style = AyahTypography.Heading1, modifier = Modifier.weight(1f))
+            AyahButton(
+                text = if (state.bookmarked) "★" else "☆",
+                variant = if (state.bookmarked) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                onClick = onToggleBookmark,
+            )
+            Spacer(modifier = Modifier.width(6.dp))
             AyahButton(text = "🔍", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSearch)
             Spacer(modifier = Modifier.width(6.dp))
             AyahButton(text = "⚙", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSettings)
@@ -293,10 +300,11 @@ private fun TahsinContent(
                 style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
             )
             Spacer(modifier = Modifier.width(8.dp))
-            FontSizeSlider(
+            AyahSlider(
                 value = state.fontScale,
                 onValueChange = onSetFontScale,
                 modifier = Modifier.weight(1f),
+                valueRange = FontScales.MIN..FontScales.MAX,
             )
             Spacer(modifier = Modifier.width(8.dp))
             AyahText(
@@ -956,74 +964,6 @@ private fun IssueCard(
             )
         }
     }
-}
-
-/** Slider ukuran huruf — design system sendiri (aplikasi tanpa material3). */
-@Composable
-private fun FontSizeSlider(
-    value: Float,
-    onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val min = FontScales.MIN
-    val max = FontScales.MAX
-    val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
-    val thumbPx = with(LocalDensity.current) { 20.dp.toPx() }
-
-    BoxWithConstraints(
-        modifier = modifier
-            .height(28.dp)
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { p ->
-                        onValueChange(fontScaleAtX(p.x, size.width.toFloat(), thumbPx, min, max))
-                    },
-                    onDrag = { change, _ ->
-                        onValueChange(fontScaleAtX(change.position.x, size.width.toFloat(), thumbPx, min, max))
-                        change.consume()
-                    },
-                )
-            },
-    ) {
-        val trackWidth = with(LocalDensity.current) { maxWidth.toPx() }
-        val thumbCenter = thumbPx / 2f + fraction * (trackWidth - thumbPx)
-        // Rel (latar track).
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .fillMaxWidth()
-                .height(4.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(AyahColors.SurfaceVariant),
-        )
-        // Bagian terisi.
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .fillMaxWidth(fraction)
-                .height(4.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(AyahColors.Primary),
-        )
-        // Thumb.
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset { IntOffset((thumbCenter - thumbPx / 2f).roundToInt(), 0) }
-                .size(20.dp)
-                .background(AyahColors.Primary, CircleShape)
-                .border(2.dp, AyahColors.Background, CircleShape),
-        )
-    }
-}
-
-/** Peta posisi x (px) di track ke fontScale (MIN..MAX); thumb menempel ujung. */
-private fun fontScaleAtX(x: Float, width: Float, thumbSize: Float, min: Float, max: Float): Float {
-    if (width <= thumbSize) return min
-    val usable = width - thumbSize
-    val f = ((x - thumbSize / 2f) / usable).coerceIn(0f, 1f)
-    return min + f * (max - min)
 }
 
 /** Simbol mode pemutaran audio untuk tombol di samping "Dengar". */

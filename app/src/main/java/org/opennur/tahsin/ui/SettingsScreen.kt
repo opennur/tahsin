@@ -34,6 +34,7 @@ import androidx.core.content.ContextCompat
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTypography
 import org.opennur.tahsin.ui.components.AyahButton
+import org.opennur.tahsin.ui.components.AyahSlider
 import org.opennur.tahsin.ui.components.AyahButtonSize
 import org.opennur.tahsin.ui.components.AyahButtonVariant
 import org.opennur.tahsin.ui.components.AyahSwitch
@@ -139,20 +140,22 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(12.dp))
             SectionLabel(strings.sectionSpeed)
             Spacer(modifier = Modifier.height(6.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                AudioSpeeds.options.forEach { speed ->
-                    AyahButton(
-                        text = AudioSpeeds.format(speed),
-                        variant = if (settings.audioSpeed == speed) {
-                            AyahButtonVariant.Primary
-                        } else {
-                            AyahButtonVariant.Outline
-                        },
-                        size = AyahButtonSize.Small,
-                        onClick = { onSetSpeed(speed) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AyahSlider(
+                    value = settings.audioSpeed,
+                    onValueChange = onSetSpeed,
+                    modifier = Modifier.weight(1f),
+                    valueRange = AudioSpeeds.MIN..AudioSpeeds.MAX,
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                AyahText(
+                    AudioSpeeds.format(settings.audioSpeed),
+                    style = AyahTypography.Caption.copy(
+                        color = AyahColors.Primary,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    modifier = Modifier.width(52.dp),
+                )
             }
 
             SectionDivider()

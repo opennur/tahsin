@@ -30,7 +30,7 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   alur RTL seperti membuka mushaf cetak), **teks ayat mengalir menyambung dari
   kanan ke kiri** (ayat pendek di juz 30 tidak bertumpuk satu per baris),
   penomoran akhir ayat (lingkaran + angka Arab-Indik) **digambar menempel di
-  ujung tiap ayat**, tanda **sujud tilawah ۩** di 15 tempat sujud, basmalah di
+  ujung tiap ayat**, **bookmark ayat (tombol ★ di header)**, tanda **sujud tilawah ۩** di 15 tempat sujud, basmalah di
   awal surah, pembatas + nama surah saat surah baru mulai di tengah halaman,
   band header (nama surah + juz), **offline bawaan** (Arab + terjemahan ID/EN
   di-bundle ke APK). Terjemahan **tersembunyi secara default** (toggle di
@@ -60,7 +60,7 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   panel kata & daftar kesalahan. **📝 Kuis Tajwid** (menu Kuis) menebak "hukum
   apa pada kata ini?" dari kata acak di seluruh mushaf (4 pilihan ganda, skor,
   penjelasan) — belajar, bukan cuma pewarnaan.
-- 📖 **Kosakata Qur'an** (menu Kosakata): **589 kata terkurasi** dari seluruh
+- 📖 **Kosakata Qur'an** (menu Kosakata): **1.200 kata terkurasi** (~68,8% token mushaf) dari seluruh
   mushaf (mirror VocabKey) — kartu kata dengan arti + contoh ayat, sistem
   SRS (kata baru vs. lagi diulang), mode **quiz** pilihan ganda, dan lompat
   langsung ke ayat contoh.
@@ -112,7 +112,7 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 - 🔊 **Audio contoh**: **pilih qari'** (menu Pengaturan): Minshawy, Husary, Husary
   Muallim, Abdul Basit, Alafasy, As-Sudais, Hudhaify (everyayah.com — audio
   ayat tersimpan per qari' di `filesDir/audio/<qari'>/`) + audio per kata
-  (qurancdn wbw); **kecepatan pemutaran 0.5×–1.25×** untuk latihan pelan-pelan
+  (qurancdn wbw); **kecepatan pemutaran (slider 0.25×–2.0×)** untuk latihan pelan-pelan
   (berlaku langsung saat sedang memutar). Diunduh in-app per surah / **semua
   surah** (dari Pengaturan atau tombol "Unduh Semua — Qari'" di Kelola Audio
   saat belum ada audio), dengan **progress bar di footer** + nama surah yang
@@ -171,7 +171,7 @@ app/src/main/java/org/opennur/tahsin/
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
 │                   #   + TajwidQuiz (kuis "hukum apa pada kata ini?")
 ├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
-│                   #   (589 kata terkurasi → assets/quran/vocab.json)
+│                   #   (1.200 kata terkurasi → assets/quran/vocab.json)
 ├── data/dreambig/  # DreamBigGame (ronde arcade); Models/Parser/Repository
 │                   #   lama (era level/transkrip) = dead code yang dipertahankan
 ├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 pelajaran orisinal
@@ -195,7 +195,7 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   Achievements (8 badge progresif, tier tak terbatas),
 │                   #   GamificationStore/Hub/Events (XP, level, streak, perayaan),
 │                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
-│                   #   Reciter (qari' everyayah + kecepatan audio 0.5×–1.25×),
+│                   #   Reciter (qari' everyayah + kecepatan audio slider 0.25×–2.0×),
 │                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
@@ -232,7 +232,7 @@ di-bundle ke APK — jalankan ulang saat konten diubah:
 
 ```bash
 python3 tools/build_pages.py      # paginasi mushaf Madani → assets/quran/pages.json
-python3 tools/build_vocab.py       # 589 kata terkurasi → assets/quran/vocab.json
+python3 tools/build_vocab.py       # 1.200 kata terkurasi → assets/quran/vocab.json
 python3 tools/build_lughoh.py      # 15 pelajaran Belajar Arab → assets/lughoh/lessons.json
                                    #   (validasi 11 aturan; --level N untuk cek per level)
 ```

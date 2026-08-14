@@ -27,7 +27,8 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 - 📖 **Page-based mushaf like the real Madani mushaf** — navigation per PAGE (604 pages,
   RTL flow like flipping a printed mushaf), **flowing ayah text connected right-to-left**
   (short juz-30 ayahs share lines instead of stacking one per row), verse-end numbering
-  (circle + Arabic-Indic digit) **drawn attached to the end of each ayah**, **sajdah
+  (circle + Arabic-Indic digit) **drawn attached to the end of each ayah**, **ayah
+  bookmarks (★ button in the header)**, **sajdah
   (prostration) marks ۩** at the 15 sajdah verses, basmalah at surah starts, a divider
   with the surah name when a new surah starts mid-page, header band (surah name + juz),
   **offline by default** (Arabic + ID/EN translations bundled into the APK). Translations
@@ -59,7 +60,7 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   endlessly. Stop cancels the chain at any time. STT reading feedback stays:
   words turn green (correct) / red (wrong) / yellow (currently read), a success
   beep on a perfect read, sound + vibration on errors.
-- 📖 **Qur'an Vocabulary** (Vocabulary menu): **589 curated words** from the
+- 📖 **Qur'an Vocabulary** (Vocabulary menu): **1,200 curated words** (~68.8% of the mushaf's tokens) from the
   whole mushaf (VocabKey mirror) — word cards with meaning + example ayah, an
   SRS system (new vs. due-for-review), a multiple-choice **quiz** mode, and a
   jump straight to the example ayah.
@@ -112,7 +113,7 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 - 🔊 **Sample audio**: **choose a reciter** (Settings menu): Minshawy, Husary,
   Husary Muallim, Abdul Basit, Alafasy, As-Sudais, Hudhaify (everyayah.com —
   ayah audio is stored per reciter in `filesDir/audio/<reciter>/`) + per-word
-  audio (qurancdn wbw); **playback speed 0.5×–1.25×** for slow practice
+  audio (qurancdn wbw); **playback speed (0.25×–2.0× slider)** for slow practice
   (applies live while playing). Downloaded in-app per surah / **all surahs**
   (from Settings, or the "📥 Download All — Reciter" button in Audio Manager
   when nothing is downloaded yet), with a **footer progress bar** + the name of
@@ -172,7 +173,7 @@ app/src/main/java/org/opennur/tahsin/
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (color spans)
 │                   #   + TajwidQuiz ("what rule applies to this word?" quiz)
 ├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
-│                   #   (589 curated words → assets/quran/vocab.json)
+│                   #   (1,200 curated words → assets/quran/vocab.json)
 ├── data/dreambig/  # DreamBigGame (arcade rounds); legacy Models/Parser/Repository
 │                   #   (level/transcript era) = dead code kept on purpose
 ├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 original lessons
@@ -196,7 +197,7 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   Achievements (8 progressive badges, unlimited tiers),
 │                   #   GamificationStore/Hub/Events (XP, level, streak, celebrations),
 │                   #   AyahSearch (normalized Arabic + translation search),
-│                   #   Reciter (everyayah reciters + 0.5×–1.25× audio speed),
+│                   #   Reciter (everyayah reciters + 0.25×–2.0× audio-speed slider),
 │                   #   AyahOfTheDayManager (daily ayah selection + cache)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
@@ -232,7 +233,7 @@ Python scripts and bundled into the APK — re-run them when content changes:
 
 ```bash
 python3 tools/build_pages.py      # Madani mushaf pagination → assets/quran/pages.json
-python3 tools/build_vocab.py       # 589 curated words → assets/quran/vocab.json
+python3 tools/build_vocab.py       # 1,200 curated words → assets/quran/vocab.json
 python3 tools/build_lughoh.py      # 15 Learn Arabic lessons → assets/lughoh/lessons.json
                                    #   (11 validation rules; --level N for per-level check)
 ```

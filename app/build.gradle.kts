@@ -130,6 +130,7 @@ tasks.register<JacocoReport>("jacocoCoreReport") {
                 "org/opennur/tahsin/util/AudioUrls*",
                 "org/opennur/tahsin/util/AyahOfTheDayPicker*",
                 "org/opennur/tahsin/util/AyahSearch*",
+                "org/opennur/tahsin/util/BookmarkStore*",
                 "org/opennur/tahsin/util/DownloadProgress*",
                 "org/opennur/tahsin/util/DreamBigProgressStore*",
                 "org/opennur/tahsin/util/GamificationEvents*",
