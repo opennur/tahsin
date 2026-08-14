@@ -608,6 +608,17 @@ class TahsinViewModel(
         }
     }
 
+    /**
+     * Muat ulang bookmark dari disk — dipanggil tiap layar Tahsin masuk
+     * komposisi (LaunchedEffect di TahsinScreen). Bookmark bisa berubah dari
+     * layar Ayat Favorit (VM berbeda), jadi jangan hanya andalkan init.
+     */
+    fun refreshBookmarks() {
+        viewModelScope.launch {
+            updateReady { it.copy(bookmarks = bookmarkStore.load()) }
+        }
+    }
+
     // ---- mode pemutaran audio (tombol di samping "Dengar") ----
 
     /** Ubah mode pemutaran: ayat ini saja / lanjut otomatis / ulang terus. */

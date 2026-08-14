@@ -119,7 +119,11 @@ private fun FavoriteRow(
     onClick: () -> Unit,
     onRemove: () -> Unit,
 ) {
-    AyahCard(modifier = Modifier.fillMaxWidth()) {
+    AyahCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+    ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {

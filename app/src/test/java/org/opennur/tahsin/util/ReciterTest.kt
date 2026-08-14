@@ -77,4 +77,12 @@ class ReciterTest {
         assertEquals("1.25×", AudioSpeeds.format(1.25f))
         assertEquals("2×", AudioSpeeds.format(2.0f))
     }
+
+    @Test
+    fun `format membulatkan ke 2 desimal`() {
+        assertEquals("1.38×", AudioSpeeds.format(1.3774511f))
+        assertEquals("1.37×", AudioSpeeds.format(1.3721f))
+        assertEquals("1.5×", AudioSpeeds.format(1.498f))
+        assertEquals("2×", AudioSpeeds.format(1.999f))
+    }
 }

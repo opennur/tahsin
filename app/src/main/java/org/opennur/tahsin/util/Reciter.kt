@@ -34,10 +34,11 @@ object AudioSpeeds {
     /** Nilai aman dalam rentang yang didukung. */
     fun clamp(speed: Float): Float = speed.coerceIn(MIN, MAX)
 
-    /** Label ringkas: 0.5×, 0.75×, 1×, 1.25× (1.0 ditampilkan "1×"). */
+    /** Label ringkas: 0.25×, 0.5×, 1×, 1.38× — maksimal 2 desimal. */
     fun format(speed: Float): String {
-        val v = if (speed == speed.toInt().toFloat()) speed.toInt().toString()
-        else speed.toString().trimEnd('0')
+        val rounded = Math.round(speed * 100f) / 100f
+        val v = if (rounded == rounded.toInt().toFloat()) rounded.toInt().toString()
+        else rounded.toString().trimEnd('0')
         return "$v×"
     }
 }

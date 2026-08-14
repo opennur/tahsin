@@ -139,6 +139,10 @@ fun TahsinScreen(
         }
     }
 
+    // Bookmark bisa berubah dari layar Ayat Favorit (VM berbeda) — muat ulang
+    // setiap Tahsin masuk komposisi agar tombol ★ selalu sinkron.
+    LaunchedEffect(Unit) { viewModel.refreshBookmarks() }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->

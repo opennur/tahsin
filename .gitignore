@@ -10,5 +10,6 @@ local.properties
 *.apk
 *.aab
 .kotlin/errors/
+.kotlin/sessions/
 .reasonix/tasks/
 *.pyc
