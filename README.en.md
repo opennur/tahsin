@@ -370,6 +370,13 @@ keyPassword=secret
 - `RECEIVE_BOOT_COMPLETED` — reschedules the daily "Ayah of the Day" alarm after
   a device restart.
 
+## Contributing
+
+Want to help develop this project? Read **[CONTRIBUTING.en.md](CONTRIBUTING.en.md)**
+first — it contains the golden rules (the 100% coverage gate, bundled-data
+rules, i18n, mushaf conventions, etc.) — because this project touches the holy
+Qur'an: **even one wrong harakah is fatal**.
+
 ## License
 
 This project is distributed under the **GNU General Public License v3.0** —

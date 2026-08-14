@@ -368,6 +368,13 @@ keyPassword=rahasia
 - `RECEIVE_BOOT_COMPLETED` — reschedule alarm harian "Ayah of the Day" setelah
   perangkat restart.
 
+## Berkontribusi
+
+Mau ikut mengembangkan? Baca dulu **[CONTRIBUTING.md](CONTRIBUTING.md)** —
+di situ ada aturan emasnya (gate cakupan 100%, aturan data bundel, i18n,
+konvensi mushaf, dll.) — karena proyek ini menyentuh kitab suci, **satu
+harakat yang salah pun fatal**.
+
 ## Lisensi
 
 Proyek ini didistribusikan di bawah **GNU General Public License v3.0** —
