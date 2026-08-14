@@ -2,10 +2,9 @@ package org.opennur.tahsin.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.dreambig.DreamBigGame
 import org.opennur.tahsin.data.vocab.VocabEntry
 import org.opennur.tahsin.data.vocab.VocabQuizQuestion
@@ -64,7 +63,8 @@ data class DreamBigUiState(
  * 10 soal diacak dari seluruh kosakata terkurasi setiap ronde. Tanpa level,
  * tanpa unlock; rekor skor & streak tersimpan di [DreamBigProgressStore].
  */
-class DreamBigViewModel(
+@HiltViewModel
+class DreamBigViewModel @Inject constructor(
     private val app: Context,
     private val vocabRepository: VocabularyRepository,
     private val progressStore: DreamBigProgressStore,
@@ -256,18 +256,5 @@ class DreamBigViewModel(
     /** Kembali ke layar awal (skor terbaik tetap tersimpan). */
     fun backToHome() {
         _state.update { it.copy(mode = DreamBigMode.HOME, quiz = null) }
-    }
-}
-
-/** Factory manual DI (tanpa Hilt) — pola sama seperti fitur lain. */
-fun dreamBigViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        DreamBigViewModel(
-            app = app,
-            vocabRepository = VocabularyRepository(app),
-            progressStore = DreamBigProgressStore.fromContext(app),
-            settings = SettingsStore(app),
-        )
     }
 }

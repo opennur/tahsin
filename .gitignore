@@ -13,3 +13,7 @@ local.properties
 .kotlin/sessions/
 .reasonix/tasks/
 *.pyc
+# Salinan boilerplate proyek lama (tidak terpakai, hanya referensi).
+.boilerplate/
+# Signing lokal — jangan pernah di-commit (lihat README "Signing release").
+keystore.properties

@@ -1,13 +1,10 @@
 package org.opennur.tahsin.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.quran.QuranRepository
-import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.AyahSearch
 import org.opennur.tahsin.util.SearchableAyah
@@ -42,8 +39,8 @@ data class SearchState(
  * Indeks seluruh mushaf dibangun sekali (lazy, di IO) lalu dicari di memori;
  * ketikan di-debounce supaya tidak memproses tiap keystroke.
  */
-class SearchViewModel(
-    app: Context,
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val repository: QuranRepository,
     private val settings: SettingsStore,
 ) : ViewModel() {
@@ -117,17 +114,5 @@ class SearchViewModel(
 
     companion object {
         private const val DEBOUNCE_MS = 300L
-    }
-}
-
-/** Factory manual DI (tanpa Hilt). */
-fun searchViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        SearchViewModel(
-            app = app,
-            repository = AssetQuranRepository(app),
-            settings = SettingsStore(app),
-        )
     }
 }

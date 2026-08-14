@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTheme
 import org.opennur.tahsin.ui.AppStrings
@@ -38,12 +39,12 @@ import org.opennur.tahsin.ui.components.BackgroundPromptDialog
 import org.opennur.tahsin.ui.components.CelebrationDialog
 import org.opennur.tahsin.ui.components.DownloadNoticeDialog
 import org.opennur.tahsin.ui.navigation.AppScreen
-import org.opennur.tahsin.ui.tahsinViewModelFactory
 import org.opennur.tahsin.util.GamificationEvents
 import org.opennur.tahsin.util.SettingsStore
 import org.opennur.tahsin.widget.AyahOfTheDayAlarm
 import org.opennur.tahsin.widget.StreakReminderAlarm
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     companion object {
@@ -83,7 +84,7 @@ class MainActivity : ComponentActivity() {
                 // ViewModel bersama (scope activity): setelan dipakai portal,
                 // layar Tahsin, dan layar Pengaturan — satu sumber kebenaran.
                 val context = LocalContext.current
-                val tahsinViewModel: TahsinViewModel = viewModel(factory = tahsinViewModelFactory(context))
+                val tahsinViewModel: TahsinViewModel = viewModel()
                 val settingsState by tahsinViewModel.settingsState.collectAsStateWithLifecycle()
 
                 // Back stack layar: Home selalu di dasar; layar lain di-push/pop.

@@ -2,13 +2,11 @@ package org.opennur.tahsin.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.opennur.tahsin.data.quran.QuranRepository
-import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.AudioDownloader
 import org.opennur.tahsin.util.DownloadProgress
@@ -68,7 +66,8 @@ data class AudioManagerState(
  * Cache dipakai hanya kalau tidak ada perubahan (tidak sedang mengunduh dan
  * tidak baru dihapus) — buka layar lagi jadi instan tanpa listFiles ulang.
  */
-class AudioManagerViewModel(
+@HiltViewModel
+class AudioManagerViewModel @Inject constructor(
     private val app: Context,
     private val repository: QuranRepository,
     private val downloader: AudioDownloader,
@@ -210,18 +209,5 @@ class AudioManagerViewModel(
         downloader.deleteAllAudio()
         markDirty()
         refresh()
-    }
-}
-
-/** Factory manual DI (tanpa Hilt). */
-fun audioManagerViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        AudioManagerViewModel(
-            app = app,
-            repository = AssetQuranRepository(app),
-            downloader = AudioDownloader(app, SettingsStore(app)),
-            settings = SettingsStore(app),
-        )
     }
 }

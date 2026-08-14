@@ -1,15 +1,12 @@
 package org.opennur.tahsin.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.dreambig.DreamBigGame
 import org.opennur.tahsin.data.lughoh.LughohEngine
 import org.opennur.tahsin.data.quran.QuranRepository
-import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.Gamification
@@ -19,7 +16,6 @@ import org.opennur.tahsin.util.ReadingHistoryEntry
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SettingsSource
-import org.opennur.tahsin.util.SettingsStore
 import org.opennur.tahsin.util.VocabularyStatsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,7 +60,8 @@ data class StatsState(
  * Dream BIG (ronde kosakata), Belajar Arab (sesi latihan), dan Kosakata
  * (kata yang dikuasai). Sumber: store persisten masing-masing fitur.
  */
-class StatsViewModel(
+@HiltViewModel
+class StatsViewModel @Inject constructor(
     private val statsStore: ReadingStatsStore,
     private val vocabStatsStore: VocabularyStatsStore,
     private val dreamBigStore: DreamBigProgressStore,
@@ -122,22 +119,5 @@ class StatsViewModel(
                 surahNames = names,
             )
         }
-    }
-}
-
-/** Factory manual DI (tanpa Hilt) — pola sama seperti fitur lain. */
-fun statsViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        StatsViewModel(
-            statsStore = ReadingStatsStore.fromContext(app),
-            vocabStatsStore = VocabularyStatsStore.fromContext(app),
-            dreamBigStore = DreamBigProgressStore.fromContext(app),
-            lughohStore = LughohProgressStore.fromContext(app),
-            gamificationStore = GamificationStore.fromContext(app),
-            readingHistory = ReadingHistoryStore.fromContext(app),
-            repository = AssetQuranRepository(app),
-            settings = SettingsStore(app),
-        )
     }
 }

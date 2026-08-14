@@ -1,0 +1,121 @@
+# Konfigurasi detekt — static analysis Kotlin.
+#
+# buildUponDefaultConfig = true (di app/build.gradle.kts): default ruleset detekt
+# tetap dipakai; file ini hanya MENYESUAIKAN threshold & mematikan aturan yang
+# tidak cocok untuk proyek ini. Temuan historis dibaseline di
+# detekt-baseline.xml (lihat build.gradle.kts) — temuan BARU tetap gagalkan CI.
+#
+# Jalankan lokal: ./gradlew detekt  |  perbarui baseline: ./gradlew detektBaseline
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+  # Warnings tetap lulus; hanya error severity yang menggagalkan (via maxIssues).
+  warningsAsErrors: false
+
+processors:
+  active: true
+  exclude:
+    - 'DetektProgressListener'
+
+console-reports:
+  active: true
+  exclude:
+    - 'ProjectComplexityReport'
+    - 'ProjectCognitiveComplexityReport'
+    - 'ProjectLLOCReport'
+    - 'ProjectCLOCReport'
+    - 'ProjectLOCReport'
+    - 'ProjectSLOCReport'
+    - 'LicenseHeaderReport'
+
+comments:
+  active: true
+  # Proyek memakai KDoc hanya untuk kelas/fungsi yang bernilai — jangan wajibkan.
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false
+  UndocumentedPublicProperty:
+    active: false
+  CommentOverPrivateFunction:
+    active: false
+  CommentOverPrivateProperty:
+    active: false
+  OutdatedDocumentation:
+    active: false
+  AbsentOrWrongFileLicense:
+    active: false
+
+complexity:
+  active: true
+  # Layar Compose cenderung panjang; naikkan ambang agar tidak berisik.
+  LongMethod:
+    threshold: 90
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 8
+    ignoreDataClasses: true
+  CyclomaticComplexMethod:
+    threshold: 18
+  TooManyFunctions:
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInInterfaces: 20
+    thresholdInObjects: 20
+    thresholdInEnums: 20
+    ignoreDeprecated: false
+    ignorePrivate: true
+    ignoreOverridden: true
+  LargeClass:
+    threshold: 900
+
+coroutines:
+  active: true
+  GlobalCoroutineUsage:
+    active: false
+
+empty-blocks:
+  active: true
+  # runCatching { }.getOrDefault() memakai catch kosong yang sah — izinkan.
+  EmptyCatchBlock:
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+
+exceptions:
+  active: true
+  SwallowedException:
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  TooGenericExceptionCaught:
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  NotImplementedDeclaration:
+    active: false
+
+naming:
+  active: true
+  # Fungsi Compose boleh memakai huruf besar di awal (konvensi Compose) —
+  # detekt default sudah mengecualikan @Composable; pertahankan.
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+    functionPattern: '([a-z][a-zA-Z0-9]*)|(`.*`)'
+
+performance:
+  active: true
+  # spread operator di vararg boleh dipakai bila jelas; default detekt mematikan.
+
+style:
+  active: true
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: false
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+    excludePackageStatements: true
+    excludeImportStatements: true
+    excludeCommentStatements: false
+    excludeRawStrings: true
+  UnusedPrivateMember:
+    active: true
+    allowedNames: '(_|ignored|expected|serialVersionUID)'

@@ -1,9 +1,10 @@
 package org.opennur.tahsin.util
 
 import android.content.Context
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
-import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.data.quran.AssetQuranRepository
+import org.opennur.tahsin.data.quran.QuranRepository
 import java.time.LocalDate
 
 /** Satu "Ayah of the Day": ayat + terjemahan untuk satu tanggal. */
@@ -18,18 +19,20 @@ data class AyahOfTheDay(
 )
 
 /**
- * "Ayah of the Day" — lapisan Android (SharedPreferences + QuranRepository).
+ * "Ayah of the Day" — lapisan Android (Preferences DataStore + QuranRepository).
  *
  * SELURUH logika (pemilihan deterministik, validasi cache, perakitan konten)
  * ada di [AyahOfTheDayPicker] yang murni dan diuji unit 100%; kelas ini hanya
- * jembatan ke Android, sehingga DIKECUALIKAN dari laporan cakupan inti
- * (butuh emulator/Robolectric untuk diuji).
+ * jembatan ke Android. Kini bisa diuji dengan Robolectric (bukan lagi
+ * butuh emulator) — lihat AyahOfTheDayManagerTest.
  */
 object AyahOfTheDayManager {
 
-    private const val PREFS = "ayah_of_the_day"
-    private const val KEY_CACHE = "cached"
+    private val KEY_CACHE = stringPreferencesKey("cached")
     private val gson = Gson()
+
+    private fun store(context: Context): PreferencesStore =
+        DataStores.preferences(context, "ayah_of_the_day", legacySharedPrefsName = "ayah_of_the_day")
 
     fun languageOf(context: Context): AppLanguage {
         val code = SettingsStore(context.applicationContext).languageCode
@@ -38,7 +41,7 @@ object AyahOfTheDayManager {
 
     /** Konten ayah hari ini dari cache (null kalau basi/rusak/belum ada). */
     fun cached(context: Context, date: LocalDate, lang: AppLanguage): AyahOfTheDay? {
-        val json = prefs(context).getString(KEY_CACHE, null)
+        val json = store(context).current[KEY_CACHE]
         return AyahOfTheDayPicker.cachedFrom(json, date, lang)
     }
 
@@ -57,9 +60,6 @@ object AyahOfTheDayManager {
     }
 
     fun cache(context: Context, ayah: AyahOfTheDay) {
-        prefs(context).edit().putString(KEY_CACHE, gson.toJson(ayah)).apply()
+        store(context).edit { this[KEY_CACHE] = gson.toJson(ayah) }
     }
-
-    private fun prefs(context: Context) =
-        context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 }

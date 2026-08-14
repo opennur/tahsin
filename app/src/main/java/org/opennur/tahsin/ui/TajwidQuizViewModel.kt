@@ -2,12 +2,10 @@ package org.opennur.tahsin.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.quran.QuranRepository
-import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.tajwid.QuizQuestion
 import org.opennur.tahsin.data.tajwid.TajwidQuiz
 import org.opennur.tahsin.util.AppLanguage
@@ -45,7 +43,8 @@ data class TajwidQuizState(
  * Kuis tajwid: ambil ayat acak dari seluruh mushaf (indeks offline), pilih
  * satu kata ber-hukum, tanya "hukum apa pada kata ini?" dengan 4 opsi.
  */
-class TajwidQuizViewModel(
+@HiltViewModel
+class TajwidQuizViewModel @Inject constructor(
     private val app: Context,
     private val repository: QuranRepository,
     private val settings: SettingsStore,
@@ -153,17 +152,5 @@ class TajwidQuizViewModel(
 
     companion object {
         private const val MAX_ATTEMPTS = 20
-    }
-}
-
-/** Factory manual DI (tanpa Hilt). */
-fun tajwidQuizViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        TajwidQuizViewModel(
-            app = app,
-            repository = AssetQuranRepository(app),
-            settings = SettingsStore(app),
-        )
     }
 }

@@ -22,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,8 +51,7 @@ fun StatsScreen(
     onOpenAyah: (Int, Int) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val viewModel: StatsViewModel = viewModel(factory = statsViewModelFactory(context))
+    val viewModel: StatsViewModel = viewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
 

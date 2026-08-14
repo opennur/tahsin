@@ -5,8 +5,33 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // kapt: annotation processing untuk Hilt — KSP tidak punya biner linux-arm64
+    // (lihat README "Alasan kapt, bukan KSP").
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt)
+    // Linter Kotlin (static analysis) — konfigurasi di config/detekt/detekt.yml.
+    alias(libs.plugins.detekt)
     // JaCoCo bawaan Gradle (bukan dari Plugin Portal — org.jacoco tidak ada di sana).
     jacoco
+}
+
+hilt {
+    // kapt (bukan KSP) — pakai jalur klasik (non-aggregating) yang paling
+    // teruji untuk kapt. (Aggregating task = jalur KSP; keduanya mengemas
+    // komponen ke APK dengan benar pada kapt — dipertahankan false agar
+    // generasi kode konsisten dengan kapt.)
+    enableAggregatingTask = false
+}
+
+kapt {
+    // Izinkan error type (mis. tipe yang belum ada) saat Hilt memetakan generics.
+    correctErrorTypes = true
+}
+
+detekt {
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
+    buildUponDefaultConfig = true
 }
 
 // Signing rilis: kalau ada keystore.properties di root proyek, dipakai.
@@ -42,7 +67,12 @@ android {
 
     buildTypes {
         release {
+            // R8 DIMATIKAN (bug: release crash saat launch, debug aman — R8
+            // me-merge/obfuscate class Hilt yang di-generate). Re-enable hanya
+            // setelah keep rules Hilt di proguard-rules.pro terverifikasi di
+            // perangkat. APK release jadi lebih besar (~12 MB) tapi stabil.
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -53,6 +83,22 @@ android {
                 signingConfigs.getByName("debug")
             }
         }
+    }
+
+    testOptions {
+        unitTests {
+            // Robolectric: framework Android dijalankan di JVM (assets & resources
+            // aplikasi digabung ke test APK).
+            isIncludeAndroidResources = true
+        }
+    }
+
+    lint {
+        // Gagalkan build kalau ada error lint (CI gate). Temuan historis
+        // dibaseline di lint-baseline.xml — temuan baru tetap dilaporkan.
+        abortOnError = true
+        checkReleaseBuilds = false
+        baseline = file("lint-baseline.xml")
     }
 
     compileOptions {
@@ -90,9 +136,29 @@ dependencies {
     // ---- JSON parsing (mushaf asset) ----
     implementation(libs.gson)
 
+    // ---- DI — Hilt (Dagger) ----
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // ---- Penyimpanan preferensi modern (pengganti SharedPreferences) ----
+    implementation(libs.androidx.datastore.preferences)
+
     // ---- Unit test (JVM) ----
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    // Robolectric: framework Android di JVM headless (tanpa emulator).
+    testImplementation(libs.robolectric)
+    // MockK (mocking) + Turbine (Flow) + Truth (assertion).
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
+    // ApplicationProvider.getApplicationContext() di test Robolectric.
+    testImplementation(libs.androidx.test.core.ktx)
+    // Hilt + Robolectric: test yang benar-benar memboot Activity/Application
+    // (memvalidasi graph Hilt di runtime — mencegah regresi packaging seperti
+    // enableAggregatingTask+kapt).
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.compiler)
 }
 
 /**

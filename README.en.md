@@ -161,7 +161,10 @@ The same ayah for every user throughout the day, automatically changing tomorrow
 
 - **Kotlin + Jetpack Compose** — **no Material 3** (custom design system in `theme/`).
 - compileSdk 35, targetSdk 35 (edge-to-edge required), minSdk 26 · AGP 8.4.0 · Kotlin 2.0.20 · Gradle 8.6 · Java 17.
-- No Room/Hilt/Retrofit/Navigation — manual DI (`ViewModel` + factory), Gson for JSON.
+- **Hilt DI** (kapt — KSP has no linux-arm64 binaries) — every ViewModel is
+  `@HiltViewModel` + `@Inject constructor`, graph in `di/AppModule`. No Room/Retrofit/Navigation.
+- **Preferences DataStore** replaces SharedPreferences (sync facade in
+  `util/PreferencesStore.kt`, automatic legacy-key migration), Gson for JSON.
 - **Offline-first**: surah content & translations bundled into the APK (ready
   without internet); audio is downloaded in-app and cached in `filesDir/`; the
   audio management list is cached too.
@@ -285,7 +288,17 @@ sdkmanager "platforms;android-35"
 
 ### Unit tests
 
-Pure JVM tests for `TajwidEngine`, `TranscriptAligner` (Levenshtein),
+**Testing stack (JVM headless):**
+
+- **Robolectric** — the Android framework (assets, resources, filesDir,
+  DataStore) runs on the JVM without an emulator; used for `SettingsStore`
+  (DataStore), `AyahOfTheDayManager` (cache + language), and `PreferencesStore`.
+- **MockK** — mocking in ViewModel tests (`FavoritesViewModelTest`,
+  `GamificationViewModelTest`).
+- **Turbine** — per-emission collection of `StateFlow`/`Flow` in ViewModel tests.
+- **Truth** — readable assertions (`assertThat(...)`).
+
+Plus pure JVM tests for `TajwidEngine`, `TranscriptAligner` (Levenshtein),
 `ArabicNormalizer`, `QuranParser` (mushaf JSON parsing), `AyahOfTheDayPicker`
 (daily ayah selection: index boundaries, cross-surah mapping, determinism,
 cache validation), the **Vocabulary** engine (`VocabularyEngine`: SRS + quiz),
@@ -315,9 +328,12 @@ non-blank Arabic + Indonesian translation, `pages.json` = **604 pages**,
 parser→engine round-trips (`meaningOfWord` for the most frequent words; valid
 `AyatQuiz` questions from real ayahs).
 
-**ViewModel logic unit tests** (`FavoritesViewModelTest`, `StatsViewModelTest`)
-run on the JVM with fake repository/store + `kotlinx-coroutines-test`
-(`Dispatchers.setMain`).
+**ViewModel logic unit tests** (`FavoritesViewModelTest`, `StatsViewModelTest`,
+`GamificationViewModelTest`) run on the JVM with MockK/fake repository/store +
+`kotlinx-coroutines-test` (`Dispatchers.setMain`) + Turbine.
+
+Every ViewModel is `@HiltViewModel` with an `@Inject` constructor — tests
+construct them **directly** (no Hilt), so UI-state logic is testable in pure JVM.
 
 > Instrumented tests (`androidTest`) are **deferred** until a device/emulator
 > is available — they cannot be verified in this environment.
@@ -342,18 +358,36 @@ test** (`MushafIntegrityTest`) validates the actual bundled data: 114 surahs,
 and no blank texts (Arabic / ID / EN translation) anywhere — if even a single
 harakah goes missing or corrupts, this test fails.
 
-**Documented exclusions** (need an emulator/Robolectric): pure Android layers —
-`ui/**`, `widget/**`, `theme/**`, `MainActivity`, `DownloadService`,
-`TahsinAudioPlayer`, `ArabicSpeechRecognizer`, repositories (asset I/O),
-`SettingsStore`, `FontStore`, `GamificationHub` (Context glue),
-`AyahOfTheDayManager` (prefs/repository glue — its logic lives in
-`AyahOfTheDayPicker`, which is 100% covered).
+**Documented exclusions** (need a device/instrumented run): full UI layers
+(`ui/**` composables, `widget/**` runtime, `theme/**`), `MainActivity`,
+`DownloadService`, `TahsinAudioPlayer` (MediaPlayer), `ArabicSpeechRecognizer`
+(SpeechRecognizer), `FontStore` (asset fonts). Android layers that used to be
+excluded are now Robolectric-tested: `SettingsStore`/`PreferencesStore`/
+`DataStores` (DataStore) and `AyahOfTheDayManager` (cache + language).
 
-### CI (GitHub Actions)
+### Linter (detekt)
 
-`.github/workflows/build.yml` runs `testDebugUnitTest` + `assembleDebug` on every
-push/PR. On CI runners the Termux overrides (`aapt2`/`aidl`) are stripped from
-`gradle.properties` automatically before building.
+Kotlin static analysis via **detekt** (`config/detekt/detekt.yml`), historical
+findings baselined in `config/detekt/detekt-baseline.xml` — NEW findings fail
+the build (CI). Android lint is gated too (baseline in `lint-baseline.xml`).
+
+```bash
+./gradlew detekt --no-daemon           # static analysis
+./gradlew detektBaseline --no-daemon   # refresh baseline (after fixes)
+./gradlew lintDebug --no-daemon        # Android lint
+```
+
+### CI/CD (GitHub Actions)
+
+- `.github/workflows/build.yml` — CI pipeline: **lint** (detekt + `lintDebug`),
+  **unit tests** (`testDebugUnitTest` incl. Robolectric + `jacocoCoreReport`),
+  **build** (assembleDebug + assembleRelease with R8). All run on every
+  push/PR; reports & APKs are uploaded as artifacts. On CI runners the Termux
+  overrides (`aapt2`/`aidl`) are stripped from `gradle.properties` automatically.
+- `.github/workflows/security.yml` — **MobSF** security scan of the release APK
+  (automatic on tag `v*` or manual) — see [docs/SECURITY.md](docs/SECURITY.md).
+- `.github/workflows/release.yml` — **CD**: on tag `v*`, build the release APK
+  (signed when keystore secrets are available) and create a GitHub Release.
 
 ### Signing a release
 

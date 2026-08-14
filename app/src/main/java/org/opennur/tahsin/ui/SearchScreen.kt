@@ -59,7 +59,7 @@ fun SearchScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory(context))
+    val viewModel: SearchViewModel = viewModel()
     LaunchedEffect(viewModel) { viewModel.refreshLanguage() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)

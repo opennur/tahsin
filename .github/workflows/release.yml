@@ -1,0 +1,60 @@
+name: Release
+
+# CD: saat tag v* di-push, bangun APK release (ditandatangani kalau secret
+# keystore tersedia; fallback unsigned) lalu buat GitHub Release + lampirkan APK.
+#
+# Secret yang dibutuhkan untuk signing:
+#   KEYSTORE_BASE64   — file keystore.jks di-encode base64
+#   KEYSTORE_PASSWORD — password keystore
+#   KEY_ALIAS         — alias kunci
+#   KEY_PASSWORD      — password kunci
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Clear Termux-only Gradle overrides
+        run: |
+          sed -i '/android.aapt2FromMavenOverride/d; /android.aidlExecutable/d' gradle.properties
+
+      # Kalau secret keystore diset → tulis keystore.properties supaya
+      # app/build.gradle.kts memakai signing release (bukan debug).
+      - name: Decode signing keystore
+        if: env.KEYSTORE_BASE64 != ''
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
+          printf 'storeFile=keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > keystore.properties
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build release APK (R8)
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/release/app-release.apk
+          generate_release_notes: true

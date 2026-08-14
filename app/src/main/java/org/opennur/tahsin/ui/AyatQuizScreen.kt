@@ -51,7 +51,7 @@ fun AyatQuizScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val viewModel: AyatQuizViewModel = viewModel(factory = ayatQuizViewModelFactory(context))
+    val viewModel: AyatQuizViewModel = viewModel()
     LaunchedEffect(viewModel) { viewModel.refreshLanguage() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)

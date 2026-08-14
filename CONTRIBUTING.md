@@ -102,7 +102,7 @@ Aturan praktis:
 - Gate command (harus hijau sebelum PR):
 
   ```bash
-  ./gradlew testDebugUnitTest assembleDebug jacocoCoreReport --no-daemon
+  ./gradlew testDebugUnitTest assembleDebug detekt lintDebug --no-daemon
   ```
 
 ## Menulis test
@@ -117,11 +117,18 @@ Aturan praktis:
 - **Integration test** (`QuranAssetsIntegrationTest`) membaca aset bundel ASLI
   (`src/main/assets/quran/`) — kalau kamu mengubah data/pipeline, tes ini yang
   bilang "jangan".
-- **Unit test ViewModel** (`FavoritesViewModelTest`, `StatsViewModelTest`)
-  memakai fake `QuranRepository`/`SettingsSource` + store file temp +
-  `kotlinx-coroutines-test` (`Dispatchers.setMain(UnconfinedTestDispatcher())`
-  di `@Before`, `resetMain()` di `@After`). Jangan lupa panggil `vm.refresh()`
-  sebelum menunggu state (di layar dipanggil `LaunchedEffect`).
+- **Unit test ViewModel** (`FavoritesViewModelTest`, `GamificationViewModelTest`,
+  `StatsViewModelTest`) memakai **MockK** (mock `QuranRepository`/store/settings)
+  + store file temp + **Turbine** (`state.test { ... }`) + **Truth**
+  (`assertThat(...)`) + `kotlinx-coroutines-test`
+  (`Dispatchers.setMain(UnconfinedTestDispatcher())` di `@Before`,
+  `resetMain()` di `@After`). Jangan lupa panggil `vm.refresh()` sebelum
+  menunggu state (di layar dipanggil `LaunchedEffect`). Karena StateFlow
+  conflating, pakai pola "skip sampai target" di Turbine (lihat contoh di
+  `FavoritesViewModelTest`) supaya tes tidak flaky.
+- **Lapisan Android** (DataStore, assets, resources) diuji dengan **Robolectric**
+  (`@RunWith(RobolectricTestRunner::class)` + `@Config(sdk = [34])`) — lihat
+  `SettingsStoreTest`, `AyahOfTheDayManagerTest`, `PreferencesStoreTest`.
 
 ## Alur kerja PR
 

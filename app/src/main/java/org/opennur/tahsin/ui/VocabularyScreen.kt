@@ -59,7 +59,7 @@ fun VocabularyScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val viewModel: VocabularyViewModel = viewModel(factory = vocabularyViewModelFactory(context))
+    val viewModel: VocabularyViewModel = viewModel()
     LaunchedEffect(viewModel) { viewModel.refreshLanguage() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)

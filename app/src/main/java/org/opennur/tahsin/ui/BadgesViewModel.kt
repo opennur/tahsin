@@ -2,10 +2,9 @@ package org.opennur.tahsin.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.util.Achievements
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.BadgeDef
@@ -42,7 +41,8 @@ data class BadgesUiState(
  * sejak terakhir dibuka), lalu tampilkan daftar diraih/terkunci + ringkasan
  * level/XP. I/O disk di Dispatchers.IO.
  */
-class BadgesViewModel(
+@HiltViewModel
+class BadgesViewModel @Inject constructor(
     private val app: Context,
     private val settings: SettingsStore,
 ) : ViewModel() {
@@ -78,13 +78,5 @@ class BadgesViewModel(
                 level = Gamification.levelFor(stats.xp),
             )
         }
-    }
-}
-
-/** Factory manual DI (tanpa Hilt) — pola sama seperti fitur lain. */
-fun badgesViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        BadgesViewModel(app = app, settings = SettingsStore(app))
     }
 }

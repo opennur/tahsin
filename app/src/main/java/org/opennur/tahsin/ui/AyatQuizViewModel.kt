@@ -2,16 +2,14 @@ package org.opennur.tahsin.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.ayatquiz.AyatQuiz
 import org.opennur.tahsin.data.ayatquiz.AyatQuizQuestion
 import org.opennur.tahsin.data.ayatquiz.SurahQuiz
 import org.opennur.tahsin.data.ayatquiz.SurahQuizQuestion
 import org.opennur.tahsin.data.quran.QuranRepository
-import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.ArabicNormalizer
 import org.opennur.tahsin.util.Gamification
@@ -53,7 +51,8 @@ data class AyatQuizUiState(
  * "Lengkapi Ayat" (kata mana yang melengkapi?) dan "Tebak Surah" (ayat ini
  * dari surah apa?). Jawaban benar memberi XP (badge ikut dievaluasi).
  */
-class AyatQuizViewModel(
+@HiltViewModel
+class AyatQuizViewModel @Inject constructor(
     private val app: Context,
     private val repository: QuranRepository,
     private val settings: SettingsStore,
@@ -215,17 +214,5 @@ class AyatQuizViewModel(
 
     companion object {
         private const val MAX_ATTEMPTS = 20
-    }
-}
-
-/** Factory manual DI (tanpa Hilt). */
-fun ayatQuizViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        AyatQuizViewModel(
-            app = app,
-            repository = AssetQuranRepository(app),
-            settings = SettingsStore(app),
-        )
     }
 }

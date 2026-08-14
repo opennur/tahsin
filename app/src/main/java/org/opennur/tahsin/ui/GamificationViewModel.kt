@@ -1,11 +1,9 @@
 package org.opennur.tahsin.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationStore
@@ -38,8 +36,9 @@ data class GamificationUiState(
  * Memuat ringkasan gamification dari [GamificationStore]. Dipakai layar
  * Home (header) — dibaca ulang setiap Home masuk komposisi (setelah pop).
  */
-class GamificationViewModel(
-    private val app: Context,
+@HiltViewModel
+class GamificationViewModel @Inject constructor(
+    private val gamificationStore: GamificationStore,
     private val settings: SettingsStore,
 ) : ViewModel() {
 
@@ -54,7 +53,7 @@ class GamificationViewModel(
     fun refresh() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val stats = GamificationStore.fromContext(app).read()
+            val stats = gamificationStore.read()
             val today = LocalDate.now().toEpochDay()
             _state.value = GamificationUiState(
                 isLoading = false,
@@ -67,13 +66,5 @@ class GamificationViewModel(
                 earnedBadgeCount = stats.badgeTiers.size,
             )
         }
-    }
-}
-
-/** Factory manual DI (tanpa Hilt). */
-fun gamificationViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        GamificationViewModel(app = app, settings = SettingsStore(app))
     }
 }

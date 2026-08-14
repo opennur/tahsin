@@ -2,10 +2,9 @@ package org.opennur.tahsin.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.vocab.VocabCard
 import org.opennur.tahsin.data.vocab.VocabDaily
 import org.opennur.tahsin.data.vocab.VocabEntry
@@ -64,7 +63,8 @@ data class VocabUiState(
  * ViewModel hanya mengurus state, persistensi ([VocabularyStatsStore]),
  * dan pemutaran audio ([TahsinAudioPlayer]).
  */
-class VocabularyViewModel(
+@HiltViewModel
+class VocabularyViewModel @Inject constructor(
     private val app: Context,
     private val repository: VocabularyRepository,
     private val store: VocabularyStatsStore,
@@ -270,19 +270,5 @@ class VocabularyViewModel(
 
     fun dismissMessage() {
         _state.update { it.copy(message = null) }
-    }
-}
-
-/** Factory manual DI (tanpa Hilt). */
-fun vocabularyViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        VocabularyViewModel(
-            app = app,
-            repository = VocabularyRepository(app),
-            store = VocabularyStatsStore.fromContext(app),
-            settings = SettingsStore(app),
-            audioPlayer = TahsinAudioPlayer(app, SettingsStore(app)),
-        )
     }
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network security config — fondasi keamanan jaringan:
+  semua trafik WAJIB HTTPS (cleartextTrafficPermitted=false, default juga
+  demikian untuk targetSdk ≥ 28; ditegaskan eksplisit di sini) dengan
+  trust anchor sistem saja (tanpa CA custom).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

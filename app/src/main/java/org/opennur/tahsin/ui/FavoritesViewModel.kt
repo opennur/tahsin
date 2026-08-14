@@ -1,11 +1,9 @@
 package org.opennur.tahsin.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,13 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.opennur.tahsin.data.quran.QuranRepository
-import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.quran.Surah
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.Bookmark
 import org.opennur.tahsin.util.BookmarkStore
 import org.opennur.tahsin.util.SettingsSource
-import org.opennur.tahsin.util.SettingsStore
 
 /** Satu baris ayat favorit di layar daftar. */
 data class FavoriteAyahUi(
@@ -42,7 +38,8 @@ data class FavoritesUiState(
  * Bahasa dibaca ulang tiap [refresh] — dipanggil tiap layar dibuka (VM
  * Activity-scoped, jadi jangan simpan bahasa hanya di init).
  */
-class FavoritesViewModel(
+@HiltViewModel
+class FavoritesViewModel @Inject constructor(
     private val settings: SettingsSource,
     private val bookmarkStore: BookmarkStore,
     private val repository: QuranRepository,
@@ -87,17 +84,5 @@ class FavoritesViewModel(
             bookmarkStore.toggle(Bookmark(surah, ayah))
             refresh()
         }
-    }
-}
-
-/** Factory Android: semua dependensi diambil dari [context]. */
-fun favoritesViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        FavoritesViewModel(
-            settings = SettingsStore(app),
-            bookmarkStore = BookmarkStore.fromContext(app),
-            repository = AssetQuranRepository(app),
-        )
     }
 }

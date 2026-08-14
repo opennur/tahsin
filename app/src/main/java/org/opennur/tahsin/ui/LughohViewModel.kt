@@ -2,10 +2,9 @@ package org.opennur.tahsin.ui
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.lughoh.Exercise
 import org.opennur.tahsin.data.lughoh.LughohCatalog
 import org.opennur.tahsin.data.lughoh.LughohEngine
@@ -88,7 +87,8 @@ data class LughohUiState(
  * bisa dimainkan terus; materi (dialog/kosakata/tata bahasa) tetap bisa
  * dibaca lewat browser level/pelajaran. Rekor tersimpan di [LughohProgressStore].
  */
-class LughohViewModel(
+@HiltViewModel
+class LughohViewModel @Inject constructor(
     private val app: Context,
     private val repository: LughohRepository,
     private val progressStore: LughohProgressStore,
@@ -324,17 +324,4 @@ class LughohViewModel(
                 },
             )
         }
-}
-
-/** Factory manual DI (tanpa Hilt) — pola sama seperti fitur lain. */
-fun lughohViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        LughohViewModel(
-            app = app,
-            repository = LughohRepository(app),
-            progressStore = LughohProgressStore.fromContext(app),
-            settings = SettingsStore(app),
-        )
-    }
 }

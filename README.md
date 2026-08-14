@@ -162,13 +162,17 @@ Satu ayat yang sama untuk semua pengguna sepanjang hari, berganti otomatis besok
 
 - **Kotlin + Jetpack Compose** — **tanpa Material 3** (custom design system di `theme/`).
 - compileSdk 35, targetSdk 35 (edge-to-edge wajib), minSdk 26 · AGP 8.4.0 · Kotlin 2.0.20 · Gradle 8.6 · Java 17.
-- Tanpa Room/Hilt/Retrofit/Navigation — DI manual (`ViewModel` + factory), Gson untuk JSON.
+- **DI Hilt** (kapt — lihat [Alasan kapt, bukan KSP](#alasan-kapt-bukan-ksp)) — semua ViewModel
+  `@HiltViewModel` + `@Inject constructor`, grafik di `di/AppModule`. Tanpa Room/Retrofit/Navigation.
+- **Preferences DataStore** menggantikan SharedPreferences (façade sinkron di
+  `util/PreferencesStore.kt`, migrasi otomatis key lama), Gson untuk JSON.
 - **Offline-first**: konten surah & terjemahan di-bundle ke APK (siap tanpa
   internet); audio diunduh in-app dan di-cache ke `filesDir/`; daftar audio
   manajemen ikut di-cache.
 
 ```
 app/src/main/java/org/opennur/tahsin/
+├── di/             # AppModule Hilt (repository, store, audio, settings)
 ├── data/quran/     # model Surah/Ayah + QuranRepository (aset bundle → cache →
 │                   #   equran.id) + MUSHAF: MushafPages (paginasi Madani 604
 │                   #   halaman ← assets/quran/pages.json), MushafPage +
@@ -195,7 +199,8 @@ app/src/main/java/org/opennur/tahsin/
 ├── widget/         # AyahOfTheDayWidget (AppWidgetProvider) + alarm harian/notifikasi
 │                   #   + StreakReminderReceiver (pengingat streak, opsional)
 ├── util/           # AudioDownloader, AudioUrls, TahsinAudioPlayer (PlaySource),
-│                   #   DownloadProgress, DownloadService, FontStore, SettingsStore,
+│                   #   DownloadProgress, DownloadService, FontStore, SettingsStore
+│                   #   (Preferences DataStore — lihat DataStores/PreferencesStore),
 │                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
 │                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
 │                   #   Achievements (8 badge progresif, tier tak terbatas),
@@ -286,7 +291,17 @@ sdkmanager "platforms;android-35"
 
 ### Unit test
 
-Test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
+**Stack testing (JVM headless):**
+
+- **Robolectric** — framework Android (assets, resources, filesDir, DataStore)
+  berjalan di JVM tanpa emulator; dipakai untuk `SettingsStore` (DataStore),
+  `AyahOfTheDayManager` (cache + bahasa), dan `PreferencesStore`.
+- **MockK** — mocking dependensi di tes ViewModel (`FavoritesViewModelTest`,
+  `GamificationViewModelTest`).
+- **Turbine** — koleksi `StateFlow`/`Flow` per-emisi di tes ViewModel.
+- **Truth** — assertion readable (`assertThat(...)`).
+
+Ditambah test JVM murni untuk `TajwidEngine`, `TranscriptAligner` (Levenshtein),
 `ArabicNormalizer`, `QuranParser` (parsing JSON mushaf), `AyahOfTheDayPicker`
 (pemilihan ayat harian: batas index, lintas surah, determinisme, validasi
 cache), mesin **Kosakata** (`VocabularyEngine`: SRS + quiz), **Dream BIG**
@@ -316,9 +331,12 @@ teks Arab + terjemahan Indonesia non-kosong, `pages.json` = **604 halaman**,
 parser → engine (`meaningOfWord` untuk kata terfrequent; soal `AyatQuiz` valid
 dari ayat asli).
 
-Unit test **logika ViewModel** (`FavoritesViewModelTest`, `StatsViewModelTest`)
-berjalan di JVM dengan fake repository/store + `kotlinx-coroutines-test`
-(`Dispatchers.setMain`).
+Unit test **logika ViewModel** (`FavoritesViewModelTest`, `StatsViewModelTest`,
+`GamificationViewModelTest`) berjalan di JVM dengan MockK/fake repository/store
++ `kotlinx-coroutines-test` (`Dispatchers.setMain`) + Turbine.
+
+Semua ViewModel memakai `@HiltViewModel` + konstruktor `@Inject` — di tes mereka
+dikonstruksi **langsung** (tanpa Hilt), jadi logika UI-state bisa diuji murni.
 
 > Instrumented test (`androidTest`) **ditunda** sampai ada perangkat/emulator —
 > tidak bisa diverifikasi di lingkungan ini.
@@ -343,18 +361,45 @@ surah, total 6.236 ayat, jumlah ayat per surah persis mushaf standar, dan
 tidak ada teks kosong (Arab / terjemahan ID / EN) — kalau satu harakat pun
 hilang atau rusak, tes ini gagal.
 
-Yang **dikecualikan secara terdokumentasi** (butuh emulator/Robolectric):
-lapisan Android murni — `ui/**`, `widget/**`, `theme/**`, `MainActivity`,
-`DownloadService`, `TahsinAudioPlayer`, `ArabicSpeechRecognizer`,
-repository (I/O assets), `SettingsStore`, `FontStore`, `GamificationHub`
-(glue Context), `AyahOfTheDayManager` (glue prefs/repository — logikanya ada
-di `AyahOfTheDayPicker` yang diuji 100%).
+Yang **dikecualikan secara terdokumentasi** (butuh emulator/instrumented):
+lapisan UI penuh (`ui/**` composable, `widget/**` runtime, `theme/**`),
+`MainActivity`, `DownloadService`, `TahsinAudioPlayer` (MediaPlayer),
+`ArabicSpeechRecognizer` (SpeechRecognizer), `FontStore` (font aset). Lapisan
+Android yang SEBELUMNYA dikecualikan kini sudah diuji Robolectric:
+`SettingsStore`/`PreferencesStore`/`DataStores` (DataStore) dan
+`AyahOfTheDayManager` (cache + bahasa).
 
-### CI (GitHub Actions)
+### Linter (detekt)
 
-`.github/workflows/build.yml` menjalankan `testDebugUnitTest` + `assembleDebug`
-pada setiap push/PR. Di runner CI, override Termux (`aapt2`/`aidl`) dihapus
-otomatis dari `gradle.properties` sebelum build.
+Kotlin static analysis dengan **detekt** (`config/detekt/detekt.yml`), baseline
+temuan historis di `config/detekt/detekt-baseline.xml` — temuan BARU menggagalkan
+build (CI). Android lint ikut digate (baseline di `lint-baseline.xml`).
+
+```bash
+./gradlew detekt --no-daemon           # static analysis
+./gradlew detektBaseline --no-daemon   # perbarui baseline (setelah perbaikan)
+./gradlew lintDebug --no-daemon        # Android lint
+```
+
+### CI/CD (GitHub Actions)
+
+- `.github/workflows/build.yml` — pipeline CI: **lint** (detekt + `lintDebug`),
+  **unit test** (`testDebugUnitTest` incl. Robolectric + `jacocoCoreReport`),
+  **build** (assembleDebug + assembleRelease dengan R8). Semua dijalankan pada
+  setiap push/PR; laporan & APK diunggah sebagai artifact. Di runner CI,
+  override Termux (`aapt2`/`aidl`) dihapus otomatis dari `gradle.properties`.
+- `.github/workflows/security.yml` — scan keamanan **MobSF** terhadap APK
+  release (otomatis saat tag `v*` atau manual) — lihat [docs/SECURITY.md](docs/SECURITY.md).
+- `.github/workflows/release.yml` — **CD**: saat tag `v*`, bangun APK release
+  (ditandatangani kalau secret keystore tersedia) + buat GitHub Release.
+
+### Alasan kapt, bukan KSP
+
+Hilt butuh annotation processing. **KSP tidak menerbitkan biner linux-arm64**
+(lingkungan build ini berjalan di Termux aarch64), jadi dipakai **kapt**
+(deprecated oleh JetBrains tapi masih didukung penuh) dengan Hilt 2.51.1.
+Kalau build dipindah ke runner x86_64 (mis. CI GitHub Actions), bisa beralih ke
+KSP tanpa mengubah kode sumber — cukup plugin & konfigurasi Gradle.
 
 ### Signing release
 

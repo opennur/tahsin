@@ -7,10 +7,9 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.opennur.tahsin.data.quran.Ayah
 import org.opennur.tahsin.data.quran.ComposedPage
 import org.opennur.tahsin.data.quran.MushafPageComposer
@@ -179,7 +178,8 @@ data class SettingsUiState(
  */
 enum class AudioPlaybackMode { AYAH, CONTINUOUS, REPEAT }
 
-class TahsinViewModel(
+@HiltViewModel
+class TahsinViewModel @Inject constructor(
     private val app: Context,
     private val repository: QuranRepository,
     private val speech: ArabicSpeechRecognizer,
@@ -1217,22 +1217,3 @@ class TahsinViewModel(
     }
 }
 
-/** Factory manual DI (tanpa Hilt). */
-fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-    initializer {
-        val app = context.applicationContext
-        TahsinViewModel(
-            app = app,
-            repository = AssetQuranRepository(app),
-            speech = ArabicSpeechRecognizer(app),
-            audioPlayer = TahsinAudioPlayer(app, SettingsStore(app)),
-            settings = SettingsStore(app),
-            downloader = AudioDownloader(app, SettingsStore(app)),
-            fontStore = FontStore(app),
-            statsStore = ReadingStatsStore.fromContext(app),
-            bookmarkStore = BookmarkStore.fromContext(app),
-            vocabulary = VocabularyRepository(app),
-            readingHistory = ReadingHistoryStore.fromContext(app),
-        )
-    }
-}

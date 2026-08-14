@@ -1,0 +1,135 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ComplexCondition:LughohEnTest.kt$LughohEnTest$line.speaker != "Ahmad" &amp;&amp; line.speaker != "Salim" &amp;&amp; line.speaker != "Fatimah" &amp;&amp; line.speaker != "Khadijah"</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Background: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Divider: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Error: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Hairline: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val OnPrimary: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val OnReading: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val OnSecondary: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Primary: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val PrimaryLight: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val PrimarySoft: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Reading: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Secondary: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Success: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val Surface: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val SurfaceVariant: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val TextPrimary: Color</ID>
+    <ID>ConstructorParameterNaming:Colors.kt$Palette$val TextSecondary: Color</ID>
+    <ID>ConstructorParameterNaming:QuranParser.kt$QuranParser.TranslationItemJson$val resource_id: Int = 0</ID>
+    <ID>CyclomaticComplexMethod:AppStrings.kt$AppStrings$fun badgeDesc(key: String, lang: AppLanguage): String</ID>
+    <ID>CyclomaticComplexMethod:AppStrings.kt$AppStrings$fun badgeTitle(key: String, lang: AppLanguage): String</ID>
+    <ID>CyclomaticComplexMethod:AudioManagerScreen.kt$@Composable fun AudioManagerScreen( onBack: () -&gt; Unit, onDownloadAll: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:AyatQuizScreen.kt$@Composable private fun QuestionCard( state: AyatQuizUiState, strings: Strings, fontFamily: FontFamily, onAnswer: (String) -&gt; Unit, onNext: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:LughohScreen.kt$@OptIn(ExperimentalLayoutApi::class) @Composable private fun LughohExercisesView( state: LughohUiState, strings: Strings, onBack: () -&gt; Unit, onAnswer: (String) -&gt; Unit, onTapChip: (Int) -&gt; Unit, onCheckRearrange: () -&gt; Unit, onNext: () -&gt; Unit, onRestart: () -&gt; Unit, onBackToHome: () -&gt; Unit, arabicFamily: FontFamily, )</ID>
+    <ID>CyclomaticComplexMethod:MainActivity.kt$MainActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
+    <ID>CyclomaticComplexMethod:TahsinScreen.kt$@Composable private fun MushafPageView( state: TahsinUiState.Ready, pageIndex: Int, strings: Strings, onSelectAyah: (Int, Int) -&gt; Unit, onSelectWord: (Int) -&gt; Unit, onPlaySelectedWord: () -&gt; Unit, onStopSelectedWord: () -&gt; Unit, onDismissMessage: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:TahsinScreen.kt$@Composable private fun SurahFlowBlock( ayahs: List&lt;MushafAyah&gt;, state: TahsinUiState.Ready, strings: Strings, onSelectAyah: (Int, Int) -&gt; Unit, onSelectWord: (Int) -&gt; Unit, onPlaySelectedWord: () -&gt; Unit, onStopSelectedWord: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:TajwidEngine.kt$TajwidEngine$fun analyzeWord(word: String, prevWord: String? = null, nextWord: String? = null): List&lt;TajwidRule&gt;</ID>
+    <ID>EmptyFunctionBlock:ArabicSpeechRecognizer.kt$ArabicSpeechRecognizer.&lt;no name provided&gt;${}</ID>
+    <ID>LongMethod:AudioManagerScreen.kt$@Composable fun AudioManagerScreen( onBack: () -&gt; Unit, onDownloadAll: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:DreamBigScreen.kt$@Composable private fun DreamBigQuizView( state: DreamBigUiState, strings: Strings, onBack: () -&gt; Unit, onAnswer: (String) -&gt; Unit, onNext: () -&gt; Unit, arabicFamily: FontFamily, )</ID>
+    <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( onOpenTahsin: () -&gt; Unit, onOpenVocab: () -&gt; Unit, onOpenQuiz: () -&gt; Unit, onOpenStats: () -&gt; Unit, onOpenDreamBig: () -&gt; Unit, onOpenLughoh: () -&gt; Unit, onOpenAyatQuiz: () -&gt; Unit, onOpenBadges: () -&gt; Unit, onOpenCoherence: () -&gt; Unit, onOpenFavorites: () -&gt; Unit, onOpenSettings: () -&gt; Unit, settings: SettingsUiState, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:LughohScreen.kt$@OptIn(ExperimentalLayoutApi::class) @Composable private fun LughohExercisesView( state: LughohUiState, strings: Strings, onBack: () -&gt; Unit, onAnswer: (String) -&gt; Unit, onTapChip: (Int) -&gt; Unit, onCheckRearrange: () -&gt; Unit, onNext: () -&gt; Unit, onRestart: () -&gt; Unit, onBackToHome: () -&gt; Unit, arabicFamily: FontFamily, )</ID>
+    <ID>LongMethod:MainActivity.kt$MainActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
+    <ID>LongMethod:SettingsScreen.kt$@Composable fun SettingsScreen( onBack: () -&gt; Unit, settings: SettingsUiState, onToggleTajwidColor: () -&gt; Unit, onToggleTranslation: () -&gt; Unit, onToggleDarkMode: () -&gt; Unit, onSetLanguage: (AppLanguage) -&gt; Unit, onSetReciter: (Reciter) -&gt; Unit, onSetSpeed: (Float) -&gt; Unit, onToggleAyahOfDay: () -&gt; Unit, onToggleStreakReminder: () -&gt; Unit, onDownloadAll: () -&gt; Unit, onOpenAudioManager: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:StatsScreen.kt$@Composable fun StatsScreen( onBack: () -&gt; Unit, onOpenAyah: (Int, Int) -&gt; Unit = { _, _ -&gt; }, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:TahsinScreen.kt$@Composable private fun MushafPageView( state: TahsinUiState.Ready, pageIndex: Int, strings: Strings, onSelectAyah: (Int, Int) -&gt; Unit, onSelectWord: (Int) -&gt; Unit, onPlaySelectedWord: () -&gt; Unit, onStopSelectedWord: () -&gt; Unit, onDismissMessage: () -&gt; Unit, )</ID>
+    <ID>LongMethod:TahsinScreen.kt$@Composable private fun SurahFlowBlock( ayahs: List&lt;MushafAyah&gt;, state: TahsinUiState.Ready, strings: Strings, onSelectAyah: (Int, Int) -&gt; Unit, onSelectWord: (Int) -&gt; Unit, onPlaySelectedWord: () -&gt; Unit, onStopSelectedWord: () -&gt; Unit, )</ID>
+    <ID>LongMethod:TahsinScreen.kt$@Composable private fun TahsinContent( state: TahsinUiState.Ready, onSelectPage: (Int) -&gt; Unit, onJumpToSurah: (Int) -&gt; Unit, onJumpToPage: (Int) -&gt; Unit, onSelectAyah: (Int, Int) -&gt; Unit, onSelectWord: (Int) -&gt; Unit, onMicClick: () -&gt; Unit, onPlaySelectedWord: () -&gt; Unit, onStopSelectedWord: () -&gt; Unit, onSetFontScale: (Float) -&gt; Unit, onSetAudioMode: (AudioPlaybackMode) -&gt; Unit, onToggleBookmark: () -&gt; Unit, onDismissMessage: () -&gt; Unit, onToggleAudioPlayback: () -&gt; Unit, onOpenSearch: () -&gt; Unit, onOpenSettings: () -&gt; Unit, onBack: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:TajwidEngine.kt$TajwidEngine$fun analyzeWord(word: String, prevWord: String? = null, nextWord: String? = null): List&lt;TajwidRule&gt;</ID>
+    <ID>LongMethod:TajwidQuizScreen.kt$@Composable private fun QuestionCard( question: QuizQuestion, selected: String?, ayahLabel: String, translation: String, language: AppLanguage, strings: Strings, fontFamily: FontFamily, onAnswer: (String) -&gt; Unit, onNext: () -&gt; Unit, )</ID>
+    <ID>LongMethod:VocabularyScreen.kt$@Composable fun VocabularyScreen( onBack: () -&gt; Unit, onOpenAyah: (surah: Int, ayah: Int) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:VocabularyScreen.kt$@Composable private fun CardsSection( state: VocabUiState, strings: Strings, arabicFamily: FontFamily, onFlip: () -&gt; Unit, onAnswer: (Boolean) -&gt; Unit, onPlay: () -&gt; Unit, onStartQuiz: () -&gt; Unit, onOpenAyah: (Int, Int) -&gt; Unit, )</ID>
+    <ID>LongMethod:VocabularyScreen.kt$@Composable private fun QuizSection( state: VocabUiState, strings: Strings, onAnswer: (String) -&gt; Unit, onNext: () -&gt; Unit, onRestart: () -&gt; Unit, onBackToCards: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:AchievementsTest.kt$AchievementsTest$( xp: Int = 0, streak: Int = 0, ayahAttempts: Int = 0, perfectAyahs: Int = 0, wordsMastered: Int = 0, dreamBigRounds: Int = 0, lughohRounds: Int = 0, surahsCompleted: Int = 0, )</ID>
+    <ID>LongParameterList:HomeScreen.kt$( onOpenTahsin: () -&gt; Unit, onOpenVocab: () -&gt; Unit, onOpenQuiz: () -&gt; Unit, onOpenStats: () -&gt; Unit, onOpenDreamBig: () -&gt; Unit, onOpenLughoh: () -&gt; Unit, onOpenAyatQuiz: () -&gt; Unit, onOpenBadges: () -&gt; Unit, onOpenCoherence: () -&gt; Unit, onOpenFavorites: () -&gt; Unit, onOpenSettings: () -&gt; Unit, settings: SettingsUiState, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:LughohScreen.kt$( state: LughohUiState, strings: Strings, onBack: () -&gt; Unit, onAnswer: (String) -&gt; Unit, onTapChip: (Int) -&gt; Unit, onCheckRearrange: () -&gt; Unit, onNext: () -&gt; Unit, onRestart: () -&gt; Unit, onBackToHome: () -&gt; Unit, arabicFamily: FontFamily, )</ID>
+    <ID>LongParameterList:LughohScreen.kt$( text: String, isArabic: Boolean, answered: Boolean, isCorrectOption: Boolean, isSelected: Boolean, enabled: Boolean, onClick: () -&gt; Unit, arabicFamily: FontFamily, )</ID>
+    <ID>LongParameterList:SettingsScreen.kt$( onBack: () -&gt; Unit, settings: SettingsUiState, onToggleTajwidColor: () -&gt; Unit, onToggleTranslation: () -&gt; Unit, onToggleDarkMode: () -&gt; Unit, onSetLanguage: (AppLanguage) -&gt; Unit, onSetReciter: (Reciter) -&gt; Unit, onSetSpeed: (Float) -&gt; Unit, onToggleAyahOfDay: () -&gt; Unit, onToggleStreakReminder: () -&gt; Unit, onDownloadAll: () -&gt; Unit, onOpenAudioManager: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:StatsViewModel.kt$StatsViewModel$( private val statsStore: ReadingStatsStore, private val vocabStatsStore: VocabularyStatsStore, private val dreamBigStore: DreamBigProgressStore, private val lughohStore: LughohProgressStore, private val gamificationStore: GamificationStore, private val readingHistory: ReadingHistoryStore, private val repository: QuranRepository, private val settings: SettingsSource, )</ID>
+    <ID>LongParameterList:TahsinScreen.kt$( fullText: String, wordStarts: List&lt;IntArray&gt;, wordsByAyah: List&lt;List&lt;String&gt;&gt;, spansByWord: List&lt;List&lt;List&lt;TajwidSpan&gt;&gt;&gt;, activeIdx: Int, statusByIndex: Map&lt;Int, AlignedWord&gt;, selectedIndex: Int?, tajwidColor: Boolean, )</ID>
+    <ID>LongParameterList:TahsinScreen.kt$( state: TahsinUiState.Ready, onSelectPage: (Int) -&gt; Unit, onJumpToSurah: (Int) -&gt; Unit, onJumpToPage: (Int) -&gt; Unit, onSelectAyah: (Int, Int) -&gt; Unit, onSelectWord: (Int) -&gt; Unit, onMicClick: () -&gt; Unit, onPlaySelectedWord: () -&gt; Unit, onStopSelectedWord: () -&gt; Unit, onSetFontScale: (Float) -&gt; Unit, onSetAudioMode: (AudioPlaybackMode) -&gt; Unit, onToggleBookmark: () -&gt; Unit, onDismissMessage: () -&gt; Unit, onToggleAudioPlayback: () -&gt; Unit, onOpenSearch: () -&gt; Unit, onOpenSettings: () -&gt; Unit, onBack: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:TahsinScreen.kt$( state: TahsinUiState.Ready, pageIndex: Int, strings: Strings, onSelectAyah: (Int, Int) -&gt; Unit, onSelectWord: (Int) -&gt; Unit, onPlaySelectedWord: () -&gt; Unit, onStopSelectedWord: () -&gt; Unit, onDismissMessage: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:TahsinViewModel.kt$TahsinViewModel$( private val app: Context, private val repository: QuranRepository, private val speech: ArabicSpeechRecognizer, private val audioPlayer: TahsinAudioPlayer, private val settings: SettingsStore, private val downloader: AudioDownloader, private val fontStore: FontStore, private val statsStore: ReadingStatsStore, private val bookmarkStore: BookmarkStore, private val vocabulary: VocabularyRepository, private val readingHistory: ReadingHistoryStore, )</ID>
+    <ID>LongParameterList:TajwidQuizScreen.kt$( question: QuizQuestion, selected: String?, ayahLabel: String, translation: String, language: AppLanguage, strings: Strings, fontFamily: FontFamily, onAnswer: (String) -&gt; Unit, onNext: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:VocabularyScreen.kt$( state: VocabUiState, strings: Strings, arabicFamily: FontFamily, onFlip: () -&gt; Unit, onAnswer: (Boolean) -&gt; Unit, onPlay: () -&gt; Unit, onStartQuiz: () -&gt; Unit, onOpenAyah: (Int, Int) -&gt; Unit, )</ID>
+    <ID>MatchingDeclarationName:Colors.kt$AyahColors</ID>
+    <ID>MatchingDeclarationName:SimpleDropdown.kt$DropdownOption</ID>
+    <ID>MatchingDeclarationName:Typography.kt$AyahTypography</ID>
+    <ID>MaxLineLength:AppStrings.kt$AppStrings$coherenceMethodology = "A summary of the nazm-school reading (not a literal quotation); it is one academic interpretive framework, not the only way to read the Qur'an."</ID>
+    <ID>MaxLineLength:AppStrings.kt$AppStrings$coherenceMethodology = "Ringkasan pembacaan mazhab nazm (bukan kutipan harfiah); ini salah satu kerangka tafsir akademis, bukan satu-satunya cara membaca Al-Qur'an."</ID>
+    <ID>MaxLineLength:AppStrings.kt$AppStrings$coherenceSubtitle = "The main theme of every surah and the connections between surahs according to the nazm school — Farahi, Islahi, and Mustansir Mir."</ID>
+    <ID>MaxLineLength:AppStrings.kt$AppStrings$coherenceSubtitle = "Topik utama tiap surah dan keterkaitan antar surah menurut mazhab nazm — Farahi, Islahi, dan Mustansir Mir."</ID>
+    <ID>MaxLineLength:AppStrings.kt$AppStrings$lughohSubtitle = "Durusul Lughoh-style method: conversation, vocabulary, grammar — unlimited random practice for beginners."</ID>
+    <ID>MaxLineLength:AppStrings.kt$AppStrings$lughohSubtitle = "Metode ala Durusul Lughoh: percakapan, kosakata, tata bahasa — latihan acak tak terbatas untuk pemula."</ID>
+    <ID>MaxLineLength:AudioManagerScreen.kt$"${strings.audioAyat}: ${item.ayahFiles}/${item.ayahCount} • ${strings.audioKata}: ${item.wordFiles}/${item.totalWords ?: "?"} • ${formatSize(item.sizeBytes)}$missingNote"</ID>
+    <ID>MaxLineLength:AyahOfTheDayPickerTest.kt$AyahOfTheDayPickerTest$assertNull(runBlocking { AyahOfTheDayPicker.contentOf(emptyList(), loader(), LocalDate.of(2026, 8, 12), AppLanguage.ID) })</ID>
+    <ID>MaxLineLength:AyahOfTheDayPickerTest.kt$AyahOfTheDayPickerTest$val result = runBlocking { AyahOfTheDayPicker.contentOf(surahs, loader(), LocalDate.ofEpochDay(19_000L), AppLanguage.ID) }</ID>
+    <ID>MaxLineLength:CoherenceContent.kt$CoherenceContent$CoherenceGroup(2, "6–9", "6–9", "Akibat penolakan terhadap Nabi bagi kaum musyrik Makkah", "Consequences of denying the Prophet for the Makkan polytheists")</ID>
+    <ID>MaxLineLength:CoherenceContent.kt$CoherenceContent$CoherenceGroup(3, "10–24", "10–24", "Kabar gembira akan kemenangan Nabi", "Glad tidings of the Prophet's dominance")</ID>
+    <ID>MaxLineLength:CoherenceContent.kt$CoherenceContent$CoherenceGroup(4, "25–33", "25–33", "Argumentasi kenabian Muhammad ﷺ dan tuntutan iman kepadanya", "Arguments for the prophethood of Muhammad ﷺ and the requirements of faith in him")</ID>
+    <ID>MaxLineLength:CoherenceContent.kt$CoherenceContent$CoherenceGroup(5, "34–49", "34–49", "Argumentasi tauhid dan tuntutan iman kepadanya", "Arguments for tawhid and the requirements of faith in it")</ID>
+    <ID>MaxLineLength:CoherenceContent.kt$CoherenceContent$CoherenceGroup(6, "50–66", "50–66", "Argumentasi akhirat dan tuntutan iman kepadanya", "Arguments for the Hereafter and the requirements of faith in it")</ID>
+    <ID>MaxLineLength:CoherenceContent.kt$CoherenceContent$CoherenceGroup(7, "67–114", "67–114", "Peringatan kepada Quraisy tentang nasib mereka di dunia dan akhirat", "Admonition to the Quraysh about their fate here and hereafter")</ID>
+    <ID>MaxLineLength:CoherenceScreen.kt$"${strings.coherenceGroupLabel.format(group.number)} · ${textOf(language, group.rangeId, group.rangeEn)}"</ID>
+    <ID>MaxLineLength:DownloadService.kt$DownloadService$startForeground(NOTIFICATION_ID, buildNotification(done, total, label), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)</ID>
+    <ID>MaxLineLength:DreamBigViewModel.kt$DreamBigViewModel$val updatedStats = progressStore.read().withRound(q.score, q.bestStreak).also { progressStore.write(it) }</ID>
+    <ID>MaxLineLength:GamificationStoreTest.kt$GamificationStoreTest$"""{"xp":100,"todayXp":10,"lastActiveDay":5,"streak":2,"badges":["vocab-50","streak-7","dream-10","tidak-ada"]}"""</ID>
+    <ID>MaxLineLength:HomeScreen.kt$"${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, settings.language)} · "</ID>
+    <ID>MaxLineLength:LughohEnTest.kt$LughohEnTest$.</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": []}], "juzStarts": [{"juz": 1, "surah": 1, "ayah": 1}]}"""</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": [{"surah": 1, "from": 7, "to": 7}]}], "juzStarts": [{"juz": 1, "surah": 1, "ayah": 1}]}"""</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": [{"surah": 2, "from": 1, "to": 5}]}], "juzStarts": [{"juz": 1, "surah": 1, "ayah": 1}]}"""</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": [{"surah": 2, "from": 3, "to": 2}]}], "juzStarts": [{"juz": 1, "surah": 1, "ayah": 1}]}"""</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": [{"surah": 22, "from": 18, "to": 18}]}], "juzStarts": [{"juz": 17, "surah": 22, "ayah": 18}]}"""</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": [{"surah": 32, "from": 15, "to": 15}]}], "juzStarts": [{"juz": 21, "surah": 32, "ayah": 15}]}"""</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": [{"surah": 7, "from": 206, "to": 206}]}], "juzStarts": [{"juz": 1, "surah": 1, "ayah": 1}]}"""</ID>
+    <ID>MaxLineLength:MushafPageComposerTest.kt$MushafPageComposerTest$"""{"pageCount": 1, "pages": [{"page": 1, "segments": [{"surah": 9, "from": 1, "to": 2}]}], "juzStarts": [{"juz": 10, "surah": 9, "ayah": 1}]}"""</ID>
+    <ID>MaxLineLength:QuranParserTest.kt$QuranParserTest$"""{"data":{"nomor":112,"nama":"الإخلاص","namaLatin":"Al-Ikhlas","jumlahAyat":4,"ayat":[{"nomorAyat":1},{"nomorAyat":2}]}}"""</ID>
+    <ID>MaxLineLength:ReadingHistoryStoreTest.kt$ReadingHistoryStoreTest$"""[{"surah":0,"ayah":5,"timestamp":1},{"surah":1,"ayah":0,"timestamp":2},{"surah":2,"ayah":255,"timestamp":3}]"""</ID>
+    <ID>MaxLineLength:ReadingHistoryStoreTest.kt$ReadingHistoryStoreTest$assertEquals(ReadingHistoryEntry(3, ReadingHistoryStore.MAX_ENTRIES + 5, (ReadingHistoryStore.MAX_ENTRIES + 5).toLong()), history[0])</ID>
+    <ID>MaxLineLength:ReadingStatsStoreTest.kt$ReadingStatsStoreTest$"""[{"surahNumber":1,"ayahNumber":1,"attempts":2,"scoreSum":100,"bestScore":60,"lastScore":40,"lastPracticedAt":0,"wordErrors":null}]"""</ID>
+    <ID>MaxLineLength:StatsScreen.kt$"${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, state.language)} · "</ID>
+    <ID>MaxLineLength:SurahQuizTest.kt$SurahQuizTest$assertTrue(q.options.filter { it != q.correctName }.all { it in names.map { n -&gt; n.second }.filter { n -&gt; n != "Al-Fatihah" } })</ID>
+    <ID>MaxLineLength:TahsinScreen.kt$AyahButton(text = "⚙", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSettings)</ID>
+    <ID>MaxLineLength:TahsinScreen.kt$AyahButton(text = "🔍", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSearch)</ID>
+    <ID>MaxLineLength:TahsinScreen.kt$DropdownOption("→ — ${strings.tahsinAudioContinuous}", { onSetAudioMode(AudioPlaybackMode.CONTINUOUS) })</ID>
+    <ID>MaxLineLength:TahsinScreen.kt$DropdownOption("↻ — ${strings.tahsinAudioRepeat}", { onSetAudioMode(AudioPlaybackMode.REPEAT) })</ID>
+    <ID>MaxLineLength:TahsinScreen.kt$onClick = if (state.isWordPlaying) onStopSelectedWord else onPlaySelectedWord</ID>
+    <ID>MaxLineLength:TahsinScreen.kt$val exp = if (state.language == AppLanguage.EN) r.explanationEn else r.explanation</ID>
+    <ID>MaxLineLength:TahsinViewModel.kt$TahsinViewModel$message = "${AppStrings.of(currentLanguage()).msgDownloadFailed} ${surah.nameLatin}: ${e.message ?: AppStrings.of(currentLanguage()).msgCheckConnection}"</ID>
+    <ID>MaxLineLength:TahsinViewModel.kt$TahsinViewModel$st.copy(message = "${AppStrings.of(lang).msgSurahLoadFailed} $number: ${AppStrings.of(lang).msgCheckConnection}")</ID>
+    <ID>MaxLineLength:TajwidEngine.kt$TajwidEngine$"Mad at the end of a word meets a hamzah at the start of the next word: may be read 2 or 4–5 counts."</ID>
+    <ID>MaxLineLength:TajwidEngine.kt$TajwidEngine$"Nun sakin/tanwin meets ${effectiveNext}: read merged without nasalization; the letter is doubled (tashdid)."</ID>
+    <ID>MaxLineLength:TajwidEngine.kt$TajwidEngine$"Nun sakin/tanwin meets ${effectiveNext}: read vaguely between izhar and idgham with ghunnah 1–2 counts."</ID>
+    <ID>MaxLineLength:TajwidEngine.kt$TajwidEngine$"Nun sukun/tanwin bertemu ${effectiveNext}: dibaca idgham tanpa dengung, huruf ${effectiveNext} ditasydid."</ID>
+    <ID>MaxLineLength:TajwidEngine.kt$TajwidEngine$"Nun sukun/tanwin bertemu ${effectiveNext}: dibaca samar antara izhar dan idgham dengan ghunnah 1–2 harakat."</ID>
+    <ID>MaxLineLength:TajwidEngineTest.kt$TajwidEngineTest$val rules = TajwidEngine.analyzeWord("\u0642\u064F\u0648", nextWord = "\u0623\u064E\u0641\u0652\u0644\u064E\u062D\u064E")</ID>
+    <ID>MaxLineLength:TajwidEngineTest.kt$TajwidEngineTest$val rules = TajwidEngine.analyzeWord("فِي", nextWord = "\u06DA\u0623\u064E\u0646\u0652\u0639\u064E\u0645\u0652\u062A\u064E")</ID>
+    <ID>MaxLineLength:TajwidQuizTest.kt$TajwidQuizTest$val words = listOf("\u0625\u0646\u0651\u064E\u0627", "مِنْ", "قَالَ", "\u0627\u0644\u0644\u0651\u064E\u0647\u064F")</ID>
+    <ID>MaxLineLength:VocabularyEngine.kt$VocabularyEngine$return "%04d-%02d-%02d".format(cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH))</ID>
+    <ID>MaxLineLength:VocabularyScreen.kt$variant = if (state.mode == VocabMode.CARDS) AyahButtonVariant.Primary else AyahButtonVariant.Outline</ID>
+    <ID>MaxLineLength:VocabularyScreen.kt$variant = if (state.mode == VocabMode.QUIZ) AyahButtonVariant.Primary else AyahButtonVariant.Outline</ID>
+    <ID>MaxLineLength:VocabularyViewModel.kt$VocabularyViewModel$it.copy(mode = VocabMode.QUIZ, question = null, selected = null, quizCorrect = 0, quizTotal = 0, quizDone = false)</ID>
+    <ID>MayBeConst:CoherenceContent.kt$CoherenceContent$/** Tema pusat seluruh Al-Qur'an menurut mazhab nazm (ringkasan, bukan kutipan). */ val centralThemeId: String = "Menurut Farahi–Islahi, Al-Qur'an adalah satu kitab yang utuh dengan satu " + "tema pusat: kehidupan manusia adalah ibadah kepada Allah semata, di atas " + "tiga pilar — tauhid, risalah (kenabian), dan akhirat."</ID>
+    <ID>MayBeConst:CoherenceContent.kt$CoherenceContent$val centralThemeEn: String = "According to Farahi–Islahi, the Qur'an is one unified book with a single " + "central theme: human life is servitude ('ibadah) to God alone, resting on " + "three pillars — tawhid, risalah (prophethood), and the Hereafter."</ID>
+    <ID>NestedBlockDepth:TajwidEngine.kt$TajwidEngine$fun analyzeWord(word: String, prevWord: String? = null, nextWord: String? = null): List&lt;TajwidRule&gt;</ID>
+    <ID>SwallowedException:AudioDownloader.kt$AudioDownloader$e: AudioUnavailableException</ID>
+    <ID>SwallowedException:AudioDownloader.kt$AudioDownloader$e: Exception</ID>
+    <ID>SwallowedException:TahsinViewModel.kt$TahsinViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AudioDownloader.kt$AudioDownloader$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TahsinViewModel.kt$TahsinViewModel$e: Exception</ID>
+    <ID>TooManyFunctions:TahsinViewModel.kt$TahsinViewModel : ViewModel</ID>
+    <ID>UnusedParameter:TahsinAudioPlayer.kt$TahsinAudioPlayer$text: String</ID>
+    <ID>UnusedParameter:TahsinAudioPlayer.kt$TahsinAudioPlayer$word: String</ID>
+    <ID>UnusedParameter:TahsinScreen.kt$ends: IntArray</ID>
+    <ID>UnusedPrivateProperty:LughohEngineTest.kt$LughohEngineTest$val random = Random(42)</ID>
+    <ID>UnusedPrivateProperty:VocabularyEngine.kt$VocabularyEngine$val dueKeys = due.mapTo(mutableSetOf()) { it.key }</ID>
+    <ID>VariableNaming:MushafIntegrityTest.kt$MushafIntegrityTest$/** Jumlah ayat standar mushaf Madinah (114 surah). Jumlah total = 6236. */ private val STANDARD_AYAH_COUNTS = listOf( 7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6, )</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,16 +1,19 @@
 package org.opennur.tahsin.ui
 
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import java.io.File
+import java.nio.file.Files
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.withTimeout
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.opennur.tahsin.data.quran.Ayah
@@ -22,10 +25,19 @@ import org.opennur.tahsin.util.Bookmark
 import org.opennur.tahsin.util.BookmarkStore
 import org.opennur.tahsin.util.SearchableAyah
 import org.opennur.tahsin.util.SettingsSource
-import java.io.File
-import java.nio.file.Files
 
-/** Tes logika FavoritesViewModel dengan fake repository + store file temp. */
+/**
+ * Tes FavoritesViewModel dengan MockK (mocking) + Turbine (koleksi StateFlow
+ * per-emisi) + Truth (assertion readable). Ini pola baseline MVVM testable:
+ * ViewModel dikonstruksi LANGSUNG dengan dependensi mock — tanpa Android,
+ * tanpa Hilt — sehingga logika UI-state bisa diuji di JVM murni.
+ *
+ * Catatan Turbine + StateFlow: StateFlow bersifat conflating, jadi emisi
+ * "isLoading = true" bisa terlewat jika pekerjaan IO selesai sangat cepat.
+ * Karena itu tes memakai pola "skip sampai target" — deterministik apa pun
+ * urutan emisinya.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
 class FavoritesViewModelTest {
 
     private lateinit var dir: File
@@ -44,95 +56,115 @@ class FavoritesViewModelTest {
         dir.deleteRecursively()
     }
 
-    private fun settings(code: String) = object : SettingsSource {
-        override val languageCode: String = code
+    private fun settings(code: String) = mockk<SettingsSource> {
+        every { languageCode } returns code
     }
 
-    private fun fakeRepo(vararg surahs: Surah): QuranRepository = object : QuranRepository {
-        override fun surahList(): List<Surah> = surahs.toList()
-        override fun pagination(): MushafPagination =
-            MushafPagination(1, 0, emptyList(), emptyList())
-        override fun cachedSurahPlain(number: Int): Surah? =
-            surahs.firstOrNull { it.number == number }
-        override suspend fun cachedSurah(number: Int, lang: AppLanguage): Surah? =
-            surahs.firstOrNull { it.number == number }
-        override suspend fun fetchSurah(number: Int, lang: AppLanguage): Surah =
-            surahs.firstOrNull { it.number == number }
-                ?: error("fetchSurah($number) tidak ada di fake")
-        override suspend fun searchIndex(): List<SearchableAyah> = emptyList()
+    private fun repo(vararg surahs: Surah): QuranRepository = mockk {
+        every { surahList() } returns surahs.toList()
+        every { pagination() } returns MushafPagination(1, 0, emptyList(), emptyList())
+        every { cachedSurahPlain(any()) } answers {
+            surahs.firstOrNull { it.number == firstArg<Int>() }
+        }
+        coEvery { cachedSurah(any(), any()) } answers {
+            surahs.firstOrNull { it.number == firstArg<Int>() }
+        }
+        coEvery { fetchSurah(any(), any()) } answers {
+            surahs.firstOrNull { it.number == firstArg<Int>() }
+                ?: error("fetchSurah(${firstArg<Int>()}) tidak ada di mock")
+        }
+        coEvery { searchIndex() } returns emptyList<SearchableAyah>()
     }
 
-    private fun awaitState(
-        state: StateFlow<FavoritesUiState>,
-        extra: (FavoritesUiState) -> Boolean = { true },
-    ): FavoritesUiState = runBlocking {
-        withTimeout(5_000) { state.first { !it.isLoading && extra(it) } }
-    }
+    private fun vm(vararg surahs: Surah, code: String = "id"): FavoritesViewModel =
+        FavoritesViewModel(settings(code), bookmarkStore, repo(*surahs))
 
     @Test
-    fun `refresh memuat bookmark terurut dan bahasa ID`() {
+    fun `refresh memuat bookmark terurut dan bahasa ID`() = runTest {
         val surah2 = Surah(2, "البقرة", "Al-Baqarah", 286, listOf(Ayah(255, "اللّٰهُ", "Allah.")))
-        val vm = FavoritesViewModel(settings("id"), bookmarkStore, fakeRepo(surah2))
+        val viewModel = vm(surah2)
         bookmarkStore.toggle(Bookmark(2, 255))
-        vm.refresh()
+        viewModel.refresh()
 
-        val state = awaitState(vm.state)
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
 
-        assertEquals(1, state.items.size)
-        assertEquals("Al-Baqarah", state.items[0].surahName)
-        assertEquals(255, state.items[0].ayah)
-        assertEquals("Allah.", state.items[0].translation)
-        assertEquals(AppLanguage.ID, state.language)
+            assertThat(state.items).hasSize(1)
+            assertThat(state.items[0].surahName).isEqualTo("Al-Baqarah")
+            assertThat(state.items[0].ayah).isEqualTo(255)
+            assertThat(state.items[0].translation).isEqualTo("Allah.")
+            assertThat(state.language).isEqualTo(AppLanguage.ID)
+        }
     }
 
     @Test
-    fun `refresh memuat terjemahan bahasa EN`() {
+    fun `refresh memuat terjemahan bahasa EN`() = runTest {
         val surah1 = Surah(1, "الفاتحة", "Al-Fatihah", 7, listOf(Ayah(1, "بِسْمِ", "In the name")))
-        val vm = FavoritesViewModel(settings("en"), bookmarkStore, fakeRepo(surah1))
+        val viewModel = vm(surah1, code = "en")
         bookmarkStore.toggle(Bookmark(1, 1))
-        vm.refresh()
+        viewModel.refresh()
 
-        val state = awaitState(vm.state)
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
 
-        assertEquals("In the name", state.items[0].translation)
-        assertEquals(AppLanguage.EN, state.language)
+            assertThat(state.items).hasSize(1)
+            assertThat(state.items[0].translation).isEqualTo("In the name")
+            assertThat(state.language).isEqualTo(AppLanguage.EN)
+        }
     }
 
     @Test
-    fun `repo gagal untuk satu surah - item itu dilewati tanpa crash`() {
-        // Fake hanya punya surah 1; bookmark surah 2 → fetchSurah(2) error.
+    fun `repo gagal untuk satu surah - item itu dilewati tanpa crash`() = runTest {
         val surah1 = Surah(1, "الفاتحة", "Al-Fatihah", 7, listOf(Ayah(1, "نص", "text")))
-        val vm = FavoritesViewModel(settings("id"), bookmarkStore, fakeRepo(surah1))
+        val viewModel = vm(surah1)
         bookmarkStore.toggle(Bookmark(1, 1))
-        bookmarkStore.toggle(Bookmark(2, 5))
-        vm.refresh()
+        bookmarkStore.toggle(Bookmark(2, 5)) // fetchSurah(2) error di mock
+        viewModel.refresh()
 
-        val state = awaitState(vm.state)
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
 
-        assertEquals(1, state.items.size)
-        assertEquals(1, state.items[0].surah)
+            assertThat(state.items).hasSize(1)
+            assertThat(state.items[0].surah).isEqualTo(1)
+        }
     }
 
     @Test
-    fun `remove menghapus dari daftar dan store`() {
+    fun `remove menghapus dari daftar dan store`() = runTest {
         val surah1 = Surah(1, "الفاتحة", "Al-Fatihah", 7, listOf(Ayah(1, "نص", "text")))
-        val vm = FavoritesViewModel(settings("id"), bookmarkStore, fakeRepo(surah1))
+        val viewModel = vm(surah1)
         bookmarkStore.toggle(Bookmark(1, 1))
-        vm.refresh()
-        awaitState(vm.state)
+        viewModel.refresh()
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+        }
 
-        vm.remove(1, 1)
-        val state = awaitState(vm.state) { it.items.isEmpty() }
+        viewModel.remove(1, 1)
+        viewModel.state.test {
+            // Skip sampai daftar kosong (emisi perantara boleh terlewat).
+            var state = awaitItem()
+            while (state.items.isNotEmpty()) state = awaitItem()
 
-        assertTrue(state.items.isEmpty())
-        assertTrue(bookmarkStore.load().isEmpty())
+            assertThat(state.items).isEmpty()
+            assertThat(bookmarkStore.load()).isEmpty()
+        }
     }
 
     @Test
-    fun `tanpa bookmark - daftar kosong`() {
-        val vm = FavoritesViewModel(settings("id"), bookmarkStore, fakeRepo())
-        vm.refresh()
-        val state = awaitState(vm.state)
-        assertTrue(state.items.isEmpty())
+    fun `tanpa bookmark - daftar kosong`() = runTest {
+        val viewModel = vm()
+        viewModel.refresh()
+
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+
+            assertThat(state.items).isEmpty()
+            assertThat(state.isLoading).isFalse()
+        }
     }
 }

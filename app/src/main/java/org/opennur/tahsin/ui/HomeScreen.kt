@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,10 +64,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val strings = AppStrings.of(settings.language)
-    val context = LocalContext.current
-    val gamificationViewModel: GamificationViewModel = viewModel(
-        factory = gamificationViewModelFactory(context),
-    )
+    val gamificationViewModel: GamificationViewModel = viewModel()
     val gamification by gamificationViewModel.state.collectAsStateWithLifecycle()
     // Muat ulang tiap Home masuk komposisi (setelah pop dari fitur lain).
     LaunchedEffect(Unit) { gamificationViewModel.refresh() }

@@ -56,7 +56,7 @@ fun DreamBigScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val viewModel: DreamBigViewModel = viewModel(factory = dreamBigViewModelFactory(context))
+    val viewModel: DreamBigViewModel = viewModel()
     LaunchedEffect(viewModel) { viewModel.refreshLanguage() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
