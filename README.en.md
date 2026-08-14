@@ -1,11 +1,13 @@
 # Tahsin Quran
 
-An Android app for **muraja'ah & Qur'an reading practice**: a mushaf in the
-original Uthmani script, real-time recitation scoring via microphone, tajwid
-letter coloring, per-ayah + per-word qari audio, and a **flow mode** for
-continuous muraja'ah without looking at the screen — plus **Qur'an & Arabic
-learning tracks**: Vocabulary, Tajweed Quiz, the **Dream BIG** game (arcade),
-and the **Learn Arabic** course (Durusul Lughoh-style methodology).
+An Android app for **muraja'ah & Qur'an reading practice**: a page-based mushaf
+in the style of the Madani mushaf (flowing ayah text connected right-to-left),
+real-time recitation scoring via microphone, tajwid letter coloring, per-ayah +
+per-word qari audio, and **audio playback modes** (single ayah / continue
+automatically / repeat) — plus **Qur'an & Arabic learning tracks**: Vocabulary,
+Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
+(Durusul Lughoh-style methodology), **Ayah Quiz**, and **Achievements**
+(XP + badges).
 
 > ⚠️ **Honest limitations** — this app is a practice aid, **not a substitute for a teacher**.
 > The page-based mushaf uses the EXACT Madani pagination (the ayahs per page match a
@@ -19,16 +21,19 @@ and the **Learn Arabic** course (Durusul Lughoh-style methodology).
 ## Features
 
 - 🧭 **Main menu** (home screen): every feature is opened from a menu card —
-  **Tahsin**, **Vocabulary**, **Tajweed Quiz**, **Statistics**, **Search**,
-  **Audio Manager**, **Dream BIG**, **Learn Arabic**, and **Settings**.
+  **Tahsin**, **Vocabulary**, **Tajweed Quiz**, **Statistics**, **Dream BIG**,
+  **Learn Arabic**, **Ayah Quiz**, **Achievements**, and **Settings**.
+  (Ayah search & Audio Manager moved: 🔍 in the Tahsin header, 🎵 in Settings.)
 - 📖 **Page-based mushaf like the real Madani mushaf** — navigation per PAGE (604 pages,
-  RTL flow like flipping a printed mushaf), verse-end marks **۝+Arabic-Indic numbers**,
-  **sajdah (prostration) marks ۩** at the 15 sajdah verses, basmalah at surah starts,
-  header band (surah name + juz), **offline by default** (Arabic + ID/EN translations
-  bundled into the APK). Translations are **hidden by default** (toggle in the header);
-  tap an ayah to make it the active STT practice target. Jump navigation is **per page**
-  (Page dropdown 1..604) plus a surah dropdown; a **persistent A− / A+ font-size control**
-  lets readers enlarge the mushaf text.
+  RTL flow like flipping a printed mushaf), **flowing ayah text connected right-to-left**
+  (short juz-30 ayahs share lines instead of stacking one per row), verse-end numbering
+  (circle + Arabic-Indic digit) **drawn attached to the end of each ayah**, **sajdah
+  (prostration) marks ۩** at the 15 sajdah verses, basmalah at surah starts, a divider
+  with the surah name when a new surah starts mid-page, header band (surah name + juz),
+  **offline by default** (Arabic + ID/EN translations bundled into the APK). Translations
+  are **hidden by default** (toggle in Settings). Navigation: **3 dropdowns**
+  [Surah] [Ayah] [Page] — short labels that never truncate with "…"; a **precision
+  font-size slider (100–250%)** lets readers enlarge the mushaf text.
 - 🎙️ **Real-time scoring**: words turn green (correct) / red (wrong) / yellow
   (currently being read) as you recite into the microphone (SpeechRecognizer `ar-SA`).
 - 📊 **Aggregate statistics across all challenges** (persistent): the
@@ -48,10 +53,12 @@ and the **Learn Arabic** course (Durusul Lughoh-style methodology).
   in the word panel & error list. **📝 Tajweed Quiz** (Quiz menu) asks "what rule
   applies to this word?" from random words across the whole mushaf (4 multiple
   choice options, score, explanation) — for learning, not just coloring.
-- 🔁 **Flow Mode (muraja'ah)**: when an ayah is fully correct, it automatically
-  advances to the next ayah and re-enables the mic; **double error sound + vibration**
-  on mistakes, success beep when an ayah is completed — practice without looking
-  at the screen.
+- ▶️ **Audio playback modes** (replaces flow mode): the dropdown beside "Listen"
+  chooses **١ — this ayah only** (plays once), **→ — continue automatically** to
+  the next ayah like reading on (across pages), or **↻ — repeat this ayah**
+  endlessly. Stop cancels the chain at any time. STT reading feedback stays:
+  words turn green (correct) / red (wrong) / yellow (currently read), a success
+  beep on a perfect read, sound + vibration on errors.
 - 📖 **Qur'an Vocabulary** (Vocabulary menu): **589 curated words** from the
   whole mushaf (VocabKey mirror) — word cards with meaning + example ayah, an
   SRS system (new vs. due-for-review), a multiple-choice **quiz** mode, and a
@@ -87,11 +94,13 @@ and the **Learn Arabic** course (Durusul Lughoh-style methodology).
   answer.
 - 🔥 **Streak reminder** (optional, Settings menu): daily 18:00 notification
   when today's goal isn't reached yet — so your streak never silently dies.
-- 👆 **Gestures**: **swipe** (mushaf, translation, or background) left/right to
-  change ayah (RTL: right = next ayah); the swipe hint can be dismissed
-  permanently with the ✕ button.
-- 🧭 **Single-line navigation**: `[‹ next] [surah ▾] [Ayah (n) ▾] [› prev]` —
-  surah/ayah labels auto-truncate (ellipsis) so it always fits on one screen.
+- 👆 **Gestures**: swipe the mushaf pages left/right (RTL: right = next page,
+  like flipping a printed mushaf); the previous & next pages are **preloaded in
+  the background** so page changes are smooth with no "loading surah" flash.
+- 🧭 **Single-line navigation**: `[Surah ▾] [Ayah ▾] [Page ▾]` — the [Ayah]
+  dropdown picks an ayah inside the active surah (the mushaf jumps to that
+  ayah's page); short labels (surah name, Arabic-Indic numbers in brackets)
+  so nothing truncates with "…".
 - 🔍 **Ayah search** (🔍 button in the header): search by **Arabic word**
   (diacritics and hamza/ya/ta-marbuta variants are normalized automatically)
   or by **ID/EN translation keyword** across all 114 surahs — offline from the
@@ -154,8 +163,12 @@ The same ayah for every user throughout the day, automatically changing tomorrow
   audio management list is cached too.
 
 ```
-app/src/main/java/com/tahsin/app/
-├── data/quran/     # Surah/Ayah models + repository (asset bundle → cache → equran.id)
+app/src/main/java/org/opennur/tahsin/
+├── data/quran/     # Surah/Ayah models + QuranRepository (asset bundle → cache →
+│                   #   equran.id) + MUSHAF: MushafPages (Madani pagination, 604
+│                   #   pages ← assets/quran/pages.json), MushafPage +
+│                   #   MushafPageComposer (page composition), Basmalah,
+│                   #   SajdahSigns (15 sajdah verses), AyahNumbering
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (color spans)
 │                   #   + TajwidQuiz ("what rule applies to this word?" quiz)
 ├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
@@ -278,7 +291,11 @@ arrangement), the **Ayah Quiz** (`AyatQuiz`/`SurahQuiz`: Complete-the-Ayah &
 Guess-the-Surah), the **gamification** system (`GamificationStore`:
 level/streak/todayXp; `Achievements`: progressive badges & tier evaluator),
 and all *progress stores* (`ReadingStatsStore`, `VocabularyStatsStore`,
-`DreamBigProgressStore`, `LughohProgressStore`):
+`DreamBigProgressStore`, `LughohProgressStore`), plus **mushaf integrity &
+pagination** (`MushafIntegrityTest` — 114 surahs / 6236 ayahs from the
+bundled data; `MushafPagesTest` & `MushafPageComposerTest` — golden Madani
+pagination tests: 604 pages, monotonic order, 30 juz boundaries, the
+basmalah rule, 15 sajdah verses, text free of ࣖ artifacts):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon

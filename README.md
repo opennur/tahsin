@@ -2,12 +2,13 @@
 
 > 🌐 **English version:** [README.en.md](README.en.md)
 
-Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf dengan gaya
-khat Utsmani, penilaian bacaan real-time lewat mikrofon, pewarnaan huruf tajwid,
-audio qari per ayat + per kata, dan **mode flow** untuk muroja'ah berkelanjutan
-tanpa melihat layar — plus **jalur belajar Qur'an & Bahasa Arab**: Kosakata,
-Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
-(metodologi ala Durusul Lughoh).
+Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf halaman
+ala mushaf Madani (teks ayat mengalir menyambung dari kanan ke kiri), penilaian
+bacaan real-time lewat mikrofon, pewarnaan huruf tajwid, audio qari per ayat +
+per kata, dan **mode pemutaran audio** (satu ayat / lanjut terus / ulang terus)
+— plus **jalur belajar Qur'an & Bahasa Arab**: Kosakata, Kuis Tajwid, game
+**Dream BIG** (arcade), kursus **Belajar Arab** (metodologi ala Durusul
+Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 
 > ⚠️ **Batasan jujur** — aplikasi ini adalah alat bantu latihan, **bukan pengganti guru**.
 > Tampilan mushaf halaman memakai paginasi Madani yang PERSIS (isi ayat per halaman
@@ -21,16 +22,20 @@ Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
 ## Fitur
 
 - 🧭 **Menu utama** (layar beranda): semua fitur dibuka lewat kartu menu —
-  **Tahsin**, **Kosakata**, **Kuis Tajwid**, **Statistik**, **Pencarian**,
-  **Kelola Audio**, **Dream BIG**, **Belajar Arab**, dan **Pengaturan**.
+  **Tahsin**, **Kosakata**, **Kuis Tajwid**, **Statistik**, **Dream BIG**,
+  **Belajar Arab**, **Kuis Ayat**, **Penghargaan**, dan **Pengaturan**.
+  (Pencarian ayat & Kelola Audio dipindah: 🔍 di header Tahsin, 🎵 di
+  Pengaturan.)
 - 📖 **Mushaf halaman ala mushaf Madani asli** — navigasi per HALAMAN (604 halaman,
-  alur RTL seperti membuka mushaf cetak), tanda akhir ayat **۝+nomor Arab-Indik**,
-  tanda **sujud tilawah ۩** di 15 tempat sujud, basmalah di awal surah, band header
-  (nama surah + juz), **offline bawaan** (Arab + terjemahan ID/EN di-bundle ke APK).
-  Terjemahan **tersembunyi secara default** (toggle di header); ketuk satu ayat
-  untuk menjadikannya ayat aktif latihan STT. Navigasi lompat **per halaman**
-  (dropdown Halaman 1..604) + dropdown surah; kontrol ukuran huruf **A− / A+
-  (persisten)** untuk yang butuh teks lebih besar.
+  alur RTL seperti membuka mushaf cetak), **teks ayat mengalir menyambung dari
+  kanan ke kiri** (ayat pendek di juz 30 tidak bertumpuk satu per baris),
+  penomoran akhir ayat (lingkaran + angka Arab-Indik) **digambar menempel di
+  ujung tiap ayat**, tanda **sujud tilawah ۩** di 15 tempat sujud, basmalah di
+  awal surah, pembatas + nama surah saat surah baru mulai di tengah halaman,
+  band header (nama surah + juz), **offline bawaan** (Arab + terjemahan ID/EN
+  di-bundle ke APK). Terjemahan **tersembunyi secara default** (toggle di
+  Pengaturan). Navigasi **3 dropdown**: [Surah] [Ayat] [Halaman] — label pendek
+  supaya tidak terpotong "…"; kontrol ukuran huruf **slider presisi (100–250%)**.
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
 - 📊 **Statistik gabungan semua challenge** (persisten): layar **Statistik**
@@ -42,9 +47,12 @@ Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
 - 🎨 **Warna tajwid** (nyala default, bisa dimatikan di menu Pengaturan): mad (merah),
   ghunnah (hijau), qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye),
   lam jalalah (teal).
-- 🔁 **Mode Flow (muroja'ah)**: kalau satu ayat selesai benar, otomatis lanjut ke
-  ayat berikutnya + mikrofon menyala lagi; **bunyi gagal ganda + getar** saat ada
-  kesalahan, beep sukses saat ayat tuntas — bisa muroja'ah tanpa lihat layar.
+- ▶️ **Mode pemutaran audio** (pengganti mode flow): dropdown di samping tombol
+  "Dengar" memilih **١ — ayat ini saja** (putar sekali), **→ — lanjut otomatis**
+  ke ayat berikutnya seperti membaca terus (lintas halaman), atau **↻ — ulang
+  terus** ayat ini. Tombol Stop membatalkan rantai kapan saja. Umpan bacaan STT
+  tetap: kata berubah hijau (benar) / merah (salah) / kuning (sedang dibaca),
+  beep sukses saat sempurna, bunyi + getar saat ada kesalahan.
 - 🧠 **Mesin tajwid lengkap + kuis**: selain mad wajib/jaiz & lam jalalah yang
   sudah ada, engine kini mendeteksi **tafkhim/tarqiq** (huruf isti'la & ra'),
   **mad badal/iwad/aridh lis-sukun**, dan **tanda waqaf mushaf** (مـ wajib,
@@ -86,11 +94,14 @@ Kuis Tajwid, game **Dream BIG** (arcade), dan kursus **Belajar Arab**
   surah yang sama / nama surah lain; skor + XP per jawaban benar.
 - 🔥 **Pengingat streak** (opsional, menu Pengaturan): notifikasi harian jam
   18:00 bila target harian belum tercapai — streak tidak putus diam-diam.
-- 👆 **Gesture**: **geser layar** (mushaf, terjemahan, maupun background) ke
-  kanan/kiri untuk ganti ayat (RTL: kanan = ayat berikutnya); petunjuk geser bisa
-  ditutup permanen lewat tombol ✕.
-- 🧭 **Navigasi satu baris**: `[‹ next] [surah ▾] [Ayat (n) ▾] [› prev]` — label
-  surah/ayat ter-truncate otomatis (ellipsis) supaya selalu muat satu layar.
+- 👆 **Gesture**: geser halaman mushaf ke kanan/kiri (RTL: kanan = halaman
+  berikutnya, seperti membalik mushaf cetak); halaman sebelum & sesudah
+  **di-pra-muat di background** supaya perpindahan mulus tanpa kilat
+  "memuat surah".
+- 🧭 **Navigasi satu baris**: `[Surah ▾] [Ayat ▾] [Halaman ▾]` — dropdown
+  [Ayat] memilih ayat di dalam surah aktif (mushaf ikut pindah ke halaman
+  ayat tersebut); label pendek (nama surah, nomor Arab-Indik dalam kurung)
+  supaya tidak terpotong "…".
 - 🔍 **Pencarian ayat** (tombol 🔍 di header): cari **kata Arab** (harakat &
   varian hamza/ya/ta marbuta dinormalisasi otomatis) atau **kata kunci
   terjemahan ID/EN** di seluruh 114 surah — offline dari bundle. Ketuk hasil
@@ -151,8 +162,12 @@ Satu ayat yang sama untuk semua pengguna sepanjang hari, berganti otomatis besok
   manajemen ikut di-cache.
 
 ```
-app/src/main/java/com/tahsin/app/
-├── data/quran/     # model Surah/Ayah + repository (aset bundle → cache → equran.id)
+app/src/main/java/org/opennur/tahsin/
+├── data/quran/     # model Surah/Ayah + QuranRepository (aset bundle → cache →
+│                   #   equran.id) + MUSHAF: MushafPages (paginasi Madani 604
+│                   #   halaman ← assets/quran/pages.json), MushafPage +
+│                   #   MushafPageComposer (susun halaman), Basmalah,
+│                   #   SajdahSigns (15 sujud tilawah), AyahNumbering
 ├── data/tajwid/    # TajwidEngine (rule-based) + TajwidColorizer (span warna)
 │                   #   + TajwidQuiz (kuis "hukum apa pada kata ini?")
 ├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
@@ -275,7 +290,11 @@ cache), mesin **Kosakata** (`VocabularyEngine`: SRS + quiz), **Dream BIG**
 **gamification** (`GamificationStore`: level/streak/todayXp; `Achievements`:
 badge progresif & evaluator tier), dan semua *progress store*
 (`ReadingStatsStore`, `VocabularyStatsStore`, `DreamBigProgressStore`,
-`LughohProgressStore`):
+`LughohProgressStore`), dan **integritas mushaf & paginasi**
+(`MushafIntegrityTest` — 114 surah / 6236 ayat dari data bundel;
+`MushafPagesTest` & `MushafPageComposerTest` — tes emas paginasi Madani:
+604 halaman, urutan monoton, batas 30 juz, aturan basmalah, 15 sajdah,
+teks tanpa artefak ࣖ):
 
 ```bash
 ./gradlew testDebugUnitTest --no-daemon

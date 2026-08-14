@@ -1,5 +1,6 @@
 package org.opennur.tahsin.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -60,6 +61,10 @@ fun DreamBigScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
     val arabicFamily = remember { FontStore(context).loadFamily(ArabicFont.UTSMANI) }
+
+    // Back sistem: kalau sedang di Kuis/Hasil, kembali ke halaman awal Dream BIG
+    // dulu — baru keluar ke menu utama (BackHandler global di MainActivity).
+    BackHandler(enabled = state.mode != DreamBigMode.HOME) { viewModel.backToHome() }
 
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
         when {

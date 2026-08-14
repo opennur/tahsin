@@ -1,5 +1,6 @@
 package org.opennur.tahsin.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -70,6 +71,12 @@ fun VocabularyScreen(
         onDispose { viewModel.stopAudio() }
     }
 
+    // Back sistem: kalau sedang di Kuis, kembali ke mode Kartu dulu — baru
+    // keluar ke menu utama (BackHandler global di MainActivity).
+    BackHandler(enabled = state.mode != VocabMode.CARDS) {
+        viewModel.switchMode(VocabMode.CARDS)
+    }
+
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
         Column(
             modifier = Modifier
@@ -82,7 +89,16 @@ fun VocabularyScreen(
 
             // ---- Header ----
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AyahButton(text = "←", variant = AyahButtonVariant.Outline, onClick = onBack)
+                AyahButton(
+                    text = "←",
+                    variant = AyahButtonVariant.Outline,
+                    // Konsisten dengan back sistem: di Kuis balik ke Kartu dulu.
+                    onClick = if (state.mode == VocabMode.CARDS) {
+                        onBack
+                    } else {
+                        { viewModel.switchMode(VocabMode.CARDS) }
+                    },
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 AyahText(
                     strings.vocabTitle,

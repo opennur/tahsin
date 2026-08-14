@@ -1,5 +1,6 @@
 package org.opennur.tahsin.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -74,6 +75,11 @@ fun LughohScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
     val arabicFamily = remember { FontStore(context).loadFamily(ArabicFont.UTSMANI) }
+
+    // Back sistem: kalau sedang di sub-tampilan Lughoh (Materi/Latihan), kembali
+    // ke halaman awal Lughoh dulu — baru keluar ke menu utama (ditangani
+    // MainActivity). BackHandler terdalam menang sebelum BackHandler global.
+    BackHandler(enabled = state.mode != LughohMode.HOME) { viewModel.backToHome() }
 
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
         when {

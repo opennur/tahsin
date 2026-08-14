@@ -152,7 +152,7 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 2: Kuis Tajwid + Statistik
+        // Baris 2: Kuis Tajwid + Kuis Ayat
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             HomeMenuCard(
                 text = strings.quizTitle,
@@ -160,33 +160,33 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f),
             )
             HomeMenuCard(
-                text = strings.menuStats,
-                onClick = onOpenStats,
+                text = strings.menuAyatQuiz,
+                onClick = onOpenAyatQuiz,
                 modifier = Modifier.weight(1f),
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 3: Dream BIG + Belajar Arab (dua kartu setengah)
+        // Baris 3: Belajar Arab + Dream BIG
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            HomeMenuCard(
-                text = strings.menuDreamBig,
-                onClick = onOpenDreamBig,
-                modifier = Modifier.weight(1f),
-            )
             HomeMenuCard(
                 text = strings.menuLughoh,
                 onClick = onOpenLughoh,
                 modifier = Modifier.weight(1f),
             )
+            HomeMenuCard(
+                text = strings.menuDreamBig,
+                onClick = onOpenDreamBig,
+                modifier = Modifier.weight(1f),
+            )
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 5: Kuis Ayat + Penghargaan
+        // Baris 4: Statistik + Penghargaan
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             HomeMenuCard(
-                text = strings.menuAyatQuiz,
-                onClick = onOpenAyatQuiz,
+                text = strings.menuStats,
+                onClick = onOpenStats,
                 modifier = Modifier.weight(1f),
             )
             HomeMenuCard(
@@ -197,7 +197,7 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Baris 6: Pengaturan (penuh, disorot)
+        // Baris 5: Pengaturan (penuh, disorot)
         HomeMenuCard(
             text = strings.menuSettings,
             onClick = onOpenSettings,
