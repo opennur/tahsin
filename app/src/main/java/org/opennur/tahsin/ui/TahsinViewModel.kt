@@ -16,9 +16,13 @@ import org.opennur.tahsin.data.quran.ComposedPage
 import org.opennur.tahsin.data.quran.MushafPageComposer
 import org.opennur.tahsin.data.quran.MushafPagination
 import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.quran.Surah
 import org.opennur.tahsin.data.tajwid.TajwidEngine
 import org.opennur.tahsin.data.tajwid.TajwidRule
+import org.opennur.tahsin.data.vocab.VocabEntry
+import org.opennur.tahsin.data.vocab.VocabularyEngine
+import org.opennur.tahsin.data.vocab.VocabularyRepository
 import org.opennur.tahsin.stt.ArabicSpeechRecognizer
 import org.opennur.tahsin.stt.AlignedWord
 import org.opennur.tahsin.stt.TranscriptAligner
@@ -29,6 +33,7 @@ import org.opennur.tahsin.ui.AppStrings
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.Bookmark
 import org.opennur.tahsin.util.BookmarkStore
+import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.AudioDownloader
 import org.opennur.tahsin.util.DownloadProgress
 import org.opennur.tahsin.util.DownloadService
@@ -86,6 +91,8 @@ sealed interface TahsinUiState {
         val ayahStats: AyahStats? = null,
         val selectedWordIndex: Int? = null,
         val selectedWordRules: List<TajwidRule> = emptyList(),
+        /** Arti kata terpilih (bahasa aktif) — null kalau belum terkurasi. */
+        val selectedWordMeaning: String? = null,
         val message: String? = null,
         val fontScale: Float = 1.5f,
         val language: AppLanguage = AppLanguage.ID,
@@ -182,10 +189,23 @@ class TahsinViewModel(
     private val fontStore: FontStore,
     private val statsStore: ReadingStatsStore,
     private val bookmarkStore: BookmarkStore,
+    private val vocabulary: VocabularyRepository,
+    private val readingHistory: ReadingHistoryStore,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
     val uiState: StateFlow<TahsinUiState> = _uiState.asStateFlow()
+
+    /** Kosakata terkurasi (cache) untuk arti kata di tooltip; dimuat di reload(). */
+    @Volatile
+    private var vocabEntries: List<VocabEntry> = emptyList()
+
+    /** Catat kunjungan ayat ke riwayat baca (IO; dedup di store). */
+    private fun recordReading(surah: Int, ayahNumber: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            readingHistory.record(surah, ayahNumber, System.currentTimeMillis())
+        }
+    }
 
     /** State setelan lintas layar (portal Home & Pengaturan) — diinisialisasi
      * dari penyimpanan, lalu disinkronkan via [syncSettings] tiap state berubah. */
@@ -282,6 +302,10 @@ class TahsinViewModel(
         viewModelScope.launch {
             updateReady { it.copy(bookmarks = bookmarkStore.load()) }
         }
+        // Muat daftar kosakata terkurasi untuk arti kata di tooltip.
+        viewModelScope.launch(Dispatchers.IO) {
+            vocabEntries = vocabulary.curatedEntries()
+        }
         // Target dari widget/notifikasi (state baru saja siap) → buka langsung.
         pendingOpenAt?.let { (s, a) -> openAt(s, a) }
     }
@@ -364,10 +388,12 @@ class TahsinViewModel(
             issues = emptyList(),
             selectedWordIndex = null,
             selectedWordRules = emptyList(),
+            selectedWordMeaning = null,
             message = null,
         ) }
         refreshAyahStats(surah, ayahNumber)
         ensurePageLoaded(clamped)
+        recordReading(surah, ayahNumber)
     }
 
     /**
@@ -497,9 +523,11 @@ class TahsinViewModel(
             issues = emptyList(),
             selectedWordIndex = null,
             selectedWordRules = emptyList(),
+            selectedWordMeaning = null,
             message = null,
         ) }
         refreshAyahStats(surah, ayahNumber)
+        recordReading(surah, ayahNumber)
     }
 
     /** Tampilkan/sembunyikan terjemahan di bawah mushaf (default: tersembunyi). */
@@ -835,12 +863,16 @@ class TahsinViewModel(
             updateReady { it.copy(
                 selectedWordIndex = null,
                 selectedWordRules = emptyList(),
+                selectedWordMeaning = null,
             ) }
             return
         }
         updateReady { it.copy(
             selectedWordIndex = index,
             selectedWordRules = rulesFor(index, words),
+            selectedWordMeaning = words.getOrNull(index)?.let { w ->
+                VocabularyEngine.meaningOfWord(vocabEntries, w, it.language)
+            },
         ) }
     }
 
@@ -1142,6 +1174,9 @@ class TahsinViewModel(
         // Reload paksa: konten surah yang sudah dimuat masih berbahasa lama —
         // tanpa ini terjemahan mushaf tidak ikut ganti bahasa.
         ensurePageLoaded(s.pageIndex, force = true)
+        // Arti kata terpilih ikut ganti bahasa.
+        val sel = s.selectedWordIndex
+        if (sel != null) selectWord(sel)
     }
 
     private fun currentReady(): TahsinUiState.Ready? = _uiState.value as? TahsinUiState.Ready
@@ -1188,7 +1223,7 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
         val app = context.applicationContext
         TahsinViewModel(
             app = app,
-            repository = QuranRepository(app),
+            repository = AssetQuranRepository(app),
             speech = ArabicSpeechRecognizer(app),
             audioPlayer = TahsinAudioPlayer(app, SettingsStore(app)),
             settings = SettingsStore(app),
@@ -1196,6 +1231,8 @@ fun tahsinViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
             fontStore = FontStore(app),
             statsStore = ReadingStatsStore.fromContext(app),
             bookmarkStore = BookmarkStore.fromContext(app),
+            vocabulary = VocabularyRepository(app),
+            readingHistory = ReadingHistoryStore.fromContext(app),
         )
     }
 }

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.AudioDownloader
 import org.opennur.tahsin.util.DownloadProgress
@@ -218,7 +219,7 @@ fun audioManagerViewModelFactory(context: Context): ViewModelProvider.Factory = 
         val app = context.applicationContext
         AudioManagerViewModel(
             app = app,
-            repository = QuranRepository(app),
+            repository = AssetQuranRepository(app),
             downloader = AudioDownloader(app, SettingsStore(app)),
             settings = SettingsStore(app),
         )

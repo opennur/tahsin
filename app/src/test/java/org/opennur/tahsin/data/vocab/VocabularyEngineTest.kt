@@ -57,6 +57,29 @@ class VocabularyEngineTest {
     }
 
     @Test
+    fun `meaningOfWord - kata terkurasi mengembalikan arti sesuai bahasa`() {
+        assertEquals("dari", VocabularyEngine.meaningOfWord(entries, "مِنْ", AppLanguage.ID))
+        assertEquals("from", VocabularyEngine.meaningOfWord(entries, "مِنْ", AppLanguage.EN))
+        // Bentuk dengan harakat berbeda tetap ter-normalisasi ke kunci sama.
+        assertEquals("Allah", VocabularyEngine.meaningOfWord(entries, "اللّٰهِ", AppLanguage.EN))
+    }
+
+    @Test
+    fun `meaningOfWord - kata tak terkurasi atau kosong mengembalikan null`() {
+        assertNull(VocabularyEngine.meaningOfWord(entries, "كلمةغريبة", AppLanguage.ID))
+        assertNull(VocabularyEngine.meaningOfWord(entries, "   ", AppLanguage.ID))
+        assertNull(VocabularyEngine.meaningOfWord(entries, "", AppLanguage.EN))
+    }
+
+    @Test
+    fun `meaningOfWord - arti blank dianggap tidak ada`() {
+        // Kunci = bentuk ternormalisasi kata, tapi artinya kosong → null.
+        val blankEntry = VocabEntry("البلانك", "اَلْبِلَانْك", "blank", "", "", 1)
+        assertNull(VocabularyEngine.meaningOfWord(listOf(blankEntry), "اَلْبِلَانْك", AppLanguage.ID))
+        assertNull(VocabularyEngine.meaningOfWord(listOf(blankEntry), "اَلْبِلَانْك", AppLanguage.EN))
+    }
+
+    @Test
     fun `dayKey - format tanggal stabil`() {
         val key = VocabularyEngine.dayKey(now)
         assertTrue(Regex("""\d{4}-\d{2}-\d{2}""").matches(key))

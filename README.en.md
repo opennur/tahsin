@@ -35,7 +35,9 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   **offline by default** (Arabic + ID/EN translations bundled into the APK). Translations
   are **hidden by default** (toggle in Settings). Navigation: **3 dropdowns**
   [Surah] [Ayah] [Page] — short labels that never truncate with "…"; a **precision
-  font-size slider (100–250%)** lets readers enlarge the mushaf text.
+  font-size slider (100–250%)** lets readers enlarge the mushaf text; **tap a word
+  → tooltip with its meaning (from the curated vocabulary) + tajwid rules** and
+  subtle haptic feedback; wide (tablet) screens are capped at 640dp and centered.
 - 🎙️ **Real-time scoring**: words turn green (correct) / red (wrong) / yellow
   (currently being read) as you recite into the microphone (SpeechRecognizer `ar-SA`).
 - 📊 **Aggregate statistics across all challenges** (persistent): the
@@ -302,6 +304,23 @@ basmalah rule, 15 sajdah verses, text free of ࣖ artifacts):
 ```bash
 ./gradlew testDebugUnitTest --no-daemon
 ```
+
+### Integration tests (JVM, real assets)
+
+`QuranAssetsIntegrationTest` reads the actual bundled files under
+`src/main/assets/quran/` (not fixtures): all 114 surahs parse, **6,236 ayahs**
+total with per-surah counts matching `surah-list.json`, every ayah has
+non-blank Arabic + Indonesian translation, `pages.json` = **604 pages**,
+`vocab.json` = **1,200 curated entries** (ID+EN meanings complete), plus
+parser→engine round-trips (`meaningOfWord` for the most frequent words; valid
+`AyatQuiz` questions from real ayahs).
+
+**ViewModel logic unit tests** (`FavoritesViewModelTest`, `StatsViewModelTest`)
+run on the JVM with fake repository/store + `kotlinx-coroutines-test`
+(`Dispatchers.setMain`).
+
+> Instrumented tests (`androidTest`) are **deferred** until a device/emulator
+> is available — they cannot be verified in this environment.
 
 #### 100% coverage of the correctness-critical core (JaCoCo)
 

@@ -86,6 +86,32 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
      replacement is the audio playback mode `AudioPlaybackMode { AYAH,
      CONTINUOUS, REPEAT }`.
 
+## Test-Driven Development (TDD)
+
+This project uses the **red → green → refactor** workflow for every behavior
+change (new features and bug fixes alike):
+
+1. **Red** — first write a FAILING test for the desired behavior (assert
+   first; the implementation does not exist or is not correct yet). Run it and
+   confirm it fails for the intended reason.
+2. **Green** — write the minimal implementation until the test passes. Do not
+   add features beyond what is tested.
+3. **Refactor** — clean up without changing behavior; re-run tests and the
+   gate.
+
+Practical rules:
+
+- Every reported bug = write a test that reproduces it FIRST, then fix the
+  code. That test becomes a permanent regression guard.
+- Test first, code second — not the other way around. If you find yourself
+  writing the implementation and the test afterwards, pause and make the test
+  the first step of the next change.
+- The gate command (must be green before a PR):
+
+  ```bash
+  ./gradlew testDebugUnitTest assembleDebug jacocoCoreReport --no-daemon
+  ```
+
 ## Writing tests
 
 - Every new pure function in `data/**` / pure `util/**` needs unit tests
@@ -95,6 +121,14 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
   `pages.json` or a parser, these tests tell you "no".
 - Use clear test names, e.g. `"page 3 starts at 2:6"` — avoid `:` inside
   test names (invalid for JVM tests).
+- **Integration tests** (`QuranAssetsIntegrationTest`) read the real bundled
+  assets (`src/main/assets/quran/`) — if you change data/pipeline, these tests
+  tell you "no".
+- **ViewModel unit tests** (`FavoritesViewModelTest`, `StatsViewModelTest`)
+  use fake `QuranRepository`/`SettingsSource` + temp-file stores +
+  `kotlinx-coroutines-test` (`Dispatchers.setMain(UnconfinedTestDispatcher())`
+  in `@Before`, `resetMain()` in `@After`). Remember to call `vm.refresh()`
+  before waiting on state (the screen calls it via `LaunchedEffect`).
 
 ## PR workflow
 

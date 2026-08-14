@@ -92,6 +92,18 @@ object VocabularyEngine {
         if (lang == AppLanguage.ID) entry.meaningId else entry.meaningEn
 
     /**
+     * Arti kata mushaf (bentuk berharakat) dari daftar terkurasi; null kalau
+     * kata belum terkurasi, kosong, atau artinya blank. Dipakai tooltip kata
+     * di layar Tahsin — murni, bisa di-unit-test.
+     */
+    fun meaningOfWord(entries: List<VocabEntry>, word: String, lang: AppLanguage): String? {
+        val key = VocabKey.normalize(word)
+        if (key.isBlank()) return null
+        val entry = entries.firstOrNull { it.key == key } ?: return null
+        return meaningOf(entry, lang).ifBlank { null }
+    }
+
+    /**
      * Pilih sesi belajar: kartu jatuh tempo (tertua dulu, maks [dueLimit]),
      * lalu kata baru (urutan frekuensi, maks [newLimit]).
      *

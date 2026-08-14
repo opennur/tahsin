@@ -2,8 +2,18 @@ package org.opennur.tahsin.util
 
 import android.content.Context
 
+/**
+ * Subset setelan yang dipakai ViewModel yang diuji — interface kecil supaya
+ * unit test JVM bisa menyuntikkan fake tanpa Android (implementasi nyata:
+ * [SettingsStore]).
+ */
+interface SettingsSource {
+    /** Kode bahasa aktif ("id" / "en"). */
+    val languageCode: String
+}
+
 /** Penyimpanan sederhana preferensi pengguna (SharedPreferences). */
-class SettingsStore(context: Context) {
+class SettingsStore(context: Context) : SettingsSource {
 
     private val prefs = context.applicationContext
         .getSharedPreferences("tahsin_settings", Context.MODE_PRIVATE)
@@ -28,7 +38,7 @@ class SettingsStore(context: Context) {
         set(value) = prefs.edit().putBoolean("show_translation", value).apply()
 
     /** Bahasa aplikasi & terjemahan (default Indonesia). */
-    var languageCode: String
+    override var languageCode: String
         get() = prefs.getString("language_code", AppLanguage.ID.code) ?: AppLanguage.ID.code
         set(value) = prefs.edit().putString("language_code", value).apply()
 

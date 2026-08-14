@@ -92,6 +92,7 @@ dependencies {
 
     // ---- Unit test (JVM) ----
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 /**
@@ -136,7 +137,9 @@ tasks.register<JacocoReport>("jacocoCoreReport") {
                 "org/opennur/tahsin/util/GamificationEvents*",
                 "org/opennur/tahsin/util/GamificationStore*",
                 "org/opennur/tahsin/util/LughohProgressStore*",
+                "org/opennur/tahsin/util/ReadingHistoryStore*",
                 "org/opennur/tahsin/util/ReadingStats*",
+                "org/opennur/tahsin/util/RelativeTime*",
                 "org/opennur/tahsin/util/Reciter*",
                 "org/opennur/tahsin/util/VocabularyStatsStore*",
                 "org/opennur/tahsin/stt/TranscriptAligner*",

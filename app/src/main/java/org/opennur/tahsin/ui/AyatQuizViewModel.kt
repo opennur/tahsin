@@ -11,6 +11,7 @@ import org.opennur.tahsin.data.ayatquiz.AyatQuizQuestion
 import org.opennur.tahsin.data.ayatquiz.SurahQuiz
 import org.opennur.tahsin.data.ayatquiz.SurahQuizQuestion
 import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.ArabicNormalizer
 import org.opennur.tahsin.util.Gamification
@@ -223,7 +224,7 @@ fun ayatQuizViewModelFactory(context: Context): ViewModelProvider.Factory = view
         val app = context.applicationContext
         AyatQuizViewModel(
             app = app,
-            repository = QuranRepository(app),
+            repository = AssetQuranRepository(app),
             settings = SettingsStore(app),
         )
     }

@@ -8,12 +8,17 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import org.opennur.tahsin.data.dreambig.DreamBigGame
 import org.opennur.tahsin.data.lughoh.LughohEngine
+import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationStore
 import org.opennur.tahsin.util.LughohProgressStore
+import org.opennur.tahsin.util.ReadingHistoryEntry
+import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
+import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.SettingsStore
 import org.opennur.tahsin.util.VocabularyStatsStore
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +54,9 @@ data class StatsState(
     val badgesCount: Int = 0,
     val latestBadgeKey: String? = null,
     val latestBadgeTier: Int = 0,
+    // Riwayat baca (ayat terakhir yang dibuka, terbaru dulu)
+    val history: List<ReadingHistoryEntry> = emptyList(),
+    val surahNames: Map<Int, String> = emptyMap(),
 )
 
 /**
@@ -62,7 +70,9 @@ class StatsViewModel(
     private val dreamBigStore: DreamBigProgressStore,
     private val lughohStore: LughohProgressStore,
     private val gamificationStore: GamificationStore,
-    private val settings: SettingsStore,
+    private val readingHistory: ReadingHistoryStore,
+    private val repository: QuranRepository,
+    private val settings: SettingsSource,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(StatsState())
@@ -86,6 +96,8 @@ class StatsViewModel(
             val dreamBestPct = dream.bestScore * 100 / DreamBigGame.QUESTIONS_PER_ROUND
             val lughohBestPct = lughoh.bestScore * 100 / LughohEngine.SESSION_SIZE
             val wordsMastered = vocab.cards.values.count { it.correctCount > 0 }
+            val history = readingHistory.load()
+            val names = repository.surahList().associate { it.number to it.nameLatin }
 
             _state.value = StatsState(
                 isLoading = false,
@@ -106,6 +118,8 @@ class StatsViewModel(
                 badgesCount = gamification.badgeTiers.size,
                 latestBadgeKey = gamification.badgeTiers.entries.lastOrNull()?.key,
                 latestBadgeTier = gamification.badgeTiers.entries.lastOrNull()?.value ?: 0,
+                history = history,
+                surahNames = names,
             )
         }
     }
@@ -121,6 +135,8 @@ fun statsViewModelFactory(context: Context): ViewModelProvider.Factory = viewMod
             dreamBigStore = DreamBigProgressStore.fromContext(app),
             lughohStore = LughohProgressStore.fromContext(app),
             gamificationStore = GamificationStore.fromContext(app),
+            readingHistory = ReadingHistoryStore.fromContext(app),
+            repository = AssetQuranRepository(app),
             settings = SettingsStore(app),
         )
     }

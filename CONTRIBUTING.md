@@ -80,6 +80,31 @@ bash tools/fetch_font.sh                # font Utsmani (Amiri, SIL OFL 1.1)
    - **Mode flow sudah dihapus permanen** — jangan kembalikan. Penggantinya:
      mode pemutaran audio `AudioPlaybackMode { AYAH, CONTINUOUS, REPEAT }`.
 
+## Test-Driven Development (TDD)
+
+Proyek ini memakai alur **red → green → refactor** untuk semua perubahan
+perilaku (fitur baru maupun perbaikan bug):
+
+1. **Red** — tulis dulu test yang GAGAL untuk perilaku yang diinginkan
+   (assert dulu, implementasi belum ada / belum benar). Jalankan dan pastikan
+   test-nya benar-benar gagal karena alasan yang dimaksud.
+2. **Green** — tulis implementasi minimal sampai test hijau. Jangan menambah
+   fitur di luar yang dites.
+3. **Refactor** — rapikan tanpa mengubah perilaku; jalankan ulang test + gate.
+
+Aturan praktis:
+
+- Setiap bug dilaporkan = tulis test yang mereproduksinya TERLEBIH DAHULU,
+  baru perbaiki kodenya. Test itu menjadi regresi permanen.
+- Test dulu, kode kemudian — bukan sebaliknya. Kalau kamu menulis
+  implementasi dan test setelahnya, tunda sebentar dan tulis ulang test-nya
+  sebagai langkah pertama pada perubahan berikutnya.
+- Gate command (harus hijau sebelum PR):
+
+  ```bash
+  ./gradlew testDebugUnitTest assembleDebug jacocoCoreReport --no-daemon
+  ```
+
 ## Menulis test
 
 - Setiap fungsi murni baru di `data/**` / `util/**` murni wajib punya unit test
@@ -89,6 +114,14 @@ bash tools/fetch_font.sh                # font Utsmani (Amiri, SIL OFL 1.1)
   mengubah `pages.json` atau parser, tes ini yang bilang "jangan".
 - Nama test pakai backtick/deskripsi jelas, mis. `"page 3 starts at 2:6"` —
   hindari `:` di dalam nama (tidak valid untuk test JVM).
+- **Integration test** (`QuranAssetsIntegrationTest`) membaca aset bundel ASLI
+  (`src/main/assets/quran/`) — kalau kamu mengubah data/pipeline, tes ini yang
+  bilang "jangan".
+- **Unit test ViewModel** (`FavoritesViewModelTest`, `StatsViewModelTest`)
+  memakai fake `QuranRepository`/`SettingsSource` + store file temp +
+  `kotlinx-coroutines-test` (`Dispatchers.setMain(UnconfinedTestDispatcher())`
+  di `@Before`, `resetMain()` di `@After`). Jangan lupa panggil `vm.refresh()`
+  sebelum menunggu state (di layar dipanggil `LaunchedEffect`).
 
 ## Alur kerja PR
 

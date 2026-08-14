@@ -1,6 +1,7 @@
 package org.opennur.tahsin.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,8 @@ import org.opennur.tahsin.ui.components.AyahCard
 import org.opennur.tahsin.ui.components.AyahText
 import org.opennur.tahsin.ui.components.GoalProgressBar
 import org.opennur.tahsin.util.Achievements
+import org.opennur.tahsin.util.ReadingHistoryEntry
+import org.opennur.tahsin.util.RelativeTime
 
 /**
  * Layar statistik keseluruhan: angka gabungan semua challenge (Tahsin,
@@ -46,6 +49,7 @@ import org.opennur.tahsin.util.Achievements
 @Composable
 fun StatsScreen(
     onBack: () -> Unit,
+    onOpenAyah: (Int, Int) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -205,6 +209,53 @@ fun StatsScreen(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         BreakdownLine(strings.statsVocabLine.format(state.wordsMastered))
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // ---- Riwayat baca (ayat terakhir yang dibuka) ----
+                    AyahText(
+                        strings.statsHistoryTitle,
+                        style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (state.history.isEmpty()) {
+                        AyahCard(modifier = Modifier.fillMaxWidth()) {
+                            AyahText(
+                                strings.statsHistoryEmpty,
+                                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                            )
+                        }
+                    } else {
+                        AyahCard(modifier = Modifier.fillMaxWidth()) {
+                            Column {
+                                state.history.take(10).forEach { entry ->
+                                    val name = state.surahNames[entry.surah] ?: "Surah ${entry.surah}"
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { onOpenAyah(entry.surah, entry.ayah) }
+                                            .padding(vertical = 8.dp),
+                                    ) {
+                                        AyahText(
+                                            "$name · ${entry.ayah} · " +
+                                                RelativeTime.format(
+                                                    entry.timestamp,
+                                                    System.currentTimeMillis(),
+                                                    state.language,
+                                                ),
+                                            style = AyahTypography.Body2.copy(color = AyahColors.TextPrimary),
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        AyahText(
+                                            "›",
+                                            style = AyahTypography.Body2.copy(color = AyahColors.Primary),
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -10,6 +10,30 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
+ * Kontrak sumber data mushaf yang dipakai ViewModel — memungkinkan fake
+ * di unit test (implementasi Android: [AssetQuranRepository]).
+ */
+interface QuranRepository {
+    /** Daftar 114 surah (metadata saja, `ayahs` kosong). */
+    fun surahList(): List<Surah>
+
+    /** Paginasi mushaf Madani (604 halaman + 30 juz) dari bundle aset. */
+    fun pagination(): MushafPagination
+
+    /** Isi surah dari cache lokal saja (tanpa unduh) — null kalau belum ada. */
+    fun cachedSurahPlain(number: Int): Surah?
+
+    /** Isi surah + terjemahan [lang] dari cache lokal saja — null kalau belum ada. */
+    suspend fun cachedSurah(number: Int, lang: AppLanguage): Surah?
+
+    /** Isi surah + terjemahan [lang]; unduh dari equran.id kalau belum ada. */
+    suspend fun fetchSurah(number: Int, lang: AppLanguage): Surah
+
+    /** Indeks pencarian seluruh mushaf (Arab + terjemahan ID & EN). */
+    suspend fun searchIndex(): List<SearchableAyah>
+}
+
+/**
  * Sumber data mushaf:
  * - Daftar 114 surah: `assets/quran/surah-list.json` (offline).
  * - Isi ayat + terjemahan ID: `assets/quran/data/surah-<n>.json` (hasil
@@ -20,7 +44,7 @@ import java.net.URL
  *
  * Parsing JSON (murni JVM, bisa di-unit-test) ada di [QuranParser].
  */
-class QuranRepository(context: Context) {
+class AssetQuranRepository(context: Context) : QuranRepository {
 
     private val appContext = context.applicationContext
     private val quranDir: File
@@ -32,8 +56,7 @@ class QuranRepository(context: Context) {
     @Volatile
     private var cachedPages: MushafPagination? = null
 
-    /** Daftar 114 surah (metadata saja, `ayahs` kosong). */
-    fun surahList(): List<Surah> = cachedList ?: synchronized(this) {
+    override fun surahList(): List<Surah> = cachedList ?: synchronized(this) {
         cachedList ?: run {
             val json = appContext.assets
                 .open("quran/surah-list.json")
@@ -45,8 +68,7 @@ class QuranRepository(context: Context) {
         }
     }
 
-    /** Paginasi mushaf Madani (604 halaman + 30 juz) dari bundle aset. */
-    fun pagination(): MushafPagination = cachedPages ?: synchronized(this) {
+    override fun pagination(): MushafPagination = cachedPages ?: synchronized(this) {
         cachedPages ?: run {
             val json = appContext.assets
                 .open("quran/pages.json")
@@ -73,7 +95,7 @@ class QuranRepository(context: Context) {
         }.getOrNull()
 
     /** Surah yang sudah tersedia (bundle aset / cache) — teks saja. */
-    fun cachedSurahPlain(number: Int): Surah? {
+    override fun cachedSurahPlain(number: Int): Surah? {
         assetSurahRaw(number)?.let { return runCatching { QuranParser.parseSurah(it) }.getOrNull() }
         val file = File(quranDir, "surah-$number.json")
         if (!file.exists()) return null
@@ -85,7 +107,7 @@ class QuranRepository(context: Context) {
      * belum ada, diunduh dulu (EN: quran.com; ID: dari respons equran.id).
      * Null kalau isi surah belum pernah diunduh.
      */
-    suspend fun cachedSurah(number: Int, lang: AppLanguage): Surah? = withContext(Dispatchers.IO) {
+    override suspend fun cachedSurah(number: Int, lang: AppLanguage): Surah? = withContext(Dispatchers.IO) {
         val raw = assetSurahRaw(number)
             ?: runCatching { File(quranDir, "surah-$number.json").readText() }.getOrNull()
             ?: return@withContext null
@@ -96,7 +118,7 @@ class QuranRepository(context: Context) {
     }
 
     /** Unduh surah (equran.id) + terjemahan bahasa aktif, lalu simpan ke cache. */
-    suspend fun fetchSurah(number: Int, lang: AppLanguage): Surah = withContext(Dispatchers.IO) {
+    override suspend fun fetchSurah(number: Int, lang: AppLanguage): Surah = withContext(Dispatchers.IO) {
         val raw = assetSurahRaw(number)
             ?: runCatching { File(quranDir, "surah-$number.json").readText() }.getOrNull()
             ?: httpGet("https://equran.id/api/v2/surat/$number").also { text ->
@@ -115,7 +137,7 @@ class QuranRepository(context: Context) {
      * belum tersedia dilewati tanpa crash. Dipanggil sekali lalu di-cache di
      * pemanggil (SearchViewModel) — 114 file JSON, jadi jangan per-keystroke.
      */
-    suspend fun searchIndex(): List<SearchableAyah> = withContext(Dispatchers.IO) {
+    override suspend fun searchIndex(): List<SearchableAyah> = withContext(Dispatchers.IO) {
         surahList().mapNotNull { meta ->
             val n = meta.number
             val raw = assetSurahRaw(n)

@@ -3,6 +3,7 @@ package org.opennur.tahsin.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -71,10 +73,13 @@ fun HomeScreen(
     // Muat ulang tiap Home masuk komposisi (setelah pop dari fitur lain).
     LaunchedEffect(Unit) { gamificationViewModel.refresh() }
 
+    Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
+    // Layar lebar (tablet): konten dibatasi 640dp dan ditengahkan.
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(AyahColors.Background)
+            .widthIn(max = 640.dp)
+            .align(Alignment.TopCenter)
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp),
@@ -230,6 +235,7 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
     }
+}
 }
 
 /** Kartu menu portal: label di tengah, latar sesuai varian. */

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.AyahSearch
 import org.opennur.tahsin.util.SearchableAyah
@@ -125,7 +126,7 @@ fun searchViewModelFactory(context: Context): ViewModelProvider.Factory = viewMo
         val app = context.applicationContext
         SearchViewModel(
             app = app,
-            repository = QuranRepository(app),
+            repository = AssetQuranRepository(app),
             settings = SettingsStore(app),
         )
     }

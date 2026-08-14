@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.tajwid.QuizQuestion
 import org.opennur.tahsin.data.tajwid.TajwidQuiz
 import org.opennur.tahsin.util.AppLanguage
@@ -161,7 +162,7 @@ fun tajwidQuizViewModelFactory(context: Context): ViewModelProvider.Factory = vi
         val app = context.applicationContext
         TajwidQuizViewModel(
             app = app,
-            repository = QuranRepository(app),
+            repository = AssetQuranRepository(app),
             settings = SettingsStore(app),
         )
     }

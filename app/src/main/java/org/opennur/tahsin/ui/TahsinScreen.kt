@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -51,7 +52,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -226,10 +229,13 @@ private fun TahsinContent(
         if (pagerState.currentPage != state.pageIndex) onSelectPage(pagerState.currentPage)
     }
 
+    Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
+    // Layar lebar (tablet): konten dibatasi 640dp dan ditengahkan, ala buku.
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(AyahColors.Background)
+            .widthIn(max = 640.dp)
+            .align(Alignment.TopCenter)
             .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         // ---- Header: kembali, judul, toggle terjemahan, pencarian, pengaturan ----
@@ -387,6 +393,7 @@ private fun TahsinContent(
             }
         }
     }
+}
 }
 
 /** Susun halaman [pageIndex] dari konten surah yang sudah dimuat (null = belum siap). */
@@ -658,6 +665,8 @@ private fun SurahFlowBlock(
     onStopSelectedWord: () -> Unit,
 ) {
     val flow = remember(ayahs) { buildFlowMeta(ayahs) }
+    // Umpan haptik halus saat kata dipilih (dibaca di komposable scope).
+    val haptics = LocalHapticFeedback.current
     val activeIdx = ayahs.indexOfFirst {
         it.surah == state.surahNumber && it.number == state.ayahIndex + 1
     }
@@ -746,7 +755,13 @@ private fun SurahFlowBlock(
                                         } ?: 0
                                         val idx = if (offset < lastEnd) wordIndexAt(offset, ws) else -1
                                         if (idx in ws.indices) {
-                                            onSelectWord(if (idx == selectedIndex) -1 else idx)
+                                            val newIdx = if (idx == selectedIndex) -1 else idx
+                                            if (newIdx >= 0) {
+                                                haptics.performHapticFeedback(
+                                                    HapticFeedbackType.TextHandleMove,
+                                                )
+                                            }
+                                            onSelectWord(newIdx)
                                         }
                                     } else {
                                         onSelectAyah(entry.surah, entry.number)
@@ -803,6 +818,17 @@ private fun SurahFlowBlock(
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(6.dp))
+                                    val meaning = state.selectedWordMeaning
+                                    if (!meaning.isNullOrBlank()) {
+                                        AyahText(
+                                            "${strings.wordMeaningLabel} $meaning",
+                                            style = AyahTypography.Caption.copy(
+                                                color = AyahColors.Primary,
+                                                fontWeight = FontWeight.Medium,
+                                            ),
+                                        )
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                    }
                                     val rules = state.selectedWordRules
                                     if (rules.isEmpty()) {
                                         AyahText(

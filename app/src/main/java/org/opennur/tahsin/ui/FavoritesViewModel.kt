@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.quran.Surah
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.Bookmark
 import org.opennur.tahsin.util.BookmarkStore
+import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.SettingsStore
 
 /** Satu baris ayat favorit di layar daftar. */
@@ -41,7 +43,7 @@ data class FavoritesUiState(
  * Activity-scoped, jadi jangan simpan bahasa hanya di init).
  */
 class FavoritesViewModel(
-    private val settings: SettingsStore,
+    private val settings: SettingsSource,
     private val bookmarkStore: BookmarkStore,
     private val repository: QuranRepository,
 ) : ViewModel() {
@@ -95,7 +97,7 @@ fun favoritesViewModelFactory(context: Context): ViewModelProvider.Factory = vie
         FavoritesViewModel(
             settings = SettingsStore(app),
             bookmarkStore = BookmarkStore.fromContext(app),
-            repository = QuranRepository(app),
+            repository = AssetQuranRepository(app),
         )
     }
 }

@@ -2,6 +2,7 @@ package org.opennur.tahsin.util
 
 import android.content.Context
 import org.opennur.tahsin.data.quran.QuranRepository
+import org.opennur.tahsin.data.quran.AssetQuranRepository
 
 /**
  * Hub ekonomi game: satu titik agregasi "catat XP + cek badge".
@@ -90,7 +91,7 @@ object GamificationHub {
 
     /** Rakit profil pemain dari semua store (membaca disk — panggil di IO). */
     fun loadProfile(app: Context, gamification: GamificationStats): PlayerProfile {
-        val surahs = runCatching { QuranRepository(app).surahList() }.getOrDefault(emptyList())
+        val surahs = runCatching { AssetQuranRepository(app).surahList() }.getOrDefault(emptyList())
         return Achievements.profileOf(
             readingStats = ReadingStatsStore.fromContext(app).all(),
             vocab = VocabularyStatsStore.fromContext(app).read(),

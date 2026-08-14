@@ -148,6 +148,9 @@ class MainActivity : ComponentActivity() {
                     )
                     AppScreen.Stats -> StatsScreen(
                         onBack = { pop() },
+                        onOpenAyah = { s, a ->
+                            target = OpenTarget(s, a, targetDelivery++)
+                        },
                     )
                     AppScreen.Search -> SearchScreen(
                         onBack = { pop() },

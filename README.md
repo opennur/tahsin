@@ -36,14 +36,19 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   band header (nama surah + juz), **offline bawaan** (Arab + terjemahan ID/EN
   di-bundle ke APK). Terjemahan **tersembunyi secara default** (toggle di
   Pengaturan). Navigasi **3 dropdown**: [Surah] [Ayat] [Halaman] — label pendek
-  supaya tidak terpotong "…"; kontrol ukuran huruf **slider presisi (100–250%)**.
+  supaya tidak terpotong "…"; kontrol ukuran huruf **slider presisi (100–250%)**;
+  **ketuk kata → tooltip berisi arti kata (dari kosakata terkurasi) + aturan
+  tajwid** + haptik halus; layar lebar (tablet) otomatis dibatasi 640dp dan
+  ditengahkan.
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
 - 📊 **Statistik gabungan semua challenge** (persisten): layar **Statistik**
   mengagregasi seluruh aktivitas — Tahsin (skor per ayat 0–100 & jumlah
   percobaan), **Dream BIG** (ronde & skor terbaik), **Belajar Arab** (sesi &
   skor terbaik), dan **Kosakata** (kata dikuasai). Ringkasan: **Total Sesi,
-  Skor Terbaik %, Total Ronde, Kata Dikuasai** + rincian per fitur. Di layar
+  Skor Terbaik %, Total Ronde, Kata Dikuasai** + rincian per fitur. Ada juga
+  **🕘 Riwayat Baca** — 10 ayat terakhir yang dibuka di mushaf (ketuk untuk
+  membukanya lagi). Di layar
   utama Tahsin tetap ada info cepat "N× dicoba · skor terbaik M%".
 - 🎨 **Warna tajwid** (nyala default, bisa dimatikan di menu Pengaturan): mad (merah),
   ghunnah (hijau), qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye),
@@ -300,6 +305,23 @@ teks tanpa artefak ࣖ):
 ```bash
 ./gradlew testDebugUnitTest --no-daemon
 ```
+
+### Integration test (JVM, aset asli)
+
+`QuranAssetsIntegrationTest` membaca LANGSUNG file bundel di
+`src/main/assets/quran/` (bukan fixture): 114 surah ter-parse, total **6.236
+ayat** dan jumlah ayat tiap surah cocok `surah-list.json`, tiap ayat punya
+teks Arab + terjemahan Indonesia non-kosong, `pages.json` = **604 halaman**,
+`vocab.json` = **1.200 entri terkurasi** (arti ID+EN lengkap), plus round-trip
+parser → engine (`meaningOfWord` untuk kata terfrequent; soal `AyatQuiz` valid
+dari ayat asli).
+
+Unit test **logika ViewModel** (`FavoritesViewModelTest`, `StatsViewModelTest`)
+berjalan di JVM dengan fake repository/store + `kotlinx-coroutines-test`
+(`Dispatchers.setMain`).
+
+> Instrumented test (`androidTest`) **ditunda** sampai ada perangkat/emulator —
+> tidak bisa diverifikasi di lingkungan ini.
 
 #### Cakupan 100% inti kebenaran (JaCoCo)
 

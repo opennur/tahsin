@@ -27,6 +27,7 @@ androidx-compose-foundation = { group = "androidx.compose.foundation", name = "f
 
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 # JSON parsing (mushaf asset)
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
