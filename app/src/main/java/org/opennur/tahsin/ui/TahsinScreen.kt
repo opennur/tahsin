@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -172,7 +175,6 @@ fun TahsinScreen(
             },
             onPlaySelectedWord = viewModel::playSelectedWord,
             onStopSelectedWord = viewModel::stopWordPlayback,
-            onToggleTranslation = viewModel::toggleTranslation,
             onSetFontScale = viewModel::setFontScale,
             onSetAudioMode = viewModel::setAudioMode,
             onDismissMessage = viewModel::clearMessage,
@@ -198,7 +200,6 @@ private fun TahsinContent(
     onMicClick: () -> Unit,
     onPlaySelectedWord: () -> Unit,
     onStopSelectedWord: () -> Unit,
-    onToggleTranslation: () -> Unit,
     onSetFontScale: (Float) -> Unit,
     onSetAudioMode: (AudioPlaybackMode) -> Unit,
     onDismissMessage: () -> Unit,
@@ -237,13 +238,6 @@ private fun TahsinContent(
             AyahButton(text = "←", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onBack)
             Spacer(modifier = Modifier.width(8.dp))
             AyahText(strings.appTitle, style = AyahTypography.Heading1, modifier = Modifier.weight(1f))
-            AyahButton(
-                text = strings.tahsinTranslation,
-                variant = if (state.showTranslation) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                onClick = onToggleTranslation,
-            )
-            Spacer(modifier = Modifier.width(6.dp))
             AyahButton(text = "🔍", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSearch)
             Spacer(modifier = Modifier.width(6.dp))
             AyahButton(text = "⚙", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSettings)
@@ -256,8 +250,11 @@ private fun TahsinContent(
                 .padding(horizontal = 12.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // 3 dropdown navigasi: [Surah] [Ayat] [Halaman]. Label dipilih yang
+            // PENDEK (nama surah tanpa nomor, nomor Arab-Indik dalam kurung)
+            // supaya tidak terpotong "..." di layar sempit.
             SimpleDropdown(
-                selectedLabel = state.surah?.let { "${it.number}. ${it.nameLatin}" } ?: "-",
+                selectedLabel = state.surah?.nameLatin ?: "-",
                 options = state.surahs.map { s ->
                     DropdownOption("${s.number}. ${s.nameLatin}", { onJumpToSurah(s.number) })
                 },
@@ -265,49 +262,55 @@ private fun TahsinContent(
             )
             Spacer(modifier = Modifier.width(8.dp))
             SimpleDropdown(
-                // Label cukup nomor halaman (Arab-Indik) — "Halaman" terlalu panjang
-                // dan kepotong di dropdown yang sempit.
-                selectedLabel = AyahNumbering.toArabicIndic(state.pageIndex + 1),
+                selectedLabel = "[${AyahNumbering.toArabicIndic(state.ayahIndex + 1)}]",
+                options = (1..(state.surah?.ayahCount ?: 0)).map { a ->
+                    DropdownOption(
+                        "${strings.tahsinAyah} ${AyahNumbering.toArabicIndic(a)}",
+                        { onSelectAyah(state.surahNumber, a) },
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            SimpleDropdown(
+                selectedLabel = "[${AyahNumbering.toArabicIndic(state.pageIndex + 1)}]",
                 options = (1..state.pageCount).map { p ->
                     DropdownOption("${strings.tahsinPage} ${AyahNumbering.toArabicIndic(p)}", { onJumpToPage(p) })
                 },
                 modifier = Modifier.weight(1f),
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            AyahText(
-                "${AyahNumbering.toArabicIndic(state.pageIndex + 1)} / ${AyahNumbering.toArabicIndic(state.pageCount)}",
-                style = AyahTypography.Caption.copy(textAlign = TextAlign.Center),
-                modifier = Modifier.weight(1f),
-            )
         }
 
-        // ---- Kontrol ukuran huruf (A− / A+) ----
+        // ---- Kontrol ukuran huruf (slider presisi) ----
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AyahButton(
-                text = "A−",
-                variant = AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                enabled = state.fontScale > FontScales.MIN,
-                onClick = { onSetFontScale(state.fontScale - FontScales.STEP) },
+            AyahText(
+                "A−",
+                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            FontSizeSlider(
+                value = state.fontScale,
+                onValueChange = onSetFontScale,
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahText(
+                "A+",
+                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
             )
             Spacer(modifier = Modifier.width(10.dp))
             AyahText(
                 "${(state.fontScale * 100).roundToInt()}%",
-                style = AyahTypography.Caption.copy(textAlign = TextAlign.Center),
-                modifier = Modifier.weight(1f),
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            AyahButton(
-                text = "A+",
-                variant = AyahButtonVariant.Outline,
-                size = AyahButtonSize.Small,
-                enabled = state.fontScale < FontScales.MAX,
-                onClick = { onSetFontScale(state.fontScale + FontScales.STEP) },
+                style = AyahTypography.Caption.copy(
+                    color = AyahColors.Primary,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                modifier = Modifier.width(44.dp),
             )
         }
 
@@ -754,6 +757,9 @@ private fun SurahFlowBlock(
                             offset = IntOffset(rect.left.roundToInt(), rect.bottom.roundToInt() + 6),
                             onDismissRequest = { onSelectWord(-1) },
                         ) {
+                            // Tooltip pakai arah LTR supaya keterangan tajwid
+                            // rata KIRI (jangan ikut RTL mushaf).
+                            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                             Box(
                                 modifier = Modifier
                                     .widthIn(min = 220.dp, max = 320.dp)
@@ -801,6 +807,7 @@ private fun SurahFlowBlock(
                                         }
                                     }
                                 }
+                            }
                             }
                         }
                     }
@@ -949,6 +956,74 @@ private fun IssueCard(
             )
         }
     }
+}
+
+/** Slider ukuran huruf — design system sendiri (aplikasi tanpa material3). */
+@Composable
+private fun FontSizeSlider(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val min = FontScales.MIN
+    val max = FontScales.MAX
+    val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
+    val thumbPx = with(LocalDensity.current) { 20.dp.toPx() }
+
+    BoxWithConstraints(
+        modifier = modifier
+            .height(28.dp)
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = { p ->
+                        onValueChange(fontScaleAtX(p.x, size.width.toFloat(), thumbPx, min, max))
+                    },
+                    onDrag = { change, _ ->
+                        onValueChange(fontScaleAtX(change.position.x, size.width.toFloat(), thumbPx, min, max))
+                        change.consume()
+                    },
+                )
+            },
+    ) {
+        val trackWidth = with(LocalDensity.current) { maxWidth.toPx() }
+        val thumbCenter = thumbPx / 2f + fraction * (trackWidth - thumbPx)
+        // Rel (latar track).
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxWidth()
+                .height(4.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(AyahColors.SurfaceVariant),
+        )
+        // Bagian terisi.
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxWidth(fraction)
+                .height(4.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(AyahColors.Primary),
+        )
+        // Thumb.
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset { IntOffset((thumbCenter - thumbPx / 2f).roundToInt(), 0) }
+                .size(20.dp)
+                .background(AyahColors.Primary, CircleShape)
+                .border(2.dp, AyahColors.Background, CircleShape),
+        )
+    }
+}
+
+/** Peta posisi x (px) di track ke fontScale (MIN..MAX); thumb menempel ujung. */
+private fun fontScaleAtX(x: Float, width: Float, thumbSize: Float, min: Float, max: Float): Float {
+    if (width <= thumbSize) return min
+    val usable = width - thumbSize
+    val f = ((x - thumbSize / 2f) / usable).coerceIn(0f, 1f)
+    return min + f * (max - min)
 }
 
 /** Simbol mode pemutaran audio untuk tombol di samping "Dengar". */

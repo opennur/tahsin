@@ -164,6 +164,7 @@ class MainActivity : ComponentActivity() {
                         onBack = { pop() },
                         settings = settingsState,
                         onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
+                        onToggleTranslation = tahsinViewModel::toggleTranslation,
                         onToggleDarkMode = tahsinViewModel::toggleDarkMode,
                         onSetLanguage = tahsinViewModel::setLanguage,
                         onSetReciter = tahsinViewModel::setReciter,

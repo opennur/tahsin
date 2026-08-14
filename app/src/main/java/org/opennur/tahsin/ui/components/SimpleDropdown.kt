@@ -66,7 +66,8 @@ fun SimpleDropdown(
                     color = AyahColors.Primary,
                     fontWeight = FontWeight.SemiBold,
                 ),
-                maxLines = 1,
+                // Maks 2 baris — kalau label kepanjangan, wrap (TIDAK "...").
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }

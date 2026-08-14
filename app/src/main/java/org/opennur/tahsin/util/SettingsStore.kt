@@ -22,6 +22,11 @@ class SettingsStore(context: Context) {
         get() = prefs.getBoolean("tajwid_color", true)
         set(value) = prefs.edit().putBoolean("tajwid_color", value).apply()
 
+    /** Tampilkan terjemahan di mushaf (default MATI — mushaf asli). */
+    var showTranslation: Boolean
+        get() = prefs.getBoolean("show_translation", false)
+        set(value) = prefs.edit().putBoolean("show_translation", value).apply()
+
     /** Bahasa aplikasi & terjemahan (default Indonesia). */
     var languageCode: String
         get() = prefs.getString("language_code", AppLanguage.ID.code) ?: AppLanguage.ID.code

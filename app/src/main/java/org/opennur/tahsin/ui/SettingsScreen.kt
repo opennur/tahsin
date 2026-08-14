@@ -55,6 +55,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     settings: SettingsUiState,
     onToggleTajwidColor: () -> Unit,
+    onToggleTranslation: () -> Unit,
     onToggleDarkMode: () -> Unit,
     onSetLanguage: (AppLanguage) -> Unit,
     onSetReciter: (Reciter) -> Unit,
@@ -107,6 +108,11 @@ fun SettingsScreen(
                 label = "🎨 ${strings.settingTajwid}",
                 checked = settings.tajwidColor,
                 onCheckedChange = onToggleTajwidColor,
+            )
+            SettingRow(
+                label = "🌐 ${strings.tahsinTranslation}",
+                checked = settings.showTranslation,
+                onCheckedChange = onToggleTranslation,
             )
             SettingRow(
                 label = "🌙 ${strings.settingDarkMode}",

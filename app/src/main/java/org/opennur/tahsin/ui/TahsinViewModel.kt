@@ -146,6 +146,7 @@ data class SettingsUiState(
     val language: AppLanguage = AppLanguage.ID,
     val darkMode: Boolean = false,
     val tajwidColor: Boolean = true,
+    val showTranslation: Boolean = false,
     val reciter: Reciter = Reciter.MINSHAWY,
     val audioSpeed: Float = 1.0f,
     val ayahOfDayEnabled: Boolean = true,
@@ -186,6 +187,7 @@ class TahsinViewModel(
             language = currentLanguage(),
             darkMode = settings.darkMode,
             tajwidColor = settings.tajwidColor,
+            showTranslation = settings.showTranslation,
             reciter = settings.reciter,
             audioSpeed = settings.audioSpeed,
             ayahOfDayEnabled = settings.ayahOfDayEnabled,
@@ -253,6 +255,7 @@ class TahsinViewModel(
                 ayahOfDayEnabled = settings.ayahOfDayEnabled,
                 streakReminderEnabled = settings.streakReminderEnabled,
                 showSwipeHint = !settings.swipeHintDismissed,
+                showTranslation = settings.showTranslation,
             )
         } catch (e: Exception) {
             TahsinUiState.Error(e.message ?: AppStrings.of(currentLanguage()).msgMushafLoadFailed)
@@ -463,6 +466,15 @@ class TahsinViewModel(
 
     /** Jadikan surah:ayat sebagai ayat aktif tanpa pindah halaman. */
     private fun setActiveAyah(surah: Int, ayahNumber: Int) {
+        val s = currentReady() ?: return
+        // Ayat dari dropdown [Ayat] bisa berada di HALAMAN lain — mushaf ikut
+        // pindah ke halaman yang memuat ayat tersebut (ketukan di halaman yang
+        // sama tidak perlu memindahkan halaman).
+        val page = s.pagination.pageOf(surah, ayahNumber)
+        if (page != null && page - 1 != s.pageIndex) {
+            moveToPage(page - 1, activeSurah = surah, activeAyahNumber = ayahNumber)
+            return
+        }
         settings.surahNumber = surah
         settings.ayahIndex = ayahNumber - 1
         updateReady { it.copy(
@@ -481,7 +493,9 @@ class TahsinViewModel(
 
     /** Tampilkan/sembunyikan terjemahan di bawah mushaf (default: tersembunyi). */
     fun toggleTranslation() {
-        updateReady { it.copy(showTranslation = !it.showTranslation) }
+        val next = !settings.showTranslation
+        settings.showTranslation = next
+        updateReady { it.copy(showTranslation = next) }
     }
 
     /**
@@ -1112,6 +1126,7 @@ class TahsinViewModel(
             language = s.language,
             darkMode = s.darkMode,
             tajwidColor = s.tajwidColor,
+            showTranslation = s.showTranslation,
             reciter = s.reciter,
             audioSpeed = s.audioSpeed,
             ayahOfDayEnabled = s.ayahOfDayEnabled,
