@@ -67,10 +67,13 @@ android {
 
     buildTypes {
         release {
-            // R8 DIMATIKAN (bug: release crash saat launch, debug aman — R8
-            // me-merge/obfuscate class Hilt yang di-generate). Re-enable hanya
-            // setelah keep rules Hilt di proguard-rules.pro terverifikasi di
-            // perangkat. APK release jadi lebih besar (~12 MB) tapi stabil.
+            // R8 DIMATIKAN TOTAL demi stabilitas — build release dengan R8
+            // terbukti crash saat launch di perangkat (debug aman). Tanpa
+            // minify/shrink, release = debug + signing → perilaku identik
+            // dengan build yang sudah terverifikasi. APK lebih besar (~9.6 MB)
+            // tapi stabil. Keep rules di proguard-rules.pro dipertahankan
+            // (dormant) untuk re-enable di masa depan setelah root cause
+            // didiagnosis lewat logcat.
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(

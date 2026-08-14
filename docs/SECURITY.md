@@ -9,7 +9,7 @@ plus cara menjalankan audit keamanan eksternal (MobSF & SecDroid).
 |---|---|---|
 | Network security | Semua trafik **HTTPS** saja (`cleartextTrafficPermitted=false`), trust anchor sistem saja (tanpa CA custom) | `app/src/main/res/xml/network_security_config.xml` + `AndroidManifest.xml` |
 | Backup data | `allowBackup=false` + aturan exclude penuh untuk cloud backup & device-to-device (data pribadi: riwayat baca, bookmark, progres tidak ikut backup) | `app/src/main/res/xml/data_extraction_rules.xml`, `backup_rules.xml` |
-| Obfuscation/ukuran | **R8 untuk release saat ini DINONAKTIFKAN** (menyebabkan crash launch pada Hilt — lihat `app/proguard-rules.pro`); keep rules Hilt sudah disiapkan untuk re-enable setelah diverifikasi di perangkat | `app/build.gradle.kts`, `app/proguard-rules.pro` |
+| Obfuscation/ukuran | **R8 untuk release DIMATIKAN TOTAL** (`isMinifyEnabled=false` + `isShrinkResources=false`) — build release ber-R8 terbukti crash saat launch di perangkat (debug aman); root cause belum didiagnosis. Tanpa R8, APK lebih besar (~9.6 MB) tapi stabil. Keep rules di `proguard-rules.pro` dipertahankan (dormant) untuk re-enable setelah didiagnosis | `app/build.gradle.kts`, `app/proguard-rules.pro` |
 | Penyimpanan preferensi | **Preferences DataStore** menggantikan SharedPreferences (baca konsisten, tulis serial + atomik, migrasi otomatis key lama) | `util/DataStores.kt`, `util/PreferencesStore.kt`, `util/SettingsStore.kt`, `util/AyahOfTheDayManager.kt` |
 | Penyimpanan data besar | JSON + `filesDir` dengan tulis atomik (tmp → rename) — tanpa database eksternal, data tetap di internal storage | `util/*Store.kt` |
 | Audio | Hanya URL HTTPS (`everyayah.com`, `audio.qurancdn.com`) | `util/AudioUrls.kt` |

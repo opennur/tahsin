@@ -1,7 +1,12 @@
-# ProGuard/R8 rules untuk release build.
-# R8 saat ini DIMATIKAN (lihat app/build.gradle.kts) karena crash Hilt saat
-# launch — aturan di bawah sudah siap dipakai KEMBALI saat R8 dinyalakan
-# (isMinifyEnabled = true) setelah diverifikasi di perangkat.
+# ProGuard/R8 rules untuk release build — SAAT INI DORMANT.
+# R8 dimatikan total untuk stabilitas (lihat app/build.gradle.kts:
+# isMinifyEnabled = false + isShrinkResources = false).
+#
+# File ini dipertahankan UTUH supaya R8 mudah diaktifkan kembali suatu saat —
+# idealnya setelah root cause crash release didiagnosis lewat logcat.
+# Selama minify mati, seluruh aturan di bawah TIDAK berpengaruh.
+-dontobfuscate
+-dontoptimize
 
 # ---- Gson (refleksi + generics) ----
 # Model yang diserialisasi Gson (JSON aset & store filesDir) di-reflect oleh
