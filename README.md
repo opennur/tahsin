@@ -332,6 +332,7 @@ memangkas spasi transport; harakat dan tanda waqaf tidak dibuang:
 
 ```bash
 python3 tools/validate_quran_content.py
+python3 tools/validate_quran_fields.py
 ```
 
 Digest 6.236 ayat yang sudah divalidasi disimpan di

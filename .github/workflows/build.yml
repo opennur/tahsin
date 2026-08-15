@@ -23,6 +23,9 @@ jobs:
       - name: Validate all bundled ayahs
         run: python3 tools/validate_quran_content.py
 
+      - name: Validate bundled Quran fields
+        run: python3 tools/validate_quran_fields.py
+
   lint:
     name: Lint (detekt + Android lint)
     runs-on: ubuntu-latest

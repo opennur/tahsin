@@ -52,8 +52,9 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
     After regenerating data, run the unit tests — the golden tests lock the
     integrity (114 surahs / 6236 ayahs, 604 pages, monotonic order, the
     basmalah rule, 15 sajdah verses, text free of ࣖ/۩ font artifacts).
-    Also run `python3 tools/validate_quran_content.py`; it compares every Arabic
-    ayah exactly against the independent official Kemenag/LPMQ source.
+     Also run `python3 tools/validate_quran_content.py` and
+     `python3 tools/validate_quran_fields.py`; they compare every ayah and
+     user-facing field against the independent official Kemenag/LPMQ source.
 
     Do not add a translation, audio host, or content source without recording
     its URL, attribution, and license status in

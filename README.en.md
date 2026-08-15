@@ -328,6 +328,7 @@ transport whitespace; harakah and pause marks are not discarded:
 
 ```bash
 python3 tools/validate_quran_content.py
+python3 tools/validate_quran_fields.py
 ```
 
 The validated 6,236-ayah digest is recorded in

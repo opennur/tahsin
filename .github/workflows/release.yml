@@ -53,6 +53,9 @@ jobs:
       - name: Validate bundled Quran content
         run: python3 tools/validate_quran_content.py
 
+      - name: Validate bundled Quran fields
+        run: python3 tools/validate_quran_fields.py
+
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon
 
