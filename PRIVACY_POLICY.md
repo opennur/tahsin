@@ -1,6 +1,6 @@
 # Kebijakan Privasi — Tahsin Quran
 
-Terakhir diperbarui: 2026-08-14
+Terakhir diperbarui: 2026-08-15
 
 ## Ringkasan
 
@@ -18,6 +18,8 @@ ketiga untuk tujuan iklan, analitik, atau profil pengguna.
 - Pengaturan (qari', kecepatan, bahasa, ukuran huruf, dll.);
 - Audio qari' yang diunduh;
 - Cache data surah yang pernah diunduh.
+- Metadata antrean unduhan audio dan file sementara `.mp3.part` untuk
+  pemulihan setelah aplikasi mati.
 
 Aplikasi tidak membuat akun, tidak meminta login, dan tidak mengirim data ke
 server milik pengembang.
@@ -26,8 +28,9 @@ server milik pengembang.
 
 - **Mikrofon (`RECORD_AUDIO`)** — hanya untuk penilaian bacaan (tahsin) lewat
   speech-to-text. Audio tidak direkam, tidak disimpan, dan tidak dikirim ke
-  server pengembang; pemrosesan memakai layanan pengenalan suara perangkat
-  (Android SpeechRecognizer).
+  server pengembang; pemrosesan memakai penyedia pengenalan suara Android.
+  Penyedia tersebut dapat memiliki kebijakan jaringan dan privasi sendiri di
+  luar kendali aplikasi ini.
 - **Internet** — untuk mengunduh audio qari' dan data surah dari sumber publik
   (equran.id, everyayah.com, quran.com) atas permintaan pengguna.
 - **Notifikasi & alarm** — notifikasi "Ayah of the Day", pengingat streak, dan
@@ -37,13 +40,15 @@ server milik pengembang.
 
 ## Sumber data konten
 
-- Teks Al-Qur'an & terjemahan: **equran.id** dan **quran.com** (Sahih
-  International untuk Inggris, Kemenag untuk Indonesia) — data dibundel dalam
-  aplikasi dan tersedia offline.
-- Audio qari': **everyayah.com** (diunduh atas permintaan pengguna).
-- Konten "Keajaiban & Keindahan Al-Qur'an": konten edukasi dengan sumber yang
-  dicantumkan di dalam aplikasi (tautan quran.com, NASA, Britannica, jurnal
-  akademik, museum, dll.).
+Sumber lengkap, validasi teks kanonik, status hak terjemahan, dan kebutuhan
+atribusi audio dicatat di
+[docs/CONTENT_PROVENANCE.en.md](docs/CONTENT_PROVENANCE.en.md).
+
+- Teks Arab dan Indonesia: **equran.id**, diaudit terhadap data resmi
+  **Qur'an Kemenag/LPMQ** sebelum rilis.
+- Terjemahan Inggris: **Saheeh International, resource 20, API Quran.com**.
+- Audio qari': **everyayah.com**; audio per kata:
+  **audio.qurancdn.com**.
 
 ## Penghapusan data
 

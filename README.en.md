@@ -16,7 +16,8 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 > STT (speech-to-text) only reads the *text* of what you say: it can catch skipped
 > words, wrong word order, or wrong letters, but it **cannot judge makhraj
 > (articulation) or vowel length**. Tajwid detection is rule-based (a "rule map"
-> derived from tashkeel text), not audio analysis.
+> derived from tashkeel text), not audio analysis. The rule map is pending
+> independent qualified-expert sign-off; see [docs/TAJWID_REVIEW.md](docs/TAJWID_REVIEW.md).
 
 ## Features
 
@@ -121,7 +122,8 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   (from Settings, or the "📥 Download All — Reciter" button in Audio Manager
   when nothing is downloaded yet), with a **footer progress bar** + the name of
   the surah currently downloading; background downloads (foreground service)
-  after the user grants permission.
+  after the user grants permission; interrupted downloads resume from private
+  `.mp3.part` files after the app is reopened.
 - 📂 **Downloaded-audio management**: size per surah, delete per surah / delete
   all (with confirmation), **live progress card** while a download is running,
   and a **list cache** — reopening the screen is instant with no re-scan.
@@ -318,6 +320,21 @@ basmalah rule, 15 sajdah verses, text free of ࣖ artifacts):
 ./gradlew testDebugUnitTest --no-daemon
 ```
 
+### Canonical Quran text validation
+
+The bundled Arabic text is checked against the independent official Qur'an
+Kemenag/LPMQ API. The comparison is exact Unicode text after trimming only
+transport whitespace; harakah and pause marks are not discarded:
+
+```bash
+python3 tools/validate_quran_content.py
+```
+
+The validated 6,236-ayah digest is recorded in
+`tools/quran-canonical-manifest.json`. Source provenance, translation status,
+audio terms, and the tajwid review gate are documented in
+[docs/CONTENT_PROVENANCE.en.md](docs/CONTENT_PROVENANCE.en.md).
+
 ### Integration tests (JVM, real assets)
 
 `QuranAssetsIntegrationTest` reads the actual bundled files under
@@ -379,9 +396,11 @@ the build (CI). Android lint is gated too (baseline in `lint-baseline.xml`).
 
 ### CI/CD (GitHub Actions)
 
-- `.github/workflows/build.yml` — CI pipeline: **lint** (detekt + `lintDebug`),
-  **unit tests** (`testDebugUnitTest` incl. Robolectric + `jacocoCoreReport`),
-  **build** (assembleDebug + assembleRelease with R8). All run on every
+- `.github/workflows/build.yml` — CI pipeline: **content integrity** (canonical
+  6,236-ayah validation), **lint** (detekt + `lintDebug`), **unit tests**
+  (`testDebugUnitTest` incl. Robolectric + `jacocoCoreReport`), **build**
+  (assembleDebug + assembleRelease; R8 is currently disabled pending a launch
+  crash investigation). All run on every
   push/PR; reports & APKs are uploaded as artifacts. On CI runners the Termux
   overrides (`aapt2`/`aidl`) are stripped from `gradle.properties` automatically.
 - `.github/workflows/security.yml` — **MobSF** security scan of the release APK
@@ -406,11 +425,14 @@ keyPassword=secret
 
 | Data | Source | License/Status |
 |---|---|---|
-| Arabic text + Indonesian translation | [equran.id API](https://equran.id/apidev) | Used non-commercially |
-| English translation (Saheeh Int'l) | [quran.com API v4](https://api.quran.com) | Used non-commercially |
-| Ayah audio (multiple reciters: Minshawy, Husary, Alafasy, etc.) | [everyayah.com](https://everyayah.com) | Publicly available |
-| Per-word audio (wbw) | audio.qurancdn.com | Publicly available |
+| Arabic text + Indonesian translation | [equran.id API](https://equran.id/apidev); Arabic audited against [official Qur'an Kemenag/LPMQ](https://quran.kemenag.go.id/) | Attribution/non-commercial use documented; redistribution terms must be confirmed |
+| English translation (Saheeh Int'l, resource 20) | [quran.com API v4](https://api.quran.com) | Rights-holder permission/license must be confirmed; not claimed public domain |
+| Ayah audio (seven reciters) | [everyayah.com](https://everyayah.com) | URLs verified; public availability is not treated as a redistribution license |
+| Per-word audio (wbw) | [audio.qurancdn.com](https://audio.qurancdn.com) | Provider terms and attribution must be confirmed |
 | Amiri font (Uthmani) | [Google Fonts](https://fonts.google.com/specimen/Amiri) | SIL OFL 1.1 |
+
+See [Content Provenance and Licensing](docs/CONTENT_PROVENANCE.en.md) for the
+full source ledger and release gate.
 
 ## App permissions
 

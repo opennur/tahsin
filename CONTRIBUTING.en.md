@@ -49,9 +49,15 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
    | Vocabulary (1,200 words) | `tools/build_vocab.py` → `assets/quran/vocab.json` | `VocabKey.normalize` (Kotlin) MUST match the normalizer in `build_vocab.py` exactly |
    | Learn Arabic (15 lessons) | `tools/build_lughoh.py` + `tools/lughoh_en.py` → `assets/lughoh/lessons.json` | the build FAILS if any ID text lacks an EN translation; `LughohEnTest` validates the output |
 
-   After regenerating data, run the unit tests — the golden tests lock the
-   integrity (114 surahs / 6236 ayahs, 604 pages, monotonic order, the
-   basmalah rule, 15 sajdah verses, text free of ࣖ/۩ font artifacts).
+    After regenerating data, run the unit tests — the golden tests lock the
+    integrity (114 surahs / 6236 ayahs, 604 pages, monotonic order, the
+    basmalah rule, 15 sajdah verses, text free of ࣖ/۩ font artifacts).
+    Also run `python3 tools/validate_quran_content.py`; it compares every Arabic
+    ayah exactly against the independent official Kemenag/LPMQ source.
+
+    Do not add a translation, audio host, or content source without recording
+    its URL, attribution, and license status in
+    `docs/CONTENT_PROVENANCE.en.md`.
 
 3. **i18n: never hardcode UI strings.** All text goes through `AppStrings.kt`
    (a data class) — **every field must exist in both the ID and EN
@@ -82,9 +88,13 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
    - The active-ayah highlight is drawn **behind the text** (`drawBehind`) —
      do not use `Modifier.clip(...).background(...)`, which cuts harakah/waqf
      signs.
-   - **Flow mode is permanently removed** — do not bring it back. Its
-     replacement is the audio playback mode `AudioPlaybackMode { AYAH,
-     CONTINUOUS, REPEAT }`.
+    - **Flow mode is permanently removed** — do not bring it back. Its
+      replacement is the audio playback mode `AudioPlaybackMode { AYAH,
+      CONTINUOUS, REPEAT }`.
+
+7. **Tajwid review.** Rule-engine changes require a regression test and an entry
+   in `docs/TAJWID_REVIEW.md`. User-facing claims remain limited until a
+   qualified expert signs off on the relevant rule family.
 
 ## Test-Driven Development (TDD)
 

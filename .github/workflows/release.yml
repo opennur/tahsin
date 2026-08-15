@@ -50,7 +50,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Build release APK (R8)
+      - name: Validate bundled Quran content
+        run: python3 tools/validate_quran_content.py
+
+      - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon
 
       - name: Create GitHub Release

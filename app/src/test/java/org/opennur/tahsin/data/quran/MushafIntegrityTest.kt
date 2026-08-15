@@ -1,9 +1,11 @@
 package org.opennur.tahsin.data.quran
 
+import com.google.gson.Gson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
+import java.security.MessageDigest
 
 /**
  * TES EMAS INTEGRITAS MUSHAF — jaminan "satu harakat pun fatal".
@@ -16,6 +18,12 @@ import java.io.File
  * Kalau tes ini gagal, artinya data mushaf rusak — jangan di-skip.
  */
 class MushafIntegrityTest {
+
+    private data class CanonicalManifest(
+        val surahs: Int = 0,
+        val ayahs: Int = 0,
+        val bundledTextSha256: String = "",
+    )
 
     private val assetsRoot: File by lazy {
         val candidates = listOf(
@@ -112,5 +120,29 @@ class MushafIntegrityTest {
                 )
             }
         }
+    }
+
+    @Test
+    fun `digest teks Arab cocok dengan manifest validasi kanonik`() {
+        val manifestFile = listOf(
+            File("tools/quran-canonical-manifest.json"),
+            File("../tools/quran-canonical-manifest.json"),
+        ).firstOrNull { it.isFile }
+            ?: error("Manifest canonical tidak ditemukan — jalankan dari root project")
+        val manifest = Gson().fromJson(manifestFile.readText(), CanonicalManifest::class.java)
+        val surahs = QuranParser.parseSurahList(File(quranDir, "surah-list.json").readText())
+        val digest = MessageDigest.getInstance("SHA-256")
+
+        surahs.forEach { surah ->
+            val parsed = QuranParser.parseSurah(File(quranDir, "data/surah-${surah.number}.json").readText())
+            parsed.ayahs.forEach { ayah ->
+                digest.update("${surah.number}:${ayah.number}|${ayah.text.trim()}\n".toByteArray(Charsets.UTF_8))
+            }
+        }
+
+        val actual = digest.digest().joinToString("") { "%02x".format(it.toInt() and 0xff) }
+        assertEquals(114, manifest.surahs)
+        assertEquals(6236, manifest.ayahs)
+        assertEquals(manifest.bundledTextSha256, actual)
     }
 }

@@ -51,12 +51,14 @@ import org.opennur.tahsin.widget.StreakReminderAlarm
 import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** State layar utama Tahsin. */
 sealed interface TahsinUiState {
@@ -308,6 +310,9 @@ class TahsinViewModel @Inject constructor(
         }
         // Target dari widget/notifikasi (state baru saja siap) → buka langsung.
         pendingOpenAt?.let { (s, a) -> openAt(s, a) }
+        // Proses yang mati saat mengunduh meninggalkan manifest + `.part`; lanjutkan
+        // saat aplikasi dibuka lagi, tanpa meminta izin latar belakang sekali lagi.
+        resumePendingDownloads()
     }
 
     /** Tutup petunjuk geser (persisten — tidak muncul lagi setelah restart). */
@@ -900,7 +905,11 @@ class TahsinViewModel @Inject constructor(
      * footer), lalu jalankan `onComplete` begitu audio siap. Mendukung beberapa
      * surah yang diunduh sekaligus.
      */
-    private fun startSurahDownloadIfNeeded(surah: Surah, onComplete: () -> Unit) {
+    private fun startSurahDownloadIfNeeded(
+        surah: Surah,
+        promptBackground: Boolean = true,
+        onComplete: () -> Unit,
+    ) {
         // Saat bulk unduh semua berjalan, play langsung ke URL streaming.
         if (currentReady()?.isDownloadingAll == true) {
             onComplete()
@@ -910,7 +919,7 @@ class TahsinViewModel @Inject constructor(
             onComplete()
             return
         }
-        maybePromptBackground()
+        if (promptBackground) maybePromptBackground()
         if (activeDownloads.containsKey(surah.number)) {
             pendingCallbacks.getOrPut(surah.number) { mutableListOf() } += onComplete
             return
@@ -945,6 +954,33 @@ class TahsinViewModel @Inject constructor(
             if (activeDownloads.isEmpty()) DownloadProgress.reset()
             updateDownloadState()
             pendingCallbacks.remove(surah.number)?.forEach { it() }
+        }
+    }
+
+    /**
+     * Pulihkan unduhan yang tertinggal setelah crash/kill. File final yang sudah
+     * lengkap hanya membersihkan manifest; file `.part` dilanjutkan oleh
+     * [AudioDownloader] melalui HTTP Range bila server mendukungnya.
+     */
+    private fun resumePendingDownloads() {
+        val slug = settings.reciter.slug
+        val pending = downloader.pendingDownloads()
+            .filter { it.reciterSlug == slug }
+            .distinctBy { it.surahNumber }
+        if (pending.isEmpty()) return
+        viewModelScope.launch {
+            pending.forEach { item ->
+                if (activeDownloads.containsKey(item.surahNumber)) return@forEach
+                val surah = withContext(Dispatchers.IO) {
+                    repository.cachedSurahPlain(item.surahNumber)
+                        ?: runCatching { repository.fetchSurah(item.surahNumber, currentLanguage()) }.getOrNull()
+                } ?: return@forEach
+                if (downloader.isSurahAudioComplete(surah)) {
+                    downloader.clearPendingDownload(item.surahNumber, item.reciterSlug)
+                } else {
+                    startSurahDownloadIfNeeded(surah, onComplete = {}, promptBackground = false)
+                }
+            }
         }
     }
 
@@ -1116,7 +1152,10 @@ class TahsinViewModel @Inject constructor(
                             }
                         }
                     }
-                }.onFailure { failed++ }
+                }.onFailure { error ->
+                    if (error is CancellationException) throw error
+                    failed++
+                }
             }
             DownloadProgress.reset()
             updateReady { it.copy(
@@ -1216,4 +1255,3 @@ class TahsinViewModel @Inject constructor(
         super.onCleared()
     }
 }
-

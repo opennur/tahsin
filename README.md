@@ -17,7 +17,9 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 > STT (speech-to-text) hanya membaca *teks* ucapan: aplikasi bisa menilai kata
 > terlewat/salah susun/salah huruf, tapi **tidak bisa menilai makhraj atau
 > panjang-pendek harakat**. Deteksi tajwid bersifat rule-based ("peta hukum"
-> dari teks ber-tashkeel), bukan analisis audio.
+> dari teks ber-tashkeel), bukan analisis audio. Peta hukum ini masih menunggu
+> pengesahan independen dari ahli yang memenuhi kualifikasi; lihat
+> [docs/TAJWID_REVIEW.md](docs/TAJWID_REVIEW.md).
 
 ## Fitur
 
@@ -123,7 +125,8 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   surah** (dari Pengaturan atau tombol "Unduh Semua — Qari'" di Kelola Audio
   saat belum ada audio), dengan **progress bar di footer** + nama surah yang
   sedang diunduh; unduhan latar belakang (foreground service) setelah user
-  mengizinkan.
+  mengizinkan; unduhan yang terputus dilanjutkan dari file privat `.mp3.part`
+  setelah aplikasi dibuka kembali.
 - 📂 **Manajemen audio terunduh**: ukuran per surah, hapus per surah / hapus
   semua (dengan konfirmasi), **kartu progres live** saat ada unduhan berjalan,
   dan **cache daftar** — membuka layar lagi instan tanpa pemindaian ulang.
@@ -321,6 +324,21 @@ teks tanpa artefak ࣖ):
 ./gradlew testDebugUnitTest --no-daemon
 ```
 
+### Validasi teks Al-Qur'an kanonik
+
+Teks Arab yang di-bundle dibandingkan dengan API resmi Qur'an Kemenag/LPMQ
+yang independen. Perbandingan memakai teks Unicode persis setelah hanya
+memangkas spasi transport; harakat dan tanda waqaf tidak dibuang:
+
+```bash
+python3 tools/validate_quran_content.py
+```
+
+Digest 6.236 ayat yang sudah divalidasi disimpan di
+`tools/quran-canonical-manifest.json`. Sumber, status terjemahan, ketentuan
+audio, dan gate review tajwid ada di
+[docs/CONTENT_PROVENANCE.en.md](docs/CONTENT_PROVENANCE.en.md).
+
 ### Integration test (JVM, aset asli)
 
 `QuranAssetsIntegrationTest` membaca LANGSUNG file bundel di
@@ -383,9 +401,11 @@ build (CI). Android lint ikut digate (baseline di `lint-baseline.xml`).
 
 ### CI/CD (GitHub Actions)
 
-- `.github/workflows/build.yml` — pipeline CI: **lint** (detekt + `lintDebug`),
-  **unit test** (`testDebugUnitTest` incl. Robolectric + `jacocoCoreReport`),
-  **build** (assembleDebug + assembleRelease dengan R8). Semua dijalankan pada
+- `.github/workflows/build.yml` — pipeline CI: **integritas konten** (validasi
+  kanonik 6.236 ayat), **lint** (detekt + `lintDebug`), **unit test**
+  (`testDebugUnitTest` incl. Robolectric + `jacocoCoreReport`), **build**
+  (assembleDebug + assembleRelease; R8 saat ini dimatikan karena investigasi
+  crash saat launch). Semua dijalankan pada
   setiap push/PR; laporan & APK diunggah sebagai artifact. Di runner CI,
   override Termux (`aapt2`/`aidl`) dihapus otomatis dari `gradle.properties`.
 - `.github/workflows/security.yml` — scan keamanan **MobSF** terhadap APK
@@ -418,11 +438,14 @@ keyPassword=rahasia
 
 | Data | Sumber | Lisensi/Status |
 |---|---|---|
-| Teks Arab + terjemahan Indonesia | [equran.id API](https://equran.id/apidev) | Digunakan non-komersial |
-| Terjemahan Inggris (Saheeh Int'l) | [quran.com API v4](https://api.quran.com) | Digunakan non-komersial |
-| Audio ayat (banyak qari': Minshawy, Husary, Alafasy, dll.) | [everyayah.com](https://everyayah.com) | Tersedia untuk umum |
-| Audio per kata (wbw) | audio.qurancdn.com | Tersedia untuk umum |
+| Teks Arab + terjemahan Indonesia | [equran.id API](https://equran.id/apidev); audit Arab terhadap [Qur'an Kemenag/LPMQ resmi](https://quran.kemenag.go.id/) | Atribusi/penggunaan non-komersial terdokumentasi; ketentuan redistribusi harus dikonfirmasi |
+| Terjemahan Inggris (Saheeh Int'l, resource 20) | [quran.com API v4](https://api.quran.com) | Izin/lisensi pemegang hak harus dikonfirmasi; tidak dianggap domain publik |
+| Audio ayat (tujuh qari') | [everyayah.com](https://everyayah.com) | URL diverifikasi; ketersediaan umum bukan otomatis lisensi redistribusi |
+| Audio per kata (wbw) | [audio.qurancdn.com](https://audio.qurancdn.com) | Ketentuan dan atribusi penyedia harus dikonfirmasi |
 | Font Amiri (Utsmani) | [Google Fonts](https://fonts.google.com/specimen/Amiri) | SIL OFL 1.1 |
+
+Lihat [Content Provenance and Licensing](docs/CONTENT_PROVENANCE.en.md) untuk
+ledger sumber lengkap dan gate sebelum rilis.
 
 ## Izin aplikasi
 

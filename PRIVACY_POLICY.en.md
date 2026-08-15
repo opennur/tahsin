@@ -1,6 +1,6 @@
 # Privacy Policy — Tahsin Quran
 
-Last updated: 2026-08-14
+Last updated: 2026-08-15
 
 ## Summary
 
@@ -18,6 +18,8 @@ profiling purposes.
 - Settings (reciter, speed, language, font size, etc.);
 - Downloaded reciter audio;
 - Cache of downloaded surah data.
+- Pending audio-download metadata and temporary `.mp3.part` files used for
+  crash-safe resume.
 
 The app has no accounts, no login, and sends no data to developer servers.
 
@@ -25,8 +27,9 @@ The app has no accounts, no login, and sends no data to developer servers.
 
 - **Microphone (`RECORD_AUDIO`)** — used only for recitation (tahsin) scoring
   via speech-to-text. Audio is not recorded, stored, or sent to developer
-  servers; processing uses the device's speech recognition (Android
-  SpeechRecognizer).
+  servers; processing uses Android's speech-recognition provider. That provider
+  may have its own network and privacy policy, which is outside this app's
+  control.
 - **Internet** — used to download reciter audio and surah data from public
   sources (equran.id, everyayah.com, quran.com) at the user's request.
 - **Notifications & alarms** — "Ayah of the Day" notification, streak reminder,
@@ -36,13 +39,15 @@ The app has no accounts, no login, and sends no data to developer servers.
 
 ## Content data sources
 
-- Qur'an text & translations: **equran.id** and **quran.com** (Sahih
-  International for English, Kemenag for Indonesian) — bundled in the app and
-  available offline.
-- Reciter audio: **everyayah.com** (downloaded at the user's request).
-- "Qur'an Wonders & Beauty" content: educational content with sources listed
-  inside the app (links to quran.com, NASA, Britannica, academic journals,
-  museums, etc.).
+The complete source, canonical-text validation, translation rights status, and
+audio attribution requirements are maintained in
+[docs/CONTENT_PROVENANCE.en.md](docs/CONTENT_PROVENANCE.en.md).
+
+- Qur'an Arabic and Indonesian data: **equran.id**, audited against official
+  **Qur'an Kemenag/LPMQ** data before release.
+- English translation: **Saheeh International, resource 20, Quran.com API**.
+- Reciter audio: **everyayah.com**; word-by-word audio:
+  **audio.qurancdn.com**.
 
 ## Data deletion
 

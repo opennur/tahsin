@@ -2,18 +2,27 @@ package org.opennur.tahsin.util
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.opennur.tahsin.data.quran.Surah
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.ConcurrentHashMap
 
 /** HTTP 404/403 — file audio memang tidak ada di server (permanen). */
 class AudioUnavailableException(message: String) : IOException(message)
@@ -22,6 +31,13 @@ class AudioUnavailableException(message: String) : IOException(message)
 data class DownloadStats(
     val ok: Int,
     val total: Int,
+)
+
+/** Surah yang masih harus diselesaikan setelah proses aplikasi mati. */
+data class PendingAudioDownload(
+    val surahNumber: Int,
+    val reciterSlug: String,
+    val queuedAt: Long = System.currentTimeMillis(),
 )
 
 /** Rekam file yang ternyata tidak ada di server (persisten). */
@@ -37,8 +53,16 @@ private data class DownloadJob(
     val isWord: Boolean,
 )
 
+/** HTTP failure yang bersifat sementara dan aman untuk dicoba ulang. */
+private class RetryableDownloadException(message: String) : IOException(message)
+
+/** HTTP client error yang tidak akan membaik dengan retry otomatis. */
+private class PermanentDownloadException(message: String) : IOException(message)
+
 /** Jumlah koneksi unduhan paralel per surah. */
 private const val PARALLELISM = 6
+private const val MAX_DOWNLOAD_ATTEMPTS = 3
+private const val RETRY_BACKOFF_MS = 500L
 
 /**
  * Mengunduh audio contoh ke penyimpanan internal (`filesDir/audio`) supaya
@@ -58,6 +82,12 @@ class AudioDownloader internal constructor(
     private val audioDir: File,
     /** Penyedia slug qari' aktif — dibaca LAZY tiap operasi (bisa ganti runtime). */
     private val slugProvider: () -> String,
+    /** Factory koneksi agar protokol unduhan dapat diuji tanpa mengubah URL produksi. */
+    private val connectionFactory: (String) -> HttpURLConnection = { url ->
+        URL(url).openConnection() as HttpURLConnection
+    },
+    /** Jeda retry dapat diperkecil di tes; produksi memakai backoff eksponensial. */
+    private val retryBackoffMs: Long = RETRY_BACKOFF_MS,
 ) {
 
     constructor(context: Context, settings: SettingsStore) : this(
@@ -75,12 +105,19 @@ class AudioDownloader internal constructor(
     private val missingAyahsBySlug = mutableMapOf<String, MutableSet<String>>()
     private val missingWords = mutableSetOf<String>()
     private val missingLock = Any()
+    /** Antrean persisten: file `.part` dipasangkan dengan surah di manifest ini. */
+    private val pendingDownloads = mutableListOf<PendingAudioDownload>()
+    private val pendingLock = Any()
+    private val pendingType = object : TypeToken<List<PendingAudioDownload>>() {}.type
+    /** Cegah dua coroutine menulis target MP3 yang sama secara bersamaan. */
+    private val fileLocks = ConcurrentHashMap<String, Mutex>()
 
     init {
         loadMissingWords()
         // Migrasi sekali: file format lama (audio/missing.json) berisi ayat
         // Minshawy + kata — dipindah ke registry baru saat dibutuhkan.
         migrateLegacyMissing()
+        loadPendingDownloads()
     }
 
     fun ayahFile(surah: Int, ayah: Int): File = File(reciterDir, AudioUrls.ayahKey(surah, ayah))
@@ -94,6 +131,22 @@ class AudioDownloader internal constructor(
     fun isWordMissing(surah: Int, ayah: Int, wordIndex: Int): Boolean =
         AudioUrls.wordKey(surah, ayah, wordIndex) in missingWords
 
+    /** Snapshot antrean yang belum selesai, aman dibaca dari UI/service. */
+    fun pendingDownloads(): List<PendingAudioDownload> = synchronized(pendingLock) {
+        pendingDownloads.toList()
+    }
+
+    /** Bersihkan entri yang tersisa bila semua file selesai sebelum proses mati. */
+    fun clearPendingDownload(surahNumber: Int, reciterSlug: String) {
+        synchronized(pendingLock) {
+            if (pendingDownloads.removeAll {
+                    it.surahNumber == surahNumber && it.reciterSlug == reciterSlug
+                }) {
+                savePendingDownloadsLocked()
+            }
+        }
+    }
+
     /** Pastikan audio ayat ada di cache; null kalau file memang tidak ada di server. */
     suspend fun ensureAyah(surah: Int, ayah: Int): File? = withContext(Dispatchers.IO) {
         // Snapshot slug SEKALI per operasi: URL, path, cek & catat missing harus
@@ -105,7 +158,7 @@ class AudioDownloader internal constructor(
             file.exists() && file.length() > 0L -> file
             key in missingAyahsFor(slug) -> null
             else -> try {
-                download(AudioUrls.ayahUrl(surah, ayah, Reciter.fromSlug(slug)), file)
+                downloadWithRetries(AudioUrls.ayahUrl(surah, ayah, Reciter.fromSlug(slug)), file)
             } catch (e: AudioUnavailableException) {
                 recordMissingAyah(file.name, slug)
                 null
@@ -120,7 +173,7 @@ class AudioDownloader internal constructor(
             file.exists() && file.length() > 0L -> file
             isWordMissing(surah, ayah, wordIndex) -> null
             else -> try {
-                download(AudioUrls.wordUrl(surah, ayah, wordIndex), file)
+                downloadWithRetries(AudioUrls.wordUrl(surah, ayah, wordIndex), file)
             } catch (e: AudioUnavailableException) {
                 recordMissingWord(file.name)
                 null
@@ -157,65 +210,75 @@ class AudioDownloader internal constructor(
     suspend fun downloadSurah(
         surah: Surah,
         onProgress: (done: Int, total: Int) -> Unit,
-    ): DownloadStats = withContext(Dispatchers.IO) {
+    ): DownloadStats {
         // Snapshot slug SEKALI per operasi (lihat catatan di ensureAyah).
         val slug = slugProvider()
-        val reciter = Reciter.fromSlug(slug)
-        val slugDir = File(audioDir, slug)
-        val jobs = mutableListOf<DownloadJob>()
-        surah.ayahs.forEach { ayah ->
-            if (AudioUrls.ayahKey(surah.number, ayah.number) !in missingAyahsFor(slug)) {
-                jobs += DownloadJob(
-                    AudioUrls.ayahUrl(surah.number, ayah.number, reciter),
-                    File(slugDir, AudioUrls.ayahKey(surah.number, ayah.number)),
-                    false,
-                )
-            }
-            ayah.words.forEachIndexed { wi, _ ->
-                if (!isWordMissing(surah.number, ayah.number, wi)) {
+        val pending = PendingAudioDownload(surah.number, slug)
+        enqueuePending(pending)
+        val stats = withContext(Dispatchers.IO) {
+            val reciter = Reciter.fromSlug(slug)
+            val slugDir = File(audioDir, slug)
+            val jobs = mutableListOf<DownloadJob>()
+            surah.ayahs.forEach { ayah ->
+                if (AudioUrls.ayahKey(surah.number, ayah.number) !in missingAyahsFor(slug)) {
                     jobs += DownloadJob(
-                        AudioUrls.wordUrl(surah.number, ayah.number, wi),
-                        wordFile(surah.number, ayah.number, wi),
-                        true,
+                        AudioUrls.ayahUrl(surah.number, ayah.number, reciter),
+                        File(slugDir, AudioUrls.ayahKey(surah.number, ayah.number)),
+                        false,
                     )
                 }
+                ayah.words.forEachIndexed { wi, _ ->
+                    if (!isWordMissing(surah.number, ayah.number, wi)) {
+                        jobs += DownloadJob(
+                            AudioUrls.wordUrl(surah.number, ayah.number, wi),
+                            wordFile(surah.number, ayah.number, wi),
+                            true,
+                        )
+                    }
+                }
             }
-        }
 
-        val total = jobs.size
-        val done = AtomicInteger(0)
-        val ok = AtomicInteger(0)
-        val progressLock = Any()
-        val semaphore = Semaphore(PARALLELISM)
-        coroutineScope {
-            jobs.forEach { job ->
-                launch(Dispatchers.IO) {
-                    // runCatching: exception apa pun dalam satu koneksi TIDAK
-                    // boleh menggagalkan coroutine (exception tak tertangkap
-                    // dalam coroutine = crash aplikasi).
-                    runCatching {
-                        semaphore.withPermit { processDownload(job, ok, slug) }
-                        synchronized(progressLock) {
-                            val d = done.incrementAndGet()
-                            onProgress(d, total)
+            val total = jobs.size
+            val done = AtomicInteger(0)
+            val ok = AtomicInteger(0)
+            val progressLock = Any()
+            val semaphore = Semaphore(PARALLELISM)
+            coroutineScope {
+                jobs.forEach { job ->
+                    launch(Dispatchers.IO) {
+                        try {
+                            semaphore.withPermit { processDownload(job, ok, slug) }
+                            synchronized(progressLock) {
+                                val d = done.incrementAndGet()
+                                onProgress(d, total)
+                            }
+                        } catch (e: CancellationException) {
+                            // Cancellation leaves the manifest and `.part` file intact.
+                            throw e
+                        } catch (_: Exception) {
+                            // A single failed file must not cancel the rest of the surah.
                         }
                     }
                 }
             }
+            DownloadStats(ok.get(), total)
         }
-        DownloadStats(ok.get(), total)
+        if (stats.ok == stats.total) completePending(pending)
+        return stats
     }
 
-    private fun processDownload(job: DownloadJob, ok: AtomicInteger, slug: String) {
+    private suspend fun processDownload(job: DownloadJob, ok: AtomicInteger, slug: String) {
         if (job.file.exists() && job.file.length() > 0L) {
             ok.incrementAndGet()
             return
         }
         try {
-            download(job.url, job.file)
+            downloadWithRetries(job.url, job.file)
             ok.incrementAndGet()
         } catch (e: AudioUnavailableException) {
             if (job.isWord) recordMissingWord(job.file.name) else recordMissingAyah(job.file.name, slug)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // error transien (timeout dll.) — biar dicoba lagi di kesempatan lain
         }
@@ -288,21 +351,30 @@ class AudioDownloader internal constructor(
 
     /** Hapus semua audio satu surah (file ayat qari' aktif + kata). */
     fun deleteSurahAudio(number: Int) {
+        forgetPendingForSurah(number)
         val prefix = number.toString().padStart(3, '0')
         val dir = reciterDir
         if (dir.exists()) {
             dir.listFiles { f ->
-                f.isFile && AudioUrls.isAyahAudioFileName(f.name) && f.name.startsWith(prefix)
+                f.isFile && f.name.startsWith(prefix) &&
+                    (AudioUrls.isAyahAudioFileName(f.name) || f.name.endsWith(".mp3.part"))
             }?.forEach { it.delete() }
         }
         val wbw = File(audioDir, "wbw")
         if (wbw.exists()) {
-            wbw.listFiles { f -> f.isFile && f.name.startsWith(prefix + "_") }?.forEach { it.delete() }
+            wbw.listFiles { f ->
+                f.isFile && f.name.startsWith(prefix + "_") &&
+                    (f.extension == "mp3" || f.name.endsWith(".mp3.part"))
+            }?.forEach { it.delete() }
         }
     }
 
     /** Hapus SEMUA audio terunduh (semua qari'). */
     fun deleteAllAudio() {
+        synchronized(pendingLock) {
+            pendingDownloads.clear()
+            savePendingDownloadsLocked()
+        }
         val dir = audioDir
         if (dir.exists()) {
             dir.listFiles()?.forEach { it.deleteRecursively() }
@@ -311,26 +383,131 @@ class AudioDownloader internal constructor(
 
     // ---- internal ----
 
+    /**
+     * Download one target with a per-file lock and exponential retry. The lock
+     * also covers the final existence check, preventing a play request from
+     * racing a bulk download for the same ayah.
+     */
+    private suspend fun downloadWithRetries(url: String, out: File): File {
+        val lock = fileLocks.computeIfAbsent(out.absolutePath) { Mutex() }
+        return lock.withLock {
+            downloadWithRetriesLocked(url, out)
+        }
+    }
+
+    @Suppress("ThrowsCount")
+    private suspend fun downloadWithRetriesLocked(url: String, out: File): File {
+        if (out.exists() && out.length() > 0L) return out
+        var attempt = 1
+        var lastError: IOException? = null
+        while (attempt <= MAX_DOWNLOAD_ATTEMPTS) {
+            try {
+                return download(url, out)
+            } catch (e: AudioUnavailableException) {
+                throw e
+            } catch (e: PermanentDownloadException) {
+                throw e
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                lastError = e
+                if (attempt == MAX_DOWNLOAD_ATTEMPTS) break
+                delay(retryBackoffMs * (1L shl (attempt - 1)))
+                attempt++
+            }
+        }
+        throw lastError ?: IOException("Audio download failed")
+    }
+
+    /**
+     * Download to `<target>.part`. A server that supports HTTP Range resumes a
+     * partial file; a server that ignores Range safely restarts from byte zero.
+     * The visible MP3 is created only by [promotePart] after validation.
+     */
+    @Suppress("ThrowsCount", "CyclomaticComplexMethod", "ComplexCondition")
     private fun download(url: String, out: File): File {
         out.parentFile?.mkdirs()
-        val conn = URL(url).openConnection() as HttpURLConnection
+        val part = partFile(out)
+        var offset = if (part.isFile) part.length() else 0L
+        val conn = connectionFactory(url)
         conn.connectTimeout = 15_000
         conn.readTimeout = 30_000
         conn.instanceFollowRedirects = true
+        if (offset > 0L) conn.setRequestProperty("Range", "bytes=$offset-")
         try {
             conn.connect()
             val code = conn.responseCode
             if (code == HttpURLConnection.HTTP_NOT_FOUND || code == 403) {
                 throw AudioUnavailableException("HTTP $code")
             }
-            check(code == HttpURLConnection.HTTP_OK) { "HTTP $code" }
-            conn.inputStream.use { input ->
-                out.outputStream().use { output -> input.copyTo(output) }
+            if (code == 416) {
+                // The remote object changed or the partial file is too long.
+                // Delete only the temporary file; the next retry starts cleanly.
+                part.delete()
+                throw RetryableDownloadException("HTTP 416: invalid range")
             }
+            if (code != HttpURLConnection.HTTP_OK && code != HttpURLConnection.HTTP_PARTIAL) {
+                if (code == 408 || code == 425 || code == 429 || code in 500..599) {
+                    throw RetryableDownloadException("HTTP $code")
+                }
+                throw PermanentDownloadException("HTTP $code")
+            }
+
+            val append = offset > 0L && code == HttpURLConnection.HTTP_PARTIAL
+            if (append) validateContentRange(conn, offset)
+            val expectedTotal = if (append) {
+                contentRangeTotal(conn)
+            } else {
+                conn.contentLengthLong.takeIf { it >= 0L }
+            }
+
+            conn.inputStream.use { input ->
+                FileOutputStream(part, append).use { output ->
+                    input.copyTo(output)
+                    output.fd.sync()
+                }
+            }
+
+            val actualLength = part.length()
+            if (actualLength <= 0L) throw IOException("Empty audio response")
+            if (expectedTotal != null && actualLength != expectedTotal) {
+                throw IOException("Incomplete audio: $actualLength/$expectedTotal bytes")
+            }
+            promotePart(part, out)
         } finally {
             conn.disconnect()
         }
         return out
+    }
+
+    private fun partFile(out: File): File = File(out.parentFile, "${out.name}.part")
+
+    @Suppress("ThrowsCount")
+    private fun validateContentRange(conn: HttpURLConnection, expectedStart: Long) {
+        val header = conn.getHeaderField("Content-Range")
+            ?: throw IOException("206 response has no Content-Range")
+        val match = CONTENT_RANGE.matchEntire(header.trim())
+            ?: throw IOException("Invalid Content-Range: $header")
+        if (match.groupValues[1].toLong() != expectedStart) {
+            throw IOException("Content-Range resumed at the wrong offset")
+        }
+    }
+
+    private fun contentRangeTotal(conn: HttpURLConnection): Long? {
+        val header = conn.getHeaderField("Content-Range") ?: return null
+        val match = CONTENT_RANGE.matchEntire(header.trim()) ?: return null
+        return match.groupValues[3].toLongOrNull()
+    }
+
+    /** Rename is the commit point: readers see either the old file or the new file. */
+    private fun promotePart(part: File, out: File) {
+        try {
+            Files.move(part.toPath(), out.toPath(), StandardCopyOption.ATOMIC_MOVE)
+        } catch (_: Exception) {
+            if (!part.renameTo(out)) {
+                throw IOException("Could not atomically publish ${out.name}")
+            }
+        }
     }
 
     /** Set missing ayat untuk satu slug — dimuat lazy (slug bisa berganti runtime). */
@@ -399,7 +576,7 @@ class AudioDownloader internal constructor(
         runCatching {
             val f = File(audioDir, "missing-$slug.json")
             f.parentFile?.mkdirs()
-            f.writeText(gson.toJson(MissingAudio(missingAyahsFor(slug).toList(), emptyList())))
+            atomicWrite(f, gson.toJson(MissingAudio(missingAyahsFor(slug).toList(), emptyList())))
         }
     }
 
@@ -407,7 +584,80 @@ class AudioDownloader internal constructor(
         runCatching {
             val f = File(audioDir, "missing-words.json")
             f.parentFile?.mkdirs()
-            f.writeText(gson.toJson(MissingAudio(emptyList(), missingWords.toList())))
+            atomicWrite(f, gson.toJson(MissingAudio(emptyList(), missingWords.toList())))
         }
+    }
+
+    // ---- persistent crash recovery queue ----
+
+    private val pendingFile: File
+        get() = File(audioDir, "pending-downloads.json")
+
+    private fun loadPendingDownloads() {
+        synchronized(pendingLock) {
+            runCatching {
+                if (pendingFile.exists()) {
+                    val loaded = gson.fromJson<List<PendingAudioDownload>>(
+                        pendingFile.readText(),
+                        pendingType,
+                    ).orEmpty()
+                    pendingDownloads += loaded
+                        .filter { it.surahNumber in 1..114 && it.reciterSlug.isNotBlank() }
+                        .distinctBy { it.surahNumber to it.reciterSlug }
+                }
+            }
+        }
+    }
+
+    private fun enqueuePending(item: PendingAudioDownload) {
+        synchronized(pendingLock) {
+            if (pendingDownloads.none { it.surahNumber == item.surahNumber && it.reciterSlug == item.reciterSlug }) {
+                pendingDownloads += item
+                savePendingDownloadsLocked()
+            }
+        }
+    }
+
+    private fun completePending(item: PendingAudioDownload) {
+        synchronized(pendingLock) {
+            if (pendingDownloads.removeAll {
+                    it.surahNumber == item.surahNumber && it.reciterSlug == item.reciterSlug
+                }) {
+                savePendingDownloadsLocked()
+            }
+        }
+    }
+
+    private fun forgetPendingForSurah(number: Int) {
+        synchronized(pendingLock) {
+            if (pendingDownloads.removeAll { it.surahNumber == number }) savePendingDownloadsLocked()
+        }
+    }
+
+    private fun savePendingDownloadsLocked() {
+        runCatching {
+            pendingFile.parentFile?.mkdirs()
+            atomicWrite(pendingFile, gson.toJson(pendingDownloads))
+        }
+    }
+
+    /** All cache metadata writes use the same temp-file commit protocol. */
+    private fun atomicWrite(target: File, text: String) {
+        val temp = File(target.parentFile, "${target.name}.tmp")
+        temp.writeText(text)
+        try {
+            Files.move(
+                temp.toPath(),
+                target.toPath(),
+                StandardCopyOption.ATOMIC_MOVE,
+                StandardCopyOption.REPLACE_EXISTING,
+            )
+        } catch (_: Exception) {
+            if (!temp.renameTo(target)) throw IOException("Could not atomically write ${target.name}")
+        }
+    }
+
+    private companion object {
+        val CONTENT_RANGE = Regex("bytes (\\d+)-(\\d+)/(\\d+|\\*)")
     }
 }

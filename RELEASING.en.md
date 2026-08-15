@@ -82,7 +82,22 @@ Play. First-release baseline: `versionCode = 1`, `versionName = "1.0.0"`.
 3. **Production** → fill release notes ("What's new", EN + ID), submit.
 4. Google review: 1–7 days for new accounts; watch the console email.
 
-## 5. After release
+## 5. Content and teaching-quality gate
+
+Before uploading an AAB:
+
+- Run `python3 tools/validate_quran_content.py`; all 6,236 ayahs must match the
+  official Kemenag/LPMQ source exactly.
+- Review the diff and update `tools/quran-canonical-manifest.json` only after a
+  clean validation.
+- Confirm the translation and audio rights ledger in
+  [docs/CONTENT_PROVENANCE.en.md](docs/CONTENT_PROVENANCE.en.md), including
+  attribution or written permission for every provider.
+- Do not mark the release ready while any row in
+  [docs/TAJWID_REVIEW.md](docs/TAJWID_REVIEW.md) is still pending qualified
+  expert sign-off.
+
+## 6. After release
 
 - Monitor **Vitals** (crash/ANR) in Play Console.
 - Each new release: bump `versionCode` **by +1** (never decrease), `versionName`

@@ -4,14 +4,60 @@ import org.opennur.tahsin.data.quran.Ayah
 import org.opennur.tahsin.data.quran.Surah
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.nio.file.Files
+import java.util.concurrent.atomic.AtomicInteger
+
+private data class FakeResponse(
+    val status: Int,
+    val body: ByteArray = byteArrayOf(),
+    val headers: Map<String, String> = emptyMap(),
+)
+
+/** Minimal HTTP connection fake; unlike JDK HttpServer it is available in CI's test JDK. */
+private class FakeHttpConnection(
+    private val responseFor: (range: String?) -> FakeResponse,
+) : HttpURLConnection(URL("https://audio.test/")) {
+
+    private val requestHeaders = mutableMapOf<String, String>()
+    private var cachedResponse: FakeResponse? = null
+
+    private fun response(): FakeResponse = cachedResponse ?: responseFor(requestHeaders["Range"]).also {
+        cachedResponse = it
+    }
+
+    override fun connect() {
+        response()
+    }
+
+    override fun disconnect() = Unit
+
+    override fun usingProxy(): Boolean = false
+
+    override fun setRequestProperty(key: String, value: String) {
+        requestHeaders[key] = value
+    }
+
+    override fun getResponseCode(): Int = response().status
+
+    override fun getHeaderField(name: String): String? = response().headers[name]
+
+    override fun getContentLengthLong(): Long = response().body.size.toLong()
+
+    override fun getInputStream(): InputStream = ByteArrayInputStream(response().body)
+}
 
 /**
  * Tes logika file & registry audio ([AudioDownloader]) — memakai direktori
@@ -43,6 +89,13 @@ class AudioDownloaderTest {
     }
 
     private fun downloader(slugProvider: () -> String = { slug }) = AudioDownloader(audioDir, slugProvider)
+
+    private fun networkDownloader(responseFor: (range: String?) -> FakeResponse) = AudioDownloader(
+        audioDir,
+        { slug },
+        { FakeHttpConnection(responseFor) },
+        retryBackoffMs = 1L,
+    )
 
     private fun write(dir: File, name: String, size: Int = 10): File {
         dir.mkdirs()
@@ -131,6 +184,70 @@ class AudioDownloaderTest {
     fun `ensureWord - tercatat missing mengembalikan null`() = runBlocking {
         writeMissingWords("001_002_001.mp3")
         assertNull(downloader().ensureWord(1, 2, 0))
+    }
+
+    @Test
+    fun `ensureAyah - berhasil menulis part lalu rename atomik`() = runBlocking {
+        val payload = "valid-mp3-payload".toByteArray()
+
+        val file = networkDownloader { FakeResponse(200, payload) }.ensureAyah(1, 1)
+
+        assertNotNull(file)
+        assertArrayEquals(payload, file!!.readBytes())
+        assertFalse(File(reciterDir, "001001.mp3.part").exists())
+    }
+
+    @Test
+    fun `ensureAyah - melanjutkan part dengan HTTP Range`() = runBlocking {
+        val payload = "resumable-mp3-payload".toByteArray()
+        val file = networkDownloader { range ->
+            val start = range?.substringAfter("bytes=")?.substringBefore("-")?.toIntOrNull()
+            if (start == null) {
+                FakeResponse(200, payload)
+            } else {
+                FakeResponse(
+                    status = 206,
+                    body = payload.copyOfRange(start, payload.size),
+                    headers = mapOf("Content-Range" to "bytes $start-${payload.lastIndex}/${payload.size}"),
+                )
+            }
+        }
+        val part = File(reciterDir, "001001.mp3.part")
+        part.parentFile!!.mkdirs()
+        part.writeBytes(payload.copyOfRange(0, 7))
+
+        val result = file.ensureAyah(1, 1)
+
+        assertNotNull(result)
+        assertArrayEquals(payload, result!!.readBytes())
+        assertFalse(part.exists())
+    }
+
+    @Test
+    fun `ensureAyah - transient HTTP error dicoba ulang`() = runBlocking {
+        val attempts = AtomicInteger(0)
+        val payload = "retry-payload".toByteArray()
+        val file = networkDownloader {
+            if (attempts.incrementAndGet() == 1) {
+                FakeResponse(503)
+            } else {
+                FakeResponse(200, payload)
+            }
+        }.ensureAyah(1, 1)
+
+        assertNotNull(file)
+        assertEquals(2, attempts.get())
+        assertArrayEquals(payload, file!!.readBytes())
+    }
+
+    @Test
+    fun `downloadSurah - antrean tetap ada setelah kegagalan dan terbaca instance baru`() = runBlocking {
+        val first = networkDownloader { FakeResponse(503) }
+        val stats = first.downloadSurah(surah(listOf(oneAyah()))) { _, _ -> }
+
+        assertEquals(0, stats.ok)
+        assertTrue(first.pendingDownloads().any { it.surahNumber == 1 && it.reciterSlug == slug })
+        assertTrue(networkDownloader { FakeResponse(503) }.pendingDownloads().any { it.surahNumber == 1 })
     }
 
     // ---- isSurahAudioComplete ----

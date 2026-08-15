@@ -14,8 +14,10 @@ import androidx.core.app.NotificationCompat
  * Layanan latar depan untuk unduhan audio: menjaga proses tetap hidup saat
  * layar mati / aplikasi di latar belakang supaya unduhan tidak gagal.
  *
- * Service ini TIDAK mengunduh sendiri — hanya "life-keeping" + menampilkan
- * notifikasi progres (orchestrasi unduhan tetap di ViewModel).
+ * Service ini menjaga proses tetap hidup + menampilkan notifikasi progres;
+ * orchestrasi tetap di ViewModel. Jika proses mati, antrean persisten milik
+ * [AudioDownloader] dipulihkan saat aplikasi dibuka kembali dan file `.part`
+ * dilanjutkan tanpa mengekspos file setengah jadi ke pemutar.
  */
 class DownloadService : Service() {
 

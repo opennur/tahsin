@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "source": "Qur'an Kemenag / LPMQ official API",
+  "sourceUrl": "https://web-api.qurankemenag.net/quran-ayah?start=0&limit=7000",
+  "comparison": "exact Unicode Arabic text after trim",
+  "surahs": 114,
+  "ayahs": 6236,
+  "canonicalTextSha256": "0c0567ccad85e9ac4f6773a21c945706de13c734f72b5d209189a4601eb12cae",
+  "bundledTextSha256": "0c0567ccad85e9ac4f6773a21c945706de13c734f72b5d209189a4601eb12cae",
+  "validatedAt": "2026-08-15T10:47:48.081836+00:00"
+}

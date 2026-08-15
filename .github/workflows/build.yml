@@ -10,6 +10,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  content-integrity:
+    name: Quran content integrity (canonical source)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate all bundled ayahs
+        run: python3 tools/validate_quran_content.py
+
   lint:
     name: Lint (detekt + Android lint)
     runs-on: ubuntu-latest
@@ -89,7 +102,7 @@ jobs:
   build:
     name: Build APK (debug + release)
     runs-on: ubuntu-latest
-    needs: [lint, unit-test]
+    needs: [content-integrity, lint, unit-test]
     steps:
       - uses: actions/checkout@v4
 
@@ -109,9 +122,9 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon
 
-      # Release memakai R8 (minify + resource shrinking); tanpa keystore di
-      # CI, fallback ke debug signing — cukup untuk verifikasi R8/proguard.
-      - name: Build release APK (R8)
+      # R8 is currently disabled in app/build.gradle.kts after a device launch
+      # regression; this still verifies the release packaging path.
+      - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon
 
       - name: Upload debug APK
