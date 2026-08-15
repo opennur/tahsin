@@ -10,16 +10,10 @@ import org.opennur.tahsin.data.learning.LearningPlanEngine
 import org.opennur.tahsin.data.lughoh.LughohEngine
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.util.AppLanguage
-import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.Gamification
-import org.opennur.tahsin.util.GamificationStore
-import org.opennur.tahsin.util.LughohProgressStore
-import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.ReadingHistoryEntry
-import org.opennur.tahsin.util.ReadingHistoryStore
-import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SettingsSource
-import org.opennur.tahsin.util.VocabularyStatsStore
+import org.opennur.tahsin.util.StatsStores
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,13 +62,7 @@ data class StatsState(
  */
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val statsStore: ReadingStatsStore,
-    private val vocabStatsStore: VocabularyStatsStore,
-    private val dreamBigStore: DreamBigProgressStore,
-    private val lughohStore: LughohProgressStore,
-    private val gamificationStore: GamificationStore,
-    private val readingHistory: ReadingHistoryStore,
-    private val learningPlanStore: LearningPlanStore,
+    private val stores: StatsStores,
     private val repository: QuranRepository,
     private val settings: SettingsSource,
 ) : ViewModel() {
@@ -86,17 +74,17 @@ class StatsViewModel @Inject constructor(
     fun refresh() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val tahsin = statsStore.all()
-            val vocab = vocabStatsStore.read()
-            val dream = dreamBigStore.read()
-            val lughoh = lughohStore.read()
-            val gamification = gamificationStore.read()
+            val tahsin = stores.readingStats.all()
+            val vocab = stores.vocabularyStats.read()
+            val dream = stores.dreamBig.read()
+            val lughoh = stores.lughoh.read()
+            val gamification = stores.gamification.read()
             val today = java.time.LocalDate.now().toEpochDay()
             val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
                 ?: AppLanguage.ID
             val goal = LearningGoal.fromKey(settings.learningGoalKey)
             val planKeys = LearningPlanEngine.taskTypesFor(goal).map { it.key }.toSet()
-            val planSnapshot = learningPlanStore.read()
+            val planSnapshot = stores.learningPlan.read()
             val planCompleted = if (planSnapshot.day == today && planSnapshot.goalKey == goal.key) {
                 planSnapshot.completedKeys.count { it in planKeys }
             } else {
@@ -109,7 +97,7 @@ class StatsViewModel @Inject constructor(
             val dreamBestPct = dream.bestScore * 100 / DreamBigGame.QUESTIONS_PER_ROUND
             val lughohBestPct = lughoh.bestScore * 100 / LughohEngine.SESSION_SIZE
             val wordsMastered = vocab.cards.values.count { it.correctCount > 0 }
-            val history = readingHistory.load()
+            val history = stores.readingHistory.load()
             val names = repository.surahList().associate { it.number to it.nameLatin }
 
             _state.value = StatsState(

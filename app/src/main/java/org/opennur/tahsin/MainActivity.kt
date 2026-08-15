@@ -27,12 +27,19 @@ import org.opennur.tahsin.ui.CoherenceScreen
 import org.opennur.tahsin.ui.DreamBigScreen
 import org.opennur.tahsin.ui.FavoritesScreen
 import org.opennur.tahsin.ui.HomeScreen
+import org.opennur.tahsin.ui.HomeActions
+import org.opennur.tahsin.ui.HomeLearningActions
+import org.opennur.tahsin.ui.HomeUtilityActions
 import org.opennur.tahsin.ui.LearningPlanViewModel
 import org.opennur.tahsin.ui.LughohScreen
 import org.opennur.tahsin.ui.MemorizationScreen
 import org.opennur.tahsin.ui.OnboardingScreen
 import org.opennur.tahsin.ui.OpenTarget
 import org.opennur.tahsin.ui.SearchScreen
+import org.opennur.tahsin.ui.SettingsActions
+import org.opennur.tahsin.ui.SettingsAppearanceActions
+import org.opennur.tahsin.ui.SettingsAudioActions
+import org.opennur.tahsin.ui.SettingsNotificationActions
 import org.opennur.tahsin.ui.SettingsScreen
 import org.opennur.tahsin.ui.StatsScreen
 import org.opennur.tahsin.ui.TahsinScreen
@@ -161,19 +168,25 @@ class MainActivity : ComponentActivity() {
                 } else {
                     when (val current = stack.last()) {
                          AppScreen.Home -> HomeScreen(
-                             onOpenTahsin = { push(AppScreen.Tahsin) },
-                             onOpenVocab = { push(AppScreen.Vocab) },
-                             onOpenMemorization = { push(AppScreen.Memorization) },
-                             onOpenQuiz = { push(AppScreen.Quiz) },
-                             onOpenStats = { push(AppScreen.Stats) },
-                             onOpenDreamBig = { push(AppScreen.DreamBig) },
-                             onOpenLughoh = { push(AppScreen.Lughoh) },
-                             onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
-                             onOpenBadges = { push(AppScreen.Badges) },
-                             onOpenCoherence = { push(AppScreen.Coherence) },
-                             onOpenFavorites = { push(AppScreen.Favorites) },
-                             onOpenSettings = { push(AppScreen.Settings) },
-                             onOpenTask = ::openLearningTask,
+                             actions = HomeActions(
+                                 learning = HomeLearningActions(
+                                     onOpenTahsin = { push(AppScreen.Tahsin) },
+                                     onOpenVocab = { push(AppScreen.Vocab) },
+                                     onOpenMemorization = { push(AppScreen.Memorization) },
+                                     onOpenQuiz = { push(AppScreen.Quiz) },
+                                     onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
+                                     onOpenLughoh = { push(AppScreen.Lughoh) },
+                                     onOpenDreamBig = { push(AppScreen.DreamBig) },
+                                 ),
+                                 utility = HomeUtilityActions(
+                                     onOpenStats = { push(AppScreen.Stats) },
+                                     onOpenBadges = { push(AppScreen.Badges) },
+                                     onOpenCoherence = { push(AppScreen.Coherence) },
+                                     onOpenFavorites = { push(AppScreen.Favorites) },
+                                     onOpenSettings = { push(AppScreen.Settings) },
+                                 ),
+                                 onOpenTask = ::openLearningTask,
+                             ),
                              learningPlan = learningPlanState,
                              settings = settingsState,
                          )
@@ -228,21 +241,29 @@ class MainActivity : ComponentActivity() {
                              onBack = { pop() },
                              language = settingsState.language,
                          )
-                         AppScreen.Settings -> SettingsScreen(
-                             onBack = { pop() },
-                             settings = settingsState,
-                             onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
-                             onToggleTranslation = tahsinViewModel::toggleTranslation,
-                              onToggleDarkMode = tahsinViewModel::toggleDarkMode,
-                              onSetLanguage = tahsinViewModel::setLanguage,
-                              onEditLearningPlan = { showLearningSetup = true },
-                             onSetReciter = tahsinViewModel::setReciter,
-                             onSetSpeed = tahsinViewModel::setAudioSpeed,
-                             onToggleAyahOfDay = tahsinViewModel::toggleAyahOfDay,
-                             onToggleStreakReminder = tahsinViewModel::toggleStreakReminder,
-                             onDownloadAll = tahsinViewModel::downloadAllAudio,
-                             onOpenAudioManager = { push(AppScreen.AudioManager) },
-                          )
+                          AppScreen.Settings -> SettingsScreen(
+                              onBack = { pop() },
+                              settings = settingsState,
+                              actions = SettingsActions(
+                                  appearance = SettingsAppearanceActions(
+                                      onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
+                                      onToggleTranslation = tahsinViewModel::toggleTranslation,
+                                      onToggleDarkMode = tahsinViewModel::toggleDarkMode,
+                                      onSetLanguage = tahsinViewModel::setLanguage,
+                                      onEditLearningPlan = { showLearningSetup = true },
+                                  ),
+                                  audio = SettingsAudioActions(
+                                      onSetReciter = tahsinViewModel::setReciter,
+                                      onSetSpeed = tahsinViewModel::setAudioSpeed,
+                                  ),
+                                  notifications = SettingsNotificationActions(
+                                      onToggleAyahOfDay = tahsinViewModel::toggleAyahOfDay,
+                                      onToggleStreakReminder = tahsinViewModel::toggleStreakReminder,
+                                  ),
+                                  onDownloadAll = tahsinViewModel::downloadAllAudio,
+                                  onOpenAudioManager = { push(AppScreen.AudioManager) },
+                              ),
+                           )
                       }
                      }
 

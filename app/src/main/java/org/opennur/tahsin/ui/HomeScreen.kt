@@ -51,21 +51,33 @@ import org.opennur.tahsin.util.Achievements
  * Tiap menu membuka layarnya sendiri (di-push di atas Home di MainActivity) —
  * tanpa drawer. Bahasa & mode gelap mengikuti [SettingsUiState] bersama.
  */
+data class HomeLearningActions(
+    val onOpenTahsin: () -> Unit,
+    val onOpenVocab: () -> Unit,
+    val onOpenMemorization: () -> Unit,
+    val onOpenQuiz: () -> Unit,
+    val onOpenAyatQuiz: () -> Unit,
+    val onOpenLughoh: () -> Unit,
+    val onOpenDreamBig: () -> Unit,
+)
+
+data class HomeUtilityActions(
+    val onOpenStats: () -> Unit,
+    val onOpenBadges: () -> Unit,
+    val onOpenCoherence: () -> Unit,
+    val onOpenFavorites: () -> Unit,
+    val onOpenSettings: () -> Unit,
+)
+
+data class HomeActions(
+    val learning: HomeLearningActions,
+    val utility: HomeUtilityActions,
+    val onOpenTask: (LearningTaskType) -> Unit,
+)
+
 @Composable
 fun HomeScreen(
-    onOpenTahsin: () -> Unit,
-    onOpenVocab: () -> Unit,
-    onOpenMemorization: () -> Unit,
-    onOpenQuiz: () -> Unit,
-    onOpenStats: () -> Unit,
-    onOpenDreamBig: () -> Unit,
-    onOpenLughoh: () -> Unit,
-    onOpenAyatQuiz: () -> Unit,
-    onOpenBadges: () -> Unit,
-    onOpenCoherence: () -> Unit,
-    onOpenFavorites: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenTask: (LearningTaskType) -> Unit,
+    actions: HomeActions,
     learningPlan: LearningPlanUiState,
     settings: SettingsUiState,
     modifier: Modifier = Modifier,
@@ -102,7 +114,7 @@ fun HomeScreen(
                 goal = learningPlan.goal,
                 dailyMinutes = learningPlan.dailyMinutes,
                 strings = strings,
-                onOpenTask = onOpenTask,
+                onOpenTask = actions.onOpenTask,
             )
             Spacer(modifier = Modifier.height(18.dp))
             AyahText(
@@ -113,144 +125,12 @@ fun HomeScreen(
         }
 
         if (!gamification.isLoading) {
-            AyahCard(modifier = Modifier.fillMaxWidth()) {
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            AyahText(
-                                strings.homeLevelLine.format(gamification.level, gamification.xp),
-                                style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
-                            )
-                            AyahText(
-                                strings.homeStreakLine.format(gamification.streak),
-                                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
-                            )
-                        }
-                        val latestKey = gamification.latestBadgeKey
-                        if (latestKey != null) {
-                            val badge = Achievements.byKey(latestKey)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column(horizontalAlignment = Alignment.End) {
-                                AyahText(
-                                    strings.homeBadgeLabel,
-                                    style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                                )
-                                AyahText(
-                                    "${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(latestKey, settings.language)} · " +
-                                        strings.badgesTierLabel.format(gamification.latestBadgeTier),
-                                    style = AyahTypography.Body2.copy(
-                                        color = AyahColors.TextPrimary,
-                                        fontWeight = FontWeight.Medium,
-                                        textAlign = TextAlign.End,
-                                    ),
-                                )
-                            }
-                        }
-                    }
-                    // Target harian XP (direset otomatis tiap hari).
-                    Spacer(modifier = Modifier.height(10.dp))
-                    AyahText(
-                        strings.homeGoalLine.format(gamification.todayXp, gamification.dailyGoalXp),
-                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    GoalProgressBar(
-                        fraction = gamification.todayXp.toFloat() / gamification.dailyGoalXp,
-                    )
-                }
-            }
+            HomeGamificationCard(gamification, settings.language, strings)
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Baris 1: Tahsin (utama, disorot) + Kosakata
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            HomeMenuCard(
-                text = strings.menuTahsin,
-                onClick = onOpenTahsin,
-                highlighted = true,
-                modifier = Modifier.weight(1f),
-            )
-            HomeMenuCard(
-                text = strings.menuVocab,
-                onClick = onOpenVocab,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        HomeMenuCard(
-            text = strings.menuMemorization,
-            onClick = onOpenMemorization,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Baris 2: Kuis Tajwid + Kuis Ayat
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            HomeMenuCard(
-                text = strings.quizTitle,
-                onClick = onOpenQuiz,
-                modifier = Modifier.weight(1f),
-            )
-            HomeMenuCard(
-                text = strings.menuAyatQuiz,
-                onClick = onOpenAyatQuiz,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Baris 3: Belajar Arab + Dream BIG
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            HomeMenuCard(
-                text = strings.menuLughoh,
-                onClick = onOpenLughoh,
-                modifier = Modifier.weight(1f),
-            )
-            HomeMenuCard(
-                text = strings.menuDreamBig,
-                onClick = onOpenDreamBig,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Baris 4: Statistik + Penghargaan
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            HomeMenuCard(
-                text = strings.menuStats,
-                onClick = onOpenStats,
-                modifier = Modifier.weight(1f),
-            )
-            HomeMenuCard(
-                text = strings.menuBadges,
-                onClick = onOpenBadges,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Baris 5: Studi Coherence + Ayat Favorit (di atas Pengaturan)
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            HomeMenuCard(
-                text = strings.menuCoherence,
-                onClick = onOpenCoherence,
-                modifier = Modifier.weight(1f),
-            )
-            HomeMenuCard(
-                text = strings.menuFavorites,
-                onClick = onOpenFavorites,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Baris 6: Pengaturan (penuh, disorot)
-        HomeMenuCard(
-            text = strings.menuSettings,
-            onClick = onOpenSettings,
-            highlighted = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        HomeLearningMenu(strings, actions.learning)
+        HomeUtilityMenu(strings, actions.utility)
 
         Spacer(modifier = Modifier.height(28.dp))
         CreditLink(
@@ -261,6 +141,142 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
+}
+
+@Composable
+private fun HomeGamificationCard(
+    gamification: GamificationUiState,
+    language: org.opennur.tahsin.util.AppLanguage,
+    strings: Strings,
+) {
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    AyahText(
+                        strings.homeLevelLine.format(gamification.level, gamification.xp),
+                        style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
+                    )
+                    AyahText(
+                        strings.homeStreakLine.format(gamification.streak),
+                        style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                    )
+                }
+                gamification.latestBadgeKey?.let { key ->
+                    val badge = Achievements.byKey(key)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column(horizontalAlignment = Alignment.End) {
+                        AyahText(
+                            strings.homeBadgeLabel,
+                            style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                        )
+                        AyahText(
+                            "${badge?.emoji.orEmpty()} ${AppStrings.badgeTitle(key, language)} · " +
+                                strings.badgesTierLabel.format(gamification.latestBadgeTier),
+                            style = AyahTypography.Body2.copy(
+                                color = AyahColors.TextPrimary,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.End,
+                            ),
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            AyahText(
+                strings.homeGoalLine.format(gamification.todayXp, gamification.dailyGoalXp),
+                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            GoalProgressBar(fraction = gamification.todayXp.toFloat() / gamification.dailyGoalXp)
+        }
+    }
+}
+
+@Composable
+private fun HomeLearningMenu(strings: Strings, actions: HomeLearningActions) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        HomeMenuCard(
+            text = strings.menuTahsin,
+            onClick = actions.onOpenTahsin,
+            highlighted = true,
+            modifier = Modifier.weight(1f),
+        )
+        HomeMenuCard(
+            text = strings.menuVocab,
+            onClick = actions.onOpenVocab,
+            modifier = Modifier.weight(1f),
+        )
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    HomeMenuCard(
+        text = strings.menuMemorization,
+        onClick = actions.onOpenMemorization,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        HomeMenuCard(
+            text = strings.quizTitle,
+            onClick = actions.onOpenQuiz,
+            modifier = Modifier.weight(1f),
+        )
+        HomeMenuCard(
+            text = strings.menuAyatQuiz,
+            onClick = actions.onOpenAyatQuiz,
+            modifier = Modifier.weight(1f),
+        )
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        HomeMenuCard(
+            text = strings.menuLughoh,
+            onClick = actions.onOpenLughoh,
+            modifier = Modifier.weight(1f),
+        )
+        HomeMenuCard(
+            text = strings.menuDreamBig,
+            onClick = actions.onOpenDreamBig,
+            modifier = Modifier.weight(1f),
+        )
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+}
+
+@Composable
+private fun HomeUtilityMenu(strings: Strings, actions: HomeUtilityActions) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        HomeMenuCard(
+            text = strings.menuStats,
+            onClick = actions.onOpenStats,
+            modifier = Modifier.weight(1f),
+        )
+        HomeMenuCard(
+            text = strings.menuBadges,
+            onClick = actions.onOpenBadges,
+            modifier = Modifier.weight(1f),
+        )
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        HomeMenuCard(
+            text = strings.menuCoherence,
+            onClick = actions.onOpenCoherence,
+            modifier = Modifier.weight(1f),
+        )
+        HomeMenuCard(
+            text = strings.menuFavorites,
+            onClick = actions.onOpenFavorites,
+            modifier = Modifier.weight(1f),
+        )
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    HomeMenuCard(
+        text = strings.menuSettings,
+        onClick = actions.onOpenSettings,
+        highlighted = true,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable

@@ -24,6 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.opennur.tahsin.data.learning.MemorizationCard
+import org.opennur.tahsin.data.quran.Ayah
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTypography
 import org.opennur.tahsin.ui.components.AyahButton
@@ -75,80 +77,107 @@ fun MemorizationScreen(
             ) {
                 AyahText(strings.memorizationError, style = AyahTypography.Body2)
             }
-            else -> {
-                val card = state.card ?: return
-                val ayah = state.ayah ?: return
-                AyahText(
-                    strings.memorizationDue.format(state.dueCount, state.totalCount),
-                    style = AyahTypography.Caption.copy(
-                        color = AyahColors.Primary,
-                        fontWeight = FontWeight.SemiBold,
-                    ),
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                AyahCard(modifier = Modifier.fillMaxWidth()) {
-                    Column {
-                        AyahText(
-                            "${card.surah}:${card.ayah}",
-                            style = AyahTypography.Caption.copy(color = AyahColors.Primary),
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        if (state.revealed) {
-                            AyahText(
-                                ayah.text,
-                                style = AyahTypography.Arabic.copy(textAlign = TextAlign.End),
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            AyahText(
-                                ayah.translation,
-                                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
-                            )
-                        } else {
-                            AyahText(
-                                strings.memorizationHidden,
-                                style = AyahTypography.Body1.copy(
-                                    color = AyahColors.TextSecondary,
-                                    textAlign = TextAlign.Center,
-                                ),
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            AyahButton(
-                                text = strings.memorizationReveal,
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = viewModel::reveal,
-                            )
-                        }
-                    }
-                }
+            else -> MemorizationReadyContent(state, strings, viewModel, onOpenAyah)
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
 
-                if (state.revealed) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AyahButton(
-                            text = strings.memorizationReview,
-                            variant = AyahButtonVariant.Danger,
-                            modifier = Modifier.weight(1f),
-                            onClick = viewModel::needReview,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        AyahButton(
-                            text = strings.memorizationRemembered,
-                            modifier = Modifier.weight(1f),
-                            onClick = viewModel::remember,
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                AyahButton(
-                    text = strings.memorizationOpenTahsin,
-                    variant = AyahButtonVariant.Outline,
+@Composable
+private fun MemorizationReadyContent(
+    state: MemorizationUiState,
+    strings: Strings,
+    viewModel: MemorizationViewModel,
+    onOpenAyah: (Int, Int) -> Unit,
+) {
+    val card = state.card ?: return
+    val ayah = state.ayah ?: return
+    AyahText(
+        strings.memorizationDue.format(state.dueCount, state.totalCount),
+        style = AyahTypography.Caption.copy(
+            color = AyahColors.Primary,
+            fontWeight = FontWeight.SemiBold,
+        ),
+    )
+    Spacer(modifier = Modifier.height(10.dp))
+    MemorizationAyahCard(card, ayah, state.revealed, strings, viewModel::reveal)
+    if (state.revealed) {
+        Spacer(modifier = Modifier.height(12.dp))
+        MemorizationAnswerButtons(strings, viewModel::needReview, viewModel::remember)
+    }
+    Spacer(modifier = Modifier.height(10.dp))
+    AyahButton(
+        text = strings.memorizationOpenTahsin,
+        variant = AyahButtonVariant.Outline,
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { onOpenAyah(card.surah, card.ayah) },
+    )
+}
+
+@Composable
+private fun MemorizationAyahCard(
+    card: MemorizationCard,
+    ayah: Ayah,
+    revealed: Boolean,
+    strings: Strings,
+    onReveal: () -> Unit,
+) {
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            AyahText(
+                "${card.surah}:${card.ayah}",
+                style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            if (revealed) {
+                AyahText(
+                    ayah.text,
+                    style = AyahTypography.Arabic.copy(textAlign = TextAlign.End),
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onOpenAyah(card.surah, card.ayah) },
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                AyahText(
+                    ayah.translation,
+                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                )
+            } else {
+                AyahText(
+                    strings.memorizationHidden,
+                    style = AyahTypography.Body1.copy(
+                        color = AyahColors.TextSecondary,
+                        textAlign = TextAlign.Center,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                AyahButton(
+                    text = strings.memorizationReveal,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onReveal,
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun MemorizationAnswerButtons(
+    strings: Strings,
+    onReview: () -> Unit,
+    onRemember: () -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        AyahButton(
+            text = strings.memorizationReview,
+            variant = AyahButtonVariant.Danger,
+            modifier = Modifier.weight(1f),
+            onClick = onReview,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        AyahButton(
+            text = strings.memorizationRemembered,
+            modifier = Modifier.weight(1f),
+            onClick = onRemember,
+        )
     }
 }

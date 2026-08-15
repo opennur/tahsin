@@ -30,6 +30,7 @@ import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SearchableAyah
 import org.opennur.tahsin.util.SettingsSource
+import org.opennur.tahsin.util.StatsStores
 import org.opennur.tahsin.util.VocabularyStatsStore
 import java.io.File
 import java.nio.file.Files
@@ -71,13 +72,15 @@ class StatsViewModelTest {
 
     private fun vm(code: String = "id", repo: QuranRepository = fakeRepo()): StatsViewModel =
         StatsViewModel(
-            statsStore = ReadingStatsStore(File(dir, "reading_stats.json")),
-            vocabStatsStore = VocabularyStatsStore(File(dir, "vocab_stats.json")),
-            dreamBigStore = DreamBigProgressStore(File(dir, "dream_big.json")),
-            lughohStore = LughohProgressStore(File(dir, "lughoh.json")),
-            gamificationStore = GamificationStore(File(dir, "gamification.json")),
-            readingHistory = ReadingHistoryStore(File(dir, "reading_history.json")),
-            learningPlanStore = LearningPlanStore(File(dir, "learning_plan.json")),
+            stores = StatsStores(
+                readingStats = ReadingStatsStore(File(dir, "reading_stats.json")),
+                vocabularyStats = VocabularyStatsStore(File(dir, "vocab_stats.json")),
+                dreamBig = DreamBigProgressStore(File(dir, "dream_big.json")),
+                lughoh = LughohProgressStore(File(dir, "lughoh.json")),
+                gamification = GamificationStore(File(dir, "gamification.json")),
+                readingHistory = ReadingHistoryStore(File(dir, "reading_history.json")),
+                learningPlan = LearningPlanStore(File(dir, "learning_plan.json")),
+            ),
             repository = repo,
             settings = settings(code),
         )

@@ -17,13 +17,13 @@ import org.opennur.tahsin.util.BookmarkStore
 import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.FontStore
 import org.opennur.tahsin.util.GamificationStore
-import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.LearningPlanStore
-import org.opennur.tahsin.util.MemorizationStore
+import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.SettingsStore
+import org.opennur.tahsin.util.StatsStores
 import org.opennur.tahsin.util.TahsinAudioPlayer
 import org.opennur.tahsin.util.VocabularyStatsStore
 import javax.inject.Singleton
@@ -137,11 +137,21 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideLearningPlanStore(@ApplicationContext context: Context): LearningPlanStore =
-        LearningPlanStore.fromContext(context)
-
-    @Provides
-    @Singleton
-    fun provideMemorizationStore(@ApplicationContext context: Context): MemorizationStore =
-        MemorizationStore.fromContext(context)
+    fun provideStatsStores(
+        readingStats: ReadingStatsStore,
+        vocabularyStats: VocabularyStatsStore,
+        dreamBig: DreamBigProgressStore,
+        lughoh: LughohProgressStore,
+        gamification: GamificationStore,
+        readingHistory: ReadingHistoryStore,
+        learningPlan: LearningPlanStore,
+    ): StatsStores = StatsStores(
+        readingStats = readingStats,
+        vocabularyStats = vocabularyStats,
+        dreamBig = dreamBig,
+        lughoh = lughoh,
+        gamification = gamification,
+        readingHistory = readingHistory,
+        learningPlan = learningPlan,
+    )
 }
