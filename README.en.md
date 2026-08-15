@@ -224,7 +224,7 @@ bash tools/fetch_font.sh                     # bundle Uthmani font (Amiri/OFL)
 
 Output is written to `app/src/main/assets/`:
 
-- `quran/data/surah-<n>.json` — raw equran.id response (Arabic + Indonesian translation)
+- `quran/data/surah-<n>.json` — cleaned equran.id response (Arabic + Indonesian translation)
 - `quran/data/trans-en-<n>.json` — English translation (quran.com, Saheeh
   International; HTML tags & `<sup>` footnotes already stripped)
 - `quran/pages.json` — Madani mushaf pagination (604 pages + 30 juz) from
@@ -323,8 +323,8 @@ basmalah rule, 15 sajdah verses, text free of ࣖ artifacts):
 ### Canonical Quran text validation
 
 The bundled Arabic text is checked against the independent official Qur'an
-Kemenag/LPMQ API. The comparison is exact Unicode text after trimming only
-transport whitespace; harakah and pause marks are not discarded:
+Kemenag/LPMQ API after the shared artifact and whitespace cleanup rules. Letters,
+harakah, and pause marks remain exact:
 
 ```bash
 python3 tools/validate_quran_content.py

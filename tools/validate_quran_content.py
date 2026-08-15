@@ -2,9 +2,9 @@
 """Validate bundled Arabic ayahs against the official Kemenag/LPMQ source.
 
 The app's Arabic bundle is generated from equran.id. This validator deliberately
-uses a different source: the official Qur'an Kemenag/LPMQ API. Comparison is an
-exact Unicode comparison after trimming transport whitespace; no harakah or
-pause-mark normalization is performed.
+uses a different source: the official Qur'an Kemenag/LPMQ API. Comparison uses
+the shared cleanup rules for transport whitespace and known upstream artifacts;
+letters, harakat, and pause marks otherwise remain exact.
 
 Usage:
     python3 tools/validate_quran_content.py
@@ -29,6 +29,8 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from quran_text_cleaner import clean_arabic
 
 
 BASE = Path(__file__).resolve().parent.parent
@@ -95,7 +97,7 @@ def load_canonical(payload: dict[str, Any]) -> dict[tuple[int, int], dict[str, s
     for row in rows:
         try:
             key = (int(row["surah_id"]), int(row["ayah"]))
-            arabic = str(row["arabic"]).strip()
+            arabic = clean_arabic(str(row["arabic"]), key)
         except (KeyError, TypeError, ValueError) as error:
             raise RuntimeError(f"invalid canonical ayah row: {row!r}") from error
         if key in result:
@@ -143,7 +145,7 @@ def write_manifest(canonical: dict[tuple[int, int], dict[str, str]], local: dict
         "schemaVersion": 1,
         "source": "Qur'an Kemenag / LPMQ official API",
         "sourceUrl": CANONICAL_URL,
-        "comparison": "exact Unicode Arabic text after trim",
+        "comparison": "canonical Unicode Arabic after shared artifact and whitespace cleanup",
         "surahs": EXPECTED_SURAHS,
         "ayahs": EXPECTED_AYAHS,
         "canonicalTextSha256": text_hash(canonical),
@@ -158,7 +160,7 @@ def write_manifest(canonical: dict[tuple[int, int], dict[str, str]], local: dict
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--canonical-file", type=Path, help="use a saved canonical API response instead of the network")
-    parser.add_argument("--fix", action="store_true", help="repair exact canonical Arabic mismatches in generated assets")
+    parser.add_argument("--fix", action="store_true", help="repair canonical Arabic mismatches in generated assets")
     parser.add_argument("--write-manifest", action="store_true", help="write tools/quran-canonical-manifest.json after a clean comparison")
     args = parser.parse_args()
 
@@ -194,7 +196,7 @@ def main() -> int:
                 print(f"  ... {len(mismatches) - 20} more", file=sys.stderr)
             return 1
 
-        print(f"OK: {len(local)} ayahs across {EXPECTED_SURAHS} surahs match Kemenag/LPMQ exactly")
+        print(f"OK: {len(local)} ayahs across {EXPECTED_SURAHS} surahs match Kemenag/LPMQ after cleanup")
         print(f"SHA-256: {text_hash(local)}")
         if args.write_manifest:
             write_manifest(canonical, local)

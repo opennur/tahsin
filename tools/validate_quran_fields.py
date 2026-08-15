@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Validate all user-facing Quran fields in the bundled source data.
 
-The Arabic bundle is compared exactly with the official Kemenag/LPMQ API.
-Latin is compared with the same source after transport whitespace is trimmed;
-the known Kemenag API misalignment at 23:78 is checked against the Arabic ayah
-explicitly. Indonesian translation comparison ignores source footnote markers
+Arabic and Latin are compared with the official Kemenag/LPMQ API after the
+shared cleanup rules are applied; letters, harakat, and pause marks remain
+exact. The known Kemenag API misalignment at 23:78 is checked against the Arabic
+ayah explicitly. Indonesian translation comparison ignores source footnote markers
 and quotation punctuation, then checks quote balance separately.
 
 Usage:
@@ -22,6 +22,13 @@ import unicodedata
 import urllib.request
 from pathlib import Path
 from typing import Any
+
+from quran_text_cleaner import (
+    ARABIC_ARTIFACTS,
+    clean_arabic,
+    clean_indonesian,
+    clean_latin,
+)
 
 
 BASE = Path(__file__).resolve().parent.parent
@@ -153,21 +160,27 @@ def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tupl
             if not char.isspace() and not name.startswith("ARABIC "):
                 add(findings, key, "teksArab", "karakter non-Arab", char, "")
                 break
-        if arabic != trim(ref["arabic"]):
-            add(findings, key, "teksArab", "huruf atau harakat tidak sesuai mushaf kanonik", arabic, trim(ref["arabic"]))
+        for artifact in ARABIC_ARTIFACTS:
+            if artifact in arabic:
+                add(findings, key, "teksArab", "artefak karakter Arab", artifact, "")
+                break
+        expected_arabic = clean_arabic(ref["arabic"], key)
+        if arabic != expected_arabic:
+            add(findings, key, "teksArab", "huruf atau harakat tidak sesuai mushaf kanonik", arabic, expected_arabic)
 
-        latin = trim(row["teksLatin"]).replace(chr(145), "‘")
+        latin = trim(row["teksLatin"])
         for char in row["teksLatin"]:
             if ord(char) < 32 or 127 <= ord(char) < 160:
                 add(findings, key, "teksLatin", f"karakter kontrol/non-Latin U+{ord(char):04X}", row["teksLatin"], row["teksLatin"].replace(char, "‘"))
                 break
-        expected_latin = MANUAL_LATIN.get(key, trim(ref["latin"]).replace(chr(145), "‘"))
+        expected_latin = clean_latin(MANUAL_LATIN.get(key, ref["latin"]))
         if latin != expected_latin:
             kind = "transliterasi bergeser ke ayat lain" if key in {(23, 79), (23, 80), (23, 81)} else "transliterasi tidak sesuai standar Kemenag"
             add(findings, key, "teksLatin", kind, trim(row["teksLatin"]), expected_latin)
 
-        if normalize_translation(row["teksIndonesia"]) != normalize_translation(ref["translation"]):
-            add(findings, key, "teksIndonesia", "teks berbeda dari terjemahan kanonik", row["teksIndonesia"], ref["translation"])
+        expected_translation = clean_indonesian(ref["translation"], key)
+        if normalize_translation(row["teksIndonesia"]) != normalize_translation(expected_translation):
+            add(findings, key, "teksIndonesia", "teks berbeda dari terjemahan kanonik", row["teksIndonesia"], expected_translation)
 
     check_quote_balance(bundle, findings)
     return findings

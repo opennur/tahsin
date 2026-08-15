@@ -229,7 +229,7 @@ bash tools/fetch_font.sh                     # bundle font khat Utsmani (Amiri/O
 
 Hasilnya ditulis ke `app/src/main/assets/`:
 
-- `quran/data/surah-<n>.json` — respons mentah equran.id (Arab + terjemahan Indonesia)
+- `quran/data/surah-<n>.json` — respons equran.id yang sudah dibersihkan (Arab + terjemahan Indonesia)
 - `quran/data/trans-en-<n>.json` — terjemahan Inggris (quran.com, Saheeh
   International; tag HTML & footnote `<sup>` sudah dibersihkan)
 - `quran/pages.json` — paginasi mushaf Madani (604 halaman + 30 juz) dari
@@ -327,8 +327,8 @@ teks tanpa artefak ࣖ):
 ### Validasi teks Al-Qur'an kanonik
 
 Teks Arab yang di-bundle dibandingkan dengan API resmi Qur'an Kemenag/LPMQ
-yang independen. Perbandingan memakai teks Unicode persis setelah hanya
-memangkas spasi transport; harakat dan tanda waqaf tidak dibuang:
+yang independen. Perbandingan memakai teks Unicode setelah aturan pembersihan
+artefak dan spasi bersama; huruf, harakat, dan tanda waqaf tetap persis:
 
 ```bash
 python3 tools/validate_quran_content.py

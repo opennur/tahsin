@@ -61,7 +61,7 @@ or all audio also removes pending download metadata and temporary files.
 
 ## Release Gate
 
-- [ ] `validate_quran_content.py` reports 6,236 exact matches.
+- [ ] `validate_quran_content.py` reports 6,236 matches after shared cleanup.
 - [ ] The canonical manifest is regenerated only after reviewing the asset diff.
 - [ ] Each translation has a recorded permission or applicable license.
 - [ ] Each reciter and word-audio provider has recorded terms and attribution.

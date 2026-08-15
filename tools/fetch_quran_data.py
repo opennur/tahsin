@@ -4,8 +4,9 @@ ke dalam APK. Setelah dijalankan, aplikasi siap dipakai tanpa internet untuk
 membaca mushaf/terjemahan/tajwid; hanya AUDIO yang tetap perlu diunduh.
 
 Output (masuk ke APK lewat assets):
-  app/src/main/assets/quran/data/surah-<n>.json     → respons mentah equran.id
-                                                     (Arab + terjemahan Indonesia)
+  app/src/main/assets/quran/data/surah-<n>.json     → respons equran.id yang
+                                                      sudah dibersihkan
+                                                      (Arab + terjemahan Indonesia)
   app/src/main/assets/quran/data/trans-en-<n>.json  → terjemahan EN (quran.com,
                                                      resource 20, HTML dibersihkan)
 
@@ -24,6 +25,8 @@ import os
 import re
 import sys
 import urllib.request
+
+from quran_text_cleaner import clean_payload
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.path.join(BASE, "app", "src", "main", "assets", "quran", "data")
@@ -64,10 +67,10 @@ def fetch_equran(n: int) -> None:
     if os.path.exists(path) and not FORCE:
         return
     raw = http_get(EQURAN_URL.format(n=n))
-    json.loads(raw)  # pastikan JSON valid sebelum disimpan
+    payload = clean_payload(json.loads(raw))
     with open(path, "w", encoding="utf-8") as f:
-        f.write(raw)
-    print(f"  [equran.id] surah {n:3d} → surah-{n}.json ({len(raw)} byte)")
+        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"  [equran.id] surah {n:3d} → surah-{n}.json ({os.path.getsize(path)} byte)")
 
 
 def fetch_en(n: int) -> None:

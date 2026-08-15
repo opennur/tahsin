@@ -46,8 +46,8 @@ sebagai langkah QA manual sebelum rilis:
 ## Checklist pra-rilis
 
 - [ ] `./gradlew testDebugUnitTest detekt lintDebug assembleRelease` hijau
-- [ ] `python3 tools/validate_quran_content.py` — 6.236 ayat cocok persis
-  dengan sumber resmi Kemenag/LPMQ dan manifest ditinjau
+- [ ] `python3 tools/validate_quran_content.py` — 6.236 ayat cocok setelah
+  pembersihan dengan sumber resmi Kemenag/LPMQ dan manifest ditinjau
 - [ ] `python3 tools/validate_quran_fields.py` — field Arab, Latin, Indonesia,
   karakter, kutip, dan urutan ayat bersih
 - [ ] Hak/atribusi semua terjemahan dan audio sudah dicatat di
