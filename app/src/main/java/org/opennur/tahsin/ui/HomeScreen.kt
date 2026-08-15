@@ -25,16 +25,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.opennur.tahsin.data.learning.DailyLearningPlan
+import org.opennur.tahsin.data.learning.LearningGoal
+import org.opennur.tahsin.data.learning.LearningTaskType
 import org.opennur.tahsin.theme.AyahColors
-import org.opennur.tahsin.theme.AyahShapes
 import org.opennur.tahsin.theme.AyahTypography
+import org.opennur.tahsin.ui.components.AyahButton
+import org.opennur.tahsin.ui.components.AyahButtonSize
+import org.opennur.tahsin.ui.components.AyahButtonVariant
 import org.opennur.tahsin.ui.components.AyahCard
 import org.opennur.tahsin.ui.components.AyahText
 import org.opennur.tahsin.ui.components.CreditLink
@@ -51,6 +55,7 @@ import org.opennur.tahsin.util.Achievements
 fun HomeScreen(
     onOpenTahsin: () -> Unit,
     onOpenVocab: () -> Unit,
+    onOpenMemorization: () -> Unit,
     onOpenQuiz: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenDreamBig: () -> Unit,
@@ -60,6 +65,8 @@ fun HomeScreen(
     onOpenCoherence: () -> Unit,
     onOpenFavorites: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenTask: (LearningTaskType) -> Unit,
+    learningPlan: LearningPlanUiState,
     settings: SettingsUiState,
     modifier: Modifier = Modifier,
 ) {
@@ -88,6 +95,22 @@ fun HomeScreen(
             style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
         )
         Spacer(modifier = Modifier.height(16.dp))
+
+        if (!learningPlan.loading) {
+            TodayPlanCard(
+                plan = learningPlan.plan,
+                goal = learningPlan.goal,
+                dailyMinutes = learningPlan.dailyMinutes,
+                strings = strings,
+                onOpenTask = onOpenTask,
+            )
+            Spacer(modifier = Modifier.height(18.dp))
+            AyahText(
+                strings.todayExplore,
+                style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         if (!gamification.isLoading) {
             AyahCard(modifier = Modifier.fillMaxWidth()) {
@@ -153,6 +176,12 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f),
             )
         }
+        Spacer(modifier = Modifier.height(12.dp))
+        HomeMenuCard(
+            text = strings.menuMemorization,
+            onClick = onOpenMemorization,
+            modifier = Modifier.fillMaxWidth(),
+        )
         Spacer(modifier = Modifier.height(12.dp))
 
         // Baris 2: Kuis Tajwid + Kuis Ayat
@@ -232,6 +261,111 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
+}
+
+@Composable
+private fun TodayPlanCard(
+    plan: DailyLearningPlan,
+    goal: LearningGoal,
+    dailyMinutes: Int,
+    strings: Strings,
+    onOpenTask: (LearningTaskType) -> Unit,
+) {
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    AyahText(strings.todayTitle, style = AyahTypography.Heading2)
+                    AyahText(
+                        strings.todaySubtitle.format(dailyMinutes),
+                        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                    )
+                }
+                AyahText(
+                    strings.todayProgress.format(plan.completedCount, plan.totalCount),
+                    style = AyahTypography.Caption.copy(
+                        color = AyahColors.Primary,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.End,
+                    ),
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahText(
+                goalLabel(goal, strings),
+                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            GoalProgressBar(
+                fraction = if (plan.totalCount == 0) 0f else {
+                    plan.completedCount.toFloat() / plan.totalCount
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (plan.isComplete) {
+                AyahText(
+                    strings.todayComplete,
+                    style = AyahTypography.Body2.copy(
+                        color = AyahColors.Success,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                )
+            } else {
+                plan.tasks.forEach { task ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        AyahText(
+                            if (task.completed) "✓" else "${task.order + 1}",
+                            style = AyahTypography.Body2.copy(
+                                color = if (task.completed) AyahColors.Success else AyahColors.Primary,
+                                fontWeight = FontWeight.Bold,
+                            ),
+                            modifier = Modifier.width(28.dp),
+                        )
+                        AyahText(
+                            taskLabel(task.type, strings),
+                            style = AyahTypography.Body2.copy(
+                                color = if (task.completed) AyahColors.TextSecondary else AyahColors.TextPrimary,
+                            ),
+                            modifier = Modifier.weight(1f),
+                        )
+                        AyahButton(
+                            text = if (task.completed) strings.todayTaskDone else strings.todayTaskStart,
+                            variant = if (task.completed) {
+                                AyahButtonVariant.Ghost
+                            } else {
+                                AyahButtonVariant.Outline
+                            },
+                            size = AyahButtonSize.Small,
+                            enabled = !task.completed,
+                            onClick = { onOpenTask(task.type) },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun goalLabel(goal: LearningGoal, strings: Strings): String = when (goal) {
+    LearningGoal.RECITATION -> strings.goalRecitation
+    LearningGoal.UNDERSTANDING -> strings.goalUnderstanding
+    LearningGoal.MEMORIZATION -> strings.goalMemorization
+    LearningGoal.ARABIC -> strings.goalArabic
+}
+
+private fun taskLabel(type: LearningTaskType, strings: Strings): String = when (type) {
+    LearningTaskType.RECITE -> strings.taskRecite
+    LearningTaskType.TAJWID -> strings.taskTajwid
+    LearningTaskType.VOCABULARY -> strings.taskVocabulary
+    LearningTaskType.UNDERSTAND -> strings.taskUnderstand
+    LearningTaskType.ARABIC -> strings.taskArabic
+    LearningTaskType.MEMORIZATION -> strings.taskMemorization
 }
 
 /** Kartu menu portal: label di tengah, latar sesuai varian. */

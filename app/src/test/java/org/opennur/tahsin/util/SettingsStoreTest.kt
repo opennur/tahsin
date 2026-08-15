@@ -44,6 +44,8 @@ class SettingsStoreTest {
         assertThat(store.reciter).isEqualTo(Reciter.MINSHAWY)
         assertThat(store.audioSpeed).isEqualTo(1.0f)
         assertThat(store.fontScale).isEqualTo(1.5f)
+        assertThat(store.learningGoal).isEqualTo(LearningGoal.RECITATION)
+        assertThat(store.dailyMinutes).isEqualTo(15)
     }
 
     @Test
@@ -57,6 +59,9 @@ class SettingsStoreTest {
             audioSpeed = 1.25f
             fontScale = 2.0f
             backgroundDownloadAllowed = true
+            onboardingComplete = true
+            learningGoalKey = LearningGoal.MEMORIZATION.key
+            dailyMinutes = 30
         }
 
         val second = SettingsStore(context)
@@ -68,6 +73,9 @@ class SettingsStoreTest {
         assertThat(second.audioSpeed).isEqualTo(1.25f)
         assertThat(second.fontScale).isEqualTo(2.0f)
         assertThat(second.backgroundDownloadAllowed).isTrue()
+        assertThat(second.onboardingComplete).isTrue()
+        assertThat(second.learningGoal).isEqualTo(LearningGoal.MEMORIZATION)
+        assertThat(second.dailyMinutes).isEqualTo(30)
     }
 
     @Test
@@ -89,6 +97,11 @@ class SettingsStoreTest {
 
         store.fontScale = 0.1f
         assertThat(store.fontScale).isEqualTo(FontScales.MIN)
+
+        store.dailyMinutes = 1
+        assertThat(store.dailyMinutes).isEqualTo(5)
+        store.dailyMinutes = 100
+        assertThat(store.dailyMinutes).isEqualTo(60)
     }
 
     @Test

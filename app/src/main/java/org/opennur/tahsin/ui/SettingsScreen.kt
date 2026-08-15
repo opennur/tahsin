@@ -59,6 +59,7 @@ fun SettingsScreen(
     onToggleTranslation: () -> Unit,
     onToggleDarkMode: () -> Unit,
     onSetLanguage: (AppLanguage) -> Unit,
+    onEditLearningPlan: () -> Unit,
     onSetReciter: (Reciter) -> Unit,
     onSetSpeed: (Float) -> Unit,
     onToggleAyahOfDay: () -> Unit,
@@ -124,6 +125,13 @@ fun SettingsScreen(
                 label = "🌐 ${strings.settingLanguage}",
                 value = languageName,
                 onClick = { onSetLanguage(settings.language.next()) },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahButton(
+                text = strings.settingLearningPlan,
+                variant = AyahButtonVariant.Outline,
+                onClick = onEditLearningPlan,
+                modifier = Modifier.fillMaxWidth(),
             )
 
             SectionDivider()

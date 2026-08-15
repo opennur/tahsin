@@ -4,7 +4,8 @@ An Android app for **muraja'ah & Qur'an reading practice**: a page-based mushaf
 in the style of the Madani mushaf (flowing ayah text connected right-to-left),
 real-time recitation scoring via microphone, tajwid letter coloring, per-ayah +
 per-word qari audio, and **audio playback modes** (single ayah / continue
-automatically / repeat) — plus **Qur'an & Arabic learning tracks**: Vocabulary,
+automatically / repeat) — plus **Qur'an & Arabic learning tracks**: a guided
+daily plan, Vocabulary,
 Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 (Durusul Lughoh-style methodology), **Ayah Quiz**, and **Achievements**
 (XP + badges).
@@ -22,10 +23,18 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 ## Features
 
 - 🧭 **Main menu** (home screen): every feature is opened from a menu card —
-  **Tahsin**, **Vocabulary**, **Tajweed Quiz**, **Statistics**, **Dream BIG**,
+  **Tahsin**, **Vocabulary**, **Memorization**, **Tajweed Quiz**, **Statistics**, **Dream BIG**,
   **Learn Arabic**, **Ayah Quiz**, **Achievements**, **Coherence Study**,
-  **Favorite Ayahs**, and **Settings**.
+  **Favorite Ayahs**, and **Settings**. The app also provides a first-run
+  **Today plan** and **Memorization & Murajaah** track.
   (Ayah search & Audio Manager moved: 🔍 in the Tahsin header, 🎵 in Settings.)
+- 🧭 **Guided learning plan**: on first launch, choose a focus (recitation,
+  understanding, memorization, or Arabic) and a daily time target. Home then
+  shows three deterministic tasks for the day and records completion locally.
+- 🧠 **Memorization & Murajaah**: an offline spaced-review queue begins with the
+  bundled Al-Fatihah ayahs. Reveal an ayah, mark it remembered or needing review,
+  and open it directly in Tahsin. This is a practice aid, not teacher-level
+  assessment; the queue stores review metadata only.
 - 📖 **Page-based mushaf like the real Madani mushaf** — navigation per PAGE (604 pages,
   RTL flow like flipping a printed mushaf), **flowing ayah text connected right-to-left**
   (short juz-30 ayahs share lines instead of stacking one per row), verse-end numbering
@@ -81,7 +90,8 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 - 🎮 **XP, Level & Streak**: every learning activity earns XP — Tahsin
   recitation (score ≥70: 5 XP, ≥90: 10 XP), correct quiz answers (2 XP),
   newly mastered vocabulary words (10 XP), Dream BIG rounds (15 XP), Learn
-  Arabic sessions (10 XP). Levels follow a quadratic curve (`√(XP/100)`), a
+  Arabic sessions (10 XP), successful memorization review (5 XP). Levels follow a
+  quadratic curve (`√(XP/100)`), a
   **daily streak** is tracked per calendar day, and a **50 XP daily goal**
   shows a progress bar on Home & Stats. Level-ups, streak milestones
   (3/7/14/30 days), and new badges are celebrated with a dialog + vibration.
@@ -173,6 +183,7 @@ The same ayah for every user throughout the day, automatically changing tomorrow
 
 ```
 app/src/main/java/org/opennur/tahsin/
+├── data/learning/  # Daily learning plan + spaced memorization rules
 ├── data/quran/     # Surah/Ayah models + QuranRepository (asset bundle → cache →
 │                   #   equran.id) + MUSHAF: MushafPages (Madani pagination, 604
 │                   #   pages ← assets/quran/pages.json), MushafPage +
@@ -189,7 +200,8 @@ app/src/main/java/org/opennur/tahsin/
 ├── data/ayatquiz/  # AyatQuiz (Complete the Ayah) + SurahQuiz (Guess the Surah)
 │                   #   — MCQs over the whole mushaf (pure, unit-tested)
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
-├── ui/             # TahsinScreen/VM, AudioManagerScreen/VM, StatsScreen/VM
+├── ui/             # TahsinScreen/VM, AudioManagerScreen/VM, StatsScreen/VM,
+│                   #   LearningPlanViewModel, MemorizationScreen/VM
 │                   #   (aggregate statistics across all challenges),
 │                   #   SearchScreen/VM, TajwidQuizScreen/VM, VocabularyScreen/VM,
 │                   #   DreamBigScreen/VM (arcade), LughohScreen/VM (arcade),
@@ -203,7 +215,8 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   ReadingStatsStore (per-ayah reading history, JSON filesDir),
 │                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
 │                   #   Achievements (8 progressive badges, unlimited tiers),
-│                   #   GamificationStore/Hub/Events (XP, level, streak, celebrations),
+│                   #   LearningPlanStore, MemorizationStore, GamificationStore/Hub/Events
+│                   #   (XP, level, streak, celebrations),
 │                   #   AyahSearch (normalized Arabic + translation search),
 │                   #   Reciter (everyayah reciters + 0.25×–2.0× audio-speed slider),
 │                   #   AyahOfTheDayManager (daily ayah selection + cache)

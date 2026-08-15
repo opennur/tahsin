@@ -14,6 +14,7 @@ ketiga untuk tujuan iklan, analitik, atau profil pengguna.
 **Tidak ada.** Seluruh data aplikasi tersimpan **lokal di perangkat**:
 
 - Statistik belajar, XP, level, streak, dan progres;
+- Fokus belajar, penyelesaian rencana harian, dan metadata pengulangan hafalan;
 - Bookmark ayat favorit;
 - Pengaturan (qari', kecepatan, bahasa, ukuran huruf, dll.);
 - Audio qari' yang diunduh;

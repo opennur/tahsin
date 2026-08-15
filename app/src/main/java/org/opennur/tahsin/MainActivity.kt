@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
+import org.opennur.tahsin.data.learning.LearningTaskType
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTheme
 import org.opennur.tahsin.ui.AppStrings
@@ -26,7 +27,10 @@ import org.opennur.tahsin.ui.CoherenceScreen
 import org.opennur.tahsin.ui.DreamBigScreen
 import org.opennur.tahsin.ui.FavoritesScreen
 import org.opennur.tahsin.ui.HomeScreen
+import org.opennur.tahsin.ui.LearningPlanViewModel
 import org.opennur.tahsin.ui.LughohScreen
+import org.opennur.tahsin.ui.MemorizationScreen
+import org.opennur.tahsin.ui.OnboardingScreen
 import org.opennur.tahsin.ui.OpenTarget
 import org.opennur.tahsin.ui.SearchScreen
 import org.opennur.tahsin.ui.SettingsScreen
@@ -86,6 +90,8 @@ class MainActivity : ComponentActivity() {
                 val context = LocalContext.current
                 val tahsinViewModel: TahsinViewModel = viewModel()
                 val settingsState by tahsinViewModel.settingsState.collectAsStateWithLifecycle()
+                val learningPlanViewModel: LearningPlanViewModel = viewModel()
+                val learningPlanState by learningPlanViewModel.state.collectAsStateWithLifecycle()
 
                 // Back stack layar: Home selalu di dasar; layar lain di-push/pop.
                 // Disimpan lewat rememberSaveable agar rotasi tidak melompat ke Home.
@@ -96,6 +102,8 @@ class MainActivity : ComponentActivity() {
                 var stack by rememberSaveable(stateSaver = stackSaver) {
                     mutableStateOf(listOf<AppScreen>(AppScreen.Home))
                 }
+                var activeTaskKey by rememberSaveable { mutableStateOf<String?>(null) }
+                var showLearningSetup by rememberSaveable { mutableStateOf(false) }
 
                 fun push(screen: AppScreen) {
                     // Jangan menumpuk layar yang sama di puncak (mis. double-tap kartu).
@@ -103,7 +111,28 @@ class MainActivity : ComponentActivity() {
                 }
 
                 fun pop() {
-                    if (stack.size > 1) stack = stack.dropLast(1)
+                    if (stack.size <= 1) return
+                    stack = stack.dropLast(1)
+                    // A task launched from Today is complete when the user
+                    // returns to the portal after using the feature.
+                    if (stack.size == 1) {
+                        activeTaskKey?.let { key ->
+                            LearningTaskType.fromKey(key)?.let(learningPlanViewModel::complete)
+                        }
+                        activeTaskKey = null
+                    }
+                }
+
+                fun openLearningTask(type: LearningTaskType) {
+                    activeTaskKey = type.key
+                    when (type) {
+                        LearningTaskType.RECITE -> push(AppScreen.Tahsin)
+                        LearningTaskType.MEMORIZATION -> push(AppScreen.Memorization)
+                        LearningTaskType.TAJWID -> push(AppScreen.Quiz)
+                        LearningTaskType.VOCABULARY -> push(AppScreen.Vocab)
+                        LearningTaskType.UNDERSTAND -> push(AppScreen.Coherence)
+                        LearningTaskType.ARABIC -> push(AppScreen.Lughoh)
+                    }
                 }
 
                 // Deep link (widget/notifikasi) & target dari layar sekunder:
@@ -118,83 +147,106 @@ class MainActivity : ComponentActivity() {
                 // Tombol back sistem = pop satu layar; di Home keluar aplikasi.
                 BackHandler(enabled = stack.size > 1) { pop() }
 
-                when (val current = stack.last()) {
-                    AppScreen.Home -> HomeScreen(
-                        onOpenTahsin = { push(AppScreen.Tahsin) },
-                        onOpenVocab = { push(AppScreen.Vocab) },
-                        onOpenQuiz = { push(AppScreen.Quiz) },
-                        onOpenStats = { push(AppScreen.Stats) },
-                        onOpenDreamBig = { push(AppScreen.DreamBig) },
-                        onOpenLughoh = { push(AppScreen.Lughoh) },
-                        onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
-                        onOpenBadges = { push(AppScreen.Badges) },
-                        onOpenCoherence = { push(AppScreen.Coherence) },
-                        onOpenFavorites = { push(AppScreen.Favorites) },
-                        onOpenSettings = { push(AppScreen.Settings) },
-                        settings = settingsState,
-                    )
-                    AppScreen.Tahsin -> TahsinScreen(
-                        viewModel = tahsinViewModel,
-                        onOpenSearch = { push(AppScreen.Search) },
-                        onOpenSettings = { push(AppScreen.Settings) },
-                        onBack = { pop() },
-                        target = target,
-                        onTargetConsumed = { target = null },
-                    )
-                    AppScreen.Vocab -> VocabularyScreen(
-                        onBack = { pop() },
-                        onOpenAyah = { s, a ->
-                            target = OpenTarget(s, a, targetDelivery++)
-                        },
-                    )
-                    AppScreen.Stats -> StatsScreen(
-                        onBack = { pop() },
-                        onOpenAyah = { s, a ->
-                            target = OpenTarget(s, a, targetDelivery++)
-                        },
-                    )
-                    AppScreen.Search -> SearchScreen(
-                        onBack = { pop() },
-                        onOpenAyah = { s, a ->
-                            target = OpenTarget(s, a, targetDelivery++)
-                        },
-                    )
-                    AppScreen.Quiz -> TajwidQuizScreen(onBack = { pop() })
-                    AppScreen.AudioManager -> AudioManagerScreen(
-                        onBack = { pop() },
-                        onDownloadAll = tahsinViewModel::downloadAllAudio,
-                    )
-                    AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
-                    AppScreen.Lughoh -> LughohScreen(onBack = { pop() })
-                    AppScreen.AyatQuiz -> AyatQuizScreen(onBack = { pop() })
-                    AppScreen.Badges -> BadgesScreen(onBack = { pop() })
-                    AppScreen.Favorites -> FavoritesScreen(
-                        onBack = { pop() },
-                        onOpenAyah = { s, a ->
-                            target = OpenTarget(s, a, targetDelivery++)
-                        },
-                    )
-                    AppScreen.Coherence -> CoherenceScreen(
-                        onBack = { pop() },
+                if (!learningPlanState.onboardingComplete || showLearningSetup) {
+                    OnboardingScreen(
                         language = settingsState.language,
-                    )
-                    AppScreen.Settings -> SettingsScreen(
-                        onBack = { pop() },
-                        settings = settingsState,
-                        onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
-                        onToggleTranslation = tahsinViewModel::toggleTranslation,
-                        onToggleDarkMode = tahsinViewModel::toggleDarkMode,
+                        initialGoal = learningPlanState.goal,
+                        initialMinutes = learningPlanState.dailyMinutes,
                         onSetLanguage = tahsinViewModel::setLanguage,
-                        onSetReciter = tahsinViewModel::setReciter,
-                        onSetSpeed = tahsinViewModel::setAudioSpeed,
-                        onToggleAyahOfDay = tahsinViewModel::toggleAyahOfDay,
-                        onToggleStreakReminder = tahsinViewModel::toggleStreakReminder,
-                        onDownloadAll = tahsinViewModel::downloadAllAudio,
-                        onOpenAudioManager = { push(AppScreen.AudioManager) },
+                        onComplete = { goal, minutes ->
+                            learningPlanViewModel.saveOnboarding(goal, minutes)
+                            showLearningSetup = false
+                        },
                     )
-                }
+                } else {
+                    when (val current = stack.last()) {
+                         AppScreen.Home -> HomeScreen(
+                             onOpenTahsin = { push(AppScreen.Tahsin) },
+                             onOpenVocab = { push(AppScreen.Vocab) },
+                             onOpenMemorization = { push(AppScreen.Memorization) },
+                             onOpenQuiz = { push(AppScreen.Quiz) },
+                             onOpenStats = { push(AppScreen.Stats) },
+                             onOpenDreamBig = { push(AppScreen.DreamBig) },
+                             onOpenLughoh = { push(AppScreen.Lughoh) },
+                             onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
+                             onOpenBadges = { push(AppScreen.Badges) },
+                             onOpenCoherence = { push(AppScreen.Coherence) },
+                             onOpenFavorites = { push(AppScreen.Favorites) },
+                             onOpenSettings = { push(AppScreen.Settings) },
+                             onOpenTask = ::openLearningTask,
+                             learningPlan = learningPlanState,
+                             settings = settingsState,
+                         )
+                         AppScreen.Tahsin -> TahsinScreen(
+                             viewModel = tahsinViewModel,
+                             onOpenSearch = { push(AppScreen.Search) },
+                             onOpenSettings = { push(AppScreen.Settings) },
+                             onBack = { pop() },
+                             target = target,
+                             onTargetConsumed = { target = null },
+                         )
+                        AppScreen.Vocab -> VocabularyScreen(
+                             onBack = { pop() },
+                             onOpenAyah = { s, a ->
+                                 target = OpenTarget(s, a, targetDelivery++)
+                             },
+                          )
+                        AppScreen.Memorization -> MemorizationScreen(
+                            onBack = { pop() },
+                            onOpenAyah = { s, a ->
+                                target = OpenTarget(s, a, targetDelivery++)
+                            },
+                        )
+                         AppScreen.Stats -> StatsScreen(
+                             onBack = { pop() },
+                             onOpenAyah = { s, a ->
+                                 target = OpenTarget(s, a, targetDelivery++)
+                             },
+                         )
+                         AppScreen.Search -> SearchScreen(
+                             onBack = { pop() },
+                             onOpenAyah = { s, a ->
+                                 target = OpenTarget(s, a, targetDelivery++)
+                             },
+                         )
+                         AppScreen.Quiz -> TajwidQuizScreen(onBack = { pop() })
+                         AppScreen.AudioManager -> AudioManagerScreen(
+                             onBack = { pop() },
+                             onDownloadAll = tahsinViewModel::downloadAllAudio,
+                         )
+                         AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
+                         AppScreen.Lughoh -> LughohScreen(onBack = { pop() })
+                         AppScreen.AyatQuiz -> AyatQuizScreen(onBack = { pop() })
+                         AppScreen.Badges -> BadgesScreen(onBack = { pop() })
+                         AppScreen.Favorites -> FavoritesScreen(
+                             onBack = { pop() },
+                             onOpenAyah = { s, a ->
+                                 target = OpenTarget(s, a, targetDelivery++)
+                             },
+                         )
+                         AppScreen.Coherence -> CoherenceScreen(
+                             onBack = { pop() },
+                             language = settingsState.language,
+                         )
+                         AppScreen.Settings -> SettingsScreen(
+                             onBack = { pop() },
+                             settings = settingsState,
+                             onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
+                             onToggleTranslation = tahsinViewModel::toggleTranslation,
+                              onToggleDarkMode = tahsinViewModel::toggleDarkMode,
+                              onSetLanguage = tahsinViewModel::setLanguage,
+                              onEditLearningPlan = { showLearningSetup = true },
+                             onSetReciter = tahsinViewModel::setReciter,
+                             onSetSpeed = tahsinViewModel::setAudioSpeed,
+                             onToggleAyahOfDay = tahsinViewModel::toggleAyahOfDay,
+                             onToggleStreakReminder = tahsinViewModel::toggleStreakReminder,
+                             onDownloadAll = tahsinViewModel::downloadAllAudio,
+                             onOpenAudioManager = { push(AppScreen.AudioManager) },
+                          )
+                      }
+                     }
 
-                // Dialog unduhan global — bisa dipicu dari Tahsin (tombol Dengar)
+                 // Dialog unduhan global — bisa dipicu dari Tahsin (tombol Dengar)
                 // maupun Pengaturan (Unduh Semua), tampil di layar mana pun.
                 val strings = AppStrings.of(settingsState.language)
                 if (settingsState.showDownloadNotice) {

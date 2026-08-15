@@ -25,6 +25,7 @@ import org.opennur.tahsin.util.DreamBigStats
 import org.opennur.tahsin.util.GamificationStore
 import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.LughohStats
+import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SearchableAyah
@@ -32,6 +33,7 @@ import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.VocabularyStatsStore
 import java.io.File
 import java.nio.file.Files
+import java.time.LocalDate
 
 /** Tes agregasi StatsViewModel dengan store file temp + fake repository. */
 class StatsViewModelTest {
@@ -75,6 +77,7 @@ class StatsViewModelTest {
             lughohStore = LughohProgressStore(File(dir, "lughoh.json")),
             gamificationStore = GamificationStore(File(dir, "gamification.json")),
             readingHistory = ReadingHistoryStore(File(dir, "reading_history.json")),
+            learningPlanStore = LearningPlanStore(File(dir, "learning_plan.json")),
             repository = repo,
             settings = settings(code),
         )
@@ -135,5 +138,21 @@ class StatsViewModelTest {
         assertEquals(0, state.wordsMastered)
         assertTrue(state.history.isEmpty())
         assertEquals(0, state.bestScorePct)
+    }
+
+    @Test
+    fun `rencana harian tampil di statistik`() {
+        LearningPlanStore(File(dir, "learning_plan.json")).markComplete(
+            day = LocalDate.now().toEpochDay(),
+            goalKey = "recitation",
+            taskKey = "recite",
+        )
+
+        val v = vm()
+        v.refresh()
+        val state = awaitState(v.state)
+
+        assertEquals(1, state.dailyPlanCompleted)
+        assertEquals(3, state.dailyPlanTotal)
     }
 }

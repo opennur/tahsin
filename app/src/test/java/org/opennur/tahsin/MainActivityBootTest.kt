@@ -10,6 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.opennur.tahsin.ui.GamificationViewModel
+import org.opennur.tahsin.ui.LearningPlanViewModel
 import org.opennur.tahsin.ui.TahsinViewModel
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
@@ -66,6 +67,10 @@ class MainActivityBootTest {
         val gamification: GamificationViewModel =
             ViewModelProvider(activity)[GamificationViewModel::class.java]
         assertThat(gamification).isNotNull()
+
+        val learningPlan: LearningPlanViewModel =
+            ViewModelProvider(activity)[LearningPlanViewModel::class.java]
+        assertThat(learningPlan).isNotNull()
 
         activity.finish()
     }

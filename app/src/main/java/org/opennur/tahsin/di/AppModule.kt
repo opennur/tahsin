@@ -18,6 +18,8 @@ import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.FontStore
 import org.opennur.tahsin.util.GamificationStore
 import org.opennur.tahsin.util.LughohProgressStore
+import org.opennur.tahsin.util.LearningPlanStore
+import org.opennur.tahsin.util.MemorizationStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SettingsSource
@@ -132,4 +134,14 @@ object AppModule {
     @Singleton
     fun provideReadingHistoryStore(@ApplicationContext context: Context): ReadingHistoryStore =
         ReadingHistoryStore.fromContext(context)
+
+    @Provides
+    @Singleton
+    fun provideLearningPlanStore(@ApplicationContext context: Context): LearningPlanStore =
+        LearningPlanStore.fromContext(context)
+
+    @Provides
+    @Singleton
+    fun provideMemorizationStore(@ApplicationContext context: Context): MemorizationStore =
+        MemorizationStore.fromContext(context)
 }

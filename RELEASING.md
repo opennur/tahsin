@@ -58,7 +58,8 @@ Play. Versi baseline rilis pertama: `versionCode = 1`, `versionName = "1.0.0"`.
   kekerasan/drugs/sex → rating **Everyone**.
 - **Data safety** (wajib diisi):
   - Data dikumpulkan: **tidak ada** (aplikasi offline-first; statistik, XP,
-    bookmark, dan progres tersimpan lokal di perangkat).
+     bookmark, rencana belajar, metadata hafalan, dan progres tersimpan lokal di
+     perangkat).
   - Izin yang dipakai + alasannya (sudah di `AndroidManifest.xml`):
     - `RECORD_AUDIO` — penilaian bacaan STT (diproses di perangkat);
     - `INTERNET` — unduh audio qari' & data surah (equran.id, everyayah.com, quran.com);

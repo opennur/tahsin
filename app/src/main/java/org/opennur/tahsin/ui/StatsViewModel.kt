@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import org.opennur.tahsin.data.dreambig.DreamBigGame
+import org.opennur.tahsin.data.learning.LearningGoal
+import org.opennur.tahsin.data.learning.LearningPlanEngine
 import org.opennur.tahsin.data.lughoh.LughohEngine
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.util.AppLanguage
@@ -12,6 +14,7 @@ import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationStore
 import org.opennur.tahsin.util.LughohProgressStore
+import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.ReadingHistoryEntry
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
@@ -50,6 +53,8 @@ data class StatsState(
     val badgesCount: Int = 0,
     val latestBadgeKey: String? = null,
     val latestBadgeTier: Int = 0,
+    val dailyPlanCompleted: Int = 0,
+    val dailyPlanTotal: Int = 0,
     // Riwayat baca (ayat terakhir yang dibuka, terbaru dulu)
     val history: List<ReadingHistoryEntry> = emptyList(),
     val surahNames: Map<Int, String> = emptyMap(),
@@ -57,8 +62,9 @@ data class StatsState(
 
 /**
  * Statistik keseluruhan: agregasi semua challenge — Tahsin (baca Al-Qur'an),
- * Dream BIG (ronde kosakata), Belajar Arab (sesi latihan), dan Kosakata
- * (kata yang dikuasai). Sumber: store persisten masing-masing fitur.
+ * Dream BIG (ronde kosakata), Belajar Arab (sesi latihan), Kosakata
+ * (kata yang dikuasai), serta progres rencana harian. Sumber: store persisten
+ * masing-masing fitur.
  */
 @HiltViewModel
 class StatsViewModel @Inject constructor(
@@ -68,6 +74,7 @@ class StatsViewModel @Inject constructor(
     private val lughohStore: LughohProgressStore,
     private val gamificationStore: GamificationStore,
     private val readingHistory: ReadingHistoryStore,
+    private val learningPlanStore: LearningPlanStore,
     private val repository: QuranRepository,
     private val settings: SettingsSource,
 ) : ViewModel() {
@@ -87,6 +94,15 @@ class StatsViewModel @Inject constructor(
             val today = java.time.LocalDate.now().toEpochDay()
             val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
                 ?: AppLanguage.ID
+            val goal = LearningGoal.fromKey(settings.learningGoalKey)
+            val planKeys = LearningPlanEngine.taskTypesFor(goal).map { it.key }.toSet()
+            val planSnapshot = learningPlanStore.read()
+            val planCompleted = if (planSnapshot.day == today && planSnapshot.goalKey == goal.key) {
+                planSnapshot.completedKeys.count { it in planKeys }
+            } else {
+                0
+            }
+            val planTotal = planKeys.size
 
             val tahsinAttempts = tahsin.sumOf { it.attempts }
             val tahsinBestPct = tahsin.maxOfOrNull { it.bestScore } ?: 0
@@ -117,7 +133,10 @@ class StatsViewModel @Inject constructor(
                 latestBadgeTier = gamification.badgeTiers.entries.lastOrNull()?.value ?: 0,
                 history = history,
                 surahNames = names,
+                dailyPlanCompleted = planCompleted,
+                dailyPlanTotal = planTotal,
             )
         }
     }
+
 }

@@ -11,6 +11,7 @@ sealed interface AppScreen {
     data object Home : AppScreen
     data object Tahsin : AppScreen
     data object Vocab : AppScreen
+    data object Memorization : AppScreen
     data object Quiz : AppScreen
     data object Stats : AppScreen
     data object Search : AppScreen
@@ -31,6 +32,7 @@ sealed interface AppScreen {
             "Home" -> Home
             "Tahsin" -> Tahsin
             "Vocab" -> Vocab
+            "Memorization" -> Memorization
             "Quiz" -> Quiz
             "Stats" -> Stats
             "Search" -> Search

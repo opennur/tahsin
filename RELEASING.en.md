@@ -57,8 +57,8 @@ Play. First-release baseline: `versionCode = 1`, `versionName = "1.0.0"`.
 - **Content rating (IARC)**: fill the questionnaire — religious education
   content, no violence/drugs/sex → rating **Everyone**.
 - **Data safety** (mandatory):
-  - Data collected: **none** (offline-first app; stats, XP, bookmarks, and
-    progress are stored locally on device).
+   - Data collected: **none** (offline-first app; stats, XP, bookmarks, learning
+     plan, memorization metadata, and progress are stored locally on device).
   - Permissions used + reasons (already in `AndroidManifest.xml`):
     - `RECORD_AUDIO` — STT recitation scoring (processed on device);
     - `INTERNET` — reciter audio & surah data downloads (equran.id, everyayah.com, quran.com);

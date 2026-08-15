@@ -53,6 +53,7 @@ object Gamification {
     const val XP_AYAH_PERFECT = 10 // bacaan Tahsin skor ≥ 90
     const val XP_QUIZ_CORRECT = 2  // jawaban benar (Kuis Tajwid, Kosakata, dll.)
     const val XP_WORD_MASTERED = 10 // kata Kosakata baru dikuasai (correctCount 1)
+    const val XP_MEMORIZATION_REVIEW = 5 // ayat hafalan berhasil diingat
     const val XP_DREAM_BIG_ROUND = 15 // ronde Dream BIG selesai
     const val XP_LUGHOH_SESSION = 10  // sesi Belajar Arab selesai
 
