@@ -5,7 +5,7 @@
   "comparison": "canonical Unicode Arabic after shared artifact and whitespace cleanup",
   "surahs": 114,
   "ayahs": 6236,
-  "canonicalTextSha256": "260eeb54020c3bd0c6b2f034b1bde9686e7e73d0efa3a2b162a2d773070ad1cd",
-  "bundledTextSha256": "260eeb54020c3bd0c6b2f034b1bde9686e7e73d0efa3a2b162a2d773070ad1cd",
-  "validatedAt": "2026-08-15T14:59:14.482968+00:00"
+  "canonicalTextSha256": "f1ba78f0f527a83d8cd9f75e975233e5c8fa763cb1d4b103bca923c0bf474f8e",
+  "bundledTextSha256": "f1ba78f0f527a83d8cd9f75e975233e5c8fa763cb1d4b103bca923c0bf474f8e",
+  "validatedAt": "2026-08-16T03:57:21.669942+00:00"
 }
