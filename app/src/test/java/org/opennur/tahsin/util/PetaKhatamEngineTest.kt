@@ -91,7 +91,8 @@ class PetaKhatamEngineTest {
     @Test
     fun juzStatuses_emptyStats_untouched() {
         val result = PetaKhatamEngine.juzStatuses(emptyList(), pagination)
-        assertThat(result).hasSize(1) // 1 juz in test pagination
+        assertThat(result).hasSize(30) // always 30 juz
+        // Only juz 1 has pages in test pagination → UNTOUCHED; rest have no pages
         assertThat(result[0].status).isEqualTo(KhatamStatus.UNTOUCHED)
     }
 
