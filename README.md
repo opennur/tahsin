@@ -310,8 +310,8 @@ sdkmanager "platforms;android-35"
 - **Robolectric** — framework Android (assets, resources, filesDir, DataStore)
   berjalan di JVM tanpa emulator; dipakai untuk `SettingsStore` (DataStore),
   `AyahOfTheDayManager` (cache + bahasa), dan `PreferencesStore`.
-- **MockK** — mocking dependensi di tes ViewModel (`FavoritesViewModelTest`,
-  `GamificationViewModelTest`).
+- **Fake eksplisit** — dependensi ViewModel deterministik tanpa attachment agent
+  JVM (`FavoritesViewModelTest`, `GamificationViewModelTest`).
 - **Turbine** — koleksi `StateFlow`/`Flow` per-emisi di tes ViewModel.
 - **Truth** — assertion readable (`assertThat(...)`).
 
@@ -362,7 +362,7 @@ parser → engine (`meaningOfWord` untuk kata terfrequent; soal `AyatQuiz` valid
 dari ayat asli).
 
 Unit test **logika ViewModel** (`FavoritesViewModelTest`, `StatsViewModelTest`,
-`GamificationViewModelTest`) berjalan di JVM dengan MockK/fake repository/store
+`GamificationViewModelTest`) berjalan di JVM dengan fake repository/store
 + `kotlinx-coroutines-test` (`Dispatchers.setMain`) + Turbine.
 
 Semua ViewModel memakai `@HiltViewModel` + konstruktor `@Inject` — di tes mereka

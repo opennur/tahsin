@@ -34,6 +34,11 @@ data class GamificationStats(
     val badgeTiers: Map<String, Int> = emptyMap(),
 )
 
+/** Read-only dependency used by summary ViewModels and simple JVM fakes. */
+interface GamificationReader {
+    fun read(): GamificationStats
+}
+
 /** Hasil pencatatan satu aktivitas: keadaan sebelum/sesudah + deteksi naik level. */
 data class ActivityResult(
     val before: GamificationStats,
@@ -119,7 +124,7 @@ object Gamification {
  * Format: satu file JSON di `filesDir/gamification.json` ([GamificationStats]).
  * Tanpa Room — konsisten dengan arsitektur proyek (Gson + filesDir).
  */
-class GamificationStore internal constructor(private val file: File) {
+class GamificationStore internal constructor(private val file: File) : GamificationReader {
 
     private val gson = Gson()
     private val statsType = object : TypeToken<GamificationStats>() {}.type
@@ -143,7 +148,7 @@ class GamificationStore internal constructor(private val file: File) {
     fun <T> withWriteLock(block: () -> T): T = synchronized(WRITE_LOCK, block)
 
     /** Keadaan saat ini; file rusak/kosong → default (semua 0). */
-    fun read(): GamificationStats = synchronized(WRITE_LOCK) {
+    override fun read(): GamificationStats = synchronized(WRITE_LOCK) {
         runCatching {
             if (!file.exists()) GamificationStats()
             else {

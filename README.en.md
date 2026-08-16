@@ -308,8 +308,8 @@ sdkmanager "platforms;android-35"
 - **Robolectric** — the Android framework (assets, resources, filesDir,
   DataStore) runs on the JVM without an emulator; used for `SettingsStore`
   (DataStore), `AyahOfTheDayManager` (cache + language), and `PreferencesStore`.
-- **MockK** — mocking in ViewModel tests (`FavoritesViewModelTest`,
-  `GamificationViewModelTest`).
+- **Explicit fakes** — deterministic ViewModel dependencies without JVM agent
+  attachment (`FavoritesViewModelTest`, `GamificationViewModelTest`).
 - **Turbine** — per-emission collection of `StateFlow`/`Flow` in ViewModel tests.
 - **Truth** — readable assertions (`assertThat(...)`).
 
@@ -360,7 +360,7 @@ parser→engine round-trips (`meaningOfWord` for the most frequent words; valid
 `AyatQuiz` questions from real ayahs).
 
 **ViewModel logic unit tests** (`FavoritesViewModelTest`, `StatsViewModelTest`,
-`GamificationViewModelTest`) run on the JVM with MockK/fake repository/store +
+`GamificationViewModelTest`) run on the JVM with explicit fake repository/store +
 `kotlinx-coroutines-test` (`Dispatchers.setMain`) + Turbine.
 
 Every ViewModel is `@HiltViewModel` with an `@Inject` constructor — tests

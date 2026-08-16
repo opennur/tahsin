@@ -4,6 +4,46 @@ import android.speech.SpeechRecognizer
 
 import org.opennur.tahsin.util.AppLanguage
 
+/** New learning copy is grouped to keep the JVM constructor below its 255-slot limit. */
+data class LearningStrings(
+    val settingLearningPlan: String,
+    val statsPlanLine: String,
+    val menuMemorization: String,
+    val todayTitle: String,
+    val todaySubtitle: String,
+    val todayProgress: String,
+    val todayComplete: String,
+    val todayTaskStart: String,
+    val todayTaskDone: String,
+    val todayExplore: String,
+    val goalRecitation: String,
+    val goalUnderstanding: String,
+    val goalMemorization: String,
+    val goalArabic: String,
+    val taskRecite: String,
+    val taskTajwid: String,
+    val taskVocabulary: String,
+    val taskUnderstand: String,
+    val taskArabic: String,
+    val taskMemorization: String,
+    val onboardingTitle: String,
+    val onboardingSubtitle: String,
+    val onboardingGoalQuestion: String,
+    val onboardingTimeQuestion: String,
+    val onboardingMinutes: String,
+    val onboardingStart: String,
+    val memorizationTitle: String,
+    val memorizationSubtitle: String,
+    val memorizationLoading: String,
+    val memorizationDue: String,
+    val memorizationHidden: String,
+    val memorizationReveal: String,
+    val memorizationReview: String,
+    val memorizationRemembered: String,
+    val memorizationOpenTahsin: String,
+    val memorizationError: String,
+)
+
 /**
  * Katalog teks UI per bahasa (tanpa resource Android — cukup untuk 2 bahasa).
  * Tambahkan bahasa baru = buat instance baru di [AppStrings.of].
@@ -40,7 +80,6 @@ data class Strings(
     val flowHint: String,
     val settingDarkMode: String,
     val settingLanguage: String,
-    val settingLearningPlan: String,
     val languageNameId: String,
     val languageNameEn: String,
     val sectionAppearance: String,
@@ -112,7 +151,6 @@ data class Strings(
     val statsDreamBigLine: String,
     val statsLughohLine: String,
     val statsVocabLine: String,
-    val statsPlanLine: String,
     val statsNoData: String,
     val statsLoading: String,
     val statsInline: String,
@@ -153,7 +191,6 @@ data class Strings(
     val ayatQuizWrong: String,
     // Kosa kata
     val menuVocab: String,
-    val menuMemorization: String,
     // Materi Dream BIG
     val menuDreamBig: String,
     val dreamBigTitle: String,
@@ -261,42 +298,45 @@ data class Strings(
     val favoritesEmpty: String,
     val favoritesLoading: String,
     val favoritesOpenHint: String,
-    // Rencana belajar harian & onboarding
-    val todayTitle: String,
-    val todaySubtitle: String,
-    val todayProgress: String,
-    val todayComplete: String,
-    val todayTaskStart: String,
-    val todayTaskDone: String,
-    val todayExplore: String,
-    val goalRecitation: String,
-    val goalUnderstanding: String,
-    val goalMemorization: String,
-    val goalArabic: String,
-    val taskRecite: String,
-    val taskTajwid: String,
-    val taskVocabulary: String,
-    val taskUnderstand: String,
-    val taskArabic: String,
-    val taskMemorization: String,
-    val onboardingTitle: String,
-    val onboardingSubtitle: String,
-    val onboardingGoalQuestion: String,
-    val onboardingTimeQuestion: String,
-    val onboardingMinutes: String,
-    val onboardingStart: String,
-    // Hifz & murajaah
-    val memorizationTitle: String,
-    val memorizationSubtitle: String,
-    val memorizationLoading: String,
-    val memorizationDue: String,
-    val memorizationHidden: String,
-    val memorizationReveal: String,
-    val memorizationReview: String,
-    val memorizationRemembered: String,
-    val memorizationOpenTahsin: String,
-    val memorizationError: String,
-)
+    val learning: LearningStrings,
+) {
+    val settingLearningPlan get() = learning.settingLearningPlan
+    val statsPlanLine get() = learning.statsPlanLine
+    val menuMemorization get() = learning.menuMemorization
+    val todayTitle get() = learning.todayTitle
+    val todaySubtitle get() = learning.todaySubtitle
+    val todayProgress get() = learning.todayProgress
+    val todayComplete get() = learning.todayComplete
+    val todayTaskStart get() = learning.todayTaskStart
+    val todayTaskDone get() = learning.todayTaskDone
+    val todayExplore get() = learning.todayExplore
+    val goalRecitation get() = learning.goalRecitation
+    val goalUnderstanding get() = learning.goalUnderstanding
+    val goalMemorization get() = learning.goalMemorization
+    val goalArabic get() = learning.goalArabic
+    val taskRecite get() = learning.taskRecite
+    val taskTajwid get() = learning.taskTajwid
+    val taskVocabulary get() = learning.taskVocabulary
+    val taskUnderstand get() = learning.taskUnderstand
+    val taskArabic get() = learning.taskArabic
+    val taskMemorization get() = learning.taskMemorization
+    val onboardingTitle get() = learning.onboardingTitle
+    val onboardingSubtitle get() = learning.onboardingSubtitle
+    val onboardingGoalQuestion get() = learning.onboardingGoalQuestion
+    val onboardingTimeQuestion get() = learning.onboardingTimeQuestion
+    val onboardingMinutes get() = learning.onboardingMinutes
+    val onboardingStart get() = learning.onboardingStart
+    val memorizationTitle get() = learning.memorizationTitle
+    val memorizationSubtitle get() = learning.memorizationSubtitle
+    val memorizationLoading get() = learning.memorizationLoading
+    val memorizationDue get() = learning.memorizationDue
+    val memorizationHidden get() = learning.memorizationHidden
+    val memorizationReveal get() = learning.memorizationReveal
+    val memorizationReview get() = learning.memorizationReview
+    val memorizationRemembered get() = learning.memorizationRemembered
+    val memorizationOpenTahsin get() = learning.memorizationOpenTahsin
+    val memorizationError get() = learning.memorizationError
+}
 
 object AppStrings {
 
@@ -334,7 +374,6 @@ object AppStrings {
         flowHint = "Lanjut otomatis ke ayat berikutnya saat selesai.",
         settingDarkMode = "Mode Gelap",
         settingLanguage = "Bahasa",
-        settingLearningPlan = "Ubah rencana belajar",
         languageNameId = "Indonesia",
         languageNameEn = "Inggris",
         sectionAppearance = "Tampilan",
@@ -405,7 +444,6 @@ object AppStrings {
         statsDreamBigLine = "Dream BIG: %d ronde • skor terbaik %d/%d",
         statsLughohLine = "Belajar Arab: %d sesi • skor terbaik %d/%d",
         statsVocabLine = "Kosakata: %d kata dikuasai",
-        statsPlanLine = "Rencana hari ini: %d/%d aktivitas selesai",
         statsNoData = "Belum ada aktivitas. Mulai dari Tahsin, Dream BIG, Belajar Arab, atau Kosakata!",
         statsLoading = "Memuat statistik…",
         statsInline = "📊 %d× dicoba · skor terbaik %d%%",
@@ -441,7 +479,6 @@ object AppStrings {
         ayatQuizSurahQuestion = "Ayat ini dari surah apa?",
         ayatQuizWrong = "✗ Belum tepat. Jawabannya: %s",
         menuVocab = "📖 Kosakata",
-        menuMemorization = "🧠 Hafalan & Muraja'ah",
         menuDreamBig = "🎬 Dream BIG",
         dreamBigTitle = "🎬 Dream BIG",
         dreamBigSubtitle = "Kuis kosakata Qur'an acak — main terus, kejar skor terbaikmu!",
@@ -544,40 +581,45 @@ object AppStrings {
         favoritesEmpty = "Belum ada ayat favorit.\nBuka layar Tahsin, pilih satu ayat, lalu ketuk ★ di header.",
         favoritesLoading = "Memuat ayat favorit…",
         favoritesOpenHint = "Ketuk untuk membuka di mushaf",
-        todayTitle = "Rencana hari ini",
-        todaySubtitle = "%d menit yang terarah, sedikit demi sedikit.",
-        todayProgress = "%d/%d aktivitas selesai",
-        todayComplete = "Rencana hari ini selesai ✓",
-        todayTaskStart = "Mulai",
-        todayTaskDone = "Selesai",
-        todayExplore = "Jelajahi semua fitur",
-        goalRecitation = "🕌 Memperbaiki bacaan",
-        goalUnderstanding = "📖 Memahami makna",
-        goalMemorization = "🧠 Menghafal dan muraja'ah",
-        goalArabic = "📚 Belajar bahasa Arab",
-        taskRecite = "Baca dan latih satu ayat",
-        taskTajwid = "Kenali satu hukum tajwid",
-        taskVocabulary = "Ulangi kosakata Qur'an",
-        taskUnderstand = "Pelajari coherence Al-Qur'an",
-        taskArabic = "Latihan pelajaran bahasa Arab",
-        taskMemorization = "Latihan hafalan dengan mushaf",
-        onboardingTitle = "Mulai perjalanan belajarmu",
-        onboardingSubtitle = "Pilih arah utama. Kamu tetap bisa membuka semua fitur kapan saja.",
-        onboardingGoalQuestion = "Apa fokus utamamu?",
-        onboardingTimeQuestion = "Berapa waktu yang ingin kamu sisihkan setiap hari?",
-        onboardingMinutes = "%d mnt",
-        onboardingStart = "Mulai belajar",
-        memorizationTitle = "🧠 Hafalan & Muraja'ah",
-        memorizationSubtitle = "Uji ingatanmu, lalu jadwalkan ayat untuk diulang lagi. " +
-            "Ini alat bantu latihan, bukan penilaian guru.",
-        memorizationLoading = "Menyiapkan antrean hafalan…",
-        memorizationDue = "%d dari %d ayat perlu diulang",
-        memorizationHidden = "Coba baca dari ingatan sebelum membuka ayat.",
-        memorizationReveal = "Buka ayat",
-        memorizationReview = "Perlu diulang",
-        memorizationRemembered = "Saya ingat",
-        memorizationOpenTahsin = "Latih di Tahsin ▸",
-        memorizationError = "Antrean hafalan belum dapat dimuat. Coba lagi nanti.",
+        learning = LearningStrings(
+            settingLearningPlan = "Ubah rencana belajar",
+            statsPlanLine = "Rencana hari ini: %d/%d aktivitas selesai",
+            menuMemorization = "🧠 Hafalan & Muraja'ah",
+            todayTitle = "Rencana hari ini",
+            todaySubtitle = "%d menit yang terarah, sedikit demi sedikit.",
+            todayProgress = "%d/%d aktivitas selesai",
+            todayComplete = "Rencana hari ini selesai ✓",
+            todayTaskStart = "Mulai",
+            todayTaskDone = "Selesai",
+            todayExplore = "Jelajahi semua fitur",
+            goalRecitation = "🕌 Memperbaiki bacaan",
+            goalUnderstanding = "📖 Memahami makna",
+            goalMemorization = "🧠 Menghafal dan muraja'ah",
+            goalArabic = "📚 Belajar bahasa Arab",
+            taskRecite = "Baca dan latih satu ayat",
+            taskTajwid = "Kenali satu hukum tajwid",
+            taskVocabulary = "Ulangi kosakata Qur'an",
+            taskUnderstand = "Pelajari coherence Al-Qur'an",
+            taskArabic = "Latihan pelajaran bahasa Arab",
+            taskMemorization = "Latihan hafalan dengan mushaf",
+            onboardingTitle = "Mulai perjalanan belajarmu",
+            onboardingSubtitle = "Pilih arah utama. Kamu tetap bisa membuka semua fitur kapan saja.",
+            onboardingGoalQuestion = "Apa fokus utamamu?",
+            onboardingTimeQuestion = "Berapa waktu yang ingin kamu sisihkan setiap hari?",
+            onboardingMinutes = "%d mnt",
+            onboardingStart = "Mulai belajar",
+            memorizationTitle = "🧠 Hafalan & Muraja'ah",
+            memorizationSubtitle = "Uji ingatanmu, lalu jadwalkan ayat untuk diulang lagi. " +
+                "Ini alat bantu latihan, bukan penilaian guru.",
+            memorizationLoading = "Menyiapkan antrean hafalan…",
+            memorizationDue = "%d dari %d ayat perlu diulang",
+            memorizationHidden = "Coba baca dari ingatan sebelum membuka ayat.",
+            memorizationReveal = "Buka ayat",
+            memorizationReview = "Perlu diulang",
+            memorizationRemembered = "Saya ingat",
+            memorizationOpenTahsin = "Latih di Tahsin ▸",
+            memorizationError = "Antrean hafalan belum dapat dimuat. Coba lagi nanti.",
+        ),
     )
 
     val English = Strings(
@@ -609,7 +651,6 @@ object AppStrings {
         flowHint = "Automatically continues to the next ayah when finished.",
         settingDarkMode = "Dark Mode",
         settingLanguage = "Language",
-        settingLearningPlan = "Edit learning plan",
         languageNameId = "Indonesian",
         languageNameEn = "English",
         sectionAppearance = "Appearance",
@@ -681,7 +722,6 @@ object AppStrings {
         statsDreamBigLine = "Dream BIG: %d rounds • best score %d/%d",
         statsLughohLine = "Learn Arabic: %d sessions • best score %d/%d",
         statsVocabLine = "Vocabulary: %d words mastered",
-        statsPlanLine = "Today's plan: %d/%d activities complete",
         statsNoData = "No activity yet. Start with Tahsin, Dream BIG, Learn Arabic, or Vocabulary!",
         statsLoading = "Loading statistics…",
         statsInline = "📊 %d× attempted · best score %d%%",
@@ -717,7 +757,6 @@ object AppStrings {
         ayatQuizSurahQuestion = "Which surah is this ayah from?",
         ayatQuizWrong = "✗ Not quite. The answer: %s",
         menuVocab = "📖 Vocabulary",
-        menuMemorization = "🧠 Memorization & Murajaah",
         menuDreamBig = "🎬 Dream BIG",
         dreamBigTitle = "🎬 Dream BIG",
         dreamBigSubtitle = "Random Qur'anic vocabulary quiz — keep playing, chase your best score!",
@@ -820,40 +859,45 @@ object AppStrings {
         favoritesEmpty = "No favorite ayahs yet.\nOpen the Tahsin screen, pick an ayah, then tap ★ in the header.",
         favoritesLoading = "Loading favorite ayahs…",
         favoritesOpenHint = "Tap to open in the mushaf",
-        todayTitle = "Today's plan",
-        todaySubtitle = "%d focused minutes, one step at a time.",
-        todayProgress = "%d/%d activities complete",
-        todayComplete = "Today's plan complete ✓",
-        todayTaskStart = "Start",
-        todayTaskDone = "Done",
-        todayExplore = "Explore all features",
-        goalRecitation = "🕌 Improve recitation",
-        goalUnderstanding = "📖 Understand meaning",
-        goalMemorization = "🧠 Memorize and review",
-        goalArabic = "📚 Learn Arabic",
-        taskRecite = "Read and practice one ayah",
-        taskTajwid = "Learn one tajweed rule",
-        taskVocabulary = "Review Qur'anic vocabulary",
-        taskUnderstand = "Study Qur'an coherence",
-        taskArabic = "Practice an Arabic lesson",
-        taskMemorization = "Practice memorization with the mushaf",
-        onboardingTitle = "Start your learning journey",
-        onboardingSubtitle = "Choose a primary direction. You can still open every feature at any time.",
-        onboardingGoalQuestion = "What is your main focus?",
-        onboardingTimeQuestion = "How much time would you like to set aside each day?",
-        onboardingMinutes = "%d min",
-        onboardingStart = "Start learning",
-        memorizationTitle = "🧠 Memorization & Murajaah",
-        memorizationSubtitle = "Test your memory, then schedule the ayah for review. " +
-            "This is a practice aid, not a teacher assessment.",
-        memorizationLoading = "Preparing your memorization queue…",
-        memorizationDue = "%d of %d ayahs due for review",
-        memorizationHidden = "Try reciting from memory before revealing the ayah.",
-        memorizationReveal = "Reveal ayah",
-        memorizationReview = "Review again",
-        memorizationRemembered = "I remembered",
-        memorizationOpenTahsin = "Practice in Tahsin ▸",
-        memorizationError = "The memorization queue could not be loaded. Try again later.",
+        learning = LearningStrings(
+            settingLearningPlan = "Edit learning plan",
+            statsPlanLine = "Today's plan: %d/%d activities complete",
+            menuMemorization = "🧠 Memorization & Murajaah",
+            todayTitle = "Today's plan",
+            todaySubtitle = "%d focused minutes, one step at a time.",
+            todayProgress = "%d/%d activities complete",
+            todayComplete = "Today's plan complete ✓",
+            todayTaskStart = "Start",
+            todayTaskDone = "Done",
+            todayExplore = "Explore all features",
+            goalRecitation = "🕌 Improve recitation",
+            goalUnderstanding = "📖 Understand meaning",
+            goalMemorization = "🧠 Memorize and review",
+            goalArabic = "📚 Learn Arabic",
+            taskRecite = "Read and practice one ayah",
+            taskTajwid = "Learn one tajweed rule",
+            taskVocabulary = "Review Qur'anic vocabulary",
+            taskUnderstand = "Study Qur'an coherence",
+            taskArabic = "Practice an Arabic lesson",
+            taskMemorization = "Practice memorization with the mushaf",
+            onboardingTitle = "Start your learning journey",
+            onboardingSubtitle = "Choose a primary direction. You can still open every feature at any time.",
+            onboardingGoalQuestion = "What is your main focus?",
+            onboardingTimeQuestion = "How much time would you like to set aside each day?",
+            onboardingMinutes = "%d min",
+            onboardingStart = "Start learning",
+            memorizationTitle = "🧠 Memorization & Murajaah",
+            memorizationSubtitle = "Test your memory, then schedule the ayah for review. " +
+                "This is a practice aid, not a teacher assessment.",
+            memorizationLoading = "Preparing your memorization queue…",
+            memorizationDue = "%d of %d ayahs due for review",
+            memorizationHidden = "Try reciting from memory before revealing the ayah.",
+            memorizationReveal = "Reveal ayah",
+            memorizationReview = "Review again",
+            memorizationRemembered = "I remembered",
+            memorizationOpenTahsin = "Practice in Tahsin ▸",
+            memorizationError = "The memorization queue could not be loaded. Try again later.",
+        ),
     )
 
     /** Judul badge terjemahan — key = [org.opennur.tahsin.util.BadgeDef.key]. */

@@ -1,6 +1,7 @@
 package org.opennur.tahsin.ui
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -37,6 +38,7 @@ import java.nio.file.Files
 import java.time.LocalDate
 
 /** Tes agregasi StatsViewModel dengan store file temp + fake repository. */
+@OptIn(ExperimentalCoroutinesApi::class)
 class StatsViewModelTest {
 
     private lateinit var dir: File

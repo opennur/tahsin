@@ -2,8 +2,6 @@ package org.opennur.tahsin.ui
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
-import io.mockk.mockk
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,13 +13,13 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.opennur.tahsin.util.Gamification
+import org.opennur.tahsin.util.GamificationReader
 import org.opennur.tahsin.util.GamificationStats
-import org.opennur.tahsin.util.GamificationStore
-import org.opennur.tahsin.util.SettingsStore
+import org.opennur.tahsin.util.SettingsSource
 
 /**
- * Tes GamificationViewModel dengan MockK + Turbine + Truth — pola baseline
- * MVVM testable: dependensi (GamificationStore, SettingsStore) di-mock,
+ * Tes GamificationViewModel dengan fake dependencies + Turbine + Truth — pola
+ * baseline MVVM testable: dependensi dibangun langsung,
  * ViewModel dikonstruksi langsung, state diverifikasi per-emisi.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -41,11 +39,11 @@ class GamificationViewModelTest {
         stats: GamificationStats = GamificationStats(),
         code: String = "id",
     ): GamificationViewModel = GamificationViewModel(
-        gamificationStore = mockk<GamificationStore> {
-            every { read() } returns stats
+        gamificationReader = object : GamificationReader {
+            override fun read(): GamificationStats = stats
         },
-        settings = mockk<SettingsStore> {
-            every { languageCode } returns code
+        settings = object : SettingsSource {
+            override val languageCode: String = code
         },
     )
 

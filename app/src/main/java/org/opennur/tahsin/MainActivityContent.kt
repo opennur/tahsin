@@ -226,8 +226,7 @@ fun MainActivityContent(
         val celebration by GamificationEvents.event.collectAsStateWithLifecycle()
         LaunchedEffect(celebration) {
             if (celebration != null) {
-                val vibrator = context.getSystemService(android.content.Context.VIBRATOR_SERVICE)
-                    as? android.os.Vibrator
+                val vibrator = context.getSystemService(android.os.Vibrator::class.java)
                 runCatching {
                     vibrator?.vibrate(
                         android.os.VibrationEffect.createOneShot(

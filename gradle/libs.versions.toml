@@ -16,9 +16,8 @@ hilt = "2.51.1"
 # Penyimpanan preferensi modern (pengganti SharedPreferences).
 datastore = "1.1.1"
 
-# Testing: Robolectric (JVM headless) + MockK + Turbine + Truth.
+# Testing: Robolectric (JVM headless) + Turbine + Truth.
 robolectric = "4.14.1"
-mockk = "1.13.13"
 turbine = "1.1.0"
 truth = "1.4.4"
 androidxTestCore = "1.6.1"
@@ -62,9 +61,6 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 # Robolectric — Android framework berjalan headless di JVM (tanpa emulator)
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
-
-# MockK — mocking untuk unit test Kotlin
-mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 # Turbine — pengujian Flow/StateFlow (emisi satu per satu)
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
