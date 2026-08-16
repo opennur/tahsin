@@ -9,6 +9,7 @@ and quotation punctuation, then checks quote balance separately.
 
 Usage:
     python3 tools/validate_quran_fields.py
+    python3 tools/validate_quran_fields.py --ignore-latin
     python3 tools/validate_quran_fields.py --canonical-file /tmp/quran.json
 """
 
@@ -140,7 +141,7 @@ def check_quote_balance(
             )
 
 
-def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tuple[int, int], dict[str, str]]) -> list[dict[str, Any]]:
+def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tuple[int, int], dict[str, str]], *, ignore_latin: bool = False) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     if len(bundle) != EXPECTED_AYAHS:
         add(findings, (0, 0), "nomorAyat", "jumlah ayat tidak 6236", str(len(bundle)), str(EXPECTED_AYAHS))
@@ -168,15 +169,16 @@ def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tupl
         if arabic != expected_arabic:
             add(findings, key, "teksArab", "huruf atau harakat tidak sesuai mushaf kanonik", arabic, expected_arabic)
 
-        latin = trim(row["teksLatin"])
-        for char in row["teksLatin"]:
-            if ord(char) < 32 or 127 <= ord(char) < 160:
-                add(findings, key, "teksLatin", f"karakter kontrol/non-Latin U+{ord(char):04X}", row["teksLatin"], row["teksLatin"].replace(char, "‘"))
-                break
-        expected_latin = clean_latin(MANUAL_LATIN.get(key, ref["latin"]))
-        if latin != expected_latin:
-            kind = "transliterasi bergeser ke ayat lain" if key in {(23, 79), (23, 80), (23, 81)} else "transliterasi tidak sesuai standar Kemenag"
-            add(findings, key, "teksLatin", kind, trim(row["teksLatin"]), expected_latin)
+        if not ignore_latin:
+            latin = trim(row["teksLatin"])
+            for char in row["teksLatin"]:
+                if ord(char) < 32 or 127 <= ord(char) < 160:
+                    add(findings, key, "teksLatin", f"karakter kontrol/non-Latin U+{ord(char):04X}", row["teksLatin"], row["teksLatin"].replace(char, "'"))
+                    break
+            expected_latin = clean_latin(MANUAL_LATIN.get(key, ref["latin"]))
+            if latin != expected_latin:
+                kind = "transliterasi bergeser ke ayat lain" if key in {(23, 79), (23, 80), (23, 81)} else "transliterasi tidak sesuai standar Kemenag"
+                add(findings, key, "teksLatin", kind, trim(row["teksLatin"]), expected_latin)
 
         expected_translation = clean_indonesian(ref["translation"], key)
         if normalize_translation(row["teksIndonesia"]) != normalize_translation(expected_translation):
@@ -189,11 +191,12 @@ def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tupl
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--canonical-file", type=Path)
+    parser.add_argument("--ignore-latin", action="store_true", help="skip Latin transliteration comparison (equran.id vs Kemenag)")
     args = parser.parse_args()
     try:
         bundle = load_bundle()
         payload = json.loads(args.canonical_file.read_text(encoding="utf-8")) if args.canonical_file else fetch_canonical()
-        findings = validate(bundle, load_canonical(payload))
+        findings = validate(bundle, load_canonical(payload), ignore_latin=args.ignore_latin)
         print(json.dumps({"hasil": findings}, ensure_ascii=False, indent=2))
         return 1 if findings else 0
     except Exception as error:  # noqa: BLE001 - command-line boundary

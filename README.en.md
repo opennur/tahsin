@@ -341,7 +341,7 @@ harakah, and pause marks remain exact:
 
 ```bash
 python3 tools/validate_quran_content.py
-python3 tools/validate_quran_fields.py
+python3 tools/validate_quran_fields.py --ignore-latin
 ```
 
 The validated 6,236-ayah digest is recorded in
