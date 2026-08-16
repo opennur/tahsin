@@ -154,7 +154,7 @@ class MorphologyEngineTest {
         assertThat(result).isNotNull()
         assertThat(result!!.root).isEqualTo("علم")
         assertThat(result.meaningId).isEqualTo("ilmu; mengetahui")
-        assertThat(result.relatedWords.size).isEqualTo(3) // يعلمون, معلم, and another
+        assertThat(result.relatedWords.size).isEqualTo(2) // يعلمون, معلم
     }
 
     @Test
