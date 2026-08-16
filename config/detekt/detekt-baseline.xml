@@ -121,6 +121,7 @@
     <ID>TooGenericExceptionCaught:AudioDownloader.kt$AudioDownloader$e: Exception</ID>
     <ID>TooGenericExceptionCaught:TahsinViewModel.kt$TahsinViewModel$e: Exception</ID>
     <ID>TooManyFunctions:TahsinViewModel.kt$TahsinViewModel : ViewModel</ID>
+    <ID>TooManyFunctions:AppModule.kt$AppModule</ID>
     <ID>UnusedParameter:TahsinAudioPlayer.kt$TahsinAudioPlayer$text: String</ID>
     <ID>UnusedParameter:TahsinAudioPlayer.kt$TahsinAudioPlayer$word: String</ID>
     <ID>UnusedParameter:TahsinScreen.kt$ends: IntArray</ID>

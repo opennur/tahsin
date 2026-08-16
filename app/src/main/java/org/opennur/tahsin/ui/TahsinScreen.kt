@@ -866,6 +866,66 @@ private fun SurahFlowBlock(
                                         )
                                         Spacer(modifier = Modifier.height(6.dp))
                                     }
+                                    // ---- Akar kata & kata terkait ----
+                                    val rootInfo = state.selectedWordRoot
+                                    if (rootInfo != null) {
+                                        AyahText(
+                                            "${strings.morphRoot}: ${rootInfo.root}",
+                                            style = AyahTypography.Caption.copy(
+                                                color = AyahColors.Primary,
+                                                fontWeight = FontWeight.Bold,
+                                            ),
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        val rootMeaning = if (state.language == AppLanguage.EN) {
+                                            rootInfo.meaningEn
+                                        } else {
+                                            rootInfo.meaningId
+                                        }
+                                        if (rootMeaning.isNotBlank()) {
+                                            AyahText(
+                                                rootMeaning,
+                                                style = AyahTypography.Caption.copy(
+                                                    color = AyahColors.TextSecondary,
+                                                ),
+                                            )
+                                        }
+                                        if (rootInfo.relatedWords.isNotEmpty()) {
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            AyahText(
+                                                strings.morphRelatedLabel,
+                                                style = AyahTypography.Caption.copy(
+                                                    color = AyahColors.Primary,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                ),
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            val relatedToShow = rootInfo.relatedWords.take(5)
+                                            relatedToShow.forEach { related ->
+                                                val relMeaning = if (state.language == AppLanguage.EN) {
+                                                    related.meaningEn
+                                                } else {
+                                                    related.meaningId
+                                                }
+                                                AyahText(
+                                                    "${related.word} — $relMeaning",
+                                                    style = AyahTypography.Caption.copy(
+                                                        color = AyahColors.TextSecondary,
+                                                    ),
+                                                )
+                                            }
+                                            if (rootInfo.relatedWords.size > 5) {
+                                                AyahText(
+                                                    "${strings.morphViewAll} (${rootInfo.relatedWords.size})",
+                                                    style = AyahTypography.Caption.copy(
+                                                        color = AyahColors.Primary,
+                                                        fontWeight = FontWeight.Medium,
+                                                    ),
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                    }
                                     val rules = state.selectedWordRules
                                     if (rules.isEmpty()) {
                                         AyahText(

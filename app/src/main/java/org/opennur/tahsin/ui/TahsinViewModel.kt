@@ -22,6 +22,8 @@ import org.opennur.tahsin.data.tajwid.TajwidRule
 import org.opennur.tahsin.data.vocab.VocabEntry
 import org.opennur.tahsin.data.vocab.VocabularyEngine
 import org.opennur.tahsin.data.vocab.VocabularyRepository
+import org.opennur.tahsin.data.vocab.MorphologyEngine
+import org.opennur.tahsin.data.vocab.RootInfo
 import org.opennur.tahsin.stt.ArabicSpeechRecognizer
 import org.opennur.tahsin.stt.AlignedWord
 import org.opennur.tahsin.stt.TranscriptAligner
@@ -94,6 +96,8 @@ sealed interface TahsinUiState {
         val selectedWordRules: List<TajwidRule> = emptyList(),
         /** Arti kata terpilih (bahasa aktif) — null kalau belum terkurasi. */
         val selectedWordMeaning: String? = null,
+        /** Info akar kata terpilih — null kalau kata tidak dikenal/tidak punya akar. */
+        val selectedWordRoot: RootInfo? = null,
         val message: String? = null,
         val fontScale: Float = 1.5f,
         val language: AppLanguage = AppLanguage.ID,
@@ -307,6 +311,7 @@ class TahsinViewModel @Inject constructor(
         // Muat daftar kosakata terkurasi untuk arti kata di tooltip.
         viewModelScope.launch(Dispatchers.IO) {
             vocabEntries = vocabulary.curatedEntries()
+            MorphologyEngine.init(vocabEntries)
         }
         // Target dari widget/notifikasi (state baru saja siap) → buka langsung.
         pendingOpenAt?.let { (s, a) -> openAt(s, a) }
@@ -869,14 +874,19 @@ class TahsinViewModel @Inject constructor(
                 selectedWordIndex = null,
                 selectedWordRules = emptyList(),
                 selectedWordMeaning = null,
+                selectedWordRoot = null,
             ) }
             return
         }
+        val word = words.getOrNull(index)
         updateReady { it.copy(
             selectedWordIndex = index,
             selectedWordRules = rulesFor(index, words),
-            selectedWordMeaning = words.getOrNull(index)?.let { w ->
+            selectedWordMeaning = word?.let { w ->
                 VocabularyEngine.meaningOfWord(vocabEntries, w, it.language)
+            },
+            selectedWordRoot = word?.let { w ->
+                MorphologyEngine.lookupRoot(w)
             },
         ) }
     }

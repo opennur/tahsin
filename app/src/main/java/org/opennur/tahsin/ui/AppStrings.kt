@@ -42,6 +42,16 @@ data class LearningStrings(
     val memorizationRemembered: String,
     val memorizationOpenTahsin: String,
     val memorizationError: String,
+    // STT recitation
+    val memorizationRecite: String,
+    val memorizationSttListening: String,
+    val memorizationSttScore: String,
+    val memorizationSttPass: String,
+    val memorizationSttFail: String,
+    // Target selection
+    val memorizationTargetSurah: String,
+    val memorizationTargetJuz: String,
+    val memorizationApply: String,
 )
 
 /**
@@ -237,6 +247,11 @@ data class Strings(
     val vocabOpenExample: String,
     val vocabAudioUnavailable: String,
     val vocabLoading: String,
+    // Morfologi / Akar Kata
+    val morphRoot: String,
+    val morphRelatedLabel: String,
+    val morphNoRoot: String,
+    val morphViewAll: String,
     // Belajar Arab (Durusul Lughoh style)
     val menuLughoh: String,
     val lughohSubtitle: String,
@@ -336,6 +351,14 @@ data class Strings(
     val memorizationRemembered get() = learning.memorizationRemembered
     val memorizationOpenTahsin get() = learning.memorizationOpenTahsin
     val memorizationError get() = learning.memorizationError
+    val memorizationRecite get() = learning.memorizationRecite
+    val memorizationSttListening get() = learning.memorizationSttListening
+    val memorizationSttScore get() = learning.memorizationSttScore
+    val memorizationSttPass get() = learning.memorizationSttPass
+    val memorizationSttFail get() = learning.memorizationSttFail
+    val memorizationTargetSurah get() = learning.memorizationTargetSurah
+    val memorizationTargetJuz get() = learning.memorizationTargetJuz
+    val memorizationApply get() = learning.memorizationApply
 }
 
 object AppStrings {
@@ -524,6 +547,11 @@ object AppStrings {
         vocabOpenExample = "Buka di mushaf ▸",
         vocabAudioUnavailable = "Audio belum tersedia. Cek koneksi lalu coba lagi.",
         vocabLoading = "Menyiapkan kosa kata…",
+        // Morfologi / Akar Kata
+        morphRoot = "Akar Kata",
+        morphRelatedLabel = "Kata lain dengan akar yang sama",
+        morphNoRoot = "Tidak ditemukan akar",
+        morphViewAll = "Lihat Semua",
         // Belajar Arab
         menuLughoh = "📚 Belajar Arab",
         lughohSubtitle = "Metode ala Durusul Lughoh: percakapan, kosakata, tata bahasa — latihan acak tak terbatas untuk pemula.",
@@ -619,6 +647,14 @@ object AppStrings {
             memorizationRemembered = "Saya ingat",
             memorizationOpenTahsin = "Latih di Tahsin ▸",
             memorizationError = "Antrean hafalan belum dapat dimuat. Coba lagi nanti.",
+            memorizationRecite = "🎤 Bacakan dari Hafalan",
+            memorizationSttListening = "Mendengarkan hafalanmu…",
+            memorizationSttScore = "Skor: %d%%",
+            memorizationSttPass = "✓ Bagus! Lanjutkan ke ayat berikutnya.",
+            memorizationSttFail = "✗ Perlu latihan lagi. Coba baca lebih pelan.",
+            memorizationTargetSurah = "Surah",
+            memorizationTargetJuz = "Juz",
+            memorizationApply = "Terapkan",
         ),
     )
 
@@ -802,6 +838,11 @@ object AppStrings {
         vocabOpenExample = "Open in mushaf ▸",
         vocabAudioUnavailable = "Audio not available yet. Check your connection and try again.",
         vocabLoading = "Preparing vocabulary…",
+        // Morphology / Root Word
+        morphRoot = "Root Word",
+        morphRelatedLabel = "Other words with same root",
+        morphNoRoot = "No root found",
+        morphViewAll = "View All",
         // Learn Arabic
         menuLughoh = "📚 Learn Arabic",
         lughohSubtitle = "Durusul Lughoh-style method: conversation, vocabulary, grammar — unlimited random practice for beginners.",
@@ -897,6 +938,14 @@ object AppStrings {
             memorizationRemembered = "I remembered",
             memorizationOpenTahsin = "Practice in Tahsin ▸",
             memorizationError = "The memorization queue could not be loaded. Try again later.",
+            memorizationRecite = "🎤 Recite from Memory",
+            memorizationSttListening = "Listening to your recitation…",
+            memorizationSttScore = "Score: %d%%",
+            memorizationSttPass = "✓ Great! Move on to the next ayah.",
+            memorizationSttFail = "✗ Needs more practice. Try reading slower.",
+            memorizationTargetSurah = "Surah",
+            memorizationTargetJuz = "Juz",
+            memorizationApply = "Apply",
         ),
     )
 

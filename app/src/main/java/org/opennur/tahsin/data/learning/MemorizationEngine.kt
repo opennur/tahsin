@@ -10,6 +10,12 @@ data class MemorizationCard(
     val successes: Int = 0,
 )
 
+/** Target pilihan hafalan: surah tertentu atau rentang juz. */
+sealed interface MemorizationTarget {
+    data class Surah(val number: Int) : MemorizationTarget
+    data class Juz(val number: Int) : MemorizationTarget
+}
+
 /** Pure, deterministic spaced-review rules for the first memorization track. */
 object MemorizationEngine {
 
@@ -17,6 +23,44 @@ object MemorizationEngine {
         if (ayahCount <= 0) return emptyList()
         return (1..ayahCount).map { ayah -> MemorizationCard(surah = surah, ayah = ayah) }
     }
+
+    /**
+     * Seed cards for a juz range using the provided surah metadata.
+     *
+     * @param juz Juz number (1..30)
+     * @param juzStarts List of JuzStart from MushafPagination
+     * @param surahAyahCounts Map of surah number → ayah count (from Surah list)
+     * @return Cards for all ayahs in the juz, in surah:ayah order
+     */
+    fun startingCardsForJuz(
+        juz: Int,
+        juzStarts: List<JuzStartRef>,
+        surahAyahCounts: Map<Int, Int>,
+    ): List<MemorizationCard> {
+        val start = juzStarts.firstOrNull { it.juz == juz } ?: return emptyList()
+        val end = juzStarts.firstOrNull { it.juz == juz + 1 }
+
+        val cards = mutableListOf<MemorizationCard>()
+        for (surah in start.surah..(end?.surah?.minus(1) ?: 114)) {
+            val ayahCount = surahAyahCounts[surah] ?: continue
+            val fromAyah = if (surah == start.surah) start.ayah else 1
+            val toAyah = if (end != null && surah == end.surah - 1 && end.ayah > 1) {
+                // Juz ends mid-surah
+                if (surah == start.surah) ayahCount else end.ayah - 1
+            } else if (end == null && surah == 114) {
+                ayahCount
+            } else {
+                ayahCount
+            }
+            for (ayah in fromAyah..toAyah) {
+                cards.add(MemorizationCard(surah = surah, ayah = ayah))
+            }
+        }
+        return cards
+    }
+
+    /** Lightweight ref for juz start data (avoids importing MushafPages). */
+    data class JuzStartRef(val juz: Int, val surah: Int, val ayah: Int)
 
     fun isDue(card: MemorizationCard, day: Long): Boolean = card.dueDay <= day
 
