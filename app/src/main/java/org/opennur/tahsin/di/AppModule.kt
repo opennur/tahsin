@@ -96,7 +96,7 @@ object AppModule {
         @ApplicationContext context: Context,
     ): MorphologyEngine {
         val repo = VocabularyRepository(context)
-        val entries = repo.entries()
+        val entries = repo.curatedEntries()
         MorphologyEngine.init(entries)
         return MorphologyEngine
     }
