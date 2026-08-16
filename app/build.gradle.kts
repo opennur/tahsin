@@ -52,6 +52,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -161,6 +162,16 @@ dependencies {
     // enableAggregatingTask+kapt).
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)
+
+    // ---- Instrumented test (androidTest) ----
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.core.ktx)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler)
+    androidTestImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 /**
