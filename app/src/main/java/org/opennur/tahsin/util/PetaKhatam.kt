@@ -54,8 +54,8 @@ object PetaKhatamEngine {
         }
 
         return (1..pagination.pageCount).map { page ->
-            val pageSegments = pagination.pages.firstOrNull { it.page == page }
-            val expectedAyahs = pageSegments?.ayahCount ?: 0
+            val pageData = pagination.pages.firstOrNull { it.page == page }
+            val expectedAyahs = pageData?.segments?.sumOf { it.ayahCount } ?: 0
             val actual = pageStats[page].orEmpty()
 
             val status = when {
@@ -92,7 +92,7 @@ object PetaKhatamEngine {
         val juzAyahCounts = mutableMapOf<Int, Int>()
         for (page in pagination.pages) {
             val juz = pagination.juzOfPage(page.page)
-            juzAyahCounts[juz] = (juzAyahCounts[juz] ?: 0) + page.ayahCount
+            juzAyahCounts[juz] = (juzAyahCounts[juz] ?: 0) + page.segments.sumOf { it.ayahCount }
         }
 
         return (1..30).map { juz ->
