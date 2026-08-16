@@ -237,6 +237,11 @@ data class Strings(
     val vocabOpenExample: String,
     val vocabAudioUnavailable: String,
     val vocabLoading: String,
+    // Morfologi / Akar Kata
+    val morphRoot: String,
+    val morphRelatedLabel: String,
+    val morphNoRoot: String,
+    val morphViewAll: String,
     // Belajar Arab (Durusul Lughoh style)
     val menuLughoh: String,
     val lughohSubtitle: String,
@@ -524,6 +529,11 @@ object AppStrings {
         vocabOpenExample = "Buka di mushaf ▸",
         vocabAudioUnavailable = "Audio belum tersedia. Cek koneksi lalu coba lagi.",
         vocabLoading = "Menyiapkan kosa kata…",
+        // Morfologi / Akar Kata
+        morphRoot = "Akar Kata",
+        morphRelatedLabel = "Kata lain dengan akar yang sama",
+        morphNoRoot = "Tidak ditemukan akar",
+        morphViewAll = "Lihat Semua",
         // Belajar Arab
         menuLughoh = "📚 Belajar Arab",
         lughohSubtitle = "Metode ala Durusul Lughoh: percakapan, kosakata, tata bahasa — latihan acak tak terbatas untuk pemula.",
@@ -802,6 +812,11 @@ object AppStrings {
         vocabOpenExample = "Open in mushaf ▸",
         vocabAudioUnavailable = "Audio not available yet. Check your connection and try again.",
         vocabLoading = "Preparing vocabulary…",
+        // Morphology / Root Word
+        morphRoot = "Root Word",
+        morphRelatedLabel = "Other words with same root",
+        morphNoRoot = "No root found",
+        morphViewAll = "View All",
         // Learn Arabic
         menuLughoh = "📚 Learn Arabic",
         lughohSubtitle = "Durusul Lughoh-style method: conversation, vocabulary, grammar — unlimited random practice for beginners.",

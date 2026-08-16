@@ -11,6 +11,7 @@ import org.opennur.tahsin.data.lughoh.LughohRepository
 import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.data.vocab.VocabularyRepository
+import org.opennur.tahsin.data.vocab.MorphologyEngine
 import org.opennur.tahsin.stt.ArabicSpeechRecognizer
 import org.opennur.tahsin.util.AudioDownloader
 import org.opennur.tahsin.util.BookmarkStore
@@ -88,6 +89,17 @@ object AppModule {
     @Singleton
     fun provideVocabularyRepository(@ApplicationContext context: Context): VocabularyRepository =
         VocabularyRepository(context)
+
+    @Provides
+    @Singleton
+    fun provideMorphologyEngine(
+        @ApplicationContext context: Context,
+    ): MorphologyEngine {
+        val repo = VocabularyRepository(context)
+        val entries = repo.entries()
+        MorphologyEngine.init(entries)
+        return MorphologyEngine
+    }
 
     @Provides
     @Singleton
