@@ -311,6 +311,7 @@ class TahsinViewModel @Inject constructor(
         // Muat daftar kosakata terkurasi untuk arti kata di tooltip.
         viewModelScope.launch(Dispatchers.IO) {
             vocabEntries = vocabulary.curatedEntries()
+            MorphologyEngine.init(vocabEntries)
         }
         // Target dari widget/notifikasi (state baru saja siap) → buka langsung.
         pendingOpenAt?.let { (s, a) -> openAt(s, a) }

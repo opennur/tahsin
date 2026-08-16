@@ -42,6 +42,16 @@ data class LearningStrings(
     val memorizationRemembered: String,
     val memorizationOpenTahsin: String,
     val memorizationError: String,
+    // STT recitation
+    val memorizationRecite: String,
+    val memorizationSttListening: String,
+    val memorizationSttScore: String,
+    val memorizationSttPass: String,
+    val memorizationSttFail: String,
+    // Target selection
+    val memorizationTargetSurah: String,
+    val memorizationTargetJuz: String,
+    val memorizationApply: String,
 )
 
 /**
@@ -341,6 +351,14 @@ data class Strings(
     val memorizationRemembered get() = learning.memorizationRemembered
     val memorizationOpenTahsin get() = learning.memorizationOpenTahsin
     val memorizationError get() = learning.memorizationError
+    val memorizationRecite get() = learning.memorizationRecite
+    val memorizationSttListening get() = learning.memorizationSttListening
+    val memorizationSttScore get() = learning.memorizationSttScore
+    val memorizationSttPass get() = learning.memorizationSttPass
+    val memorizationSttFail get() = learning.memorizationSttFail
+    val memorizationTargetSurah get() = learning.memorizationTargetSurah
+    val memorizationTargetJuz get() = learning.memorizationTargetJuz
+    val memorizationApply get() = learning.memorizationApply
 }
 
 object AppStrings {
@@ -629,6 +647,14 @@ object AppStrings {
             memorizationRemembered = "Saya ingat",
             memorizationOpenTahsin = "Latih di Tahsin ▸",
             memorizationError = "Antrean hafalan belum dapat dimuat. Coba lagi nanti.",
+            memorizationRecite = "🎤 Bacakan dari Hafalan",
+            memorizationSttListening = "Mendengarkan hafalanmu…",
+            memorizationSttScore = "Skor: %d%%",
+            memorizationSttPass = "✓ Bagus! Lanjutkan ke ayat berikutnya.",
+            memorizationSttFail = "✗ Perlu latihan lagi. Coba baca lebih pelan.",
+            memorizationTargetSurah = "Surah",
+            memorizationTargetJuz = "Juz",
+            memorizationApply = "Terapkan",
         ),
     )
 
@@ -912,6 +938,14 @@ object AppStrings {
             memorizationRemembered = "I remembered",
             memorizationOpenTahsin = "Practice in Tahsin ▸",
             memorizationError = "The memorization queue could not be loaded. Try again later.",
+            memorizationRecite = "🎤 Recite from Memory",
+            memorizationSttListening = "Listening to your recitation…",
+            memorizationSttScore = "Score: %d%%",
+            memorizationSttPass = "✓ Great! Move on to the next ayah.",
+            memorizationSttFail = "✗ Needs more practice. Try reading slower.",
+            memorizationTargetSurah = "Surah",
+            memorizationTargetJuz = "Juz",
+            memorizationApply = "Apply",
         ),
     )
 
