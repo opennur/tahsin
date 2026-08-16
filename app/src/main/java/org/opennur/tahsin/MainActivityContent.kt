@@ -30,6 +30,7 @@ import org.opennur.tahsin.ui.LughohScreen
 import org.opennur.tahsin.ui.MemorizationScreen
 import org.opennur.tahsin.ui.OnboardingScreen
 import org.opennur.tahsin.ui.OpenTarget
+import org.opennur.tahsin.ui.PetaKhatamScreen
 import org.opennur.tahsin.ui.SearchScreen
 import org.opennur.tahsin.ui.SettingsActions
 import org.opennur.tahsin.ui.SettingsAppearanceActions
@@ -161,6 +162,18 @@ fun MainActivityContent(
                 AppScreen.Stats -> StatsScreen(
                     onBack = { pop() },
                     onOpenAyah = onOpenAyah,
+                    onOpenPetaKhatam = { push(AppScreen.PetaKhatam) },
+                )
+                AppScreen.PetaKhatam -> PetaKhatamScreen(
+                    onBack = { pop() },
+                    onOpenPage = { page ->
+                        // Buka halaman mushaf di Tahsin
+                        val pagination = tahsinViewModel.uiState.value.let { state ->
+                            (state as? org.opennur.tahsin.ui.TahsinUiState.Ready)?.pagination
+                        }
+                        val firstAyah = pagination?.firstAyahOf(page)
+                        if (firstAyah != null) onOpenAyah(firstAyah.first, firstAyah.second)
+                    },
                 )
                 AppScreen.Search -> SearchScreen(
                     onBack = { pop() },

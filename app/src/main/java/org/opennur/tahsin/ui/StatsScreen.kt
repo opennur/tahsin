@@ -49,6 +49,7 @@ import org.opennur.tahsin.util.RelativeTime
 fun StatsScreen(
     onBack: () -> Unit,
     onOpenAyah: (Int, Int) -> Unit = { _, _ -> },
+    onOpenPetaKhatam: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val viewModel: StatsViewModel = viewModel()
@@ -271,6 +272,17 @@ fun StatsScreen(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ---- Peta Khatam ----
+            AyahButton(
+                text = strings.petaTitle,
+                variant = AyahButtonVariant.Outline,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onOpenPetaKhatam,
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
