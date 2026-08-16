@@ -21,6 +21,9 @@ robolectric = "4.14.1"
 turbine = "1.1.0"
 truth = "1.4.4"
 androidxTestCore = "1.6.1"
+androidxTestRunner = "1.6.2"
+androidxTestEspresso = "3.6.1"
+androidxComposeUiTest = "1.7.6"
 
 # Linter Kotlin (static analysis).
 detekt = "1.23.7"
@@ -70,6 +73,12 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 
 # ApplicationProvider.getApplicationContext() di test Robolectric
 androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidxTestCore" }
+
+# Instrumented test (androidTest)
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
+androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidxTestEspresso" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -104,6 +104,57 @@ import org.opennur.tahsin.ui.components.DropdownOption
 import org.opennur.tahsin.ui.components.SimpleDropdown
 import kotlin.math.roundToInt
 
+// ============================================================ Parameter objects
+
+/** Callbacks untuk [TahsinContent] — menggantikan 17 parameter lambda terpisah. */
+private data class TahsinContentActions(
+    val onSelectPage: (Int) -> Unit,
+    val onJumpToSurah: (Int) -> Unit,
+    val onJumpToPage: (Int) -> Unit,
+    val onSelectAyah: (Int, Int) -> Unit,
+    val onSelectWord: (Int) -> Unit,
+    val onMicClick: () -> Unit,
+    val onPlaySelectedWord: () -> Unit,
+    val onStopSelectedWord: () -> Unit,
+    val onSetFontScale: (Float) -> Unit,
+    val onSetAudioMode: (AudioPlaybackMode) -> Unit,
+    val onToggleBookmark: () -> Unit,
+    val onDismissMessage: () -> Unit,
+    val onToggleAudioPlayback: () -> Unit,
+    val onOpenSearch: () -> Unit,
+    val onOpenSettings: () -> Unit,
+    val onBack: () -> Unit,
+)
+
+/** Callbacks untuk [MushafPageView]. */
+private data class MushafPageActions(
+    val onSelectAyah: (Int, Int) -> Unit,
+    val onSelectWord: (Int) -> Unit,
+    val onPlaySelectedWord: () -> Unit,
+    val onStopSelectedWord: () -> Unit,
+    val onDismissMessage: () -> Unit,
+)
+
+/** Callbacks untuk [SurahFlowBlock]. */
+private data class SurahFlowActions(
+    val onSelectAyah: (Int, Int) -> Unit,
+    val onSelectWord: (Int) -> Unit,
+    val onPlaySelectedWord: () -> Unit,
+    val onStopSelectedWord: () -> Unit,
+)
+
+/** Parameter untuk [buildFlowAnnotated]. */
+private data class FlowAnnotatedParams(
+    val fullText: String,
+    val wordStarts: List<IntArray>,
+    val wordsByAyah: List<List<String>>,
+    val spansByWord: List<List<List<TajwidSpan>>>,
+    val activeIdx: Int,
+    val statusByIndex: Map<Int, AlignedWord>,
+    val selectedIndex: Int?,
+    val tajwidColor: Boolean,
+)
+
 /**
  * Layar Tahsin — mushaf halaman (604 halaman Madani): baca seperti membuka
  * mushaf asli (flip halaman RTL), tanda akhir ayat ۝+nomor, tanda sujud ۩,
@@ -166,28 +217,30 @@ fun TahsinScreen(
         )
         is TahsinUiState.Ready -> TahsinContent(
             state = state,
-            onSelectPage = viewModel::selectPage,
-            onJumpToSurah = viewModel::jumpToSurah,
-            onJumpToPage = viewModel::jumpToPage,
-            onSelectAyah = viewModel::selectAyahAt,
-            onSelectWord = viewModel::selectWord,
-            onMicClick = {
-                val granted = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.RECORD_AUDIO,
-                ) == PackageManager.PERMISSION_GRANTED
-                if (granted) viewModel.toggleMic() else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-            },
-            onPlaySelectedWord = viewModel::playSelectedWord,
-            onStopSelectedWord = viewModel::stopWordPlayback,
-            onSetFontScale = viewModel::setFontScale,
-            onSetAudioMode = viewModel::setAudioMode,
-            onToggleBookmark = viewModel::toggleBookmark,
-            onDismissMessage = viewModel::clearMessage,
-            onToggleAudioPlayback = viewModel::toggleAudioPlayback,
-            onOpenSearch = onOpenSearch,
-            onOpenSettings = onOpenSettings,
-            onBack = onBack,
+            actions = TahsinContentActions(
+                onSelectPage = viewModel::selectPage,
+                onJumpToSurah = viewModel::jumpToSurah,
+                onJumpToPage = viewModel::jumpToPage,
+                onSelectAyah = viewModel::selectAyahAt,
+                onSelectWord = viewModel::selectWord,
+                onMicClick = {
+                    val granted = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO,
+                    ) == PackageManager.PERMISSION_GRANTED
+                    if (granted) viewModel.toggleMic() else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                },
+                onPlaySelectedWord = viewModel::playSelectedWord,
+                onStopSelectedWord = viewModel::stopWordPlayback,
+                onSetFontScale = viewModel::setFontScale,
+                onSetAudioMode = viewModel::setAudioMode,
+                onToggleBookmark = viewModel::toggleBookmark,
+                onDismissMessage = viewModel::clearMessage,
+                onToggleAudioPlayback = viewModel::toggleAudioPlayback,
+                onOpenSearch = onOpenSearch,
+                onOpenSettings = onOpenSettings,
+                onBack = onBack,
+            ),
             modifier = modifier,
         )
     }
@@ -198,22 +251,7 @@ fun TahsinScreen(
 @Composable
 private fun TahsinContent(
     state: TahsinUiState.Ready,
-    onSelectPage: (Int) -> Unit,
-    onJumpToSurah: (Int) -> Unit,
-    onJumpToPage: (Int) -> Unit,
-    onSelectAyah: (Int, Int) -> Unit,
-    onSelectWord: (Int) -> Unit,
-    onMicClick: () -> Unit,
-    onPlaySelectedWord: () -> Unit,
-    onStopSelectedWord: () -> Unit,
-    onSetFontScale: (Float) -> Unit,
-    onSetAudioMode: (AudioPlaybackMode) -> Unit,
-    onToggleBookmark: () -> Unit,
-    onDismissMessage: () -> Unit,
-    onToggleAudioPlayback: () -> Unit,
-    onOpenSearch: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onBack: () -> Unit,
+    actions: TahsinContentActions,
     modifier: Modifier = Modifier,
 ) {
     val strings = AppStrings.of(state.language)
@@ -226,7 +264,7 @@ private fun TahsinContent(
     }
     // User menggeser pager → VM memuat & menyusun halaman baru.
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage != state.pageIndex) onSelectPage(pagerState.currentPage)
+        if (pagerState.currentPage != state.pageIndex) actions.onSelectPage(pagerState.currentPage)
     }
 
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
@@ -245,19 +283,19 @@ private fun TahsinContent(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AyahButton(text = "←", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onBack)
+            AyahButton(text = "←", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = actions.onBack)
             Spacer(modifier = Modifier.width(8.dp))
             AyahText(strings.appTitle, style = AyahTypography.Heading1, modifier = Modifier.weight(1f))
             AyahButton(
                 text = if (state.bookmarked) "★" else "☆",
                 variant = if (state.bookmarked) AyahButtonVariant.Primary else AyahButtonVariant.Outline,
                 size = AyahButtonSize.Small,
-                onClick = onToggleBookmark,
+                onClick = actions.onToggleBookmark,
             )
             Spacer(modifier = Modifier.width(6.dp))
-            AyahButton(text = "🔍", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSearch)
+            AyahButton(text = "🔍", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = actions.onOpenSearch)
             Spacer(modifier = Modifier.width(6.dp))
-            AyahButton(text = "⚙", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = onOpenSettings)
+            AyahButton(text = "⚙", variant = AyahButtonVariant.Outline, size = AyahButtonSize.Small, onClick = actions.onOpenSettings)
         }
 
         // ---- Navigasi lompat: surah / juz + indikator halaman ----
@@ -273,7 +311,7 @@ private fun TahsinContent(
             SimpleDropdown(
                 selectedLabel = state.surah?.nameLatin ?: "-",
                 options = state.surahs.map { s ->
-                    DropdownOption("${s.number}. ${s.nameLatin}", { onJumpToSurah(s.number) })
+                    DropdownOption("${s.number}. ${s.nameLatin}", { actions.onJumpToSurah(s.number) })
                 },
                 modifier = Modifier.weight(2f),
             )
@@ -283,7 +321,7 @@ private fun TahsinContent(
                 options = (1..(state.surah?.ayahCount ?: 0)).map { a ->
                     DropdownOption(
                         "${strings.tahsinAyah} ${AyahNumbering.toArabicIndic(a)}",
-                        { onSelectAyah(state.surahNumber, a) },
+                        { actions.onSelectAyah(state.surahNumber, a) },
                     )
                 },
                 modifier = Modifier.weight(1f),
@@ -292,7 +330,7 @@ private fun TahsinContent(
             SimpleDropdown(
                 selectedLabel = "[${AyahNumbering.toArabicIndic(state.pageIndex + 1)}]",
                 options = (1..state.pageCount).map { p ->
-                    DropdownOption("${strings.tahsinPage} ${AyahNumbering.toArabicIndic(p)}", { onJumpToPage(p) })
+                    DropdownOption("${strings.tahsinPage} ${AyahNumbering.toArabicIndic(p)}", { actions.onJumpToPage(p) })
                 },
                 modifier = Modifier.weight(1f),
             )
@@ -312,7 +350,7 @@ private fun TahsinContent(
             Spacer(modifier = Modifier.width(8.dp))
             AyahSlider(
                 value = state.fontScale,
-                onValueChange = onSetFontScale,
+                onValueChange = actions.onSetFontScale,
                 modifier = Modifier.weight(1f),
                 valueRange = FontScales.MIN..FontScales.MAX,
             )
@@ -344,11 +382,13 @@ private fun TahsinContent(
                 state = state,
                 pageIndex = pageIndex,
                 strings = strings,
-                onSelectAyah = onSelectAyah,
-                onSelectWord = onSelectWord,
-                onPlaySelectedWord = onPlaySelectedWord,
-                onStopSelectedWord = onStopSelectedWord,
-                onDismissMessage = onDismissMessage,
+                actions = MushafPageActions(
+                    onSelectAyah = actions.onSelectAyah,
+                    onSelectWord = actions.onSelectWord,
+                    onPlaySelectedWord = actions.onPlaySelectedWord,
+                    onStopSelectedWord = actions.onStopSelectedWord,
+                    onDismissMessage = actions.onDismissMessage,
+                ),
             )
         }
 
@@ -368,7 +408,7 @@ private fun TahsinContent(
                 .padding(horizontal = 20.dp, vertical = 10.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                MicButton(listening = state.listening, onClick = onMicClick)
+                MicButton(listening = state.listening, onClick = actions.onMicClick)
                 Spacer(modifier = Modifier.width(14.dp))
                 AyahText(
                     if (state.listening) strings.listeningHint else strings.micHint,
@@ -378,9 +418,9 @@ private fun TahsinContent(
                 SimpleDropdown(
                     selectedLabel = audioModeSymbol(state.audioMode),
                     options = listOf(
-                        DropdownOption("١ — ${strings.tahsinAudioSingle}", { onSetAudioMode(AudioPlaybackMode.AYAH) }),
-                        DropdownOption("→ — ${strings.tahsinAudioContinuous}", { onSetAudioMode(AudioPlaybackMode.CONTINUOUS) }),
-                        DropdownOption("↻ — ${strings.tahsinAudioRepeat}", { onSetAudioMode(AudioPlaybackMode.REPEAT) }),
+                        DropdownOption("١ — ${strings.tahsinAudioSingle}", { actions.onSetAudioMode(AudioPlaybackMode.AYAH) }),
+                        DropdownOption("→ — ${strings.tahsinAudioContinuous}", { actions.onSetAudioMode(AudioPlaybackMode.CONTINUOUS) }),
+                        DropdownOption("↻ — ${strings.tahsinAudioRepeat}", { actions.onSetAudioMode(AudioPlaybackMode.REPEAT) }),
                     ),
                     modifier = Modifier.width(52.dp),
                 )
@@ -388,7 +428,7 @@ private fun TahsinContent(
                 AyahButton(
                     text = if (state.isAudioPlaying) strings.stop else strings.listen,
                     variant = if (state.isAudioPlaying) AyahButtonVariant.Danger else AyahButtonVariant.Secondary,
-                    onClick = onToggleAudioPlayback,
+                    onClick = actions.onToggleAudioPlayback,
                 )
             }
         }
@@ -411,11 +451,7 @@ private fun MushafPageView(
     state: TahsinUiState.Ready,
     pageIndex: Int,
     strings: Strings,
-    onSelectAyah: (Int, Int) -> Unit,
-    onSelectWord: (Int) -> Unit,
-    onPlaySelectedWord: () -> Unit,
-    onStopSelectedWord: () -> Unit,
-    onDismissMessage: () -> Unit,
+    actions: MushafPageActions,
 ) {
     val composed = remember(state.surahs, state.pagination, pageIndex) {
         composePage(state, pageIndex)
@@ -471,10 +507,12 @@ private fun MushafPageView(
                     ayahs = groupAyahs,
                     state = state,
                     strings = strings,
-                    onSelectAyah = onSelectAyah,
-                    onSelectWord = onSelectWord,
-                    onPlaySelectedWord = onPlaySelectedWord,
-                    onStopSelectedWord = onStopSelectedWord,
+                    actions = SurahFlowActions(
+                        onSelectAyah = actions.onSelectAyah,
+                        onSelectWord = actions.onSelectWord,
+                        onPlaySelectedWord = actions.onPlaySelectedWord,
+                        onStopSelectedWord = actions.onStopSelectedWord,
+                    ),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -543,7 +581,7 @@ private fun MushafPageView(
             if (isCurrentPage) {
                 state.message?.let { msg ->
                     Spacer(modifier = Modifier.height(8.dp))
-                    AyahCard(modifier = Modifier.fillMaxWidth(), onClick = onDismissMessage) {
+                    AyahCard(modifier = Modifier.fillMaxWidth(), onClick = actions.onDismissMessage) {
                         AyahText(msg, style = AyahTypography.Body2, color = AyahColors.Error)
                     }
                     Spacer(modifier = Modifier.height(12.dp))
@@ -659,10 +697,7 @@ private fun SurahFlowBlock(
     ayahs: List<MushafAyah>,
     state: TahsinUiState.Ready,
     strings: Strings,
-    onSelectAyah: (Int, Int) -> Unit,
-    onSelectWord: (Int) -> Unit,
-    onPlaySelectedWord: () -> Unit,
-    onStopSelectedWord: () -> Unit,
+    actions: SurahFlowActions,
 ) {
     val flow = remember(ayahs) { buildFlowMeta(ayahs) }
     // Umpan haptik halus saat kata dipilih (dibaca di komposable scope).
@@ -684,14 +719,16 @@ private fun SurahFlowBlock(
     }
     val annotated = remember(flow, activeIdx, statusByIndex, selectedIndex, state.tajwidColor) {
         buildFlowAnnotated(
-            fullText = flow.fullText,
-            wordStarts = flow.wordStarts,
-            wordsByAyah = flow.wordsByAyah,
-            spansByWord = spansByWord,
-            activeIdx = activeIdx,
-            statusByIndex = statusByIndex,
-            selectedIndex = selectedIndex,
-            tajwidColor = state.tajwidColor,
+            FlowAnnotatedParams(
+                fullText = flow.fullText,
+                wordStarts = flow.wordStarts,
+                wordsByAyah = flow.wordsByAyah,
+                spansByWord = spansByWord,
+                activeIdx = activeIdx,
+                statusByIndex = statusByIndex,
+                selectedIndex = selectedIndex,
+                tajwidColor = state.tajwidColor,
+            ),
         )
     }
     var textLayout by remember(flow) { mutableStateOf<TextLayoutResult?>(null) }
@@ -761,10 +798,10 @@ private fun SurahFlowBlock(
                                                     HapticFeedbackType.TextHandleMove,
                                                 )
                                             }
-                                            onSelectWord(newIdx)
+                                            actions.onSelectWord(newIdx)
                                         }
                                     } else {
-                                        onSelectAyah(entry.surah, entry.number)
+                                        actions.onSelectAyah(entry.surah, entry.number)
                                     }
                                 }
                             }
@@ -782,7 +819,7 @@ private fun SurahFlowBlock(
                         Popup(
                             alignment = Alignment.TopStart,
                             offset = IntOffset(rect.left.roundToInt(), rect.bottom.roundToInt() + 6),
-                            onDismissRequest = { onSelectWord(-1) },
+                            onDismissRequest = { actions.onSelectWord(-1) },
                         ) {
                             // Tooltip pakai arah LTR supaya keterangan tajwid
                             // rata KIRI (jangan ikut RTL mushaf).
@@ -814,7 +851,7 @@ private fun SurahFlowBlock(
                                                 AyahButtonVariant.Secondary
                                             },
                                             size = AyahButtonSize.Small,
-                                            onClick = if (state.isWordPlaying) onStopSelectedWord else onPlaySelectedWord,
+                                            onClick = if (state.isWordPlaying) actions.onStopSelectedWord else actions.onPlaySelectedWord,
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(6.dp))
@@ -1115,35 +1152,28 @@ private fun wordIndexAt(offset: Int, wordOffsets: IntArray): Int {
  * tajwid per huruf + latar status STT + latar kata terpilih (ayat aktif saja).
  */
 private fun buildFlowAnnotated(
-    fullText: String,
-    wordStarts: List<IntArray>,
-    wordsByAyah: List<List<String>>,
-    spansByWord: List<List<List<TajwidSpan>>>,
-    activeIdx: Int,
-    statusByIndex: Map<Int, AlignedWord>,
-    selectedIndex: Int?,
-    tajwidColor: Boolean,
+    params: FlowAnnotatedParams,
 ): AnnotatedString = buildAnnotatedString {
-    append(fullText)
-    wordStarts.forEachIndexed { i, ws ->
-        val words = wordsByAyah[i]
-        val isActive = i == activeIdx
+    append(params.fullText)
+    params.wordStarts.forEachIndexed { i, ws ->
+        val words = params.wordsByAyah[i]
+        val isActive = i == params.activeIdx
         ws.forEachIndexed { j, start ->
             val wordLength = words.getOrNull(j)?.length ?: 0
-            val s0 = start.coerceIn(0, fullText.length)
-            val end = (s0 + wordLength).coerceAtMost(fullText.length)
-            if (tajwidColor) {
-                for (sp in spansByWord[i].getOrNull(j).orEmpty()) {
+            val s0 = start.coerceIn(0, params.fullText.length)
+            val end = (s0 + wordLength).coerceAtMost(params.fullText.length)
+            if (params.tajwidColor) {
+                for (sp in params.spansByWord[i].getOrNull(j).orEmpty()) {
                     val color = tajwidColorFor(sp.category) ?: continue
                     addStyle(
                         SpanStyle(color = color),
                         s0 + sp.start.coerceAtMost(wordLength),
-                        (s0 + sp.end.coerceAtMost(wordLength)).coerceAtMost(fullText.length),
+                        (s0 + sp.end.coerceAtMost(wordLength)).coerceAtMost(params.fullText.length),
                     )
                 }
             }
             if (isActive) {
-                val bg = when (statusByIndex[j]?.status) {
+                val bg = when (params.statusByIndex[j]?.status) {
                     WordStatus.CORRECT -> AyahColors.Success.copy(alpha = 0.22f)
                     WordStatus.MISMATCH -> AyahColors.Error.copy(alpha = 0.22f)
                     WordStatus.READING -> AyahColors.Reading.copy(alpha = 0.5f)
@@ -1151,7 +1181,7 @@ private fun buildFlowAnnotated(
                     else -> null
                 }
                 if (bg != null) addStyle(SpanStyle(background = bg), s0, end)
-                if (selectedIndex == j) {
+                if (params.selectedIndex == j) {
                     addStyle(
                         SpanStyle(
                             background = AyahColors.Primary.copy(alpha = 0.42f),
