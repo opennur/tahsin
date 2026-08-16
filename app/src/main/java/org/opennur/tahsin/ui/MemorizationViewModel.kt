@@ -127,7 +127,7 @@ class MemorizationViewModel @Inject constructor(
         }
     }
 
-    private fun seedCards(target: MemorizationTarget) {
+    private suspend fun seedCards(target: MemorizationTarget) {
         val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
             ?: AppLanguage.ID
         val cards = when (target) {
