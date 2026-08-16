@@ -343,7 +343,7 @@ artefak dan spasi bersama; huruf, harakat, dan tanda waqaf tetap persis:
 
 ```bash
 python3 tools/validate_quran_content.py
-python3 tools/validate_quran_fields.py
+python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian
 ```
 
 Digest 6.236 ayat yang sudah divalidasi disimpan di

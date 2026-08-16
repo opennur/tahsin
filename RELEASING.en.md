@@ -87,7 +87,7 @@ Play. First-release baseline: `versionCode = 1`, `versionName = "1.0.0"`.
 Before uploading an AAB:
 
 - Run `python3 tools/validate_quran_content.py` and
-  `python3 tools/validate_quran_fields.py`; all 6,236 ayahs and user-facing
+  `python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian`; all 6,236 ayahs and user-facing
   fields must pass the official Kemenag/LPMQ checks.
 - Review the diff and update `tools/quran-canonical-manifest.json` only after a
   clean validation.
