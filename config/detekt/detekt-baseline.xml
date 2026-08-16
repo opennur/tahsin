@@ -27,6 +27,7 @@
     <ID>CyclomaticComplexMethod:AyatQuizScreen.kt$@Composable private fun QuestionCard( state: AyatQuizUiState, strings: Strings, fontFamily: FontFamily, onAnswer: (String) -&gt; Unit, onNext: () -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:LughohScreen.kt$@OptIn(ExperimentalLayoutApi::class) @Composable private fun LughohExercisesView( state: LughohUiState, strings: Strings, onBack: () -&gt; Unit, onAnswer: (String) -&gt; Unit, onTapChip: (Int) -&gt; Unit, onCheckRearrange: () -&gt; Unit, onNext: () -&gt; Unit, onRestart: () -&gt; Unit, onBackToHome: () -&gt; Unit, arabicFamily: FontFamily, )</ID>
     <ID>CyclomaticComplexMethod:MainActivity.kt$MainActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
+    <ID>CyclomaticComplexMethod:AppScreen.kt$AppScreen.Companion$fun fromTag(tag: String): AppScreen</ID>
     <ID>CyclomaticComplexMethod:TajwidEngine.kt$TajwidEngine$fun analyzeWord(word: String, prevWord: String? = null, nextWord: String? = null): List&lt;TajwidRule&gt;</ID>
     <ID>CyclomaticComplexMethod:TahsinScreen.kt$@Composable private fun MushafPageView( state: TahsinUiState.Ready, pageIndex: Int, strings: Strings, actions: MushafPageActions, )</ID>
     <ID>CyclomaticComplexMethod:TahsinScreen.kt$@Composable private fun SurahFlowBlock( ayahs: List&lt;MushafAyah&gt;, state: TahsinUiState.Ready, strings: Strings, actions: SurahFlowActions, )</ID>
@@ -38,7 +39,7 @@
     <ID>LongMethod:TahsinScreen.kt$@Composable private fun TahsinContent( state: TahsinUiState.Ready, actions: TahsinContentActions, modifier: Modifier = Modifier, )</ID>
     <ID>LongMethod:TahsinScreen.kt$@Composable private fun MushafPageView( state: TahsinUiState.Ready, pageIndex: Int, strings: Strings, actions: MushafPageActions, )</ID>
     <ID>LongMethod:TahsinScreen.kt$@Composable private fun SurahFlowBlock( ayahs: List&lt;MushafAyah&gt;, state: TahsinUiState.Ready, strings: Strings, actions: SurahFlowActions, )</ID>
-    <ID>LongMethod:StatsScreen.kt$@Composable fun StatsScreen( onBack: () -&gt; Unit, onOpenAyah: (Int, Int) -&gt; Unit = { _, _ -&gt; }, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:StatsScreen.kt$@Composable fun StatsScreen( onBack: () -&gt; Unit, onOpenAyah: (Int, Int) -&gt; Unit = { _, _ -&gt; }, onOpenPetaKhatam: () -&gt; Unit = {}, modifier: Modifier = Modifier, )</ID>
     <ID>LongMethod:TajwidEngine.kt$TajwidEngine$fun analyzeWord(word: String, prevWord: String? = null, nextWord: String? = null): List&lt;TajwidRule&gt;</ID>
     <ID>LongMethod:TajwidQuizScreen.kt$@Composable private fun QuestionCard( question: QuizQuestion, selected: String?, ayahLabel: String, translation: String, language: AppLanguage, strings: Strings, fontFamily: FontFamily, onAnswer: (String) -&gt; Unit, onNext: () -&gt; Unit, )</ID>
     <ID>LongMethod:VocabularyScreen.kt$@Composable fun VocabularyScreen( onBack: () -&gt; Unit, onOpenAyah: (surah: Int, ayah: Int) -&gt; Unit, modifier: Modifier = Modifier, )</ID>

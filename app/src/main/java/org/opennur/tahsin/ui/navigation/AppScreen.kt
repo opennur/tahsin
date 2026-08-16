@@ -23,6 +23,7 @@ sealed interface AppScreen {
     data object Coherence : AppScreen
     data object Favorites : AppScreen
     data object Settings : AppScreen
+    data object PetaKhatam : AppScreen
     /** Tag unik per layar (dipakai rememberSaveable untuk rotasi layar). */
     val tag: String get() = javaClass.simpleName
 
@@ -44,6 +45,7 @@ sealed interface AppScreen {
             "Coherence" -> Coherence
             "Favorites" -> Favorites
             "Settings" -> Settings
+            "PetaKhatam" -> PetaKhatam
             else -> Home
         }
     }
