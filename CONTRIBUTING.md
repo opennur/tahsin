@@ -118,7 +118,7 @@ Aturan praktis:
   (`src/main/assets/quran/`) — kalau kamu mengubah data/pipeline, tes ini yang
   bilang "jangan".
 - **Unit test ViewModel** (`FavoritesViewModelTest`, `GamificationViewModelTest`,
-  `StatsViewModelTest`) memakai **MockK** (mock `QuranRepository`/store/settings)
+  `StatsViewModelTest`) memakai **fake eksplisit** untuk repository/store/settings
   + store file temp + **Turbine** (`state.test { ... }`) + **Truth**
   (`assertThat(...)`) + `kotlinx-coroutines-test`
   (`Dispatchers.setMain(UnconfinedTestDispatcher())` di `@Before`,

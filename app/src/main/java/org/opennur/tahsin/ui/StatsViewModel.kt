@@ -5,18 +5,15 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import org.opennur.tahsin.data.dreambig.DreamBigGame
+import org.opennur.tahsin.data.learning.LearningGoal
+import org.opennur.tahsin.data.learning.LearningPlanEngine
 import org.opennur.tahsin.data.lughoh.LughohEngine
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.util.AppLanguage
-import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.Gamification
-import org.opennur.tahsin.util.GamificationStore
-import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.ReadingHistoryEntry
-import org.opennur.tahsin.util.ReadingHistoryStore
-import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SettingsSource
-import org.opennur.tahsin.util.VocabularyStatsStore
+import org.opennur.tahsin.util.StatsStores
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +47,8 @@ data class StatsState(
     val badgesCount: Int = 0,
     val latestBadgeKey: String? = null,
     val latestBadgeTier: Int = 0,
+    val dailyPlanCompleted: Int = 0,
+    val dailyPlanTotal: Int = 0,
     // Riwayat baca (ayat terakhir yang dibuka, terbaru dulu)
     val history: List<ReadingHistoryEntry> = emptyList(),
     val surahNames: Map<Int, String> = emptyMap(),
@@ -57,17 +56,13 @@ data class StatsState(
 
 /**
  * Statistik keseluruhan: agregasi semua challenge — Tahsin (baca Al-Qur'an),
- * Dream BIG (ronde kosakata), Belajar Arab (sesi latihan), dan Kosakata
- * (kata yang dikuasai). Sumber: store persisten masing-masing fitur.
+ * Dream BIG (ronde kosakata), Belajar Arab (sesi latihan), Kosakata
+ * (kata yang dikuasai), serta progres rencana harian. Sumber: store persisten
+ * masing-masing fitur.
  */
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val statsStore: ReadingStatsStore,
-    private val vocabStatsStore: VocabularyStatsStore,
-    private val dreamBigStore: DreamBigProgressStore,
-    private val lughohStore: LughohProgressStore,
-    private val gamificationStore: GamificationStore,
-    private val readingHistory: ReadingHistoryStore,
+    private val stores: StatsStores,
     private val repository: QuranRepository,
     private val settings: SettingsSource,
 ) : ViewModel() {
@@ -79,21 +74,30 @@ class StatsViewModel @Inject constructor(
     fun refresh() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val tahsin = statsStore.all()
-            val vocab = vocabStatsStore.read()
-            val dream = dreamBigStore.read()
-            val lughoh = lughohStore.read()
-            val gamification = gamificationStore.read()
+            val tahsin = stores.readingStats.all()
+            val vocab = stores.vocabularyStats.read()
+            val dream = stores.dreamBig.read()
+            val lughoh = stores.lughoh.read()
+            val gamification = stores.gamification.read()
             val today = java.time.LocalDate.now().toEpochDay()
             val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
                 ?: AppLanguage.ID
+            val goal = LearningGoal.fromKey(settings.learningGoalKey)
+            val planKeys = LearningPlanEngine.taskTypesFor(goal).map { it.key }.toSet()
+            val planSnapshot = stores.learningPlan.read()
+            val planCompleted = if (planSnapshot.day == today && planSnapshot.goalKey == goal.key) {
+                planSnapshot.completedKeys.count { it in planKeys }
+            } else {
+                0
+            }
+            val planTotal = planKeys.size
 
             val tahsinAttempts = tahsin.sumOf { it.attempts }
             val tahsinBestPct = tahsin.maxOfOrNull { it.bestScore } ?: 0
             val dreamBestPct = dream.bestScore * 100 / DreamBigGame.QUESTIONS_PER_ROUND
             val lughohBestPct = lughoh.bestScore * 100 / LughohEngine.SESSION_SIZE
             val wordsMastered = vocab.cards.values.count { it.correctCount > 0 }
-            val history = readingHistory.load()
+            val history = stores.readingHistory.load()
             val names = repository.surahList().associate { it.number to it.nameLatin }
 
             _state.value = StatsState(
@@ -117,7 +121,10 @@ class StatsViewModel @Inject constructor(
                 latestBadgeTier = gamification.badgeTiers.entries.lastOrNull()?.value ?: 0,
                 history = history,
                 surahNames = names,
+                dailyPlanCompleted = planCompleted,
+                dailyPlanTotal = planTotal,
             )
         }
     }
+
 }

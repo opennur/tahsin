@@ -1,6 +1,7 @@
 package org.opennur.tahsin.ui
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -25,15 +26,19 @@ import org.opennur.tahsin.util.DreamBigStats
 import org.opennur.tahsin.util.GamificationStore
 import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.LughohStats
+import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SearchableAyah
 import org.opennur.tahsin.util.SettingsSource
+import org.opennur.tahsin.util.StatsStores
 import org.opennur.tahsin.util.VocabularyStatsStore
 import java.io.File
 import java.nio.file.Files
+import java.time.LocalDate
 
 /** Tes agregasi StatsViewModel dengan store file temp + fake repository. */
+@OptIn(ExperimentalCoroutinesApi::class)
 class StatsViewModelTest {
 
     private lateinit var dir: File
@@ -69,12 +74,15 @@ class StatsViewModelTest {
 
     private fun vm(code: String = "id", repo: QuranRepository = fakeRepo()): StatsViewModel =
         StatsViewModel(
-            statsStore = ReadingStatsStore(File(dir, "reading_stats.json")),
-            vocabStatsStore = VocabularyStatsStore(File(dir, "vocab_stats.json")),
-            dreamBigStore = DreamBigProgressStore(File(dir, "dream_big.json")),
-            lughohStore = LughohProgressStore(File(dir, "lughoh.json")),
-            gamificationStore = GamificationStore(File(dir, "gamification.json")),
-            readingHistory = ReadingHistoryStore(File(dir, "reading_history.json")),
+            stores = StatsStores(
+                readingStats = ReadingStatsStore(File(dir, "reading_stats.json")),
+                vocabularyStats = VocabularyStatsStore(File(dir, "vocab_stats.json")),
+                dreamBig = DreamBigProgressStore(File(dir, "dream_big.json")),
+                lughoh = LughohProgressStore(File(dir, "lughoh.json")),
+                gamification = GamificationStore(File(dir, "gamification.json")),
+                readingHistory = ReadingHistoryStore(File(dir, "reading_history.json")),
+                learningPlan = LearningPlanStore(File(dir, "learning_plan.json")),
+            ),
             repository = repo,
             settings = settings(code),
         )
@@ -135,5 +143,21 @@ class StatsViewModelTest {
         assertEquals(0, state.wordsMastered)
         assertTrue(state.history.isEmpty())
         assertEquals(0, state.bestScorePct)
+    }
+
+    @Test
+    fun `rencana harian tampil di statistik`() {
+        LearningPlanStore(File(dir, "learning_plan.json")).markComplete(
+            day = LocalDate.now().toEpochDay(),
+            goalKey = "recitation",
+            taskKey = "recite",
+        )
+
+        val v = vm()
+        v.refresh()
+        val state = awaitState(v.state)
+
+        assertEquals(1, state.dailyPlanCompleted)
+        assertEquals(3, state.dailyPlanTotal)
     }
 }

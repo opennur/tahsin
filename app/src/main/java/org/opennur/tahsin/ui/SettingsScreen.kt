@@ -51,30 +51,54 @@ import org.opennur.tahsin.util.next
  * Layar Pengaturan penuh — pengganti drawer: semua setelan aplikasi dalam satu
  * layar mandiri (dibuka dari portal atau ikon ⚙ di Tahsin).
  */
+data class SettingsAppearanceActions(
+    val onToggleTajwidColor: () -> Unit,
+    val onToggleTranslation: () -> Unit,
+    val onToggleDarkMode: () -> Unit,
+    val onSetLanguage: (AppLanguage) -> Unit,
+    val onEditLearningPlan: () -> Unit,
+)
+
+data class SettingsAudioActions(
+    val onSetReciter: (Reciter) -> Unit,
+    val onSetSpeed: (Float) -> Unit,
+)
+
+data class SettingsNotificationActions(
+    val onToggleAyahOfDay: () -> Unit,
+    val onToggleStreakReminder: () -> Unit,
+)
+
+data class SettingsActions(
+    val appearance: SettingsAppearanceActions,
+    val audio: SettingsAudioActions,
+    val notifications: SettingsNotificationActions,
+    val onDownloadAll: () -> Unit,
+    val onOpenAudioManager: () -> Unit,
+)
+
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
     settings: SettingsUiState,
-    onToggleTajwidColor: () -> Unit,
-    onToggleTranslation: () -> Unit,
-    onToggleDarkMode: () -> Unit,
-    onSetLanguage: (AppLanguage) -> Unit,
-    onSetReciter: (Reciter) -> Unit,
-    onSetSpeed: (Float) -> Unit,
-    onToggleAyahOfDay: () -> Unit,
-    onToggleStreakReminder: () -> Unit,
-    onDownloadAll: () -> Unit,
-    onOpenAudioManager: () -> Unit,
+    actions: SettingsActions,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val strings = AppStrings.of(settings.language)
-    val languageName = if (settings.language == AppLanguage.ID) strings.languageNameId else strings.languageNameEn
 
     // Izin notifikasi (Android 13+) diminta saat user menghidupkan notifikasi harian.
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { /* keputusan dipakai otomatis oleh postNotification */ }
+    val requestNotificationPermission = {
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     Column(
         modifier = modifier
@@ -82,8 +106,8 @@ fun SettingsScreen(
             .background(AyahColors.Background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(horizontal = 20.dp, vertical = 16.dp),
-    ) {
-        // ---- Header: kembali + judul ----
+        ) {
+            // ---- Header: kembali + judul ----
         Row(verticalAlignment = Alignment.CenterVertically) {
             AyahButton(
                 text = "←",
@@ -102,120 +126,23 @@ fun SettingsScreen(
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
         ) {
-            // ---- Tampilan: warna tajwid, flow, mode gelap, bahasa ----
-            SectionLabel(strings.sectionAppearance)
-            Spacer(modifier = Modifier.height(6.dp))
-            SettingRow(
-                label = "🎨 ${strings.settingTajwid}",
-                checked = settings.tajwidColor,
-                onCheckedChange = onToggleTajwidColor,
-            )
-            SettingRow(
-                label = "🌐 ${strings.tahsinTranslation}",
-                checked = settings.showTranslation,
-                onCheckedChange = onToggleTranslation,
-            )
-            SettingRow(
-                label = "🌙 ${strings.settingDarkMode}",
-                checked = settings.darkMode,
-                onCheckedChange = onToggleDarkMode,
-            )
-            SettingRow(
-                label = "🌐 ${strings.settingLanguage}",
-                value = languageName,
-                onClick = { onSetLanguage(settings.language.next()) },
-            )
+            SettingsAppearanceSection(settings, strings, actions.appearance)
 
             SectionDivider()
 
-            // ---- Audio: qari' + kecepatan ----
-            SectionLabel(strings.sectionReciter)
-            Spacer(modifier = Modifier.height(6.dp))
-            SimpleDropdown(
-                selectedLabel = settings.reciter.label,
-                options = Reciter.entries.map { r -> DropdownOption(r.label) { onSetReciter(r) } },
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-            SectionLabel(strings.sectionSpeed)
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AyahSlider(
-                    value = settings.audioSpeed,
-                    onValueChange = onSetSpeed,
-                    modifier = Modifier.weight(1f),
-                    valueRange = AudioSpeeds.MIN..AudioSpeeds.MAX,
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                AyahText(
-                    AudioSpeeds.format(settings.audioSpeed),
-                    style = AyahTypography.Caption.copy(
-                        color = AyahColors.Primary,
-                        fontWeight = FontWeight.SemiBold,
-                    ),
-                    modifier = Modifier.width(52.dp),
-                )
-            }
+            SettingsAudioSection(settings, strings, actions.audio)
 
             SectionDivider()
 
-            // ---- Aksi: Kelola Audio (pindah dari menu utama) + Unduh Semua ----
-            SectionLabel(strings.sectionMenu)
-            Spacer(modifier = Modifier.height(8.dp))
-            AyahButton(
-                text = strings.menuAudio,
-                variant = AyahButtonVariant.Outline,
-                onClick = onOpenAudioManager,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            AyahButton(
-                text = strings.menuDownloadAll,
-                variant = if (settings.isDownloading) AyahButtonVariant.Outline else AyahButtonVariant.Primary,
-                onClick = onDownloadAll,
-                enabled = !settings.isDownloading,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            if (settings.isDownloading) {
-                Spacer(modifier = Modifier.height(8.dp))
-                AyahText(
-                    "${settings.downloadDone} / ${settings.downloadTotal}",
-                    style = AyahTypography.Caption.copy(color = AyahColors.Primary),
-                )
-            }
+            SettingsDownloadSection(settings, strings, actions)
 
             SectionDivider()
 
-            // ---- Ayah of the Day ----
-            SettingRow(
-                label = "🗓️ ${strings.sectionDaily}",
-                checked = settings.ayahOfDayEnabled,
-                onCheckedChange = {
-                    // Menghidupkan notifikasi tanpa izin (API 33+) → minta izin dulu.
-                    if (!settings.ayahOfDayEnabled && Build.VERSION.SDK_INT >= 33 &&
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
-                        PackageManager.PERMISSION_GRANTED
-                    ) {
-                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                    onToggleAyahOfDay()
-                },
-            )
-
-            // ---- Pengingat streak ----
-            SettingRow(
-                label = "🔥 ${strings.sectionStreakReminder}",
-                checked = settings.streakReminderEnabled,
-                onCheckedChange = {
-                    if (!settings.streakReminderEnabled && Build.VERSION.SDK_INT >= 33 &&
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
-                        PackageManager.PERMISSION_GRANTED
-                    ) {
-                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                    onToggleStreakReminder()
-                },
+            SettingsNotificationSection(
+                settings = settings,
+                strings = strings,
+                actions = actions.notifications,
+                requestNotificationPermission = requestNotificationPermission,
             )
 
             SectionDivider()
@@ -223,6 +150,123 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
+}
+
+@Composable
+private fun SettingsAppearanceSection(
+    settings: SettingsUiState,
+    strings: Strings,
+    actions: SettingsAppearanceActions,
+) {
+    val languageName = if (settings.language == AppLanguage.ID) strings.languageNameId else strings.languageNameEn
+    SectionLabel(strings.sectionAppearance)
+    Spacer(modifier = Modifier.height(6.dp))
+    SettingRow("🎨 ${strings.settingTajwid}", settings.tajwidColor, actions.onToggleTajwidColor)
+    SettingRow("🌐 ${strings.tahsinTranslation}", settings.showTranslation, actions.onToggleTranslation)
+    SettingRow("🌙 ${strings.settingDarkMode}", settings.darkMode, actions.onToggleDarkMode)
+    SettingRow(
+        label = "🌐 ${strings.settingLanguage}",
+        value = languageName,
+        onClick = { actions.onSetLanguage(settings.language.next()) },
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    AyahButton(
+        text = strings.settingLearningPlan,
+        variant = AyahButtonVariant.Outline,
+        onClick = actions.onEditLearningPlan,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun SettingsAudioSection(
+    settings: SettingsUiState,
+    strings: Strings,
+    actions: SettingsAudioActions,
+) {
+    SectionLabel(strings.sectionReciter)
+    Spacer(modifier = Modifier.height(6.dp))
+    SimpleDropdown(
+        selectedLabel = settings.reciter.label,
+        options = Reciter.entries.map { r -> DropdownOption(r.label) { actions.onSetReciter(r) } },
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+    SectionLabel(strings.sectionSpeed)
+    Spacer(modifier = Modifier.height(6.dp))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        AyahSlider(
+            value = settings.audioSpeed,
+            onValueChange = actions.onSetSpeed,
+            modifier = Modifier.weight(1f),
+            valueRange = AudioSpeeds.MIN..AudioSpeeds.MAX,
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        AyahText(
+            AudioSpeeds.format(settings.audioSpeed),
+            style = AyahTypography.Caption.copy(
+                color = AyahColors.Primary,
+                fontWeight = FontWeight.SemiBold,
+            ),
+            modifier = Modifier.width(52.dp),
+        )
+    }
+}
+
+@Composable
+private fun SettingsDownloadSection(
+    settings: SettingsUiState,
+    strings: Strings,
+    actions: SettingsActions,
+) {
+    SectionLabel(strings.sectionMenu)
+    Spacer(modifier = Modifier.height(8.dp))
+    AyahButton(
+        text = strings.menuAudio,
+        variant = AyahButtonVariant.Outline,
+        onClick = actions.onOpenAudioManager,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    AyahButton(
+        text = strings.menuDownloadAll,
+        variant = if (settings.isDownloading) AyahButtonVariant.Outline else AyahButtonVariant.Primary,
+        onClick = actions.onDownloadAll,
+        enabled = !settings.isDownloading,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    if (settings.isDownloading) {
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahText(
+            "${settings.downloadDone} / ${settings.downloadTotal}",
+            style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+        )
+    }
+}
+
+@Composable
+private fun SettingsNotificationSection(
+    settings: SettingsUiState,
+    strings: Strings,
+    actions: SettingsNotificationActions,
+    requestNotificationPermission: () -> Unit,
+) {
+    SettingRow(
+        label = "🗓️ ${strings.sectionDaily}",
+        checked = settings.ayahOfDayEnabled,
+        onCheckedChange = {
+            if (!settings.ayahOfDayEnabled) requestNotificationPermission()
+            actions.onToggleAyahOfDay()
+        },
+    )
+    SettingRow(
+        label = "🔥 ${strings.sectionStreakReminder}",
+        checked = settings.streakReminderEnabled,
+        onCheckedChange = {
+            if (!settings.streakReminderEnabled) requestNotificationPermission()
+            actions.onToggleStreakReminder()
+        },
+    )
 }
 
 /** Pembatas seksi tipis. */

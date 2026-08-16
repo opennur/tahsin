@@ -151,8 +151,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     // Robolectric: framework Android di JVM headless (tanpa emulator).
     testImplementation(libs.robolectric)
-    // MockK (mocking) + Turbine (Flow) + Truth (assertion).
-    testImplementation(libs.mockk)
+    // Turbine (Flow) + Truth (assertion); ViewModel tests use explicit fakes.
     testImplementation(libs.turbine)
     testImplementation(libs.truth)
     // ApplicationProvider.getApplicationContext() di test Robolectric.

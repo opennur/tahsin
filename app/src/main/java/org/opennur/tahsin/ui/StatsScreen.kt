@@ -185,6 +185,20 @@ fun StatsScreen(
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
+                    AyahCard(modifier = Modifier.fillMaxWidth()) {
+                        AyahText(
+                            strings.statsPlanLine.format(
+                                state.dailyPlanCompleted,
+                                state.dailyPlanTotal,
+                            ),
+                            style = AyahTypography.Body2.copy(
+                                color = AyahColors.Primary,
+                                fontWeight = FontWeight.SemiBold,
+                            ),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // ---- Rincian per fitur ----
                     AyahCard(modifier = Modifier.fillMaxWidth()) {

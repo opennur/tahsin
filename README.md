@@ -6,7 +6,7 @@ Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf halaman
 ala mushaf Madani (teks ayat mengalir menyambung dari kanan ke kiri), penilaian
 bacaan real-time lewat mikrofon, pewarnaan huruf tajwid, audio qari per ayat +
 per kata, dan **mode pemutaran audio** (satu ayat / lanjut terus / ulang terus)
-— plus **jalur belajar Qur'an & Bahasa Arab**: Kosakata, Kuis Tajwid, game
+— plus **jalur belajar Qur'an & Bahasa Arab**: rencana belajar harian, Kosakata, Kuis Tajwid, game
 **Dream BIG** (arcade), kursus **Belajar Arab** (metodologi ala Durusul
 Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 
@@ -24,11 +24,19 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 ## Fitur
 
 - 🧭 **Menu utama** (layar beranda): semua fitur dibuka lewat kartu menu —
-  **Tahsin**, **Kosakata**, **Kuis Tajwid**, **Statistik**, **Dream BIG**,
+  **Tahsin**, **Kosakata**, **Hafalan**, **Kuis Tajwid**, **Statistik**, **Dream BIG**,
   **Belajar Arab**, **Kuis Ayat**, **Penghargaan**, **Studi Coherence**,
-  **Ayat Favorit**, dan **Pengaturan**.
+  **Ayat Favorit**, dan **Pengaturan**. Ada juga **Rencana Hari Ini** dan
+  jalur **Hafalan & Muraja'ah**.
   (Pencarian ayat & Kelola Audio dipindah: 🔍 di header Tahsin, 🎵 di
   Pengaturan.)
+- 🧭 **Rencana belajar terpandu**: saat pertama dibuka, pilih fokus (bacaan,
+  pemahaman, hafalan, atau Bahasa Arab) dan target waktu harian. Beranda lalu
+  menampilkan tiga tugas deterministik dan menyimpan penyelesaiannya secara lokal.
+- 🧠 **Hafalan & Muraja'ah**: antrean pengulangan berjeda yang offline, dimulai
+  dari ayat-ayat Al-Fatihah yang sudah di-bundle. Buka ayat, tandai ingat atau
+  perlu diulang, lalu buka langsung di Tahsin. Ini alat bantu latihan, bukan
+  penilaian setara guru; yang disimpan hanya metadata pengulangan.
 - 📖 **Mushaf halaman ala mushaf Madani asli** — navigasi per HALAMAN (604 halaman,
   alur RTL seperti membuka mushaf cetak), **teks ayat mengalir menyambung dari
   kanan ke kiri** (ayat pendek di juz 30 tidak bertumpuk satu per baris),
@@ -85,7 +93,7 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 - 🎮 **XP, Level & Streak**: setiap aktivitas belajar memberi XP — bacaan
   Tahsin (skor ≥70: 5 XP, ≥90: 10 XP), jawaban benar kuis (2 XP), kata
   kosakata baru dikuasai (10 XP), ronde Dream BIG (15 XP), sesi Belajar Arab
-  (10 XP). Level naik dengan kurva kuadratik (`√(XP/100)`), **streak hari
+  (10 XP), review hafalan berhasil (5 XP). Level naik dengan kurva kuadratik (`√(XP/100)`), **streak hari
   beruntun** dihitung per hari kalender, dan **target harian 50 XP** tampil
   dengan progress bar di beranda & Statistik. Naik level, capaian streak
   (3/7/14/30 hari), atau badge baru dirayakan lewat dialog + getar.
@@ -185,6 +193,7 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   + TajwidQuiz (kuis "hukum apa pada kata ini?")
 ├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
 │                   #   (1.200 kata terkurasi → assets/quran/vocab.json)
+├── data/learning/  # Rencana belajar harian + aturan pengulangan hafalan
 ├── data/dreambig/  # DreamBigGame (ronde arcade); Models/Parser/Repository
 │                   #   lama (era level/transkrip) = dead code yang dipertahankan
 ├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 pelajaran orisinal
@@ -194,6 +203,7 @@ app/src/main/java/org/opennur/tahsin/
 ├── stt/            # ArabicSpeechRecognizer + TranscriptAligner (Levenshtein)
 ├── ui/             # TahsinScreen/VM, AudioManagerScreen/VM, StatsScreen/VM
 │                   #   (statistik gabungan semua challenge), SearchScreen/VM,
+│                   #   LearningPlanViewModel, MemorizationScreen/VM,
 │                   #   TajwidQuizScreen/VM, VocabularyScreen/VM,
 │                   #   DreamBigScreen/VM (arcade), LughohScreen/VM (arcade),
 │                   #   AyatQuizScreen/VM (Kuis Ayat), BadgesScreen/VM
@@ -207,7 +217,8 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   ReadingStatsStore (riwayat bacaan per ayat, JSON filesDir),
 │                   #   VocabularyStatsStore, DreamBigProgressStore, LughohProgressStore,
 │                   #   Achievements (8 badge progresif, tier tak terbatas),
-│                   #   GamificationStore/Hub/Events (XP, level, streak, perayaan),
+│                   #   LearningPlanStore, MemorizationStore, GamificationStore/Hub/Events
+│                   #   (XP, level, streak, perayaan),
 │                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
 │                   #   Reciter (qari' everyayah + kecepatan audio slider 0.25×–2.0×),
 │                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
@@ -299,8 +310,8 @@ sdkmanager "platforms;android-35"
 - **Robolectric** — framework Android (assets, resources, filesDir, DataStore)
   berjalan di JVM tanpa emulator; dipakai untuk `SettingsStore` (DataStore),
   `AyahOfTheDayManager` (cache + bahasa), dan `PreferencesStore`.
-- **MockK** — mocking dependensi di tes ViewModel (`FavoritesViewModelTest`,
-  `GamificationViewModelTest`).
+- **Fake eksplisit** — dependensi ViewModel deterministik tanpa attachment agent
+  JVM (`FavoritesViewModelTest`, `GamificationViewModelTest`).
 - **Turbine** — koleksi `StateFlow`/`Flow` per-emisi di tes ViewModel.
 - **Truth** — assertion readable (`assertThat(...)`).
 
@@ -351,7 +362,7 @@ parser → engine (`meaningOfWord` untuk kata terfrequent; soal `AyatQuiz` valid
 dari ayat asli).
 
 Unit test **logika ViewModel** (`FavoritesViewModelTest`, `StatsViewModelTest`,
-`GamificationViewModelTest`) berjalan di JVM dengan MockK/fake repository/store
+`GamificationViewModelTest`) berjalan di JVM dengan fake repository/store
 + `kotlinx-coroutines-test` (`Dispatchers.setMain`) + Turbine.
 
 Semua ViewModel memakai `@HiltViewModel` + konstruktor `@Inject` — di tes mereka

@@ -6,8 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.Gamification
-import org.opennur.tahsin.util.GamificationStore
-import org.opennur.tahsin.util.SettingsStore
+import org.opennur.tahsin.util.GamificationReader
+import org.opennur.tahsin.util.SettingsSource
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,8 +38,8 @@ data class GamificationUiState(
  */
 @HiltViewModel
 class GamificationViewModel @Inject constructor(
-    private val gamificationStore: GamificationStore,
-    private val settings: SettingsStore,
+    private val gamificationReader: GamificationReader,
+    private val settings: SettingsSource,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GamificationUiState())
@@ -53,7 +53,7 @@ class GamificationViewModel @Inject constructor(
     fun refresh() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val stats = gamificationStore.read()
+            val stats = gamificationReader.read()
             val today = LocalDate.now().toEpochDay()
             _state.value = GamificationUiState(
                 isLoading = false,

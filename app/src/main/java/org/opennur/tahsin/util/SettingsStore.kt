@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import org.opennur.tahsin.data.learning.LearningGoal
 
 /**
  * Subset setelan yang dipakai ViewModel yang diuji — interface kecil supaya
@@ -15,6 +16,10 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 interface SettingsSource {
     /** Kode bahasa aktif ("id" / "en"). */
     val languageCode: String
+
+    /** Primary learning goal; simple fakes can keep the default for unrelated tests. */
+    val learningGoalKey: String
+        get() = LearningGoal.RECITATION.key
 }
 
 /**
@@ -114,6 +119,24 @@ class SettingsStore(context: Context) : SettingsSource {
         get() = FontScales.clamp(prefs[Keys.FONT_SCALE] ?: 1.5f)
         set(value) = store.edit { this[Keys.FONT_SCALE] = FontScales.clamp(value) }
 
+    /** Whether the user has completed the first-run learning setup. */
+    var onboardingComplete: Boolean
+        get() = prefs[Keys.ONBOARDING_COMPLETE] ?: false
+        set(value) = store.edit { this[Keys.ONBOARDING_COMPLETE] = value }
+
+    /** Selected primary learning goal; unknown persisted values fall back safely. */
+    override var learningGoalKey: String
+        get() = prefs[Keys.LEARNING_GOAL] ?: LearningGoal.RECITATION.key
+        set(value) = store.edit { this[Keys.LEARNING_GOAL] = value }
+
+    val learningGoal: LearningGoal
+        get() = LearningGoal.fromKey(learningGoalKey)
+
+    /** Daily target in minutes, constrained to the supported onboarding choices. */
+    var dailyMinutes: Int
+        get() = (prefs[Keys.DAILY_MINUTES] ?: 15).coerceIn(5, 60)
+        set(value) = store.edit { this[Keys.DAILY_MINUTES] = value.coerceIn(5, 60) }
+
     /** Nama key DataStore (sama dengan key SharedPreferences lama — migrasi 1:1). */
     private object Keys {
         val DARK_MODE = booleanPreferencesKey("dark_mode")
@@ -130,6 +153,9 @@ class SettingsStore(context: Context) : SettingsSource {
         val RECITER_SLUG = stringPreferencesKey("reciter_slug")
         val AUDIO_SPEED = floatPreferencesKey("audio_speed")
         val FONT_SCALE = floatPreferencesKey("font_scale")
+        val ONBOARDING_COMPLETE = booleanPreferencesKey("onboarding_complete")
+        val LEARNING_GOAL = stringPreferencesKey("learning_goal")
+        val DAILY_MINUTES = intPreferencesKey("daily_minutes")
     }
 }
 

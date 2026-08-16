@@ -2,9 +2,6 @@ package org.opennur.tahsin.ui
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
 import java.io.File
 import java.nio.file.Files
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +24,9 @@ import org.opennur.tahsin.util.SearchableAyah
 import org.opennur.tahsin.util.SettingsSource
 
 /**
- * Tes FavoritesViewModel dengan MockK (mocking) + Turbine (koleksi StateFlow
+ * Tes FavoritesViewModel dengan fake dependencies + Turbine (koleksi StateFlow
  * per-emisi) + Truth (assertion readable). Ini pola baseline MVVM testable:
- * ViewModel dikonstruksi LANGSUNG dengan dependensi mock — tanpa Android,
+ * ViewModel dikonstruksi LANGSUNG dengan dependensi fake — tanpa Android,
  * tanpa Hilt — sehingga logika UI-state bisa diuji di JVM murni.
  *
  * Catatan Turbine + StateFlow: StateFlow bersifat conflating, jadi emisi
@@ -56,24 +53,27 @@ class FavoritesViewModelTest {
         dir.deleteRecursively()
     }
 
-    private fun settings(code: String) = mockk<SettingsSource> {
-        every { languageCode } returns code
+    private fun settings(code: String): SettingsSource = object : SettingsSource {
+        override val languageCode: String = code
     }
 
-    private fun repo(vararg surahs: Surah): QuranRepository = mockk {
-        every { surahList() } returns surahs.toList()
-        every { pagination() } returns MushafPagination(1, 0, emptyList(), emptyList())
-        every { cachedSurahPlain(any()) } answers {
-            surahs.firstOrNull { it.number == firstArg<Int>() }
-        }
-        coEvery { cachedSurah(any(), any()) } answers {
-            surahs.firstOrNull { it.number == firstArg<Int>() }
-        }
-        coEvery { fetchSurah(any(), any()) } answers {
-            surahs.firstOrNull { it.number == firstArg<Int>() }
-                ?: error("fetchSurah(${firstArg<Int>()}) tidak ada di mock")
-        }
-        coEvery { searchIndex() } returns emptyList<SearchableAyah>()
+    private fun repo(vararg surahs: Surah): QuranRepository = object : QuranRepository {
+        override fun surahList(): List<Surah> = surahs.toList()
+
+        override fun pagination(): MushafPagination =
+            MushafPagination(1, 0, emptyList(), emptyList())
+
+        override fun cachedSurahPlain(number: Int): Surah? =
+            surahs.firstOrNull { it.number == number }
+
+        override suspend fun cachedSurah(number: Int, lang: AppLanguage): Surah? =
+            surahs.firstOrNull { it.number == number }
+
+        override suspend fun fetchSurah(number: Int, lang: AppLanguage): Surah =
+            surahs.firstOrNull { it.number == number }
+                ?: error("fetchSurah($number) tidak ada di fake")
+
+        override suspend fun searchIndex(): List<SearchableAyah> = emptyList()
     }
 
     private fun vm(vararg surahs: Surah, code: String = "id"): FavoritesViewModel =

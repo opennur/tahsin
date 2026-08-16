@@ -14,6 +14,7 @@ profiling purposes.
 **None.** All app data is stored **locally on your device**:
 
 - Learning stats, XP, level, streak, and progress;
+- Learning goal, daily plan completion, and memorization review metadata;
 - Favorite ayah bookmarks;
 - Settings (reciter, speed, language, font size, etc.);
 - Downloaded reciter audio;
