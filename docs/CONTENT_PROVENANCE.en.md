@@ -26,7 +26,7 @@ Run the check after every content regeneration:
 
 ```bash
 python3 tools/validate_quran_content.py
-python3 tools/validate_quran_fields.py --ignore-latin
+python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian
 ```
 
 If the canonical source identifies a clear correction, use the guarded repair

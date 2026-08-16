@@ -23,7 +23,7 @@
 ## Quran And Generated Content
 
 - Treat Arabic, harakah, pause marks, transliteration, and translations as correctness-critical content. Do not hand-edit `app/src/main/assets/quran/data/*.json`.
-- Regenerate Quran assets with `python3 tools/fetch_quran_data.py` (idempotent) or `--force`; it applies `tools/quran_text_cleaner.py`. After any regeneration, run both `python3 tools/validate_quran_content.py` and `python3 tools/validate_quran_fields.py --ignore-latin`.
+- Regenerate Quran assets with `python3 tools/fetch_quran_data.py` (idempotent) or `--force`; it applies `tools/quran_text_cleaner.py`. After any regeneration, run both `python3 tools/validate_quran_content.py` and `python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian`.
 - `validate_quran_content.py --fix --write-manifest` is the guarded repair path; inspect the asset diff before accepting changes and only regenerate `tools/quran-canonical-manifest.json` after a clean review.
 - Build or check derived content through its generator: `python3 tools/build_pages.py --check`, `python3 tools/build_vocab.py`, and `python3 tools/build_lughoh.py --check`/`python3 tools/build_lughoh.py`; read `tools/lughoh-schema.md` before editing Learn Arabic content.
 - `pages.json` is Madani metadata for 604 pages and 30 juz; `build_pages.py` must not replace bundled Arabic text. The golden asset tests cover 114 surahs, 6,236 ayahs, pagination, and vocabulary/assets integrity.

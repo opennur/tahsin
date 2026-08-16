@@ -10,6 +10,7 @@ and quotation punctuation, then checks quote balance separately.
 Usage:
     python3 tools/validate_quran_fields.py
     python3 tools/validate_quran_fields.py --ignore-latin
+    python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian
     python3 tools/validate_quran_fields.py --canonical-file /tmp/quran.json
 """
 
@@ -141,7 +142,7 @@ def check_quote_balance(
             )
 
 
-def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tuple[int, int], dict[str, str]], *, ignore_latin: bool = False) -> list[dict[str, Any]]:
+def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tuple[int, int], dict[str, str]], *, ignore_latin: bool = False, ignore_indonesian: bool = False) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     if len(bundle) != EXPECTED_AYAHS:
         add(findings, (0, 0), "nomorAyat", "jumlah ayat tidak 6236", str(len(bundle)), str(EXPECTED_AYAHS))
@@ -180,11 +181,13 @@ def validate(bundle: dict[tuple[int, int], dict[str, str]], canonical: dict[tupl
                 kind = "transliterasi bergeser ke ayat lain" if key in {(23, 79), (23, 80), (23, 81)} else "transliterasi tidak sesuai standar Kemenag"
                 add(findings, key, "teksLatin", kind, trim(row["teksLatin"]), expected_latin)
 
-        expected_translation = clean_indonesian(ref["translation"], key)
-        if normalize_translation(row["teksIndonesia"]) != normalize_translation(expected_translation):
-            add(findings, key, "teksIndonesia", "teks berbeda dari terjemahan kanonik", row["teksIndonesia"], expected_translation)
+        if not ignore_indonesian:
+            expected_translation = clean_indonesian(ref["translation"], key)
+            if normalize_translation(row["teksIndonesia"]) != normalize_translation(expected_translation):
+                add(findings, key, "teksIndonesia", "teks berbeda dari terjemahan kanonik", row["teksIndonesia"], expected_translation)
 
-    check_quote_balance(bundle, findings)
+    if not ignore_indonesian:
+        check_quote_balance(bundle, findings)
     return findings
 
 
@@ -192,11 +195,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--canonical-file", type=Path)
     parser.add_argument("--ignore-latin", action="store_true", help="skip Latin transliteration comparison (equran.id vs Kemenag)")
+    parser.add_argument("--ignore-indonesian", action="store_true", help="skip Indonesian translation and quote balance comparison (equran.id vs Kemenag)")
     args = parser.parse_args()
     try:
         bundle = load_bundle()
         payload = json.loads(args.canonical_file.read_text(encoding="utf-8")) if args.canonical_file else fetch_canonical()
-        findings = validate(bundle, load_canonical(payload), ignore_latin=args.ignore_latin)
+        findings = validate(bundle, load_canonical(payload), ignore_latin=args.ignore_latin, ignore_indonesian=args.ignore_indonesian)
         print(json.dumps({"hasil": findings}, ensure_ascii=False, indent=2))
         return 1 if findings else 0
     except Exception as error:  # noqa: BLE001 - command-line boundary

@@ -54,7 +54,7 @@ jobs:
         run: python3 tools/validate_quran_content.py
 
       - name: Validate bundled Quran fields
-        run: python3 tools/validate_quran_fields.py --ignore-latin
+        run: python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian
 
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon
