@@ -247,6 +247,8 @@ class TahsinViewModel @Inject constructor(
     private var flowRestartJob: Job? = null
     private var recitationFlowActive = false
     private var recitationGeneration = 0L
+    private var accumulatedTranscript = ""
+    private var accumulatedTarget: Pair<Int, Int>? = null
 
     private companion object {
         const val FLOW_RESTART_DELAY_MS = 250L
@@ -639,7 +641,7 @@ class TahsinViewModel @Inject constructor(
         recitationFlowActive = true
         recitationGeneration++
         GamificationEvents.beginSuppression()
-        startListeningSession(s.surahNumber, ayah.number, words, recitationGeneration)
+        startListeningSession(s.surahNumber, ayah.number, words, recitationGeneration, resetProgress = true)
     }
 
     private fun startListeningSession(
@@ -647,29 +649,46 @@ class TahsinViewModel @Inject constructor(
         ayahNumber: Int,
         words: List<String>,
         generation: Long,
+        resetProgress: Boolean,
     ) {
         if (generation != recitationGeneration || words.isEmpty()) return
+        val target = surahNumber to ayahNumber
+        if (resetProgress || accumulatedTarget != target) {
+            accumulatedTranscript = ""
+            accumulatedTarget = target
+        }
+        val displayedTranscript = accumulatedTranscript
         updateReady { it.copy(
             listening = true,
-            transcript = "",
-            alignedWords = emptyList(),
-            issues = emptyList(),
+            transcript = displayedTranscript,
+            alignedWords = if (displayedTranscript.isBlank()) {
+                emptyList()
+            } else {
+                TranscriptAligner.align(displayedTranscript, words)
+            },
+            issues = if (displayedTranscript.isBlank()) emptyList() else issuesFor(displayedTranscript, words),
             message = null,
         ) }
         speech.start(object : ArabicSpeechRecognizer.Listener {
             override fun onPartial(text: String) {
-                if (isCurrentRecitation(surahNumber, ayahNumber, generation)) onTranscript(text, words)
+                if (isCurrentRecitation(surahNumber, ayahNumber, generation)) {
+                    onTranscript(TranscriptAligner.appendTranscript(accumulatedTranscript, text), words)
+                }
             }
 
             override fun onResult(text: String) {
                 if (!isCurrentRecitation(surahNumber, ayahNumber, generation)) return
-                onTranscript(text, words)
-                recordAttempt(text, words)
+                accumulatedTranscript = TranscriptAligner.appendTranscript(accumulatedTranscript, text)
+                onTranscript(accumulatedTranscript, words)
+                val complete = TranscriptAligner.reachesEnd(currentReady()?.alignedWords.orEmpty())
+                if (!complete) {
+                    scheduleFlowRestart(generation)
+                    return
+                }
+                recordAttempt(accumulatedTranscript, words)
                 maybePlayFeedbackTone()
-                if (recitationFlowActive) {
-                    advanceRecitation(generation)
-                } else {
-                    updateReady { it.copy(listening = false) }
+                if (recitationFlowActive) advanceRecitation(generation) else updateReady {
+                    it.copy(listening = false)
                 }
             }
 
@@ -697,7 +716,7 @@ class TahsinViewModel @Inject constructor(
         return generation == recitationGeneration && s.surahNumber == surah && s.ayah?.number == ayah
     }
 
-    private fun scheduleFlowRestart(generation: Long) {
+    private fun scheduleFlowRestart(generation: Long, resetProgress: Boolean = false) {
         flowRestartJob?.cancel()
         flowRestartJob = viewModelScope.launch {
             repeat(FLOW_READY_RETRIES) { attempt ->
@@ -706,7 +725,7 @@ class TahsinViewModel @Inject constructor(
                 if (!recitationFlowActive || generation != recitationGeneration) return@launch
                 val ayah = s.ayah
                 if (ayah != null && ayah.words.isNotEmpty()) {
-                    startListeningSession(s.surahNumber, ayah.number, ayah.words, generation)
+                    startListeningSession(s.surahNumber, ayah.number, ayah.words, generation, resetProgress)
                     return@launch
                 }
                 if (!s.loadingSurah) {
@@ -718,7 +737,7 @@ class TahsinViewModel @Inject constructor(
         }
     }
 
-    private fun scheduleFlowStart(generation: Long) = scheduleFlowRestart(generation)
+    private fun scheduleFlowStart(generation: Long) = scheduleFlowRestart(generation, resetProgress = true)
 
     private fun advanceRecitation(generation: Long) {
         if (!recitationFlowActive || generation != recitationGeneration) return
@@ -748,6 +767,8 @@ class TahsinViewModel @Inject constructor(
         pendingFlowStart = false
         flowRestartJob?.cancel()
         flowRestartJob = null
+        accumulatedTranscript = ""
+        accumulatedTarget = null
         speech.stop()
         GamificationEvents.endSuppression()
         updateReady { it.copy(listening = false, message = message ?: it.message) }
@@ -959,7 +980,17 @@ class TahsinViewModel @Inject constructor(
 
     private fun onTranscript(text: String, words: List<String>) {
         val aligned = TranscriptAligner.align(text, words)
-        val issues = aligned
+        updateReady { it.copy(
+            transcript = text,
+            alignedWords = aligned,
+            issues = issuesFor(aligned, words),
+        ) }
+    }
+
+    private fun issuesFor(text: String, words: List<String>): List<ReadingIssue> =
+        issuesFor(TranscriptAligner.align(text, words), words)
+
+    private fun issuesFor(aligned: List<AlignedWord>, words: List<String>): List<ReadingIssue> = aligned
             .filter { it.status == WordStatus.MISMATCH || it.status == WordStatus.SKIPPED }
             .map { w ->
                 ReadingIssue(
@@ -969,12 +1000,6 @@ class TahsinViewModel @Inject constructor(
                     rules = rulesFor(w.index, words),
                 )
             }
-        updateReady { it.copy(
-            transcript = text,
-            alignedWords = aligned,
-            issues = issues,
-        ) }
-    }
 
     private fun rulesFor(index: Int, words: List<String>): List<TajwidRule> {
         if (index !in words.indices) return emptyList()
