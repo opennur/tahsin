@@ -46,8 +46,8 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   are **hidden by default** (toggle in Settings). Navigation: **3 dropdowns**
   [Surah] [Ayah] [Page] — short labels that never truncate with "…"; a **precision
   font-size slider (100–250%)** lets readers enlarge the mushaf text; **tap a word
-  → tooltip with its meaning (from the curated vocabulary) + tajwid rules** and
-  subtle haptic feedback; wide (tablet) screens are capped at 640dp and centered.
+  → tooltip with its meaning, root, and tajwid rules** from curated vocabulary
+  and morphology data; wide (tablet) screens are capped at 640dp and centered.
 - 🎙️ **Real-time scoring**: words turn green (correct) / red (wrong) / yellow
   (currently being read) as you recite into the microphone (SpeechRecognizer `ar-SA`).
 - 📊 **Aggregate statistics across all challenges** (persistent): the
@@ -56,7 +56,12 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   (sessions & best score), and **Vocabulary** (words mastered). Summary:
   **Total Sessions, Best Score %, Total Rounds, Words Mastered** + a per-feature
   breakdown. The Tahsin main screen still shows the quick line "N× attempted ·
-  best score M%".
+  best score M%". Home also shows the daily XP target, ayahs practiced, good
+  pages, good juz, and ayahs ready for murajaah.
+- 📈 **Progress by surah and juz**: Statistics breaks down practiced ayahs,
+  good scores, mushaf coverage, and due murajaah reviews.
+- 🗺️ **Khatam Map**: a 604-page and 30-juz map with untouched, review-needed,
+  and good statuses; tap a page or juz to open the exact location.
 - 🎨 **Tajwid colors** (on by default, toggleable in Settings): mad (red),
   ghunnah (green), qalqalah (blue), ikhfa' (gray), iqlab (purple), idgham (orange),
   lam jalalah (teal).
@@ -121,7 +126,7 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   or by **ID/EN translation keyword** across all 114 surahs — offline from the
   bundle. Tap a result to jump straight to that ayah; typing is debounced and
   the index is built once.
-- 🔍 **Word panel**: tap a word in the mushaf → tajwid rule + explanation + play
+- 🔍 **Word panel**: tap a word in the mushaf → meaning, root, tajwid rule + explanation + play
   the word audio; the button becomes **⏹ Stop** while the word is playing
   (separate from the "Listen to ayah" button — race-free).
 - 🔊 **Sample audio**: **choose a reciter** (Settings menu): Minshawy, Husary,
@@ -139,6 +144,9 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   and a **list cache** — reopening the screen is instant with no re-scan.
 - 🌙 **Dark mode** & **ID/EN language switch** via the **Settings** menu; every
   screen has a back (←) button at the top left.
+- 💾 **Data export/import**: reading progress, bookmarks, XP, learning plan,
+  memorization, vocabulary, and settings can be exported as JSON and restored
+  from Settings.
 - 🗓️ **"Ayah of the Day" widget + notification** — one ayah that changes daily
   (deterministic per date, offline from the bundled assets). The home-screen
   widget is compact: translation only; the notification shows Arabic + translation.
@@ -219,7 +227,9 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   (XP, level, streak, celebrations),
 │                   #   AyahSearch (normalized Arabic + translation search),
 │                   #   Reciter (everyayah reciters + 0.25×–2.0× audio-speed slider),
-│                   #   AyahOfTheDayManager (daily ayah selection + cache)
+│                   #   AyahOfTheDayManager (daily ayah selection + cache),
+│                   #   ReviewSchedule/ReadingProgress (murajaah + progress aggregation),
+│                   #   BackupManager (local data export/import)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
 

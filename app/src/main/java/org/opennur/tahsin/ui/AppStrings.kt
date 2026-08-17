@@ -32,6 +32,28 @@ data class LearningStrings(
     val onboardingTimeQuestion: String,
     val onboardingMinutes: String,
     val onboardingStart: String,
+    val onboardingFeatureTitle: String,
+    val onboardingFeatureFlow: String,
+    val onboardingFeatureMap: String,
+    val onboardingFeatureRoots: String,
+    val onboardingFeatureBackup: String,
+    val tahsinResultTitle: String,
+    val tahsinResultAyah: String,
+    val tahsinResultScore: String,
+    val tahsinResultHistory: String,
+    val tahsinResultNextReview: String,
+    val homeReadingSummary: String,
+    val homeReadingPages: String,
+    val homeReadingDue: String,
+    val homeOpenMap: String,
+    val statsReadingTitle: String,
+    val statsReadingSummary: String,
+    val statsDueTitle: String,
+    val statsNoDue: String,
+    val statsSurahProgress: String,
+    val statsJuzProgress: String,
+    val statsSurahRow: String,
+    val statsJuzRow: String,
     val memorizationTitle: String,
     val memorizationSubtitle: String,
     val memorizationLoading: String,
@@ -359,6 +381,28 @@ class Strings(
     val onboardingTimeQuestion get() = learning.onboardingTimeQuestion
     val onboardingMinutes get() = learning.onboardingMinutes
     val onboardingStart get() = learning.onboardingStart
+    val onboardingFeatureTitle get() = learning.onboardingFeatureTitle
+    val onboardingFeatureFlow get() = learning.onboardingFeatureFlow
+    val onboardingFeatureMap get() = learning.onboardingFeatureMap
+    val onboardingFeatureRoots get() = learning.onboardingFeatureRoots
+    val onboardingFeatureBackup get() = learning.onboardingFeatureBackup
+    val tahsinResultTitle get() = learning.tahsinResultTitle
+    val tahsinResultAyah get() = learning.tahsinResultAyah
+    val tahsinResultScore get() = learning.tahsinResultScore
+    val tahsinResultHistory get() = learning.tahsinResultHistory
+    val tahsinResultNextReview get() = learning.tahsinResultNextReview
+    val homeReadingSummary get() = learning.homeReadingSummary
+    val homeReadingPages get() = learning.homeReadingPages
+    val homeReadingDue get() = learning.homeReadingDue
+    val homeOpenMap get() = learning.homeOpenMap
+    val statsReadingTitle get() = learning.statsReadingTitle
+    val statsReadingSummary get() = learning.statsReadingSummary
+    val statsDueTitle get() = learning.statsDueTitle
+    val statsNoDue get() = learning.statsNoDue
+    val statsSurahProgress get() = learning.statsSurahProgress
+    val statsJuzProgress get() = learning.statsJuzProgress
+    val statsSurahRow get() = learning.statsSurahRow
+    val statsJuzRow get() = learning.statsJuzRow
     val memorizationTitle get() = learning.memorizationTitle
     val memorizationSubtitle get() = learning.memorizationSubtitle
     val memorizationLoading get() = learning.memorizationLoading
@@ -672,6 +716,28 @@ object AppStrings {
             onboardingTimeQuestion = "Berapa waktu yang ingin kamu sisihkan setiap hari?",
             onboardingMinutes = "%d mnt",
             onboardingStart = "Mulai belajar",
+            onboardingFeatureTitle = "Satu alur belajar yang saling terhubung",
+            onboardingFeatureFlow = "🎙️ Tahsin: baca ayat, lihat skor, lalu dapatkan jadwal murajaah berikutnya.",
+            onboardingFeatureMap = "🗺️ Peta Khatam: pantau halaman dan juz yang sudah kamu latih.",
+            onboardingFeatureRoots = "🌱 Kosakata: lihat arti, contoh ayat, dan akar kata terkait.",
+            onboardingFeatureBackup = "💾 Data tetap lokal dan bisa diekspor atau diimpor dari Pengaturan.",
+            tahsinResultTitle = "Hasil latihan tersimpan",
+            tahsinResultAyah = "Surah %d · ayat %d",
+            tahsinResultScore = "Skor latihan: %d%%",
+            tahsinResultHistory = "%d× dicoba · terbaik %d%%",
+            tahsinResultNextReview = "Murajaah berikutnya: %d hari lagi",
+            homeReadingSummary = "%d%% ayat dilatih · %d/%d juz baik",
+            homeReadingPages = "%d/%d halaman baik",
+            homeReadingDue = "%d ayat siap dimurajaah",
+            homeOpenMap = "Buka Peta Khatam",
+            statsReadingTitle = "Progres mushaf",
+            statsReadingSummary = "%d/%d ayat dilatih · %d%% cakupan · %d juz baik",
+            statsDueTitle = "Murajaah berikutnya",
+            statsNoDue = "Belum ada ayat yang dijadwalkan untuk murajaah.",
+            statsSurahProgress = "Progres per surah",
+            statsJuzProgress = "Progres per juz",
+            statsSurahRow = "%s: %d/%d ayat · %d baik",
+            statsJuzRow = "Juz %d: %d/%d ayat · %d baik",
             memorizationTitle = "🧠 Hafalan & Muraja'ah",
             memorizationSubtitle = "Uji ingatanmu, lalu jadwalkan ayat untuk diulang lagi. " +
                 "Ini alat bantu latihan, bukan penilaian guru.",
@@ -981,6 +1047,28 @@ object AppStrings {
             onboardingTimeQuestion = "How much time would you like to set aside each day?",
             onboardingMinutes = "%d min",
             onboardingStart = "Start learning",
+            onboardingFeatureTitle = "One connected learning loop",
+            onboardingFeatureFlow = "🎙️ Tahsin: recite an ayah, see your score, then get the next murajaah date.",
+            onboardingFeatureMap = "🗺️ Khatam Map: track the pages and juz you have practiced.",
+            onboardingFeatureRoots = "🌱 Vocabulary: see meanings, examples, and related roots.",
+            onboardingFeatureBackup = "💾 Data stays local and can be exported or imported from Settings.",
+            tahsinResultTitle = "Practice result saved",
+            tahsinResultAyah = "Surah %d · ayah %d",
+            tahsinResultScore = "Practice score: %d%%",
+            tahsinResultHistory = "%d× attempted · best %d%%",
+            tahsinResultNextReview = "Next murajaah: in %d days",
+            homeReadingSummary = "%d%% of ayahs practiced · %d/%d juz good",
+            homeReadingPages = "%d/%d good pages",
+            homeReadingDue = "%d ayahs ready for murajaah",
+            homeOpenMap = "Open Khatam Map",
+            statsReadingTitle = "Mushaf progress",
+            statsReadingSummary = "%d/%d ayahs practiced · %d%% coverage · %d good juz",
+            statsDueTitle = "Next murajaah",
+            statsNoDue = "No ayahs are scheduled for murajaah yet.",
+            statsSurahProgress = "Progress by surah",
+            statsJuzProgress = "Progress by juz",
+            statsSurahRow = "%s: %d/%d ayahs · %d good",
+            statsJuzRow = "Juz %d: %d/%d ayahs · %d good",
             memorizationTitle = "🧠 Memorization & Murajaah",
             memorizationSubtitle = "Test your memory, then schedule the ayah for review. " +
                 "This is a practice aid, not a teacher assessment.",

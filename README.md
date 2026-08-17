@@ -47,8 +47,8 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   di-bundle ke APK). Terjemahan **tersembunyi secara default** (toggle di
   Pengaturan). Navigasi **3 dropdown**: [Surah] [Ayat] [Halaman] — label pendek
   supaya tidak terpotong "…"; kontrol ukuran huruf **slider presisi (100–250%)**;
-  **ketuk kata → tooltip berisi arti kata (dari kosakata terkurasi) + aturan
-  tajwid** + haptik halus; layar lebar (tablet) otomatis dibatasi 640dp dan
+  **ketuk kata → tooltip berisi arti kata, akar kata, dan aturan tajwid** dari
+  data terkurasi/morfologi; layar lebar (tablet) otomatis dibatasi 640dp dan
   ditengahkan.
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
@@ -59,7 +59,13 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   Skor Terbaik %, Total Ronde, Kata Dikuasai** + rincian per fitur. Ada juga
   **🕘 Riwayat Baca** — 10 ayat terakhir yang dibuka di mushaf (ketuk untuk
   membukanya lagi). Di layar
-  utama Tahsin tetap ada info cepat "N× dicoba · skor terbaik M%".
+  utama Tahsin tetap ada info cepat "N× dicoba · skor terbaik M%". Beranda juga
+  menampilkan target XP harian, ayat yang sudah dilatih, halaman baik, juz baik,
+  dan ayat yang siap dimurajaah.
+- 📈 **Progress per surah dan juz**: Statistik merinci ayat yang sudah dilatih,
+  skor baik, cakupan mushaf, dan murajaah yang jatuh tempo.
+- 🗺️ **Peta Khatam**: peta 604 halaman dan 30 juz dengan status belum dibaca,
+  perlu murajaah, atau sudah baik; ketuk halaman/juz untuk membuka lokasi tepat.
 - 🎨 **Warna tajwid** (nyala default, bisa dimatikan di menu Pengaturan): mad (merah),
   ghunnah (hijau), qalqalah (biru), ikhfa' (abu-abu), iqlab (ungu), idgham (oranye),
   lam jalalah (teal).
@@ -122,7 +128,7 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   varian hamza/ya/ta marbuta dinormalisasi otomatis) atau **kata kunci
   terjemahan ID/EN** di seluruh 114 surah — offline dari bundle. Ketuk hasil
   → langsung buka ayat itu; ketikan di-debounce, indeks dibangun sekali.
-- 🔍 **Panel kata**: ketuk kata di mushaf → hukum tajwid + penjelasan + putar
+- 🔍 **Panel kata**: ketuk kata di mushaf → arti, akar kata, hukum tajwid + penjelasan + putar
   audio kata; tombolnya berubah jadi **⏹ Stop** saat kata sedang diputar
   (terpisah dari tombol Dengar ayat — bebas race).
 - 🔊 **Audio contoh**: **pilih qari'** (menu Pengaturan): Minshawy, Husary, Husary
@@ -140,6 +146,9 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   dan **cache daftar** — membuka layar lagi instan tanpa pemindaian ulang.
 - 🌙 **Dark mode** & **ganti bahasa ID/EN** lewat menu **Pengaturan**; setiap
   layar punya tombol kembali (←) di kiri atas.
+- 💾 **Ekspor/impor data**: progres bacaan, bookmark, XP, rencana belajar,
+  hafalan, kosakata, dan setelan dapat diekspor sebagai JSON lalu dipulihkan
+  dari Pengaturan.
 - 🗓️ **Widget + notifikasi "Ayah of the Day"** — satu ayat berganti setiap hari
   (deterministik per tanggal, offline dari bundel aset). Widget home screen
   ringkas: terjemahan saja; notifikasi menampilkan teks Arab + terjemahan.
@@ -221,7 +230,9 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   (XP, level, streak, perayaan),
 │                   #   AyahSearch (pencarian Arab ternormalisasi + terjemahan),
 │                   #   Reciter (qari' everyayah + kecepatan audio slider 0.25×–2.0×),
-│                   #   AyahOfTheDayManager (pemilihan ayat harian + cache)
+│                   #   AyahOfTheDayManager (pemilihan ayat harian + cache),
+│                   #   ReviewSchedule/ReadingProgress (murajaah + agregasi progres),
+│                   #   BackupManager (ekspor/impor data lokal)
 └── theme/          # Colors, Typography, Shapes, ArabicFont (custom design system)
 ```
 

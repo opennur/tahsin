@@ -58,6 +58,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -94,6 +96,8 @@ sealed interface TahsinUiState {
         val issues: List<ReadingIssue> = emptyList(),
         /** Riwayat bacaan ayat aktif (dari ReadingStatsStore) — untuk info cepat. */
         val ayahStats: AyahStats? = null,
+        /** Hasil latihan terakhir yang siap ditampilkan sebagai ringkasan sesi. */
+        val lastResult: TahsinResult? = null,
         val selectedWordIndex: Int? = null,
         val selectedWordRules: List<TajwidRule> = emptyList(),
         /** Arti kata terpilih (bahasa aktif) — null kalau belum terkurasi. */
@@ -160,6 +164,16 @@ data class OpenTarget(
     val deliveryId: Long,
 )
 
+/** Hasil satu percobaan final Tahsin dan jadwal murajaah berikutnya. */
+data class TahsinResult(
+    val surah: Int,
+    val ayah: Int,
+    val score: Int,
+    val bestScore: Int,
+    val attempts: Int,
+    val reviewDueDay: Long,
+)
+
 /** State setelan ringkas lintas layar — tidak bergantung data mushaf. Dipakai
  * portal Home & layar Pengaturan; disinkronkan dari [TahsinUiState.Ready]. */
 data class SettingsUiState(
@@ -204,6 +218,9 @@ class TahsinViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<TahsinUiState>(TahsinUiState.Loading)
     val uiState: StateFlow<TahsinUiState> = _uiState.asStateFlow()
+
+    private val _results = MutableSharedFlow<TahsinResult>(extraBufferCapacity = 1)
+    val results: SharedFlow<TahsinResult> = _results
 
     /** Kosakata terkurasi (cache) untuk arti kata di tooltip; dimuat di reload(). */
     @Volatile
@@ -971,11 +988,29 @@ class TahsinViewModel @Inject constructor(
                 else -> 0
             }
             if (xp > 0) GamificationHub.award(app, xp)
-            val cur = currentReady() ?: return@launch
-            if (cur.surahNumber == surahNumber && cur.ayah?.number == ayahNumber) {
-                updateReady { it.copy(ayahStats = updated) }
+            val result = TahsinResult(
+                surah = surahNumber,
+                ayah = ayahNumber,
+                score = score,
+                bestScore = updated?.bestScore ?: score,
+                attempts = updated?.attempts ?: 1,
+                reviewDueDay = updated?.reviewDueDay ?: 0L,
+            )
+            _results.tryEmit(result)
+            updateReady { current ->
+                val sameAyah = current.surahNumber == surahNumber &&
+                    current.ayah?.number == ayahNumber
+                current.copy(
+                    ayahStats = if (sameAyah) updated else current.ayahStats,
+                    lastResult = result,
+                )
             }
         }
+    }
+
+    /** Tutup ringkasan hasil tanpa menghapus statistik persisten. */
+    fun dismissResult() {
+        updateReady { it.copy(lastResult = null) }
     }
 
     private fun onTranscript(text: String, words: List<String>) {

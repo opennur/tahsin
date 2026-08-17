@@ -12,6 +12,9 @@ import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.ReadingHistoryEntry
+import org.opennur.tahsin.util.AyahStats
+import org.opennur.tahsin.util.ReadingProgressEngine
+import org.opennur.tahsin.util.ReadingProgressSummary
 import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.StatsStores
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +55,8 @@ data class StatsState(
     // Riwayat baca (ayat terakhir yang dibuka, terbaru dulu)
     val history: List<ReadingHistoryEntry> = emptyList(),
     val surahNames: Map<Int, String> = emptyMap(),
+    val readingProgress: ReadingProgressSummary = ReadingProgressSummary.empty(),
+    val nextReviews: List<AyahStats> = emptyList(),
 )
 
 /**
@@ -98,7 +103,16 @@ class StatsViewModel @Inject constructor(
             val lughohBestPct = lughoh.bestScore * 100 / LughohEngine.SESSION_SIZE
             val wordsMastered = vocab.cards.values.count { it.correctCount > 0 }
             val history = stores.readingHistory.load()
-            val names = repository.surahList().associate { it.number to it.nameLatin }
+            val surahList = repository.surahList()
+            val names = surahList.associate { it.number to it.nameLatin }
+            val pagination = repository.pagination()
+            val readingProgress = ReadingProgressEngine.summarize(
+                stats = tahsin,
+                surahs = surahList,
+                pagination = pagination,
+                today = today,
+            )
+            val nextReviews = ReadingProgressEngine.nextReviews(tahsin, today)
 
             _state.value = StatsState(
                 isLoading = false,
@@ -123,6 +137,8 @@ class StatsViewModel @Inject constructor(
                 surahNames = names,
                 dailyPlanCompleted = planCompleted,
                 dailyPlanTotal = planTotal,
+                readingProgress = readingProgress,
+                nextReviews = nextReviews,
             )
         }
     }

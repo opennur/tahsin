@@ -18,6 +18,10 @@ data class AyahStats(
     val bestScore: Int = 0,
     val lastScore: Int = 0,
     val lastPracticedAt: Long = 0L,
+    /** Hari epoch saat ayat ini disarankan untuk murajaah berikutnya. */
+    val reviewDueDay: Long = 0L,
+    /** Interval terakhir yang berhasil dicapai oleh jadwal Tahsin. */
+    val reviewIntervalDays: Int = 0,
     /** Kata yang pernah salah/terlewat, errorCount = berapa kali (terurut menurun). */
     val wordErrors: List<WordError> = emptyList(),
 ) {
@@ -59,9 +63,11 @@ object ReadingStats {
         aligned: List<AlignedWord>,
         referenceWords: List<String>,
         now: Long = System.currentTimeMillis(),
+        today: Long = java.time.LocalDate.now().toEpochDay(),
     ): AyahStats {
         val score = scoreOf(aligned)
         val base = existing ?: AyahStats(surahNumber = surahNumber, ayahNumber = ayahNumber)
+        val review = ReviewScheduleEngine.next(base.reviewIntervalDays, score, today)
 
         // Kata yang salah/terlewat pada percobaan ini (satu kata dihitung sekali).
         val hitErrors = aligned
@@ -92,6 +98,8 @@ object ReadingStats {
             bestScore = maxOf(base.bestScore, score),
             lastScore = score,
             lastPracticedAt = now,
+            reviewDueDay = review.dueDay,
+            reviewIntervalDays = review.intervalDays,
             wordErrors = mergedErrors.values.sortedByDescending { it.errorCount },
         )
     }
