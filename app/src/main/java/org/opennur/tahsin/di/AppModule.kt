@@ -72,7 +72,7 @@ object AppModule {
     fun provideBackupManager(
         @ApplicationContext context: Context,
         settings: SettingsStore,
-    ): BackupManager = BackupManager.create(context, SettingsBackupAdapter(settings))
+    ): BackupManager = BackupManager(context.applicationContext.filesDir, SettingsBackupAdapter(settings))
 
     @Provides
     @Singleton
