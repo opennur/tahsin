@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.opennur.tahsin.util.BackupManager
+import org.opennur.tahsin.util.BackupResult
 
 data class BackupUiState(
     val busy: Boolean = false,
@@ -81,11 +82,4 @@ class BackupViewModel @Inject constructor(
     fun clearMessage() {
         _state.value = _state.value.copy(message = null)
     }
-}
-
-private data class BackupResult(
-    val importedStores: Int = 0,
-    val errors: List<String> = emptyList(),
-) {
-    val success: Boolean get() = errors.isEmpty()
 }
