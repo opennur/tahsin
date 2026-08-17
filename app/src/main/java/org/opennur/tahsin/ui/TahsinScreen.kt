@@ -102,6 +102,7 @@ import org.opennur.tahsin.ui.components.AyahLoadingView
 import org.opennur.tahsin.ui.components.AyahText
 import org.opennur.tahsin.ui.components.DropdownOption
 import org.opennur.tahsin.ui.components.SimpleDropdown
+import java.time.LocalDate
 import kotlin.math.roundToInt
 
 // ============================================================ Parameter objects
@@ -124,6 +125,7 @@ private data class TahsinContentActions(
     val onOpenSearch: () -> Unit,
     val onOpenSettings: () -> Unit,
     val onBack: () -> Unit,
+    val onDismissResult: () -> Unit,
 )
 
 /** Callbacks untuk [MushafPageView]. */
@@ -240,6 +242,7 @@ fun TahsinScreen(
                 onOpenSearch = onOpenSearch,
                 onOpenSettings = onOpenSettings,
                 onBack = onBack,
+                onDismissResult = viewModel::dismissResult,
             ),
             modifier = modifier,
         )
@@ -370,6 +373,16 @@ private fun TahsinContent(
             )
         }
 
+        // ---- Ringkasan hasil latihan terakhir ----
+        state.lastResult?.let { result ->
+            TahsinResultCard(
+                result = result,
+                strings = strings,
+                onDismiss = actions.onDismissResult,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
         // ---- Pager halaman mushaf ----
         HorizontalPager(
             state = pagerState,
@@ -434,6 +447,40 @@ private fun TahsinContent(
         }
     }
 }
+}
+
+@Composable
+private fun TahsinResultCard(
+    result: TahsinResult,
+    strings: Strings,
+    onDismiss: () -> Unit,
+) {
+    val days = (result.reviewDueDay - LocalDate.now().toEpochDay()).coerceAtLeast(0L)
+    AyahCard(modifier = Modifier.fillMaxWidth(), onClick = onDismiss) {
+        AyahText(strings.tahsinResultTitle, style = AyahTypography.Heading2)
+        Spacer(modifier = Modifier.height(4.dp))
+        AyahText(
+            strings.tahsinResultAyah.format(result.surah, result.ayah),
+            style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahText(
+            strings.tahsinResultScore.format(result.score),
+            style = AyahTypography.Body1.copy(
+                color = if (result.score >= 70) AyahColors.Success else AyahColors.Error,
+                fontWeight = FontWeight.SemiBold,
+            ),
+        )
+        AyahText(
+            strings.tahsinResultHistory.format(result.attempts, result.bestScore),
+            style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        AyahText(
+            strings.tahsinResultNextReview.format(days),
+            style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+        )
+    }
 }
 
 /** Susun halaman [pageIndex] dari konten surah yang sudah dimuat (null = belum siap). */

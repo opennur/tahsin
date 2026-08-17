@@ -20,6 +20,7 @@ data class BackupUiState(
     val busy: Boolean = false,
     val message: String? = null,
     val success: Boolean = false,
+    val importCompleted: Boolean = false,
 )
 
 @HiltViewModel
@@ -68,12 +69,14 @@ class BackupViewModel @Inject constructor(
                 result.getOrDefault(BackupResult()).success -> BackupUiState(
                     message = "Impor berhasil! ${result.getOrDefault(BackupResult()).importedStores} file dipulihkan.",
                     success = true,
+                    importCompleted = true,
                 )
                 else -> BackupUiState(
                     message = "Impor selesai: ${result.getOrDefault(
                         org.opennur.tahsin.util.BackupResult(),
                     ).errors.joinToString("; ")}",
                     success = true,
+                    importCompleted = true,
                 )
             }
         }

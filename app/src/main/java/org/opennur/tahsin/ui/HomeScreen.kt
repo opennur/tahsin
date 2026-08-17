@@ -44,6 +44,7 @@ import org.opennur.tahsin.ui.components.AyahText
 import org.opennur.tahsin.ui.components.CreditLink
 import org.opennur.tahsin.ui.components.GoalProgressBar
 import org.opennur.tahsin.util.Achievements
+import org.opennur.tahsin.util.ReadingProgressSummary
 
 /**
  * Portal layar utama: grid kartu menu untuk semua fitur.
@@ -63,6 +64,7 @@ data class HomeLearningActions(
 
 data class HomeUtilityActions(
     val onOpenStats: () -> Unit,
+    val onOpenPetaKhatam: () -> Unit,
     val onOpenBadges: () -> Unit,
     val onOpenCoherence: () -> Unit,
     val onOpenFavorites: () -> Unit,
@@ -85,8 +87,13 @@ fun HomeScreen(
     val strings = AppStrings.of(settings.language)
     val gamificationViewModel: GamificationViewModel = viewModel()
     val gamification by gamificationViewModel.state.collectAsStateWithLifecycle()
+    val statsViewModel: StatsViewModel = viewModel()
+    val stats by statsViewModel.state.collectAsStateWithLifecycle()
     // Muat ulang tiap Home masuk komposisi (setelah pop dari fitur lain).
-    LaunchedEffect(Unit) { gamificationViewModel.refresh() }
+    LaunchedEffect(Unit) {
+        gamificationViewModel.refresh()
+        statsViewModel.refresh()
+    }
 
     Box(modifier = modifier.fillMaxSize().background(AyahColors.Background)) {
     // Layar lebar (tablet): konten dibatasi 640dp dan ditengahkan.
@@ -126,6 +133,15 @@ fun HomeScreen(
 
         if (!gamification.isLoading) {
             HomeGamificationCard(gamification, settings.language, strings)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        if (!stats.isLoading) {
+            HomeReadingProgressCard(
+                progress = stats.readingProgress,
+                strings = strings,
+                onOpenMap = actions.utility.onOpenPetaKhatam,
+            )
             Spacer(modifier = Modifier.height(16.dp))
         }
 
@@ -194,6 +210,46 @@ private fun HomeGamificationCard(
 }
 
 @Composable
+private fun HomeReadingProgressCard(
+    progress: ReadingProgressSummary,
+    strings: Strings,
+    onOpenMap: () -> Unit,
+) {
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            AyahText(strings.statsReadingTitle, style = AyahTypography.Heading2)
+            Spacer(modifier = Modifier.height(6.dp))
+            AyahText(
+                strings.homeReadingSummary.format(
+                    progress.practicedPercent,
+                    progress.goodJuz,
+                    30,
+                ),
+                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            AyahText(
+                strings.homeReadingPages.format(
+                    progress.goodPages,
+                    progress.goodPages + progress.reviewPages + progress.untouchedPages,
+                ),
+                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+            )
+            AyahText(
+                strings.homeReadingDue.format(progress.dueAyahs),
+                style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahButton(
+                text = strings.homeOpenMap,
+                variant = AyahButtonVariant.Outline,
+                size = AyahButtonSize.Small,
+                onClick = onOpenMap,
+            )
+        }
+    }
+}
+
+@Composable
 private fun HomeLearningMenu(strings: Strings, actions: HomeLearningActions) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         HomeMenuCard(
@@ -252,18 +308,26 @@ private fun HomeUtilityMenu(strings: Strings, actions: HomeUtilityActions) {
             modifier = Modifier.weight(1f),
         )
         HomeMenuCard(
-            text = strings.menuBadges,
-            onClick = actions.onOpenBadges,
+            text = strings.petaTitle,
+            onClick = actions.onOpenPetaKhatam,
             modifier = Modifier.weight(1f),
         )
     }
     Spacer(modifier = Modifier.height(12.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         HomeMenuCard(
+            text = strings.menuBadges,
+            onClick = actions.onOpenBadges,
+            modifier = Modifier.weight(1f),
+        )
+        HomeMenuCard(
             text = strings.menuCoherence,
             onClick = actions.onOpenCoherence,
             modifier = Modifier.weight(1f),
         )
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         HomeMenuCard(
             text = strings.menuFavorites,
             onClick = actions.onOpenFavorites,

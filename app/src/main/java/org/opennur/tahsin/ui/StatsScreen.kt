@@ -39,6 +39,7 @@ import org.opennur.tahsin.ui.components.GoalProgressBar
 import org.opennur.tahsin.util.Achievements
 import org.opennur.tahsin.util.ReadingHistoryEntry
 import org.opennur.tahsin.util.RelativeTime
+import java.time.LocalDate
 
 /**
  * Layar statistik keseluruhan: angka gabungan semua challenge (Tahsin,
@@ -200,6 +201,13 @@ fun StatsScreen(
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
+                    StatsReadingProgressSection(
+                        state = state,
+                        strings = strings,
+                        onOpenAyah = onOpenAyah,
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // ---- Rincian per fitur ----
                     AyahCard(modifier = Modifier.fillMaxWidth()) {
@@ -305,6 +313,103 @@ private fun StatCard(
                 style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
             )
         }
+    }
+}
+
+@Composable
+private fun StatsReadingProgressSection(
+    state: StatsState,
+    strings: Strings,
+    onOpenAyah: (Int, Int) -> Unit,
+) {
+    val progress = state.readingProgress
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            AyahText(strings.statsReadingTitle, style = AyahTypography.Heading2)
+            Spacer(modifier = Modifier.height(6.dp))
+            AyahText(
+                strings.statsReadingSummary.format(
+                    progress.practicedAyahs,
+                    progress.totalAyahs,
+                    progress.practicedPercent,
+                    progress.goodJuz,
+                ),
+                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahText(
+                strings.homeReadingPages.format(
+                    progress.goodPages,
+                    progress.goodPages + progress.reviewPages + progress.untouchedPages,
+                ),
+                style = AyahTypography.Caption.copy(color = AyahColors.Primary),
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+            AyahText(strings.statsDueTitle, style = AyahTypography.Heading2)
+            if (state.nextReviews.isEmpty()) {
+                AyahText(
+                    strings.statsNoDue,
+                    style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
+                )
+            } else {
+                val today = LocalDate.now().toEpochDay()
+                state.nextReviews.forEach { review ->
+                    val name = state.surahNames[review.surahNumber] ?: "#${review.surahNumber}"
+                    AyahText(
+                        "$name · ${review.ayahNumber} · " +
+                            strings.tahsinResultNextReview.format(
+                                (review.reviewDueDay - today).coerceAtLeast(0L),
+                            ),
+                        style = AyahTypography.Body2.copy(color = AyahColors.Primary),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onOpenAyah(review.surahNumber, review.ayahNumber) }
+                            .padding(vertical = 4.dp),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            AyahText(strings.statsJuzProgress, style = AyahTypography.Heading2)
+            progress.juz.forEach { juz ->
+                ProgressLine(
+                    label = strings.statsJuzRow.format(
+                        juz.juz,
+                        juz.practicedAyahs,
+                        juz.totalAyahs,
+                        juz.goodAyahs,
+                    ),
+                    fraction = if (juz.totalAyahs == 0) 0f else {
+                        juz.practicedAyahs.toFloat() / juz.totalAyahs
+                    },
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            AyahText(strings.statsSurahProgress, style = AyahTypography.Heading2)
+            progress.surahs.filter { it.practicedAyahs > 0 || it.dueAyahs > 0 }.forEach { surah ->
+                ProgressLine(
+                    label = strings.statsSurahRow.format(
+                        surah.name,
+                        surah.practicedAyahs,
+                        surah.totalAyahs,
+                        surah.goodAyahs,
+                    ),
+                    fraction = if (surah.totalAyahs == 0) 0f else {
+                        surah.practicedAyahs.toFloat() / surah.totalAyahs
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProgressLine(label: String, fraction: Float) {
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        AyahText(label, style = AyahTypography.Caption)
+        GoalProgressBar(fraction = fraction)
     }
 }
 

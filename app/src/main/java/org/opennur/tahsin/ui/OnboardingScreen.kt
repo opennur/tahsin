@@ -60,6 +60,8 @@ fun OnboardingScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
             OnboardingIntro(strings)
+            Spacer(modifier = Modifier.height(14.dp))
+            OnboardingFeatureSection(strings)
             Spacer(modifier = Modifier.height(18.dp))
             OnboardingGoalSection(
                 strings = strings,
@@ -96,6 +98,31 @@ private fun OnboardingIntro(strings: Strings) {
         ),
         modifier = Modifier.fillMaxWidth(),
     )
+}
+
+@Composable
+private fun OnboardingFeatureSection(strings: Strings) {
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            AyahText(
+                strings.onboardingFeatureTitle,
+                style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            listOf(
+                strings.onboardingFeatureFlow,
+                strings.onboardingFeatureMap,
+                strings.onboardingFeatureRoots,
+                strings.onboardingFeatureBackup,
+            ).forEach { feature ->
+                AyahText(
+                    feature,
+                    style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+                    modifier = Modifier.padding(vertical = 3.dp),
+                )
+            }
+        }
+    }
 }
 
 @Composable

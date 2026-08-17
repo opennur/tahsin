@@ -123,7 +123,7 @@ fun PetaKhatamScreen(
                 if (state.viewMode == "pages") {
                     PetaKhatamPageGrid(state.pageStatuses, onOpenPage)
                 } else {
-                    PetaKhatamJuzCircles(state.juzStatuses, onOpenPage)
+                    PetaKhatamJuzCircles(state.juzStatuses, state.juzStartPages, onOpenPage)
                 }
             }
         }
@@ -231,6 +231,7 @@ private fun PetaKhatamPageGrid(
 @Composable
 private fun PetaKhatamJuzCircles(
     juzList: List<JuzStatusRow>,
+    startPages: Map<Int, Int>,
     onOpenPage: (Int) -> Unit,
 ) {
     FlowRow(
@@ -252,9 +253,7 @@ private fun PetaKhatamJuzCircles(
                     .background(color)
                     .border(2.dp, AyahColors.Hairline, CircleShape)
                     .clickable {
-                        // Open first page of the juz (approximate: juz 1 = page 1, etc.)
-                        val approxPage = ((juz.juz - 1) * 20) + 1
-                        onOpenPage(approxPage.coerceIn(1, 604))
+                        onOpenPage(startPages[juz.juz] ?: 1)
                     },
             ) {
                 AyahText(

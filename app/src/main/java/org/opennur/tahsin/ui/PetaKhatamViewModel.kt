@@ -23,6 +23,7 @@ data class PetaKhatamUiState(
     val language: AppLanguage = AppLanguage.ID,
     val pageStatuses: List<PageStatusRow> = emptyList(),
     val juzStatuses: List<JuzStatusRow> = emptyList(),
+    val juzStartPages: Map<Int, Int> = emptyMap(),
     val summary: PetaKhatamSummary = PetaKhatamSummary(0, 0, 0, 0),
     val viewMode: String = "pages",
 )
@@ -60,6 +61,9 @@ class PetaKhatamViewModel @Inject constructor(
 
         val pageStatuses = PetaKhatamEngine.pageStatuses(stats, pagination)
         val juzStatuses = PetaKhatamEngine.juzStatuses(stats, pagination)
+        val juzStartPages = pagination.juzStarts.associate { start ->
+            start.juz to (pagination.pageOf(start.surah, start.ayah) ?: 1)
+        }
         val summary = PetaKhatamEngine.summary(pageStatuses)
 
         _state.value = PetaKhatamUiState(
@@ -67,6 +71,7 @@ class PetaKhatamViewModel @Inject constructor(
             language = language,
             pageStatuses = pageStatuses,
             juzStatuses = juzStatuses,
+            juzStartPages = juzStartPages,
             summary = summary,
             viewMode = _state.value.viewMode,
         )

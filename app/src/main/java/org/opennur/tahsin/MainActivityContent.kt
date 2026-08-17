@@ -81,7 +81,11 @@ fun MainActivityContent(
             stack = stack.dropLast(1)
             if (stack.size == 1) {
                 activeTaskKey?.let { key ->
-                    LearningTaskType.fromKey(key)?.let(learningPlanViewModel::complete)
+                    // Tahsin hanya selesai setelah ada hasil final; keluar tanpa
+                    // membaca tidak boleh menghapus tugas dari rencana harian.
+                    if (key != LearningTaskType.RECITE.key) {
+                        LearningTaskType.fromKey(key)?.let(learningPlanViewModel::complete)
+                    }
                 }
                 activeTaskKey = null
             }
@@ -96,6 +100,16 @@ fun MainActivityContent(
                 LearningTaskType.VOCABULARY -> push(AppScreen.Vocab)
                 LearningTaskType.UNDERSTAND -> push(AppScreen.Coherence)
                 LearningTaskType.ARABIC -> push(AppScreen.Lughoh)
+            }
+        }
+
+        // Hasil final Tahsin adalah sumber kebenaran penyelesaian tugas RECITE.
+        LaunchedEffect(tahsinViewModel, activeTaskKey) {
+            tahsinViewModel.results.collect {
+                if (activeTaskKey == LearningTaskType.RECITE.key) {
+                    learningPlanViewModel.complete(LearningTaskType.RECITE)
+                    activeTaskKey = null
+                }
             }
         }
 
@@ -133,6 +147,7 @@ fun MainActivityContent(
                         ),
                         utility = HomeUtilityActions(
                             onOpenStats = { push(AppScreen.Stats) },
+                            onOpenPetaKhatam = { push(AppScreen.PetaKhatam) },
                             onOpenBadges = { push(AppScreen.Badges) },
                             onOpenCoherence = { push(AppScreen.Coherence) },
                             onOpenFavorites = { push(AppScreen.Favorites) },
@@ -217,6 +232,10 @@ fun MainActivityContent(
                         ),
                         onDownloadAll = tahsinViewModel::downloadAllAudio,
                         onOpenAudioManager = { push(AppScreen.AudioManager) },
+                        onDataImported = {
+                            tahsinViewModel.reload()
+                            learningPlanViewModel.refresh()
+                        },
                     ),
                 )
             }

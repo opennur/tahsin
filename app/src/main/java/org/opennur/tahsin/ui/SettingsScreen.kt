@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,6 +81,7 @@ data class SettingsActions(
     val notifications: SettingsNotificationActions,
     val onDownloadAll: () -> Unit,
     val onOpenAudioManager: () -> Unit,
+    val onDataImported: () -> Unit = {},
 )
 
 @Composable
@@ -94,6 +96,10 @@ fun SettingsScreen(
 
     val backupViewModel: BackupViewModel = viewModel()
     val backupState by backupViewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(backupState.importCompleted) {
+        if (backupState.importCompleted) actions.onDataImported()
+    }
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/json"),
