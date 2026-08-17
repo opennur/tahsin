@@ -59,7 +59,6 @@ import org.opennur.tahsin.util.next
 data class SettingsAppearanceActions(
     val onToggleTajwidColor: () -> Unit,
     val onToggleTranslation: () -> Unit,
-    val onToggleFlowMode: () -> Unit,
     val onToggleDarkMode: () -> Unit,
     val onSetLanguage: (AppLanguage) -> Unit,
     val onEditLearningPlan: () -> Unit,
@@ -191,12 +190,6 @@ private fun SettingsAppearanceSection(
     Spacer(modifier = Modifier.height(6.dp))
     SettingRow("🎨 ${strings.settingTajwid}", settings.tajwidColor, actions.onToggleTajwidColor)
     SettingRow("🌐 ${strings.tahsinTranslation}", settings.showTranslation, actions.onToggleTranslation)
-    SettingRow("→ ${strings.settingFlow}", settings.flowMode, actions.onToggleFlowMode)
-    AyahText(
-        strings.flowHint,
-        style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-        modifier = Modifier.padding(bottom = 6.dp),
-    )
     SettingRow("🌙 ${strings.settingDarkMode}", settings.darkMode, actions.onToggleDarkMode)
     SettingRow(
         label = "🌐 ${strings.settingLanguage}",

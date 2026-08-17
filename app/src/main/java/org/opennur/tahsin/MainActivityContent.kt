@@ -203,7 +203,6 @@ fun MainActivityContent(
                         appearance = SettingsAppearanceActions(
                             onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
                             onToggleTranslation = tahsinViewModel::toggleTranslation,
-                            onToggleFlowMode = tahsinViewModel::toggleFlowMode,
                             onToggleDarkMode = tahsinViewModel::toggleDarkMode,
                             onSetLanguage = tahsinViewModel::setLanguage,
                             onEditLearningPlan = { showLearningSetup = true },

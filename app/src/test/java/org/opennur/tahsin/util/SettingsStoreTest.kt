@@ -37,7 +37,6 @@ class SettingsStoreTest {
         assertThat(store.showTranslation).isFalse()
         assertThat(store.languageCode).isEqualTo(AppLanguage.ID.code)
         assertThat(store.audioMode).isEqualTo("AYAH")
-        assertThat(store.flowMode).isTrue()
         assertThat(store.backgroundDownloadAllowed).isNull()
         assertThat(store.surahNumber).isEqualTo(1)
         assertThat(store.ayahIndex).isEqualTo(0)
@@ -55,7 +54,6 @@ class SettingsStoreTest {
         SettingsStore(context).apply {
             darkMode = true
             languageCode = "en"
-            flowMode = false
             surahNumber = 2
             ayahIndex = 255
             reciterSlug = Reciter.HUSARY.slug
@@ -70,7 +68,6 @@ class SettingsStoreTest {
         val second = SettingsStore(context)
         assertThat(second.darkMode).isTrue()
         assertThat(second.languageCode).isEqualTo("en")
-        assertThat(second.flowMode).isFalse()
         assertThat(second.surahNumber).isEqualTo(2)
         assertThat(second.ayahIndex).isEqualTo(255)
         assertThat(second.reciter).isEqualTo(Reciter.HUSARY)

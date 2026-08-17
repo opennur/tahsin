@@ -117,7 +117,6 @@ private data class TahsinContentActions(
     val onPlaySelectedWord: () -> Unit,
     val onStopSelectedWord: () -> Unit,
     val onSetFontScale: (Float) -> Unit,
-    val onSetFlowMode: (Boolean) -> Unit,
     val onSetAudioMode: (AudioPlaybackMode) -> Unit,
     val onToggleBookmark: () -> Unit,
     val onDismissMessage: () -> Unit,
@@ -234,7 +233,6 @@ fun TahsinScreen(
                 onPlaySelectedWord = viewModel::playSelectedWord,
                 onStopSelectedWord = viewModel::stopWordPlayback,
                 onSetFontScale = viewModel::setFontScale,
-                onSetFlowMode = viewModel::setFlowMode,
                 onSetAudioMode = viewModel::setAudioMode,
                 onToggleBookmark = viewModel::toggleBookmark,
                 onDismissMessage = viewModel::clearMessage,
@@ -417,22 +415,6 @@ private fun TahsinContent(
                     style = AyahTypography.Caption,
                     modifier = Modifier.weight(1f),
                 )
-                state.lastRecitationScore?.let { score ->
-                    AyahText(
-                        "✓ $score%",
-                        style = AyahTypography.Caption.copy(color = AyahColors.Primary),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                SimpleDropdown(
-                    selectedLabel = if (state.flowMode) "→" else "١",
-                    options = listOf(
-                        DropdownOption("١ — ${strings.ayahLabel}", { actions.onSetFlowMode(false) }),
-                        DropdownOption("→ — ${strings.settingFlow}", { actions.onSetFlowMode(true) }),
-                    ),
-                    modifier = Modifier.width(52.dp),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
                 SimpleDropdown(
                     selectedLabel = audioModeSymbol(state.audioMode),
                     options = listOf(

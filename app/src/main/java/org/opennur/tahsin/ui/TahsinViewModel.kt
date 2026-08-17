@@ -92,8 +92,6 @@ sealed interface TahsinUiState {
         val transcript: String = "",
         val alignedWords: List<AlignedWord> = emptyList(),
         val issues: List<ReadingIssue> = emptyList(),
-        /** Skor terakhir, dipertahankan saat flow berpindah ke ayat berikutnya. */
-        val lastRecitationScore: Int? = null,
         /** Riwayat bacaan ayat aktif (dari ReadingStatsStore) — untuk info cepat. */
         val ayahStats: AyahStats? = null,
         val selectedWordIndex: Int? = null,
@@ -113,8 +111,6 @@ sealed interface TahsinUiState {
         val tajwidColor: Boolean = true,
         /** Mode pemutaran audio: ayat ini saja / lanjut terus / ulang terus. */
         val audioMode: AudioPlaybackMode = AudioPlaybackMode.AYAH,
-        /** Mode latihan: hasil final langsung membawa ke ayat berikutnya. */
-        val flowMode: Boolean = true,
         /** Qari' (perawi) audio ayat aktif. */
         val reciter: Reciter = Reciter.MINSHAWY,
         /** Kecepatan pemutaran audio (0.5×–1.25×). */
@@ -175,7 +171,6 @@ data class SettingsUiState(
     val audioSpeed: Float = 1.0f,
     val ayahOfDayEnabled: Boolean = true,
     val streakReminderEnabled: Boolean = false,
-    val flowMode: Boolean = true,
     val isDownloading: Boolean = false,
     val downloadDone: Int = 0,
     val downloadTotal: Int = 0,
@@ -233,7 +228,6 @@ class TahsinViewModel @Inject constructor(
             audioSpeed = settings.audioSpeed,
             ayahOfDayEnabled = settings.ayahOfDayEnabled,
             streakReminderEnabled = settings.streakReminderEnabled,
-            flowMode = settings.flowMode,
         ),
     )
     val settingsState: StateFlow<SettingsUiState> = _settingsState.asStateFlow()
@@ -308,7 +302,6 @@ class TahsinViewModel @Inject constructor(
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
                 audioMode = currentAudioMode(),
-                flowMode = settings.flowMode,
                 reciter = settings.reciter,
                 audioSpeed = settings.audioSpeed,
                 ayahOfDayEnabled = settings.ayahOfDayEnabled,
@@ -643,20 +636,11 @@ class TahsinViewModel @Inject constructor(
         val ayah = s.ayah ?: return
         val words = ayah.words
         if (words.isEmpty()) return
-        recitationFlowActive = s.flowMode
+        recitationFlowActive = true
         recitationGeneration++
-        if (recitationFlowActive) GamificationEvents.beginSuppression()
+        GamificationEvents.beginSuppression()
         startListeningSession(s.surahNumber, ayah.number, words, recitationGeneration)
     }
-
-    /** Ubah mode satu ayat/flow tanpa mengubah sesi yang sedang berjalan. */
-    fun setFlowMode(enabled: Boolean) {
-        settings.flowMode = enabled
-        if (!enabled && recitationFlowActive) stopRecitation()
-        updateReady { it.copy(flowMode = enabled) }
-    }
-
-    fun toggleFlowMode() = setFlowMode(!settings.flowMode)
 
     private fun startListeningSession(
         surahNumber: Int,
@@ -682,8 +666,6 @@ class TahsinViewModel @Inject constructor(
                 onTranscript(text, words)
                 recordAttempt(text, words)
                 maybePlayFeedbackTone()
-                val score = currentReady()?.alignedWords?.let(ReadingStats::scoreOf)
-                updateReady { it.copy(lastRecitationScore = score) }
                 if (recitationFlowActive) {
                     advanceRecitation(generation)
                 } else {
@@ -1386,7 +1368,6 @@ class TahsinViewModel @Inject constructor(
             audioSpeed = s.audioSpeed,
             ayahOfDayEnabled = s.ayahOfDayEnabled,
             streakReminderEnabled = s.streakReminderEnabled,
-            flowMode = s.flowMode,
             isDownloading = s.isDownloading,
             downloadDone = s.downloadDone,
             downloadTotal = s.downloadTotal,

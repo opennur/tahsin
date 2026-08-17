@@ -68,11 +68,6 @@ class SettingsStore(context: Context) : SettingsSource {
         get() = prefs[Keys.AUDIO_MODE] ?: "AYAH"
         set(value) = store.edit { this[Keys.AUDIO_MODE] = value }
 
-    /** Mode flow bacaan Tahsin: lanjut otomatis ke ayat berikutnya (default aktif). */
-    var flowMode: Boolean
-        get() = prefs[Keys.FLOW_MODE] ?: true
-        set(value) = store.edit { this[Keys.FLOW_MODE] = value }
-
     /**
      * Izin pengguna untuk unduhan latar belakang (foreground service).
      * null = belum pernah ditanya; true/false = keputusan tersimpan.
@@ -152,7 +147,6 @@ class SettingsStore(context: Context) : SettingsSource {
         parts.add(jsonBool("show_translation", showTranslation))
         parts.add(jsonStr("language_code", languageCode))
         parts.add(jsonStr("audio_mode", audioMode))
-        parts.add(jsonBool("flow_mode", flowMode))
         parts.add(jsonInt("surah_number", surahNumber))
         parts.add(jsonInt("ayah_index", ayahIndex))
         parts.add(jsonBool("ayah_of_day_enabled", ayahOfDayEnabled))
@@ -175,7 +169,6 @@ class SettingsStore(context: Context) : SettingsSource {
         (map["show_translation"] as? Boolean)?.let { showTranslation = it }
         (map["language_code"] as? String)?.let { languageCode = it }
         (map["audio_mode"] as? String)?.let { audioMode = it }
-        (map["flow_mode"] as? Boolean)?.let { flowMode = it }
         (map["surah_number"] as? Number)?.let { surahNumber = it.toInt() }
         (map["ayah_index"] as? Number)?.let { ayahIndex = it.toInt() }
         (map["ayah_of_day_enabled"] as? Boolean)?.let { ayahOfDayEnabled = it }
@@ -227,7 +220,6 @@ class SettingsStore(context: Context) : SettingsSource {
         val SHOW_TRANSLATION = booleanPreferencesKey("show_translation")
         val LANGUAGE_CODE = stringPreferencesKey("language_code")
         val AUDIO_MODE = stringPreferencesKey("audio_mode")
-        val FLOW_MODE = booleanPreferencesKey("flow_mode")
         val BG_DOWNLOAD = booleanPreferencesKey("bg_download")
         val SURAH_NUMBER = intPreferencesKey("surah_number")
         val AYAH_INDEX = intPreferencesKey("ayah_index")
