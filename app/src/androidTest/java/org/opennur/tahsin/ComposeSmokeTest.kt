@@ -77,6 +77,7 @@ class ComposeSmokeTest {
                     appearance = org.opennur.tahsin.ui.SettingsAppearanceActions(
                         onToggleTajwidColor = {},
                         onToggleTranslation = {},
+                        onToggleFlowMode = {},
                         onToggleDarkMode = {},
                         onSetLanguage = {},
                         onEditLearningPlan = {},
