@@ -54,7 +54,11 @@ object TranscriptAligner {
             val i = step.refIndex
             val w = reference[i]
             when {
-                step.spokenIndex == null -> AlignedWord(i, w, WordStatus.SKIPPED)
+                step.spokenIndex == null -> AlignedWord(
+                    i,
+                    w,
+                    if (step.trailing) WordStatus.NOT_REACHED else WordStatus.SKIPPED,
+                )
                 step.similarity >= MATCH_THRESHOLD ->
                     AlignedWord(i, w, WordStatus.CORRECT, spoken[step.spokenIndex])
                 step.similarity >= READING_THRESHOLD ->
@@ -66,9 +70,24 @@ object TranscriptAligner {
         return result
     }
 
+    /** Gabungkan potongan ucapan dari beberapa sesi SpeechRecognizer. */
+    fun appendTranscript(previous: String, segment: String): String = listOfNotNull(
+        previous.takeIf { it.isNotBlank() },
+        segment.takeIf { it.isNotBlank() },
+    ).joinToString(" ")
+
+    /** Ayat dianggap selesai hanya jika kata acuan terakhir sudah terdengar. */
+    fun reachesEnd(aligned: List<AlignedWord>): Boolean =
+        aligned.lastOrNull()?.spokenWord != null
+
     // ---- internal ----
 
-    private data class Step(val refIndex: Int, val spokenIndex: Int?, val similarity: Double)
+    private data class Step(
+        val refIndex: Int,
+        val spokenIndex: Int?,
+        val similarity: Double,
+        val trailing: Boolean = false,
+    )
 
     /**
      * Greedy two-pointer: cocokkan kata acuan dengan kata ucapan secara urut.
@@ -99,7 +118,7 @@ object TranscriptAligner {
             }
         }
         while (ri < ref.size) {
-            steps += Step(ri, null, 0.0)
+            steps += Step(ri, null, 0.0, trailing = true)
             ri++
         }
         return steps

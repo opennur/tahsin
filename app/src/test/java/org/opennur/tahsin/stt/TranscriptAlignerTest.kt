@@ -29,20 +29,20 @@ class TranscriptAlignerTest {
     }
 
     @Test
-    fun `kata tengah terlewat - kata sebelumnya MISMATCH, sisanya SKIPPED`() {
-        // "a c": b tidak cocok dengan c (MISMATCH), c tidak pernah tercapai (SKIPPED).
+    fun `bacaan parsial - sisa ayat NOT_REACHED`() {
+        // "a c": b tidak cocok dengan c (MISMATCH), c belum tercapai.
         val result = TranscriptAligner.align("a c", listOf("a", "b", "c"))
         assertEquals(
-            listOf(WordStatus.CORRECT, WordStatus.MISMATCH, WordStatus.SKIPPED),
+            listOf(WordStatus.CORRECT, WordStatus.MISMATCH, WordStatus.NOT_REACHED),
             result.map { it.status },
         )
     }
 
     @Test
-    fun `kata terakhir belum terbaca - SKIPPED`() {
+    fun `kata terakhir belum terbaca - NOT_REACHED`() {
         val result = TranscriptAligner.align("a b", listOf("a", "b", "c"))
         assertEquals(
-            listOf(WordStatus.CORRECT, WordStatus.CORRECT, WordStatus.SKIPPED),
+            listOf(WordStatus.CORRECT, WordStatus.CORRECT, WordStatus.NOT_REACHED),
             result.map { it.status },
         )
     }
@@ -73,12 +73,12 @@ class TranscriptAlignerTest {
     }
 
     @Test
-    fun `kata yang cocok dengan kata acuan kedua - kata pertama SKIPPED (greedy)`() {
+    fun `kata yang cocok dengan kata acuan kedua - kata pertama mismatch`() {
         // "b" hanya cocok dengan acuan kedua; greedy memakai b untuk acuan
-        // pertama (MISMATCH) sehingga acuan kedua tak tercapai → SKIPPED.
+        // pertama (MISMATCH) sehingga acuan kedua belum tercapai.
         val result = TranscriptAligner.align("b", listOf("a", "b"))
         assertEquals(
-            listOf(WordStatus.MISMATCH, WordStatus.SKIPPED),
+            listOf(WordStatus.MISMATCH, WordStatus.NOT_REACHED),
             result.map { it.status },
         )
     }
@@ -178,5 +178,36 @@ class TranscriptAlignerTest {
         assertEquals(0, TranscriptAligner.levenshtein("", ""))
         assertEquals(0, TranscriptAligner.levenshtein("kata", "kata"))
         assertEquals(1, TranscriptAligner.levenshtein("kata", "kaza"))
+    }
+
+    @Test
+    fun `bacaan terpotong - kata setelah posisi terakhir NOT_REACHED`() {
+        val result = TranscriptAligner.align("a b", listOf("a", "b", "c"))
+        assertEquals(WordStatus.NOT_REACHED, result.last().status)
+        assertTrue(!TranscriptAligner.reachesEnd(result))
+    }
+
+    @Test
+    fun `waqaf di tengah ayat - belum dianggap selesai`() {
+        val reference = listOf("بِسْمِۙ", "اللَّهِ", "الرَّحْمَٰنِ")
+        val result = TranscriptAligner.align("بسم الله", reference)
+
+        assertEquals(WordStatus.NOT_REACHED, result.last().status)
+        assertTrue(!TranscriptAligner.reachesEnd(result))
+    }
+
+    @Test
+    fun `kata terakhir salah tetapi terdengar - ayat dianggap selesai`() {
+        val result = TranscriptAligner.align("a b x", listOf("a", "b", "c"))
+        assertEquals(WordStatus.MISMATCH, result.last().status)
+        assertTrue(TranscriptAligner.reachesEnd(result))
+    }
+
+    @Test
+    fun `append transcript - menggabungkan hanya potongan yang terisi`() {
+        assertEquals("", TranscriptAligner.appendTranscript("", ""))
+        assertEquals("a", TranscriptAligner.appendTranscript("a", ""))
+        assertEquals("b", TranscriptAligner.appendTranscript("", "b"))
+        assertEquals("a b", TranscriptAligner.appendTranscript("a", "b"))
     }
 }
