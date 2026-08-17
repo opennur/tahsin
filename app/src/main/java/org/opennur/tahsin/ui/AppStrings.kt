@@ -58,7 +58,7 @@ data class LearningStrings(
  * Katalog teks UI per bahasa (tanpa resource Android — cukup untuk 2 bahasa).
  * Tambahkan bahasa baru = buat instance baru di [AppStrings.of].
  */
-data class Strings(
+class Strings(
     val appTitle: String,
     val subtitle: String,
     /** Subjudul portal (layar utama). */
