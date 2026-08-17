@@ -3,8 +3,11 @@ package org.opennur.tahsin.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Environment
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +37,7 @@ import androidx.core.content.ContextCompat
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTypography
 import org.opennur.tahsin.ui.components.AyahButton
+import org.opennur.tahsin.ui.components.AyahCard
 import org.opennur.tahsin.ui.components.AyahSlider
 import org.opennur.tahsin.ui.components.AyahButtonSize
 import org.opennur.tahsin.ui.components.AyahButtonVariant
@@ -87,6 +91,20 @@ fun SettingsScreen(
     val context = LocalContext.current
     val strings = AppStrings.of(settings.language)
 
+    val backupViewModel: BackupViewModel = viewModel()
+    val backupState by backupViewModel.state.collectAsStateWithLifecycle()
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        uri?.let { backupViewModel.exportTo(it) }
+    }
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        uri?.let { backupViewModel.importFrom(it) }
+    }
+
     // Izin notifikasi (Android 13+) diminta saat user menghidupkan notifikasi harian.
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -135,6 +153,14 @@ fun SettingsScreen(
             SectionDivider()
 
             SettingsDownloadSection(settings, strings, actions)
+
+            SectionDivider()
+
+            SettingsDataSection(strings, backupState, onExport = {
+                exportLauncher.launch("tahsin-backup.json")
+            }, onImport = {
+                importLauncher.launch(arrayOf("application/json"))
+            }, onDismissMessage = { backupViewModel.clearMessage() })
 
             SectionDivider()
 
@@ -351,4 +377,42 @@ private fun SettingRow(
         Spacer(modifier = Modifier.width(6.dp))
         AyahText("▸", style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary))
     }
+}
+
+@Composable
+private fun SettingsDataSection(
+    strings: Strings,
+    backupState: BackupUiState,
+    onExport: () -> Unit,
+    onImport: () -> Unit,
+    onDismissMessage: () -> Unit,
+) {
+    SectionLabel(strings.sectionData)
+    Spacer(modifier = Modifier.height(8.dp))
+    if (backupState.message != null) {
+        AyahCard(modifier = Modifier.fillMaxWidth(), onClick = onDismissMessage) {
+            AyahText(
+                backupState.message ?: "",
+                style = AyahTypography.Body2.copy(
+                    color = if (backupState.success) AyahColors.Success else AyahColors.Error,
+                ),
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+    AyahButton(
+        text = strings.exportBackup,
+        variant = AyahButtonVariant.Outline,
+        onClick = onExport,
+        enabled = !backupState.busy,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    AyahButton(
+        text = strings.importBackup,
+        variant = AyahButtonVariant.Outline,
+        onClick = onImport,
+        enabled = !backupState.busy,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }

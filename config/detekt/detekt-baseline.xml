@@ -29,6 +29,9 @@
     <ID>CyclomaticComplexMethod:MainActivity.kt$MainActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
     <ID>CyclomaticComplexMethod:AppScreen.kt$AppScreen.Companion$fun fromTag(tag: String): AppScreen</ID>
     <ID>CyclomaticComplexMethod:TajwidEngine.kt$TajwidEngine$fun analyzeWord(word: String, prevWord: String? = null, nextWord: String? = null): List&lt;TajwidRule&gt;</ID>
+    <ID>CyclomaticComplexMethod:SettingsStore.kt$SettingsStore$override fun restoreJson(json: String)</ID>
+    <ID>NestedBlockDepth:BackupManager.kt$BackupManager$fun import(json: String): BackupResult</ID>
+    <ID>TooGenericExceptionCaught:BackupManager.kt$BackupManager$e: Exception</ID>
     <ID>CyclomaticComplexMethod:TahsinScreen.kt$@Composable private fun MushafPageView( state: TahsinUiState.Ready, pageIndex: Int, strings: Strings, actions: MushafPageActions, )</ID>
     <ID>CyclomaticComplexMethod:TahsinScreen.kt$@Composable private fun SurahFlowBlock( ayahs: List&lt;MushafAyah&gt;, state: TahsinUiState.Ready, strings: Strings, actions: SurahFlowActions, )</ID>
     <ID>EmptyFunctionBlock:ArabicSpeechRecognizer.kt$ArabicSpeechRecognizer.&lt;no name provided&gt;${}</ID>

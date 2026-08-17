@@ -6,6 +6,9 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import org.opennur.tahsin.data.learning.LearningGoal
 
 /**
@@ -29,7 +32,7 @@ interface SettingsSource {
  * [PreferencesStore] — baca dari cache yang di-prime saat konstruksi, tulis
  * update cache + persist async. Lihat [PreferencesStore] untuk detail.
  */
-class SettingsStore(context: Context) : SettingsSource {
+class SettingsStore(context: Context) : SettingsSource, SettingsBackupSource {
 
     private val store = DataStores.preferences(
         context,
@@ -136,6 +139,55 @@ class SettingsStore(context: Context) : SettingsSource {
     var dailyMinutes: Int
         get() = (prefs[Keys.DAILY_MINUTES] ?: 15).coerceIn(5, 60)
         set(value) = store.edit { this[Keys.DAILY_MINUTES] = value.coerceIn(5, 60) }
+
+    // ---- SettingsBackupSource: snapshot/restore ----
+
+    override fun snapshotJson(): String {
+        val obj = JsonObject().apply {
+            addProperty("dark_mode", darkMode)
+            addProperty("swipe_hint_dismissed", swipeHintDismissed)
+            addProperty("tajwid_color", tajwidColor)
+            addProperty("show_translation", showTranslation)
+            addProperty("language_code", languageCode)
+            addProperty("audio_mode", audioMode)
+            addProperty("surah_number", surahNumber)
+            addProperty("ayah_index", ayahIndex)
+            addProperty("ayah_of_day_enabled", ayahOfDayEnabled)
+            addProperty("streak_reminder_enabled", streakReminderEnabled)
+            addProperty("reciter_slug", reciterSlug)
+            addProperty("audio_speed", audioSpeed)
+            addProperty("font_scale", fontScale)
+            addProperty("onboarding_complete", onboardingComplete)
+            addProperty("learning_goal", learningGoalKey)
+            addProperty("daily_minutes", dailyMinutes)
+            // Nullable: only include if set
+            backgroundDownloadAllowed?.let { addProperty("bg_download", it) }
+        }
+        return Gson().toJson(obj)
+    }
+
+    override fun restoreJson(json: String) {
+        val obj = JsonParser.parseString(json).asJsonObject
+        obj.get("dark_mode")?.asBoolean?.let { darkMode = it }
+        obj.get("swipe_hint_dismissed")?.asBoolean?.let { swipeHintDismissed = it }
+        obj.get("tajwid_color")?.asBoolean?.let { tajwidColor = it }
+        obj.get("show_translation")?.asBoolean?.let { showTranslation = it }
+        obj.get("language_code")?.asString?.let { languageCode = it }
+        obj.get("audio_mode")?.asString?.let { audioMode = it }
+        obj.get("surah_number")?.asInt?.let { surahNumber = it }
+        obj.get("ayah_index")?.asInt?.let { ayahIndex = it }
+        obj.get("ayah_of_day_enabled")?.asBoolean?.let { ayahOfDayEnabled = it }
+        obj.get("streak_reminder_enabled")?.asBoolean?.let { streakReminderEnabled = it }
+        obj.get("reciter_slug")?.asString?.let { reciterSlug = it }
+        obj.get("audio_speed")?.asFloat?.let { audioSpeed = it }
+        obj.get("font_scale")?.asFloat?.let { fontScale = it }
+        obj.get("onboarding_complete")?.asBoolean?.let { onboardingComplete = it }
+        obj.get("learning_goal")?.asString?.let { learningGoalKey = it }
+        obj.get("daily_minutes")?.asInt?.let { dailyMinutes = it }
+        obj.get("bg_download")?.let {
+            backgroundDownloadAllowed = if (it.isJsonNull) null else it.asBoolean
+        }
+    }
 
     /** Nama key DataStore (sama dengan key SharedPreferences lama — migrasi 1:1). */
     private object Keys {
