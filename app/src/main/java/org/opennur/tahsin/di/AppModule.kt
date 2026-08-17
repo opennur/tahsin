@@ -22,6 +22,7 @@ import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
+import org.opennur.tahsin.util.SettingsBackupAdapter
 import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.SettingsStore
 import org.opennur.tahsin.util.StatsStores
@@ -71,7 +72,7 @@ object AppModule {
     fun provideBackupManager(
         @ApplicationContext context: Context,
         settings: SettingsStore,
-    ): BackupManager = BackupManager.create(context, settings)
+    ): BackupManager = BackupManager.create(context, SettingsBackupAdapter(settings))
 
     @Provides
     @Singleton

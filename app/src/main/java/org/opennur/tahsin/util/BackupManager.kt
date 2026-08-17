@@ -7,30 +7,6 @@ import java.io.File
 import java.time.Instant
 
 /**
- * Sumber data setelan untuk backup/restore — interface kecil supaya
- * [BackupManager] bisa di-unit-test tanpa Android (inject fake).
- */
-interface SettingsBackupSource {
-    /** Serialisasi semua setelan ke JSON string. */
-    fun snapshotJson(): String?
-    /** Pulihkan semua setelan dari JSON string (hasil [snapshotJson]). */
-    fun restoreJson(json: String)
-}
-
-/**
- * Hasil operasi impor backup.
- *
- * @param importedStores Jumlah file store yang berhasil diimpor
- * @param errors Daftar error yang terjadi selama impor (0 = sukses penuh)
- */
-data class BackupResult(
-    val importedStores: Int = 0,
-    val errors: List<String> = emptyList(),
-) {
-    val success: Boolean get() = errors.isEmpty()
-}
-
-/**
  * Manajer backup/restore data pengguna.
  *
  * Membaca/menulis file store langsung dari [filesDir] (store menggunakan pola

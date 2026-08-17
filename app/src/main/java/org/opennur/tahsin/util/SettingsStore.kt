@@ -6,9 +6,6 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import org.opennur.tahsin.data.learning.LearningGoal
 
 /**
@@ -32,7 +29,7 @@ interface SettingsSource {
  * [PreferencesStore] — baca dari cache yang di-prime saat konstruksi, tulis
  * update cache + persist async. Lihat [PreferencesStore] untuk detail.
  */
-class SettingsStore(context: Context) : SettingsSource, SettingsBackupSource {
+class SettingsStore(context: Context) : SettingsSource {
 
     private val store = DataStores.preferences(
         context,
@@ -140,53 +137,79 @@ class SettingsStore(context: Context) : SettingsSource, SettingsBackupSource {
         get() = (prefs[Keys.DAILY_MINUTES] ?: 15).coerceIn(5, 60)
         set(value) = store.edit { this[Keys.DAILY_MINUTES] = value.coerceIn(5, 60) }
 
-    // ---- SettingsBackupSource: snapshot/restore ----
+    // ---- snapshot/restore for backup ----
 
-    override fun snapshotJson(): String {
-        val obj = JsonObject().apply {
-            addProperty("dark_mode", darkMode)
-            addProperty("swipe_hint_dismissed", swipeHintDismissed)
-            addProperty("tajwid_color", tajwidColor)
-            addProperty("show_translation", showTranslation)
-            addProperty("language_code", languageCode)
-            addProperty("audio_mode", audioMode)
-            addProperty("surah_number", surahNumber)
-            addProperty("ayah_index", ayahIndex)
-            addProperty("ayah_of_day_enabled", ayahOfDayEnabled)
-            addProperty("streak_reminder_enabled", streakReminderEnabled)
-            addProperty("reciter_slug", reciterSlug)
-            addProperty("audio_speed", audioSpeed)
-            addProperty("font_scale", fontScale)
-            addProperty("onboarding_complete", onboardingComplete)
-            addProperty("learning_goal", learningGoalKey)
-            addProperty("daily_minutes", dailyMinutes)
-            // Nullable: only include if set
-            backgroundDownloadAllowed?.let { addProperty("bg_download", it) }
-        }
-        return Gson().toJson(obj)
+    fun snapshotJson(): String {
+        val parts = mutableListOf<String>()
+        parts.add(jsonBool("dark_mode", darkMode))
+        parts.add(jsonBool("swipe_hint_dismissed", swipeHintDismissed))
+        parts.add(jsonBool("tajwid_color", tajwidColor))
+        parts.add(jsonBool("show_translation", showTranslation))
+        parts.add(jsonStr("language_code", languageCode))
+        parts.add(jsonStr("audio_mode", audioMode))
+        parts.add(jsonInt("surah_number", surahNumber))
+        parts.add(jsonInt("ayah_index", ayahIndex))
+        parts.add(jsonBool("ayah_of_day_enabled", ayahOfDayEnabled))
+        parts.add(jsonBool("streak_reminder_enabled", streakReminderEnabled))
+        parts.add(jsonStr("reciter_slug", reciterSlug))
+        parts.add(jsonFloat("audio_speed", audioSpeed))
+        parts.add(jsonFloat("font_scale", fontScale))
+        parts.add(jsonBool("onboarding_complete", onboardingComplete))
+        parts.add(jsonStr("learning_goal", learningGoalKey))
+        parts.add(jsonInt("daily_minutes", dailyMinutes))
+        backgroundDownloadAllowed?.let { parts.add(jsonBool("bg_download", it)) }
+        return "{" + parts.joinToString(",") + "}"
     }
 
-    override fun restoreJson(json: String) {
-        val obj = JsonParser.parseString(json).asJsonObject
-        obj.get("dark_mode")?.asBoolean?.let { darkMode = it }
-        obj.get("swipe_hint_dismissed")?.asBoolean?.let { swipeHintDismissed = it }
-        obj.get("tajwid_color")?.asBoolean?.let { tajwidColor = it }
-        obj.get("show_translation")?.asBoolean?.let { showTranslation = it }
-        obj.get("language_code")?.asString?.let { languageCode = it }
-        obj.get("audio_mode")?.asString?.let { audioMode = it }
-        obj.get("surah_number")?.asInt?.let { surahNumber = it }
-        obj.get("ayah_index")?.asInt?.let { ayahIndex = it }
-        obj.get("ayah_of_day_enabled")?.asBoolean?.let { ayahOfDayEnabled = it }
-        obj.get("streak_reminder_enabled")?.asBoolean?.let { streakReminderEnabled = it }
-        obj.get("reciter_slug")?.asString?.let { reciterSlug = it }
-        obj.get("audio_speed")?.asFloat?.let { audioSpeed = it }
-        obj.get("font_scale")?.asFloat?.let { fontScale = it }
-        obj.get("onboarding_complete")?.asBoolean?.let { onboardingComplete = it }
-        obj.get("learning_goal")?.asString?.let { learningGoalKey = it }
-        obj.get("daily_minutes")?.asInt?.let { dailyMinutes = it }
-        obj.get("bg_download")?.let {
-            backgroundDownloadAllowed = if (it.isJsonNull) null else it.asBoolean
+    fun restoreJson(json: String) {
+        val map = parseSimpleJson(json)
+        (map["dark_mode"] as? Boolean)?.let { darkMode = it }
+        (map["swipe_hint_dismissed"] as? Boolean)?.let { swipeHintDismissed = it }
+        (map["tajwid_color"] as? Boolean)?.let { tajwidColor = it }
+        (map["show_translation"] as? Boolean)?.let { showTranslation = it }
+        (map["language_code"] as? String)?.let { languageCode = it }
+        (map["audio_mode"] as? String)?.let { audioMode = it }
+        (map["surah_number"] as? Number)?.let { surahNumber = it.toInt() }
+        (map["ayah_index"] as? Number)?.let { ayahIndex = it.toInt() }
+        (map["ayah_of_day_enabled"] as? Boolean)?.let { ayahOfDayEnabled = it }
+        (map["streak_reminder_enabled"] as? Boolean)?.let { streakReminderEnabled = it }
+        (map["reciter_slug"] as? String)?.let { reciterSlug = it }
+        (map["audio_speed"] as? Number)?.let { audioSpeed = it.toFloat() }
+        (map["font_scale"] as? Number)?.let { fontScale = it.toFloat() }
+        (map["onboarding_complete"] as? Boolean)?.let { onboardingComplete = it }
+        (map["learning_goal"] as? String)?.let { learningGoalKey = it }
+        (map["daily_minutes"] as? Number)?.let { dailyMinutes = it.toInt() }
+        map["bg_download"]?.let {
+            backgroundDownloadAllowed = it as? Boolean
         }
+    }
+
+    private fun jsonBool(key: String, value: Boolean): String = "\"$key\":$value"
+    private fun jsonInt(key: String, value: Int): String = "\"$key\":$value"
+    private fun jsonFloat(key: String, value: Float): String = "\"$key\":$value"
+    private fun jsonStr(key: String, value: String): String =
+        "\"$key\":\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
+    private fun parseSimpleJson(json: String): Map<String, Any> {
+        val result = mutableMapOf<String, Any>()
+        val trimmed = json.trim().removeSurrounding("{", "}")
+        if (trimmed.isBlank()) return result
+        // Simple parser for flat JSON object with boolean/string/number values
+        val regex = Regex(""""([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?|true|false|null)""")
+        for (match in regex.findAll(trimmed)) {
+            val key = match.groupValues[1]
+            val raw = match.groupValues[2]
+            result[key] = when {
+                raw == "true" -> true
+                raw == "false" -> false
+                raw == "null" -> continue
+                raw.startsWith('"') && raw.endsWith('"') -> raw.removeSurrounding("\"")
+                    .replace("\\\\", "\u0000").replace("\\\"", "\"").replace("\u0000", "\\")
+                raw.contains('.') -> raw.toDouble()
+                else -> raw.toLongOrNull() ?: raw.toDouble()
+            }
+        }
+        return result
     }
 
     /** Nama key DataStore (sama dengan key SharedPreferences lama — migrasi 1:1). */
