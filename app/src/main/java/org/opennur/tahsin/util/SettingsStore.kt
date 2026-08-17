@@ -137,6 +137,81 @@ class SettingsStore(context: Context) : SettingsSource {
         get() = (prefs[Keys.DAILY_MINUTES] ?: 15).coerceIn(5, 60)
         set(value) = store.edit { this[Keys.DAILY_MINUTES] = value.coerceIn(5, 60) }
 
+    // ---- snapshot/restore for backup ----
+
+    fun snapshotJson(): String {
+        val parts = mutableListOf<String>()
+        parts.add(jsonBool("dark_mode", darkMode))
+        parts.add(jsonBool("swipe_hint_dismissed", swipeHintDismissed))
+        parts.add(jsonBool("tajwid_color", tajwidColor))
+        parts.add(jsonBool("show_translation", showTranslation))
+        parts.add(jsonStr("language_code", languageCode))
+        parts.add(jsonStr("audio_mode", audioMode))
+        parts.add(jsonInt("surah_number", surahNumber))
+        parts.add(jsonInt("ayah_index", ayahIndex))
+        parts.add(jsonBool("ayah_of_day_enabled", ayahOfDayEnabled))
+        parts.add(jsonBool("streak_reminder_enabled", streakReminderEnabled))
+        parts.add(jsonStr("reciter_slug", reciterSlug))
+        parts.add(jsonFloat("audio_speed", audioSpeed))
+        parts.add(jsonFloat("font_scale", fontScale))
+        parts.add(jsonBool("onboarding_complete", onboardingComplete))
+        parts.add(jsonStr("learning_goal", learningGoalKey))
+        parts.add(jsonInt("daily_minutes", dailyMinutes))
+        backgroundDownloadAllowed?.let { parts.add(jsonBool("bg_download", it)) }
+        return "{" + parts.joinToString(",") + "}"
+    }
+
+    fun restoreJson(json: String) {
+        val map = parseSimpleJson(json)
+        (map["dark_mode"] as? Boolean)?.let { darkMode = it }
+        (map["swipe_hint_dismissed"] as? Boolean)?.let { swipeHintDismissed = it }
+        (map["tajwid_color"] as? Boolean)?.let { tajwidColor = it }
+        (map["show_translation"] as? Boolean)?.let { showTranslation = it }
+        (map["language_code"] as? String)?.let { languageCode = it }
+        (map["audio_mode"] as? String)?.let { audioMode = it }
+        (map["surah_number"] as? Number)?.let { surahNumber = it.toInt() }
+        (map["ayah_index"] as? Number)?.let { ayahIndex = it.toInt() }
+        (map["ayah_of_day_enabled"] as? Boolean)?.let { ayahOfDayEnabled = it }
+        (map["streak_reminder_enabled"] as? Boolean)?.let { streakReminderEnabled = it }
+        (map["reciter_slug"] as? String)?.let { reciterSlug = it }
+        (map["audio_speed"] as? Number)?.let { audioSpeed = it.toFloat() }
+        (map["font_scale"] as? Number)?.let { fontScale = it.toFloat() }
+        (map["onboarding_complete"] as? Boolean)?.let { onboardingComplete = it }
+        (map["learning_goal"] as? String)?.let { learningGoalKey = it }
+        (map["daily_minutes"] as? Number)?.let { dailyMinutes = it.toInt() }
+        map["bg_download"]?.let {
+            backgroundDownloadAllowed = it as? Boolean
+        }
+    }
+
+    private fun jsonBool(key: String, value: Boolean): String = "\"$key\":$value"
+    private fun jsonInt(key: String, value: Int): String = "\"$key\":$value"
+    private fun jsonFloat(key: String, value: Float): String = "\"$key\":$value"
+    private fun jsonStr(key: String, value: String): String =
+        "\"$key\":\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
+    private fun parseSimpleJson(json: String): Map<String, Any> {
+        val result = mutableMapOf<String, Any>()
+        val trimmed = json.trim().removeSurrounding("{", "}")
+        if (trimmed.isBlank()) return result
+        // Simple parser for flat JSON object with boolean/string/number values
+        val regex = Regex(""""([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?|true|false|null)""")
+        for (match in regex.findAll(trimmed)) {
+            val key = match.groupValues[1]
+            val raw = match.groupValues[2]
+            result[key] = when {
+                raw == "true" -> true
+                raw == "false" -> false
+                raw == "null" -> continue
+                raw.startsWith('"') && raw.endsWith('"') -> raw.removeSurrounding("\"")
+                    .replace("\\\\", "\u0000").replace("\\\"", "\"").replace("\u0000", "\\")
+                raw.contains('.') -> raw.toDouble()
+                else -> raw.toLongOrNull() ?: raw.toDouble()
+            }
+        }
+        return result
+    }
+
     /** Nama key DataStore (sama dengan key SharedPreferences lama — migrasi 1:1). */
     private object Keys {
         val DARK_MODE = booleanPreferencesKey("dark_mode")

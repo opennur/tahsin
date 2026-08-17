@@ -58,7 +58,7 @@ data class LearningStrings(
  * Katalog teks UI per bahasa (tanpa resource Android — cukup untuk 2 bahasa).
  * Tambahkan bahasa baru = buat instance baru di [AppStrings.of].
  */
-data class Strings(
+class Strings(
     val appTitle: String,
     val subtitle: String,
     /** Subjudul portal (layar utama). */
@@ -103,6 +103,14 @@ data class Strings(
     val menuQuiz: String,
     val menuAudio: String,
     val menuDownloadAll: String,
+    // Data backup
+    val sectionData: String,
+    val exportBackup: String,
+    val importBackup: String,
+    val backupSuccess: String,
+    val backupFailed: String,
+    val importSuccess: String,
+    val importFailed: String,
     val swipeHint: String,
     val credit: String,
     val downloadNoticeTitle: String,
@@ -420,6 +428,14 @@ object AppStrings {
         menuQuiz = "📝 Kuis",
         menuAudio = "🎵 Kelola Audio",
         menuDownloadAll = "📥 Unduh Semua Audio",
+        // Data backup
+        sectionData = "Data & Cadangan",
+        exportBackup = "💾 Ekspor Data",
+        importBackup = "📥 Impor Data",
+        backupSuccess = "Ekspor berhasil! Simpan file backup di tempat aman.",
+        backupFailed = "Gagal mengekspor data: %s",
+        importSuccess = "Impor berhasil! %d file dipulihkan.",
+        importFailed = "Gagal mengimpor data: %s",
         swipeHint = "Geser layar ke kiri/kanan untuk ganti ayat",
         credit = "Dibuat dengan ❤️ oleh OpenNur Project (FOSS)",
         downloadNoticeTitle = "Mengunduh audio…",
@@ -720,6 +736,14 @@ object AppStrings {
         menuQuiz = "📝 Quiz",
         menuAudio = "🎵 Audio",
         menuDownloadAll = "📥 Download All Audio",
+        // Data backup
+        sectionData = "Data & Backup",
+        exportBackup = "💾 Export Data",
+        importBackup = "📥 Import Data",
+        backupSuccess = "Export successful! Save the backup file in a safe place.",
+        backupFailed = "Failed to export data: %s",
+        importSuccess = "Import successful! %d files restored.",
+        importFailed = "Failed to import data: %s",
         swipeHint = "Swipe the screen left/right to change ayah",
         credit = "Made with ❤️ by OpenNur Project (FOSS)",
         downloadNoticeTitle = "Downloading audio…",

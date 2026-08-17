@@ -13,6 +13,7 @@ import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.data.vocab.VocabularyRepository
 import org.opennur.tahsin.stt.ArabicSpeechRecognizer
 import org.opennur.tahsin.util.AudioDownloader
+import org.opennur.tahsin.util.BackupManager
 import org.opennur.tahsin.util.BookmarkStore
 import org.opennur.tahsin.util.DreamBigProgressStore
 import org.opennur.tahsin.util.FontStore
@@ -21,6 +22,7 @@ import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
+import org.opennur.tahsin.util.SettingsBackupAdapter
 import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.SettingsStore
 import org.opennur.tahsin.util.StatsStores
@@ -64,6 +66,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSettingsSource(store: SettingsStore): SettingsSource = store
+
+    @Provides
+    @Singleton
+    fun provideBackupManager(
+        @ApplicationContext context: Context,
+        settings: SettingsStore,
+    ): BackupManager = BackupManager(context.applicationContext.filesDir, SettingsBackupAdapter(settings))
 
     @Provides
     @Singleton
