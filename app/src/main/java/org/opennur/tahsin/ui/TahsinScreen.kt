@@ -1307,4 +1307,3 @@ private fun ayahIndexAt(offset: Int, starts: IntArray, ends: IntArray): Int {
     }
     return result
 }
-

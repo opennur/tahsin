@@ -6,6 +6,7 @@ import android.media.ToneGenerator
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.speech.SpeechRecognizer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,6 +42,7 @@ import org.opennur.tahsin.util.DownloadService
 import org.opennur.tahsin.util.FontScales
 import org.opennur.tahsin.util.FontStore
 import org.opennur.tahsin.util.Gamification
+import org.opennur.tahsin.util.GamificationEvents
 import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.ReadingStats
 import org.opennur.tahsin.util.AyahStats
@@ -185,6 +187,7 @@ data class SettingsUiState(
 enum class AudioPlaybackMode { AYAH, CONTINUOUS, REPEAT }
 
 @HiltViewModel
+@Suppress("LargeClass")
 class TahsinViewModel @Inject constructor(
     private val app: Context,
     private val repository: QuranRepository,
@@ -239,6 +242,22 @@ class TahsinViewModel @Inject constructor(
 
     /** Mode lanjut (audio) menunggu halaman berikutnya termuat untuk diputar. */
     private var pendingAutoPlay = false
+    /** Menunggu halaman berikutnya siap sebelum melanjutkan sesi flow. */
+    private var pendingFlowStart = false
+    private var flowRestartJob: Job? = null
+    private var recitationFlowActive = false
+    private var recitationGeneration = 0L
+
+    private companion object {
+        const val FLOW_RESTART_DELAY_MS = 250L
+        const val FLOW_READY_RETRY_DELAY_MS = 100L
+        const val FLOW_READY_RETRIES = 30
+        val RETRYABLE_SPEECH_ERRORS = setOf(
+            SpeechRecognizer.ERROR_NO_MATCH,
+            SpeechRecognizer.ERROR_SPEECH_TIMEOUT,
+            SpeechRecognizer.ERROR_RECOGNIZER_BUSY,
+        )
+    }
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     private var pendingOpenAt: Pair<Int, Int>? = null
     /** Penjaga muatan halaman: geser cepat → muatan lama yang selesai belakangan dibuang. */
@@ -341,10 +360,14 @@ class TahsinViewModel @Inject constructor(
     }
 
     /** Pager digeser ke halaman [index] — muat konten & set ayat aktif (ayat pertama). */
-    fun selectPage(index: Int) = moveToPage(index)
+    fun selectPage(index: Int) {
+        if (recitationFlowActive) stopRecitation()
+        moveToPage(index)
+    }
 
     /** Lompat ke halaman pertama surah [number]. */
     fun jumpToSurah(number: Int) {
+        if (recitationFlowActive) stopRecitation()
         pendingAutoPlay = false // navigasi manual membatalkan rantai audio tertunda
         // Navigasi manual membatalkan target widget/notifikasi yang belum terpakai.
         pendingOpenAt = null
@@ -355,6 +378,7 @@ class TahsinViewModel @Inject constructor(
 
     /** Lompat ke halaman awal juz [juz] (1..30). */
     fun jumpToJuz(juz: Int) {
+        if (recitationFlowActive) stopRecitation()
         pendingAutoPlay = false
         pendingOpenAt = null
         val s = currentReady() ?: return
@@ -365,6 +389,7 @@ class TahsinViewModel @Inject constructor(
 
     /** Lompat langsung ke halaman [page] (1-based, 1..604) — navigasi utama mushaf. */
     fun jumpToPage(page: Int) {
+        if (recitationFlowActive) stopRecitation()
         pendingAutoPlay = false
         pendingOpenAt = null
         val s = currentReady() ?: return
@@ -472,6 +497,10 @@ class TahsinViewModel @Inject constructor(
             pendingAutoPlay = false
             playAyahNow()
         }
+        if (pendingFlowStart) {
+            pendingFlowStart = false
+            scheduleFlowStart(recitationGeneration)
+        }
     }
 
     /** Ayat aktif berikutnya dalam halaman; habis → halaman berikutnya. */
@@ -509,7 +538,10 @@ class TahsinViewModel @Inject constructor(
     }
 
     /** Ketuk ayat di halaman → jadikan ayat aktif (sasaran latihan). */
-    fun selectAyahAt(surah: Int, ayahNumber: Int) = setActiveAyah(surah, ayahNumber)
+    fun selectAyahAt(surah: Int, ayahNumber: Int) {
+        if (recitationFlowActive) stopRecitation()
+        setActiveAyah(surah, ayahNumber)
+    }
 
     /** Jadikan surah:ayat sebagai ayat aktif tanpa pindah halaman. */
     private fun setActiveAyah(surah: Int, ayahNumber: Int) {
@@ -596,17 +628,27 @@ class TahsinViewModel @Inject constructor(
 
     fun toggleMic() {
         val s = currentReady() ?: return
-        if (s.listening) {
-            speech.stop()
+        if (s.listening || recitationFlowActive) {
+            stopRecitation()
             return
         }
         pendingAutoPlay = false // inisiatif manual membatalkan rantai audio tertunda
-        val words = s.ayah?.words.orEmpty()
+        val ayah = s.ayah ?: return
+        val words = ayah.words
         if (words.isEmpty()) return
-        startListeningSession(words)
+        recitationFlowActive = true
+        recitationGeneration++
+        GamificationEvents.beginSuppression()
+        startListeningSession(s.surahNumber, ayah.number, words, recitationGeneration)
     }
 
-    private fun startListeningSession(words: List<String>) {
+    private fun startListeningSession(
+        surahNumber: Int,
+        ayahNumber: Int,
+        words: List<String>,
+        generation: Long,
+    ) {
+        if (generation != recitationGeneration || words.isEmpty()) return
         updateReady { it.copy(
             listening = true,
             transcript = "",
@@ -615,23 +657,100 @@ class TahsinViewModel @Inject constructor(
             message = null,
         ) }
         speech.start(object : ArabicSpeechRecognizer.Listener {
-            override fun onPartial(text: String) = onTranscript(text, words)
+            override fun onPartial(text: String) {
+                if (isCurrentRecitation(surahNumber, ayahNumber, generation)) onTranscript(text, words)
+            }
+
             override fun onResult(text: String) {
+                if (!isCurrentRecitation(surahNumber, ayahNumber, generation)) return
                 onTranscript(text, words)
                 recordAttempt(text, words)
                 maybePlayFeedbackTone()
+                if (recitationFlowActive) {
+                    advanceRecitation(generation)
+                } else {
+                    updateReady { it.copy(listening = false) }
+                }
             }
+
             override fun onError(error: Int) {
-                updateReady { it.copy(
-                    listening = false,
-                    message = AppStrings.sttErrorMessage(error, currentLanguage()),
-                ) }
+                if (!isCurrentRecitation(surahNumber, ayahNumber, generation)) return
+                if (recitationFlowActive && error in RETRYABLE_SPEECH_ERRORS) {
+                    scheduleFlowRestart(generation)
+                } else {
+                    stopRecitation(AppStrings.sttErrorMessage(error, currentLanguage()))
+                }
             }
 
             override fun onListeningChanged(listening: Boolean) {
+                if (generation != recitationGeneration) return
+                // SpeechRecognizer ends each short session before onResults; keep
+                // the footer active while flow schedules the next one.
+                if (!listening && recitationFlowActive) return
                 updateReady { it.copy(listening = listening) }
             }
         })
+    }
+
+    private fun isCurrentRecitation(surah: Int, ayah: Int, generation: Long): Boolean {
+        val s = currentReady() ?: return false
+        return generation == recitationGeneration && s.surahNumber == surah && s.ayah?.number == ayah
+    }
+
+    private fun scheduleFlowRestart(generation: Long) {
+        flowRestartJob?.cancel()
+        flowRestartJob = viewModelScope.launch {
+            repeat(FLOW_READY_RETRIES) { attempt ->
+                delay(if (attempt == 0) FLOW_RESTART_DELAY_MS else FLOW_READY_RETRY_DELAY_MS)
+                val s = currentReady() ?: return@launch
+                if (!recitationFlowActive || generation != recitationGeneration) return@launch
+                val ayah = s.ayah
+                if (ayah != null && ayah.words.isNotEmpty()) {
+                    startListeningSession(s.surahNumber, ayah.number, ayah.words, generation)
+                    return@launch
+                }
+                if (!s.loadingSurah) {
+                    stopRecitation(s.message ?: AppStrings.of(currentLanguage()).msgMushafLoadFailed)
+                    return@launch
+                }
+            }
+            stopRecitation(AppStrings.of(currentLanguage()).msgMushafLoadFailed)
+        }
+    }
+
+    private fun scheduleFlowStart(generation: Long) = scheduleFlowRestart(generation)
+
+    private fun advanceRecitation(generation: Long) {
+        if (!recitationFlowActive || generation != recitationGeneration) return
+        val s = currentReady() ?: return
+        val page = s.composedPage ?: run {
+            stopRecitation(AppStrings.of(currentLanguage()).msgMushafLoadFailed)
+            return
+        }
+        val pos = page.ayahs.indexOfFirst { it.surah == s.surahNumber && it.number == s.ayahIndex + 1 }
+        if (pos >= 0 && pos < page.ayahs.lastIndex) {
+            val next = page.ayahs[pos + 1]
+            setActiveAyah(next.surah, next.number)
+            scheduleFlowStart(generation)
+            return
+        }
+        if (s.pageIndex < s.pageCount - 1) {
+            pendingFlowStart = true
+            moveToPage(s.pageIndex + 1)
+            return
+        }
+        stopRecitation(AppStrings.of(currentLanguage()).msgMurojaahDone)
+    }
+
+    private fun stopRecitation(message: String? = null) {
+        recitationFlowActive = false
+        recitationGeneration++
+        pendingFlowStart = false
+        flowRestartJob?.cancel()
+        flowRestartJob = null
+        speech.stop()
+        GamificationEvents.endSuppression()
+        updateReady { it.copy(listening = false, message = message ?: it.message) }
     }
 
     // ---- bookmark ayat ----
@@ -1258,6 +1377,8 @@ class TahsinViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        flowRestartJob?.cancel()
+        GamificationEvents.endSuppression()
         speech.destroy()
         audioPlayer.release()
         toneGen?.release()

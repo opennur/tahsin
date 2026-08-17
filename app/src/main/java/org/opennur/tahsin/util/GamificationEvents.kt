@@ -29,12 +29,30 @@ object GamificationEvents {
     private val _event = MutableStateFlow<CelebrationEvent?>(null)
     val event: StateFlow<CelebrationEvent?> = _event.asStateFlow()
 
+    private var suppressed = false
+    private var pending: CelebrationEvent? = null
+
     fun post(e: CelebrationEvent) {
-        _event.value = e
+        if (suppressed) pending = e else _event.value = e
+    }
+
+    /** Tahan dialog perayaan selama sesi flow agar bacaan tidak terputus. */
+    fun beginSuppression() {
+        suppressed = true
+    }
+
+    /** Akhiri penahanan dan tampilkan perayaan terakhir yang tertunda, bila ada. */
+    fun endSuppression() {
+        suppressed = false
+        pending?.let {
+            _event.value = it
+            pending = null
+        }
     }
 
     /** Tandai dialog sudah ditutup user. */
     fun consume() {
         _event.value = null
+        pending = null
     }
 }
