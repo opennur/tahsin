@@ -51,6 +51,7 @@ import org.opennur.tahsin.ui.components.SimpleDropdown
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.AudioSpeeds
 import org.opennur.tahsin.util.Reciter
+import org.opennur.tahsin.util.MushafRenderMode
 import org.opennur.tahsin.util.next
 
 /**
@@ -61,6 +62,7 @@ data class SettingsAppearanceActions(
     val onToggleTajwidColor: () -> Unit,
     val onToggleTranslation: () -> Unit,
     val onToggleDarkMode: () -> Unit,
+    val onSetMushafRenderMode: (MushafRenderMode) -> Unit,
     val onSetLanguage: (AppLanguage) -> Unit,
     val onEditLearningPlan: () -> Unit,
 )
@@ -197,6 +199,22 @@ private fun SettingsAppearanceSection(
     SettingRow("🎨 ${strings.settingTajwid}", settings.tajwidColor, actions.onToggleTajwidColor)
     SettingRow("🌐 ${strings.tahsinTranslation}", settings.showTranslation, actions.onToggleTranslation)
     SettingRow("🌙 ${strings.settingDarkMode}", settings.darkMode, actions.onToggleDarkMode)
+    Spacer(modifier = Modifier.height(8.dp))
+    SimpleDropdown(
+        selectedLabel = when (settings.mushafRenderMode) {
+            MushafRenderMode.EXACT -> strings.mushafModeExact
+            MushafRenderMode.ACCESSIBLE -> strings.mushafModeAccessible
+        },
+        options = listOf(
+            DropdownOption(strings.mushafModeExact) {
+                actions.onSetMushafRenderMode(MushafRenderMode.EXACT)
+            },
+            DropdownOption(strings.mushafModeAccessible) {
+                actions.onSetMushafRenderMode(MushafRenderMode.ACCESSIBLE)
+            },
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    )
     SettingRow(
         label = "🌐 ${strings.settingLanguage}",
         value = languageName,

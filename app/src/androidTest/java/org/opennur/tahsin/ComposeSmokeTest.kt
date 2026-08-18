@@ -78,6 +78,7 @@ class ComposeSmokeTest {
                         onToggleTajwidColor = {},
                         onToggleTranslation = {},
                         onToggleDarkMode = {},
+                        onSetMushafRenderMode = {},
                         onSetLanguage = {},
                         onEditLearningPlan = {},
                     ),

@@ -168,6 +168,23 @@ fun AudioManagerScreen(
 
         // ---- Progres unduhan aktif (mulai dari layar utama / download semua) ----
         val dl by DownloadProgress.state.collectAsStateWithLifecycle()
+        if (dl.errorMessage != null) {
+            AyahCard(modifier = Modifier.fillMaxWidth()) {
+                Column {
+                    AyahText(
+                        dl.errorMessage ?: strings.msgDownloadFailed,
+                        style = AyahTypography.Body2.copy(color = AyahColors.Error),
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AyahButton(
+                        text = strings.msgAudioRetry,
+                        variant = AyahButtonVariant.Outline,
+                        onClick = onDownloadAll,
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
         if (dl.isDownloading) {
             AyahCard(modifier = Modifier.fillMaxWidth()) {
                 Column {

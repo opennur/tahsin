@@ -1,5 +1,6 @@
 package org.opennur.tahsin
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +48,7 @@ import org.opennur.tahsin.ui.components.CelebrationDialog
 import org.opennur.tahsin.ui.components.DownloadNoticeDialog
 import org.opennur.tahsin.ui.navigation.AppScreen
 import org.opennur.tahsin.util.GamificationEvents
+import org.opennur.tahsin.util.MushafRenderMode
 
 @Composable
 @Suppress("LongMethod", "CyclomaticComplexMethod")
@@ -178,6 +180,19 @@ fun MainActivityContent(
                     onBack = { pop() },
                     onOpenAyah = onOpenAyah,
                     onOpenPetaKhatam = { push(AppScreen.PetaKhatam) },
+                    onShareReport = { report ->
+                        runCatching {
+                            context.startActivity(
+                                Intent.createChooser(
+                                    Intent(Intent.ACTION_SEND).apply {
+                                        type = "application/json"
+                                        putExtra(Intent.EXTRA_TEXT, report)
+                                    },
+                                    AppStrings.of(settingsState.language).statsShareReport,
+                                ),
+                            )
+                        }
+                    },
                 )
                 AppScreen.PetaKhatam -> PetaKhatamScreen(
                     onBack = { pop() },
@@ -219,6 +234,7 @@ fun MainActivityContent(
                             onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
                             onToggleTranslation = tahsinViewModel::toggleTranslation,
                             onToggleDarkMode = tahsinViewModel::toggleDarkMode,
+                            onSetMushafRenderMode = tahsinViewModel::setMushafRenderMode,
                             onSetLanguage = tahsinViewModel::setLanguage,
                             onEditLearningPlan = { showLearningSetup = true },
                         ),

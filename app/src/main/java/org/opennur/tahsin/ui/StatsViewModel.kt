@@ -17,6 +17,10 @@ import org.opennur.tahsin.util.ReadingProgressEngine
 import org.opennur.tahsin.util.ReadingProgressSummary
 import org.opennur.tahsin.util.SettingsSource
 import org.opennur.tahsin.util.StatsStores
+import org.opennur.tahsin.util.OfflineProgressReport
+import org.opennur.tahsin.util.OfflineProgressReportEncoder
+import org.opennur.tahsin.util.OfflineSurahProgress
+import org.opennur.tahsin.util.OfflineJuzProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -141,6 +145,48 @@ class StatsViewModel @Inject constructor(
                 nextReviews = nextReviews,
             )
         }
+    }
+
+    /** JSON anonim untuk dibagikan ke guru atau komunitas secara offline. */
+    fun exportOfflineReport(): String {
+        val current = _state.value
+        val progress = current.readingProgress
+        return OfflineProgressReportEncoder.encode(
+            OfflineProgressReport(
+                generatedAt = System.currentTimeMillis(),
+                totalAyahs = progress.totalAyahs,
+                practicedAyahs = progress.practicedAyahs,
+                goodAyahs = progress.goodAyahs,
+                dueAyahs = progress.dueAyahs,
+                goodPages = progress.goodPages,
+                reviewPages = progress.reviewPages,
+                untouchedPages = progress.untouchedPages,
+                goodJuz = progress.goodJuz,
+                totalSessions = current.totalSessions,
+                bestScorePct = current.bestScorePct,
+                streak = current.streak,
+                xp = current.xp,
+                surahs = progress.surahs.map {
+                    OfflineSurahProgress(
+                        number = it.number,
+                        totalAyahs = it.totalAyahs,
+                        practicedAyahs = it.practicedAyahs,
+                        goodAyahs = it.goodAyahs,
+                        averageScore = it.averageScore,
+                        dueAyahs = it.dueAyahs,
+                    )
+                },
+                juz = progress.juz.map {
+                    OfflineJuzProgress(
+                        juz = it.juz,
+                        startPage = it.startPage,
+                        totalAyahs = it.totalAyahs,
+                        practicedAyahs = it.practicedAyahs,
+                        goodAyahs = it.goodAyahs,
+                    )
+                },
+            ),
+        )
     }
 
 }

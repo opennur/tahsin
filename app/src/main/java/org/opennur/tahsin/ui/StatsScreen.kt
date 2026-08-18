@@ -47,10 +47,12 @@ import java.time.LocalDate
  * ronde, dan kata dikuasai, plus rincian ringkas per fitur.
  */
 @Composable
+@Suppress("LongMethod")
 fun StatsScreen(
     onBack: () -> Unit,
     onOpenAyah: (Int, Int) -> Unit = { _, _ -> },
     onOpenPetaKhatam: () -> Unit = {},
+    onShareReport: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val viewModel: StatsViewModel = viewModel()
@@ -84,6 +86,13 @@ fun StatsScreen(
             AyahText(
                 strings.statsSubtitle,
                 style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            AyahButton(
+                text = strings.statsShareReport,
+                variant = AyahButtonVariant.Outline,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onShareReport(viewModel.exportOfflineReport()) },
             )
 
             Spacer(modifier = Modifier.height(16.dp))

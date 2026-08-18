@@ -53,6 +53,11 @@ class SettingsStore(context: Context) : SettingsSource {
         get() = prefs[Keys.TAJWID_COLOR] ?: true
         set(value) = store.edit { this[Keys.TAJWID_COLOR] = value }
 
+    /** Mode render mushaf: exact 15 baris atau reflow aksesibel. */
+    var mushafRenderMode: MushafRenderMode
+        get() = MushafRenderMode.fromKey(prefs[Keys.MUSHAF_RENDER_MODE] ?: MushafRenderMode.ACCESSIBLE.key)
+        set(value) = store.edit { this[Keys.MUSHAF_RENDER_MODE] = value.key }
+
     /** Tampilkan terjemahan di mushaf (default MATI — mushaf asli). */
     var showTranslation: Boolean
         get() = prefs[Keys.SHOW_TRANSLATION] ?: false
@@ -144,6 +149,7 @@ class SettingsStore(context: Context) : SettingsSource {
         parts.add(jsonBool("dark_mode", darkMode))
         parts.add(jsonBool("swipe_hint_dismissed", swipeHintDismissed))
         parts.add(jsonBool("tajwid_color", tajwidColor))
+        parts.add(jsonStr("mushaf_render_mode", mushafRenderMode.key))
         parts.add(jsonBool("show_translation", showTranslation))
         parts.add(jsonStr("language_code", languageCode))
         parts.add(jsonStr("audio_mode", audioMode))
@@ -166,6 +172,7 @@ class SettingsStore(context: Context) : SettingsSource {
         (map["dark_mode"] as? Boolean)?.let { darkMode = it }
         (map["swipe_hint_dismissed"] as? Boolean)?.let { swipeHintDismissed = it }
         (map["tajwid_color"] as? Boolean)?.let { tajwidColor = it }
+        (map["mushaf_render_mode"] as? String)?.let { mushafRenderMode = MushafRenderMode.fromKey(it) }
         (map["show_translation"] as? Boolean)?.let { showTranslation = it }
         (map["language_code"] as? String)?.let { languageCode = it }
         (map["audio_mode"] as? String)?.let { audioMode = it }
@@ -217,6 +224,7 @@ class SettingsStore(context: Context) : SettingsSource {
         val DARK_MODE = booleanPreferencesKey("dark_mode")
         val SWIPE_HINT_DISMISSED = booleanPreferencesKey("swipe_hint_dismissed")
         val TAJWID_COLOR = booleanPreferencesKey("tajwid_color")
+        val MUSHAF_RENDER_MODE = stringPreferencesKey("mushaf_render_mode")
         val SHOW_TRANSLATION = booleanPreferencesKey("show_translation")
         val LANGUAGE_CODE = stringPreferencesKey("language_code")
         val AUDIO_MODE = stringPreferencesKey("audio_mode")

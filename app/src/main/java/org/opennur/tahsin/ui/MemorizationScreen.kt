@@ -321,6 +321,17 @@ private fun MemorizationSttSection(
                     strings.memorizationSttListening,
                     style = AyahTypography.Body2.copy(color = AyahColors.Primary),
                 )
+            } else if (state.sttError != null) {
+                AyahText(
+                    state.sttError,
+                    style = AyahTypography.Body2.copy(color = AyahColors.Error),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                AyahButton(
+                    text = strings.msgRetry,
+                    variant = AyahButtonVariant.Outline,
+                    onClick = onMicClick,
+                )
             } else if (state.sttScore != null) {
                 val score = state.sttScore
                 val pass = score >= 80

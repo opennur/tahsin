@@ -21,6 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
@@ -53,10 +57,15 @@ fun SimpleDropdown(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(min = 48.dp)
                 .onSizeChanged { triggerHeight = it.height }
                 .clip(AyahShapes.Field)
                 .background(AyahColors.SurfaceVariant)
-                .clickable { expanded = !expanded }
+                .clickable(role = Role.Button) { expanded = !expanded }
+                .semantics {
+                    this.contentDescription = selectedLabel
+                    this.role = Role.Button
+                }
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             contentAlignment = Alignment.CenterStart,
         ) {
@@ -90,7 +99,8 @@ fun SimpleDropdown(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable {
+                                    .heightIn(min = 48.dp)
+                                    .clickable(role = Role.Button) {
                                         expanded = false
                                         option.onClick()
                                     }

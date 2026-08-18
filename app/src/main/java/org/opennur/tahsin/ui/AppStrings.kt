@@ -76,10 +76,24 @@ data class LearningStrings(
     val memorizationApply: String,
 )
 
+/** Teks fitur tambahan agar konstruktor [Strings] tetap di bawah batas JVM. */
+data class AdditionalStrings(
+    val settingMushafMode: String,
+    val mushafModeExact: String,
+    val mushafModeAccessible: String,
+    val mushafExactNotice: String,
+    val msgSpeechUnavailable: String,
+    val msgSpeechRetry: String,
+    val msgAudioRetry: String,
+    val statsShareReport: String,
+    val statsReportShared: String,
+)
+
 /**
  * Katalog teks UI per bahasa (tanpa resource Android — cukup untuk 2 bahasa).
  * Tambahkan bahasa baru = buat instance baru di [AppStrings.of].
  */
+@Suppress("LongParameterList")
 class Strings(
     val appTitle: String,
     val subtitle: String,
@@ -353,8 +367,18 @@ class Strings(
     val favoritesEmpty: String,
     val favoritesLoading: String,
     val favoritesOpenHint: String,
+    val additional: AdditionalStrings,
     val learning: LearningStrings,
 ) {
+    val settingMushafMode get() = additional.settingMushafMode
+    val mushafModeExact get() = additional.mushafModeExact
+    val mushafModeAccessible get() = additional.mushafModeAccessible
+    val mushafExactNotice get() = additional.mushafExactNotice
+    val msgSpeechUnavailable get() = additional.msgSpeechUnavailable
+    val msgSpeechRetry get() = additional.msgSpeechRetry
+    val msgAudioRetry get() = additional.msgAudioRetry
+    val statsShareReport get() = additional.statsShareReport
+    val statsReportShared get() = additional.statsReportShared
     val settingLearningPlan get() = learning.settingLearningPlan
     val statsPlanLine get() = learning.statsPlanLine
     val menuMemorization get() = learning.menuMemorization
@@ -689,6 +713,17 @@ object AppStrings {
         favoritesEmpty = "Belum ada ayat favorit.\nBuka layar Tahsin, pilih satu ayat, lalu ketuk ★ di header.",
         favoritesLoading = "Memuat ayat favorit…",
         favoritesOpenHint = "Ketuk untuk membuka di mushaf",
+        additional = AdditionalStrings(
+            settingMushafMode = "Mode tampilan mushaf",
+            mushafModeExact = "Exact 15 baris",
+            mushafModeAccessible = "Aksesibel dan reflow",
+            mushafExactNotice = "Mode exact: Uthmani Madani, 15 baris, ukuran halaman terkunci.",
+            msgSpeechUnavailable = "Pengenalan suara Arab tidak tersedia di perangkat ini.",
+            msgSpeechRetry = "Pengenalan suara gagal. Periksa izin atau koneksi, lalu coba lagi.",
+            msgAudioRetry = "Audio gagal diputar. Periksa koneksi lalu coba lagi.",
+            statsShareReport = "Bagikan laporan offline",
+            statsReportShared = "Laporan siap dibagikan.",
+        ),
         learning = LearningStrings(
             settingLearningPlan = "Ubah rencana belajar",
             statsPlanLine = "Rencana hari ini: %d/%d aktivitas selesai",
@@ -1020,6 +1055,17 @@ object AppStrings {
         favoritesEmpty = "No favorite ayahs yet.\nOpen the Tahsin screen, pick an ayah, then tap ★ in the header.",
         favoritesLoading = "Loading favorite ayahs…",
         favoritesOpenHint = "Tap to open in the mushaf",
+        additional = AdditionalStrings(
+            settingMushafMode = "Mushaf display mode",
+            mushafModeExact = "Exact 15 lines",
+            mushafModeAccessible = "Accessible reflow",
+            mushafExactNotice = "Exact mode: Uthmani Madani, 15 lines, locked page geometry.",
+            msgSpeechUnavailable = "Arabic speech recognition is not available on this device.",
+            msgSpeechRetry = "Speech recognition failed. Check permission or connection, then try again.",
+            msgAudioRetry = "Audio playback failed. Check your connection and try again.",
+            statsShareReport = "Share offline report",
+            statsReportShared = "Report ready to share.",
+        ),
         learning = LearningStrings(
             settingLearningPlan = "Edit learning plan",
             statsPlanLine = "Today's plan: %d/%d activities complete",

@@ -21,6 +21,8 @@ ketiga untuk tujuan iklan, analitik, atau profil pengguna.
 - Cache data surah yang pernah diunduh.
 - Metadata antrean unduhan audio dan file sementara `.mp3.part` untuk
   pemulihan setelah aplikasi mati.
+- Laporan progres JSON hanya dibuat saat pengguna menekan tombol bagikan; laporan
+  berisi agregat anonim dan tidak berisi audio atau transcript suara.
 
 Aplikasi tidak membuat akun, tidak meminta login, dan tidak mengirim data ke
 server milik pengembang.

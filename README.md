@@ -12,8 +12,8 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 
 > ⚠️ **Batasan jujur** — aplikasi ini adalah alat bantu latihan, **bukan pengganti guru**.
 > Tampilan mushaf halaman memakai paginasi Madani yang PERSIS (isi ayat per halaman
-> sama dengan mushaf cetak), tapi teksnya disusun mengalir rata kanan-kiri (belum
-> ada data layout 15-baris per halaman yang pixel-exact).
+> sama dengan mushaf cetak). Tersedia dua mode tampilan: **Exact 15 baris** dengan
+> geometri Uthmani Madani terkunci, atau **Aksesibel/Reflow** untuk ukuran huruf besar.
 > STT (speech-to-text) hanya membaca *teks* ucapan: aplikasi bisa menilai kata
 > terlewat/salah susun/salah huruf, tapi **tidak bisa menilai makhraj atau
 > panjang-pendek harakat**. Deteksi tajwid bersifat rule-based ("peta hukum"
@@ -47,9 +47,10 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   di-bundle ke APK). Terjemahan **tersembunyi secara default** (toggle di
   Pengaturan). Navigasi **3 dropdown**: [Surah] [Ayat] [Halaman] — label pendek
   supaya tidak terpotong "…"; kontrol ukuran huruf **slider presisi (100–250%)**;
-  **ketuk kata → tooltip berisi arti kata, akar kata, dan aturan tajwid** dari
-  data terkurasi/morfologi; layar lebar (tablet) otomatis dibatasi 640dp dan
-  ditengahkan.
+   **ketuk kata → tooltip berisi arti kata, akar kata, dan aturan tajwid** dari
+   data terkurasi/morfologi; layar lebar (tablet) otomatis dibatasi 640dp dan
+   ditengahkan. Mode **Exact 15 baris** memakai font Uthmani yang dibundel;
+   mode **Aksesibel/Reflow** mendukung pembesaran teks dan TalkBack.
 - 🎙️ **Penilaian real-time**: kata berubah hijau (benar) / merah (salah) / kuning
   (sedang dibaca) saat kamu membaca ke mikrofon (SpeechRecognizer `ar-SA`).
 - 📊 **Statistik gabungan semua challenge** (persisten): layar **Statistik**
@@ -63,7 +64,9 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   menampilkan target XP harian, ayat yang sudah dilatih, halaman baik, juz baik,
   dan ayat yang siap dimurajaah.
 - 📈 **Progress per surah dan juz**: Statistik merinci ayat yang sudah dilatih,
-  skor baik, cakupan mushaf, dan murajaah yang jatuh tempo.
+   skor baik, cakupan mushaf, dan murajaah yang jatuh tempo.
+- 📤 **Laporan progres offline**: Statistik dapat dibagikan sebagai JSON anonim;
+   tidak ada audio atau transcript suara yang dimasukkan.
 - 🗺️ **Peta Khatam**: peta 604 halaman dan 30 juz dengan status belum dibaca,
   perlu murajaah, atau sudah baik; ketuk halaman/juz untuk membuka lokasi tepat.
 - 🎨 **Warna tajwid** (nyala default, bisa dimatikan di menu Pengaturan): mad (merah),
