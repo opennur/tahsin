@@ -102,6 +102,9 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
    yang berdiri sendiri — 8 pelajaran bertahap tentang jenis kata, jumlah,
    fa'il, maf'ul, jar, na'at, dan i'rab; lengkap dengan contoh, latihan susun
    kalimat, progres tersimpan, XP, rencana harian, dan Statistik.
+ - 📘 **Belajar Shorof** (menu Belajar Shorof): kursus morfologi Arab pemula
+   tentang akar kata, wazan, fi'il, isim turunan, dan tasrif; dilengkapi contoh,
+   latihan, progres tersimpan, XP, rencana harian, dan Statistik.
 - 🎮 **XP, Level & Streak**: setiap aktivitas belajar memberi XP — bacaan
   Tahsin (skor ≥70: 5 XP, ≥90: 10 XP), jawaban benar kuis (2 XP), kata
   kosakata baru dikuasai (10 XP), ronde Dream BIG (15 XP), sesi Belajar Arab

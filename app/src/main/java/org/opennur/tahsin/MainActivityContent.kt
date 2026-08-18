@@ -30,6 +30,7 @@ import org.opennur.tahsin.ui.HomeUtilityActions
 import org.opennur.tahsin.ui.LearningPlanViewModel
 import org.opennur.tahsin.ui.LughohScreen
 import org.opennur.tahsin.ui.NahwuScreen
+import org.opennur.tahsin.ui.ShorofScreen
 import org.opennur.tahsin.ui.MemorizationScreen
 import org.opennur.tahsin.ui.OnboardingScreen
 import org.opennur.tahsin.ui.OpenTarget
@@ -106,6 +107,7 @@ fun MainActivityContent(
                 LearningTaskType.UNDERSTAND -> push(AppScreen.Coherence)
                 LearningTaskType.ARABIC -> push(AppScreen.Lughoh)
                 LearningTaskType.NAHWU -> push(AppScreen.Nahwu)
+                LearningTaskType.SHOROF -> push(AppScreen.Shorof)
             }
         }
 
@@ -150,6 +152,7 @@ fun MainActivityContent(
                             onOpenAyatQuiz = { push(AppScreen.AyatQuiz) },
                             onOpenLughoh = { push(AppScreen.Lughoh) },
                             onOpenNahwu = { push(AppScreen.Nahwu) },
+                            onOpenShorof = { push(AppScreen.Shorof) },
                             onOpenDreamBig = { push(AppScreen.DreamBig) },
                         ),
                         utility = HomeUtilityActions(
@@ -233,6 +236,7 @@ fun MainActivityContent(
                 AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
                 AppScreen.Lughoh -> LughohScreen(onBack = { pop() })
                 AppScreen.Nahwu -> NahwuScreen(onBack = { pop() })
+                AppScreen.Shorof -> ShorofScreen(onBack = { pop() })
                 AppScreen.AyatQuiz -> AyatQuizScreen(onBack = { pop() })
                 AppScreen.Badges -> BadgesScreen(onBack = { pop() })
                 AppScreen.Favorites -> FavoritesScreen(

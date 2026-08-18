@@ -19,6 +19,7 @@ sealed interface AppScreen {
     data object DreamBig : AppScreen
     data object Lughoh : AppScreen
     data object Nahwu : AppScreen
+    data object Shorof : AppScreen
     data object AyatQuiz : AppScreen
     data object Badges : AppScreen
     data object Coherence : AppScreen
@@ -42,6 +43,7 @@ sealed interface AppScreen {
             "DreamBig" -> DreamBig
             "Lughoh" -> Lughoh
             "Nahwu" -> Nahwu
+            "Shorof" -> Shorof
             "AyatQuiz" -> AyatQuiz
             "Badges" -> Badges
             "Coherence" -> Coherence

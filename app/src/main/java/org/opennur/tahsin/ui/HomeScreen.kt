@@ -60,6 +60,7 @@ data class HomeLearningActions(
     val onOpenAyatQuiz: () -> Unit,
     val onOpenLughoh: () -> Unit,
     val onOpenNahwu: () -> Unit,
+    val onOpenShorof: () -> Unit,
     val onOpenDreamBig: () -> Unit,
 )
 
@@ -299,6 +300,12 @@ private fun HomeLearningMenu(strings: Strings, actions: HomeLearningActions) {
     }
     Spacer(modifier = Modifier.height(12.dp))
     HomeMenuCard(
+        text = strings.menuShorof,
+        onClick = actions.onOpenShorof,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+    HomeMenuCard(
         text = strings.menuDreamBig,
         onClick = actions.onOpenDreamBig,
         modifier = Modifier.fillMaxWidth(),
@@ -453,6 +460,7 @@ private fun taskLabel(type: LearningTaskType, strings: Strings): String = when (
     LearningTaskType.UNDERSTAND -> strings.taskUnderstand
     LearningTaskType.ARABIC -> strings.taskArabic
     LearningTaskType.NAHWU -> strings.taskNahwu
+    LearningTaskType.SHOROF -> strings.taskShorof
     LearningTaskType.MEMORIZATION -> strings.taskMemorization
 }
 

@@ -56,7 +56,7 @@ or all audio also removes pending download metadata and temporary files.
 | Content | Source | License/status |
 |---|---|---|
 | Amiri/Uthmani font | [Google Fonts: Amiri](https://fonts.google.com/specimen/Amiri) | SIL Open Font License 1.1; retain the license notice. |
-| Vocabulary, Learn Arabic lessons, quizzes, and app explanations | OpenNur-authored project content | GPLv3 with the project, unless a file states otherwise. |
+| Vocabulary, Learn Arabic, Nahwu, Shorof lessons, quizzes, and app explanations | OpenNur-authored project content | GPLv3 with the project, unless a file states otherwise. |
 | Madani pagination metadata | [alquran.cloud metadata API](https://alquran.cloud/api) | Metadata source attribution is retained in `tools/build_pages.py`; verify upstream terms before separate redistribution. |
 
 ## Release Gate

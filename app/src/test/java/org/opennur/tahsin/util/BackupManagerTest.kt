@@ -183,7 +183,7 @@ class BackupManagerTest {
 
     @Test
     fun storeFileNames_contains9Files() {
-        assertThat(BackupManager.STORE_FILENAMES).hasSize(10)
+        assertThat(BackupManager.STORE_FILENAMES).hasSize(11)
     }
 
     @Test
@@ -191,7 +191,8 @@ class BackupManagerTest {
         val expected = setOf(
             "reading-stats.json", "reading_history.json", "bookmarks.json",
             "gamification.json", "vocab-stats.json", "dreambig-progress.json",
-            "lughoh-progress.json", "nahwu-progress.json", "learning-plan.json", "memorization.json",
+            "lughoh-progress.json", "nahwu-progress.json", "shorof-progress.json",
+            "learning-plan.json", "memorization.json",
         )
         assertThat(BackupManager.STORE_FILENAMES.toSet()).isEqualTo(expected)
     }

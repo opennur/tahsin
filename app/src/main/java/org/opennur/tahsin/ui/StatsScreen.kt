@@ -248,6 +248,14 @@ fun StatsScreen(
                                 org.opennur.tahsin.data.nahwu.NahwuEngine.SESSION_SIZE,
                             ),
                         )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        BreakdownLine(
+                            strings.statsShorofLine.format(
+                                state.shorofRounds,
+                                state.shorofBest,
+                                org.opennur.tahsin.data.shorof.ShorofEngine.SESSION_SIZE,
+                            ),
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

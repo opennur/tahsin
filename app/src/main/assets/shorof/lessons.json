@@ -1,0 +1,1104 @@
+{
+ "schemaVersion": 1,
+ "generatedBy": "tools/build_shorof.py",
+ "levels": [
+  {
+   "id": 1,
+   "titleId": "Level 1 — Akar dan Tasrif Dasar",
+   "titleEn": "Level 1 — Roots and Basic Conjugation",
+   "titleAr": "المُسْتَوَى الأَوَّلُ",
+   "lessons": [
+    {
+     "id": "1-1",
+     "titleId": "Akar Kata dan Wazan",
+     "titleEn": "Roots and Wazan",
+     "titleAr": "الْجِذْرُ وَالْوَزْنُ",
+     "introId": "Akar kata terdiri dari huruf asli. Wazan membantu kita mengenali pola perubahan sebuah kata.",
+     "introEn": "A root consists of original letters. A wazan helps us recognize a word's transformation pattern.",
+     "rules": [
+      {
+       "titleId": "Akar kata tiga huruf",
+       "titleEn": "A three-letter root",
+       "explanationId": "Banyak kata Arab dibangun dari tiga huruf asli, seperti ع ل م.",
+       "explanationEn": "Many Arabic words are built from three root letters, such as ع ل م.",
+       "exampleAr": "عَلِمَ الطَّالِبُ",
+       "exampleLatin": "ʿAlima ṭ-ṭālibu",
+       "exampleId": "Siswa itu mengetahui",
+       "exampleEn": "The student knew"
+      },
+      {
+       "titleId": "Wazan فَعَلَ",
+       "titleEn": "The فَعَلَ pattern",
+       "explanationId": "فَعَلَ adalah pola dasar untuk banyak fi'il tsulatsi mujarrad.",
+       "explanationEn": "فَعَلَ is a basic pattern for many simple triliteral verbs.",
+       "exampleAr": "كَتَبَ مُحَمَّدٌ",
+       "exampleLatin": "Kataba Muḥammadun",
+       "exampleId": "Muhammad menulis",
+       "exampleEn": "Muhammad wrote"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ع ل م",
+       "rootLatin": "ʿ-l-m",
+       "wazan": "فَعَلَ",
+       "wazanLatin": "faʿala",
+       "formId": "Fi'il tsulatsi mujarrad",
+       "formEn": "Basic triliteral verb",
+       "meaningId": "mengetahui",
+       "meaningEn": "to know",
+       "exampleAr": "عَلِمَ",
+       "exampleLatin": "ʿalima"
+      }
+     ],
+     "conjugations": [],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Apa akar kata عَلِمَ?",
+       "promptEn": "What is the root of عَلِمَ?",
+       "promptAr": "عَلِمَ",
+       "promptLatin": "ʿAlima",
+       "optionsId": [
+        "ع ل م",
+        "ك ت ب",
+        "ن ص ر",
+        "ف ت ح"
+       ],
+       "optionsEn": [
+        "ع ل م",
+        "ك ت ب",
+        "ن ص ر",
+        "ف ت ح"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan kata كَتَبَ adalah...",
+       "promptEn": "The wazan of كَتَبَ is...",
+       "promptAr": "كَتَبَ",
+       "promptLatin": "Kataba",
+       "optionsId": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "أَفْعَلَ",
+        "فَاعَلَ"
+       ],
+       "optionsEn": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "أَفْعَلَ",
+        "فَاعَلَ"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Huruf asli dalam نَصَرَ adalah...",
+       "promptEn": "The root letters in نَصَرَ are...",
+       "promptAr": "نَصَرَ",
+       "promptLatin": "Naṣara",
+       "optionsId": [
+        "ن ص ر",
+        "ن س ر",
+        "ص ر ن",
+        "ن ض ر"
+       ],
+       "optionsEn": [
+        "ن ص ر",
+        "ن س ر",
+        "ص ر ن",
+        "ن ض ر"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Arti عَلِمَ adalah...",
+       "promptEn": "The meaning of عَلِمَ is...",
+       "promptAr": "عَلِمَ",
+       "promptLatin": "ʿAlima",
+       "optionsId": [
+        "mengetahui",
+        "menulis",
+        "membuka",
+        "menolong"
+       ],
+       "optionsEn": [
+        "to know",
+        "to write",
+        "to open",
+        "to help"
+       ],
+       "answerIndex": 0
+      }
+     ]
+    },
+    {
+     "id": "1-2",
+     "titleId": "Fi'il Madhi",
+     "titleEn": "The Past Tense",
+     "titleAr": "الْفِعْلُ الْمَاضِي",
+     "introId": "Fi'il madhi menunjukkan pekerjaan yang telah terjadi. Bentuk dasar biasanya memakai dhammah pada akhir fa'il.",
+     "introEn": "The past tense shows an action that happened. Its basic form commonly has dammah on the ending for a masculine singular subject.",
+     "rules": [
+      {
+       "titleId": "هُوَ dan هِيَ",
+       "titleEn": "هُوَ and هِيَ",
+       "explanationId": "Bentuk هُوَ dan هِيَ memakai bentuk tunggal yang berbeda pada beberapa fi'il.",
+       "explanationEn": "هُوَ and هِيَ use different singular forms for some verbs.",
+       "exampleAr": "هُوَ كَتَبَ وَهِيَ كَتَبَتْ",
+       "exampleLatin": "Huwa kataba wa-hiya katabat",
+       "exampleId": "Dia laki-laki menulis dan dia perempuan menulis",
+       "exampleEn": "He wrote and she wrote"
+      },
+      {
+       "titleId": "Akhiran jamak",
+       "titleEn": "Plural endings",
+       "explanationId": "وَاوُ الْجَمَاعَةِ pada كَتَبُوا menunjukkan pelaku laki-laki jamak.",
+       "explanationEn": "The plural suffix in كَتَبُوا shows a masculine plural subject.",
+       "exampleAr": "هُمْ كَتَبُوا الدَّرْسَ",
+       "exampleLatin": "Hum katabū d-darsa",
+       "exampleId": "Mereka menulis pelajaran",
+       "exampleEn": "They wrote the lesson"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ك ت ب",
+       "rootLatin": "k-t-b",
+       "wazan": "فَعَلَ",
+       "wazanLatin": "faʿala",
+       "formId": "Fi'il lampau",
+       "formEn": "Past-tense verb",
+       "meaningId": "menulis",
+       "meaningEn": "to write",
+       "exampleAr": "كَتَبَ",
+       "exampleLatin": "kataba"
+      }
+     ],
+     "conjugations": [
+      {
+       "pronounAr": "هُوَ",
+       "pronounLatin": "huwa",
+       "past": "كَتَبَ",
+       "present": "يَكْتُبُ",
+       "imperative": "اُكْتُبْ"
+      },
+      {
+       "pronounAr": "هِيَ",
+       "pronounLatin": "hiya",
+       "past": "كَتَبَتْ",
+       "present": "تَكْتُبُ",
+       "imperative": "اُكْتُبِي"
+      },
+      {
+       "pronounAr": "هُمْ",
+       "pronounLatin": "hum",
+       "past": "كَتَبُوا",
+       "present": "يَكْتُبُونَ",
+       "imperative": "اُكْتُبُوا"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Bentuk madhi untuk هِيَ adalah...",
+       "promptEn": "The past form for هِيَ is...",
+       "promptAr": "هِيَ ____",
+       "promptLatin": "Hiya ____",
+       "optionsId": [
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "كَتَبُوا",
+        "كَتَبْتُ"
+       ],
+       "optionsEn": [
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "كَتَبُوا",
+        "كَتَبْتُ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk كَتَبُوا menunjukkan...",
+       "promptEn": "كَتَبُوا shows...",
+       "promptAr": "هُمْ ____",
+       "promptLatin": "Hum ____",
+       "optionsId": [
+        "satu laki-laki",
+        "satu perempuan",
+        "banyak laki-laki",
+        "saya"
+       ],
+       "optionsEn": [
+        "one male",
+        "one female",
+        "many males",
+        "I"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: هُوَ ____ الدَّرْسَ",
+       "promptEn": "Complete: He ____ the lesson",
+       "promptAr": "هُوَ ____ الدَّرْسَ",
+       "promptLatin": "Huwa ____ d-darsa",
+       "optionsId": [
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "كَتَبُوا",
+        "كَتَبْنَ"
+       ],
+       "optionsEn": [
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "كَتَبُوا",
+        "كَتَبْنَ"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Arti كَتَبَتْ adalah...",
+       "promptEn": "The meaning of كَتَبَتْ is...",
+       "promptAr": "كَتَبَتْ",
+       "promptLatin": "Katabat",
+       "optionsId": [
+        "dia perempuan menulis",
+        "dia laki-laki menulis",
+        "mereka menulis",
+        "aku menulis"
+       ],
+       "optionsEn": [
+        "she wrote",
+        "he wrote",
+        "they wrote",
+        "I wrote"
+       ],
+       "answerIndex": 0
+      }
+     ]
+    },
+    {
+     "id": "1-3",
+     "titleId": "Fi'il Mudhari'",
+     "titleEn": "The Present Tense",
+     "titleAr": "الْفِعْلُ الْمُضَارِعُ",
+     "introId": "Fi'il mudhari' sering dikenali dengan salah satu huruf أ ن ي ت di awalnya.",
+     "introEn": "The present tense is often recognized by one of the prefix letters أ ن ي ت.",
+     "rules": [
+      {
+       "titleId": "Huruf mudhari'",
+       "titleEn": "Present-tense prefixes",
+       "explanationId": "أَكْتُبُ berarti saya menulis, نَكْتُبُ berarti kami menulis, dan يَكْتُبُ berarti dia laki-laki menulis.",
+       "explanationEn": "أَكْتُبُ means I write, نَكْتُبُ means we write, and يَكْتُبُ means he writes.",
+       "exampleAr": "نَكْتُبُ الدَّرْسَ",
+       "exampleLatin": "Naktubu d-darsa",
+       "exampleId": "Kami menulis pelajaran",
+       "exampleEn": "We write the lesson"
+      },
+      {
+       "titleId": "تَفْعَلُ untuk beberapa pelaku",
+       "titleEn": "تَفْعَلُ for several subjects",
+       "explanationId": "تَكْتُبُ dapat berarti kamu laki-laki menulis atau dia perempuan menulis.",
+       "explanationEn": "تَكْتُبُ can mean you (male) write or she writes.",
+       "exampleAr": "هِيَ تَكْتُبُ الرِّسَالَةَ",
+       "exampleLatin": "Hiya taktubu r-risālata",
+       "exampleId": "Dia perempuan menulis surat",
+       "exampleEn": "She writes the letter"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ك ت ب",
+       "rootLatin": "k-t-b",
+       "wazan": "يَفْعُلُ",
+       "wazanLatin": "yafʿulu",
+       "formId": "Fi'il sedang/akan",
+       "formEn": "Present or future verb",
+       "meaningId": "menulis",
+       "meaningEn": "to write",
+       "exampleAr": "يَكْتُبُ",
+       "exampleLatin": "yaktubu"
+      }
+     ],
+     "conjugations": [],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Bentuk untuk 'saya menulis' adalah...",
+       "promptEn": "The form for 'I write' is...",
+       "promptAr": "أَنَا ____",
+       "promptLatin": "Anā ____",
+       "optionsId": [
+        "أَكْتُبُ",
+        "نَكْتُبُ",
+        "يَكْتُبُ",
+        "تَكْتُبُ"
+       ],
+       "optionsEn": [
+        "أَكْتُبُ",
+        "نَكْتُبُ",
+        "يَكْتُبُ",
+        "تَكْتُبُ"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Huruf mudhari' pada نَكْتُبُ adalah...",
+       "promptEn": "The present prefix in نَكْتُبُ is...",
+       "promptAr": "نَكْتُبُ",
+       "promptLatin": "Naktubu",
+       "optionsId": [
+        "أ",
+        "ن",
+        "ي",
+        "ت"
+       ],
+       "optionsEn": [
+        "أ",
+        "ن",
+        "ي",
+        "ت"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: هُوَ ____ الْكِتَابَ",
+       "promptEn": "Complete: He ____ the book",
+       "promptAr": "هُوَ ____ الْكِتَابَ",
+       "promptLatin": "Huwa ____ l-kitāba",
+       "optionsId": [
+        "يَقْرَأُ",
+        "تَقْرَأُ",
+        "أَقْرَأُ",
+        "نَقْرَأُ"
+       ],
+       "optionsEn": [
+        "يَقْرَأُ",
+        "تَقْرَأُ",
+        "أَقْرَأُ",
+        "نَقْرَأُ"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "نَكْتُبُ berarti...",
+       "promptEn": "نَكْتُبُ means...",
+       "promptAr": "نَكْتُبُ",
+       "promptLatin": "Naktubu",
+       "optionsId": [
+        "kami menulis",
+        "saya menulis",
+        "dia menulis",
+        "kamu menulis"
+       ],
+       "optionsEn": [
+        "we write",
+        "I write",
+        "he writes",
+        "you write"
+       ],
+       "answerIndex": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "titleId": "Level 2 — Bentuk Turunan",
+   "titleEn": "Level 2 — Derived Forms",
+   "titleAr": "المُسْتَوَى الثَّانِي",
+   "lessons": [
+    {
+     "id": "2-1",
+     "titleId": "Fi'il Amr",
+     "titleEn": "The Imperative",
+     "titleAr": "فِعْلُ الْأَمْرِ",
+     "introId": "Fi'il amr digunakan untuk perintah. Bentuknya mengikuti fi'il mudhari' dan ditujukan kepada lawan bicara.",
+     "introEn": "The imperative is used for commands. Its form relates to the present tense and addresses the listener.",
+     "rules": [
+      {
+       "titleId": "Perintah kepada laki-laki",
+       "titleEn": "A command to one male",
+       "explanationId": "اُكْتُبْ berarti tulislah untuk satu laki-laki.",
+       "explanationEn": "اُكْتُبْ means write to one male.",
+       "exampleAr": "اُكْتُبْ دَرْسَكَ",
+       "exampleLatin": "Uktub darsaka",
+       "exampleId": "Tulislah pelajaranmu",
+       "exampleEn": "Write your lesson"
+      },
+      {
+       "titleId": "Perintah kepada perempuan dan jamak",
+       "titleEn": "Commands to females and plurals",
+       "explanationId": "Akhiran اُكْتُبِي dan اُكْتُبُوا menyesuaikan lawan bicara.",
+       "explanationEn": "The endings in اُكْتُبِي and اُكْتُبُوا match the listeners.",
+       "exampleAr": "اُكْتُبُوا الْوَاجِبَ",
+       "exampleLatin": "Uktubū l-wājiba",
+       "exampleId": "Tulislah tugas itu",
+       "exampleEn": "Write the assignment"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ك ت ب",
+       "rootLatin": "k-t-b",
+       "wazan": "اُفْعُلْ",
+       "wazanLatin": "ufʿul",
+       "formId": "Perintah",
+       "formEn": "Imperative",
+       "meaningId": "tulislah",
+       "meaningEn": "write",
+       "exampleAr": "اُكْتُبْ",
+       "exampleLatin": "uktub"
+      }
+     ],
+     "conjugations": [],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Perintah kepada satu laki-laki adalah...",
+       "promptEn": "The command to one male is...",
+       "promptAr": "أَنْتَ ____",
+       "promptLatin": "Anta ____",
+       "optionsId": [
+        "اُكْتُبْ",
+        "اُكْتُبِي",
+        "اُكْتُبُوا",
+        "كَتَبَ"
+       ],
+       "optionsEn": [
+        "اُكْتُبْ",
+        "اُكْتُبِي",
+        "اُكْتُبُوا",
+        "كَتَبَ"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk perintah untuk banyak orang adalah...",
+       "promptEn": "The command to many people is...",
+       "promptAr": "أَنْتُمْ ____",
+       "promptLatin": "Antum ____",
+       "optionsId": [
+        "اُجْلِسْ",
+        "اُجْلِسِي",
+        "اُجْلِسُوا",
+        "جَلَسَ"
+       ],
+       "optionsEn": [
+        "اُجْلِسْ",
+        "اُجْلِسِي",
+        "اُجْلِسُوا",
+        "جَلَسَ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Arti اُقْرَأْ adalah...",
+       "promptEn": "The meaning of اُقْرَأْ is...",
+       "promptAr": "اُقْرَأْ",
+       "promptLatin": "Iqra'",
+       "optionsId": [
+        "bacalah",
+        "membaca",
+        "dia membaca",
+        "mereka membaca"
+       ],
+       "optionsEn": [
+        "read",
+        "reading",
+        "he reads",
+        "they read"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Pilih fi'il amr: درس",
+       "promptEn": "Choose the imperative: درس",
+       "promptAr": "اخْتَرْ فِعْلَ الْأَمْرِ",
+       "promptLatin": "Choose the imperative",
+       "optionsId": [
+        "دَرَسَ",
+        "يَدْرُسُ",
+        "اُدْرُسْ",
+        "دِرَاسَةٌ"
+       ],
+       "optionsEn": [
+        "دَرَسَ",
+        "يَدْرُسُ",
+        "اُدْرُسْ",
+        "دِرَاسَةٌ"
+       ],
+       "answerIndex": 2
+      }
+     ]
+    },
+    {
+     "id": "2-2",
+     "titleId": "Wazan Form II",
+     "titleEn": "Form II Wazan",
+     "titleAr": "وَزْنُ فَعَّلَ",
+     "introId": "Form II memakai pola فَعَّلَ. Tasydid pada huruf tengah sering memberi makna membuat atau mengintensifkan.",
+     "introEn": "Form II uses فَعَّلَ. A doubled middle root letter often gives a causative or intensive meaning.",
+     "rules": [
+      {
+       "titleId": "Tasydid huruf tengah",
+       "titleEn": "Doubling the middle root letter",
+       "explanationId": "Pada عَلَّمَ, huruf ل kedua diberi tasydid sehingga berbeda dari عَلِمَ.",
+       "explanationEn": "In عَلَّمَ, the second ل is doubled, making it different from عَلِمَ.",
+       "exampleAr": "عَلَّمَ الْمُعَلِّمُ الطَّالِبَ",
+       "exampleLatin": "ʿAllama l-muʿallimu ṭ-ṭāliba",
+       "exampleId": "Guru mengajar siswa",
+       "exampleEn": "The teacher taught the student"
+      },
+      {
+       "titleId": "Makna membuat atau mengajarkan",
+       "titleEn": "Causative or intensive meaning",
+       "explanationId": "Form II dapat menjadikan orang lain melakukan sesuatu, seperti عَلَّمَ.",
+       "explanationEn": "Form II can cause someone else to do something, as in عَلَّمَ.",
+       "exampleAr": "كَسَّرَ الْوَلَدُ الْقَلَمَ",
+       "exampleLatin": "Kassara l-waladu l-qalama",
+       "exampleId": "Anak itu memecahkan pena",
+       "exampleEn": "The child broke the pen into pieces"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ع ل م",
+       "rootLatin": "ʿ-l-m",
+       "wazan": "فَعَّلَ",
+       "wazanLatin": "faʿʿala",
+       "formId": "Form II",
+       "formEn": "Form II",
+       "meaningId": "mengajarkan",
+       "meaningEn": "to teach",
+       "exampleAr": "عَلَّمَ",
+       "exampleLatin": "ʿallama"
+      }
+     ],
+     "conjugations": [],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Wazan عَلَّمَ adalah...",
+       "promptEn": "The wazan of عَلَّمَ is...",
+       "promptAr": "عَلَّمَ",
+       "promptLatin": "ʿAllama",
+       "optionsId": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "فَاعَلَ",
+        "أَفْعَلَ"
+       ],
+       "optionsEn": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "فَاعَلَ",
+        "أَفْعَلَ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Ciri utama Form II adalah...",
+       "promptEn": "The main feature of Form II is...",
+       "promptAr": "فَعَّلَ",
+       "promptLatin": "Faʿʿala",
+       "optionsId": [
+        "tasydid huruf tengah",
+        "alif di awal",
+        "hamzah di akhir",
+        "tanwin"
+       ],
+       "optionsEn": [
+        "doubling the middle letter",
+        "an initial alif",
+        "a final hamzah",
+        "tanwin"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Arti عَلَّمَ adalah...",
+       "promptEn": "The meaning of عَلَّمَ is...",
+       "promptAr": "عَلَّمَ",
+       "promptLatin": "ʿAllama",
+       "optionsId": [
+        "mengajarkan",
+        "mengetahui",
+        "duduk",
+        "keluar"
+       ],
+       "optionsEn": [
+        "to teach",
+        "to know",
+        "to sit",
+        "to leave"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Pilih bentuk Form II dari ك س ر",
+       "promptEn": "Choose Form II of ك س ر",
+       "promptAr": "ك س ر",
+       "promptLatin": "k-s-r",
+       "optionsId": [
+        "كَسَرَ",
+        "كَسَّرَ",
+        "أَكْسَرَ",
+        "كَاسَرَ"
+       ],
+       "optionsEn": [
+        "كَسَرَ",
+        "كَسَّرَ",
+        "أَكْسَرَ",
+        "كَاسَرَ"
+       ],
+       "answerIndex": 1
+      }
+     ]
+    },
+    {
+     "id": "2-3",
+     "titleId": "Wazan Form III dan IV",
+     "titleEn": "Form III and IV",
+     "titleAr": "وَزْنُ فَاعَلَ وَأَفْعَلَ",
+     "introId": "Form III memakai فَاعَلَ, sedangkan Form IV memakai أَفْعَلَ dengan hamzah tambahan di awal.",
+     "introEn": "Form III uses فَاعَلَ, while Form IV uses أَفْعَلَ with an added initial hamzah.",
+     "rules": [
+      {
+       "titleId": "Form III menunjukkan keterlibatan",
+       "titleEn": "Form III shows involvement",
+       "explanationId": "فَاعَلَ sering menunjukkan pekerjaan antara dua pihak, seperti سَاعَدَ.",
+       "explanationEn": "فَاعَلَ often shows an action involving two parties, such as سَاعَدَ.",
+       "exampleAr": "سَاعَدَ عَلِيٌّ صَدِيقَهُ",
+       "exampleLatin": "Sāʿada ʿAliyyun ṣadīqahu",
+       "exampleId": "Ali membantu temannya",
+       "exampleEn": "Ali helped his friend"
+      },
+      {
+       "titleId": "Form IV dengan أَفْعَلَ",
+       "titleEn": "Form IV with أَفْعَلَ",
+       "explanationId": "أَكْرَمَ memiliki hamzah tambahan dan berarti memuliakan.",
+       "explanationEn": "أَكْرَمَ has an added hamzah and means to honor.",
+       "exampleAr": "أَكْرَمَ الرَّجُلُ ضَيْفَهُ",
+       "exampleLatin": "Akrama r-rajulu ḍayfahu",
+       "exampleId": "Laki-laki itu memuliakan tamunya",
+       "exampleEn": "The man honored his guest"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ص ع د",
+       "rootLatin": "ṣ-ʿ-d",
+       "wazan": "فَاعَلَ",
+       "wazanLatin": "fāʿala",
+       "formId": "Form III",
+       "formEn": "Form III",
+       "meaningId": "saling menaikkan",
+       "meaningEn": "to deal with",
+       "exampleAr": "سَاعَدَ",
+       "exampleLatin": "sāʿada"
+      },
+      {
+       "root": "ك ر م",
+       "rootLatin": "k-r-m",
+       "wazan": "أَفْعَلَ",
+       "wazanLatin": "afʿala",
+       "formId": "Form IV",
+       "formEn": "Form IV",
+       "meaningId": "memuliakan",
+       "meaningEn": "to honor",
+       "exampleAr": "أَكْرَمَ",
+       "exampleLatin": "akrama"
+      }
+     ],
+     "conjugations": [],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Wazan سَاعَدَ adalah...",
+       "promptEn": "The wazan of سَاعَدَ is...",
+       "promptAr": "سَاعَدَ",
+       "promptLatin": "Sāʿada",
+       "optionsId": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "فَاعَلَ",
+        "أَفْعَلَ"
+       ],
+       "optionsEn": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "فَاعَلَ",
+        "أَفْعَلَ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan أَكْرَمَ adalah...",
+       "promptEn": "The wazan of أَكْرَمَ is...",
+       "promptAr": "أَكْرَمَ",
+       "promptLatin": "Akrama",
+       "optionsId": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "فَاعَلَ",
+        "أَفْعَلَ"
+       ],
+       "optionsEn": [
+        "فَعَلَ",
+        "فَعَّلَ",
+        "فَاعَلَ",
+        "أَفْعَلَ"
+       ],
+       "answerIndex": 3
+      },
+      {
+       "type": "choice",
+       "promptId": "Arti سَاعَدَ adalah...",
+       "promptEn": "The meaning of سَاعَدَ is...",
+       "promptAr": "سَاعَدَ",
+       "promptLatin": "Sāʿada",
+       "optionsId": [
+        "membantu",
+        "memuliakan",
+        "mengetahui",
+        "mengajar"
+       ],
+       "optionsEn": [
+        "to help",
+        "to honor",
+        "to know",
+        "to teach"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Ciri Form IV adalah...",
+       "promptEn": "A feature of Form IV is...",
+       "promptAr": "أَفْعَلَ",
+       "promptLatin": "Afʿala",
+       "optionsId": [
+        "hamzah tambahan di awal",
+        "tasydid huruf tengah",
+        "alif setelah huruf pertama",
+        "tanwin"
+       ],
+       "optionsEn": [
+        "an added initial hamzah",
+        "a doubled middle letter",
+        "alif after the first letter",
+        "tanwin"
+       ],
+       "answerIndex": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "titleId": "Level 3 — Isim Turunan dan Review",
+   "titleEn": "Level 3 — Derived Nouns and Review",
+   "titleAr": "المُسْتَوَى الثَّالِثُ",
+   "lessons": [
+    {
+     "id": "3-1",
+     "titleId": "Isim Fa'il dan Isim Maf'ul",
+     "titleEn": "Active and Passive Participles",
+     "titleAr": "اسْمُ الْفَاعِلِ وَاسْمُ الْمَفْعُولِ",
+     "introId": "Isim fa'il menunjukkan pelaku, sedangkan isim maf'ul menunjukkan sesuatu yang dikenai pekerjaan.",
+     "introEn": "The active participle shows the doer, while the passive participle shows what receives the action.",
+     "rules": [
+      {
+       "titleId": "Isim fa'il dari fi'il tiga huruf",
+       "titleEn": "Active participle from a triliteral verb",
+       "explanationId": "Dari كَتَبَ terbentuk كَاتِبٌ dengan pola فَاعِلٌ.",
+       "explanationEn": "كَاتِبٌ is formed from كَتَبَ on the فَاعِلٌ pattern.",
+       "exampleAr": "هٰذَا كَاتِبٌ",
+       "exampleLatin": "Hādhā kātibun",
+       "exampleId": "Ini seorang penulis",
+       "exampleEn": "This is a writer"
+      },
+      {
+       "titleId": "Isim maf'ul",
+       "titleEn": "Passive participle",
+       "explanationId": "Dari كَتَبَ terbentuk مَكْتُوبٌ yang berarti sesuatu yang ditulis.",
+       "explanationEn": "مَكْتُوبٌ comes from كَتَبَ and means something written.",
+       "exampleAr": "هٰذَا دَرْسٌ مَكْتُوبٌ",
+       "exampleLatin": "Hādhā darsun maktūbun",
+       "exampleId": "Ini pelajaran tertulis",
+       "exampleEn": "This is a written lesson"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ك ت ب",
+       "rootLatin": "k-t-b",
+       "wazan": "فَاعِلٌ",
+       "wazanLatin": "fāʿilun",
+       "formId": "Isim fa'il",
+       "formEn": "Active participle",
+       "meaningId": "penulis",
+       "meaningEn": "writer",
+       "exampleAr": "كَاتِبٌ",
+       "exampleLatin": "kātibun"
+      },
+      {
+       "root": "ك ت ب",
+       "rootLatin": "k-t-b",
+       "wazan": "مَفْعُولٌ",
+       "wazanLatin": "mafʿūlun",
+       "formId": "Isim maf'ul",
+       "formEn": "Passive participle",
+       "meaningId": "yang ditulis",
+       "meaningEn": "written",
+       "exampleAr": "مَكْتُوبٌ",
+       "exampleLatin": "maktūbun"
+      }
+     ],
+     "conjugations": [],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Isim fa'il dari كَتَبَ adalah...",
+       "promptEn": "The active participle of كَتَبَ is...",
+       "promptAr": "كَتَبَ → ____",
+       "promptLatin": "Kataba → ____",
+       "optionsId": [
+        "كَاتِبٌ",
+        "مَكْتُوبٌ",
+        "كِتَابَةٌ",
+        "مَكْتَبٌ"
+       ],
+       "optionsEn": [
+        "كَاتِبٌ",
+        "مَكْتُوبٌ",
+        "كِتَابَةٌ",
+        "مَكْتَبٌ"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Isim maf'ul dari كَتَبَ adalah...",
+       "promptEn": "The passive participle of كَتَبَ is...",
+       "promptAr": "كَتَبَ → ____",
+       "promptLatin": "Kataba → ____",
+       "optionsId": [
+        "كَاتِبٌ",
+        "مَكْتُوبٌ",
+        "كِتَابَةٌ",
+        "كَاتَبَ"
+       ],
+       "optionsEn": [
+        "كَاتِبٌ",
+        "مَكْتُوبٌ",
+        "كِتَابَةٌ",
+        "كَاتَبَ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "كَاتِبٌ berarti...",
+       "promptEn": "كَاتِبٌ means...",
+       "promptAr": "كَاتِبٌ",
+       "promptLatin": "Kātibun",
+       "optionsId": [
+        "penulis",
+        "yang ditulis",
+        "tulisan",
+        "tempat menulis"
+       ],
+       "optionsEn": [
+        "writer",
+        "written",
+        "writing",
+        "writing place"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Pola isim maf'ul adalah...",
+       "promptEn": "The passive participle pattern is...",
+       "promptAr": "اسْمُ الْمَفْعُولِ",
+       "promptLatin": "Ismu l-mafʿūl",
+       "optionsId": [
+        "فَاعِلٌ",
+        "مَفْعُولٌ",
+        "فَعَّالٌ",
+        "أَفْعَلُ"
+       ],
+       "optionsEn": [
+        "فَاعِلٌ",
+        "مَفْعُولٌ",
+        "فَعَّالٌ",
+        "أَفْعَلُ"
+       ],
+       "answerIndex": 1
+      }
+     ]
+    },
+    {
+     "id": "3-2",
+     "titleId": "Masdar",
+     "titleEn": "The Verbal Noun",
+     "titleAr": "الْمَصْدَرُ",
+     "introId": "Masdar adalah kata benda yang menunjukkan pekerjaan tanpa terikat waktu, seperti كِتَابَةٌ.",
+     "introEn": "A masdar is a verbal noun that shows an action without being tied to time, such as كِتَابَةٌ.",
+     "rules": [
+      {
+       "titleId": "Masdar dari كَتَبَ",
+       "titleEn": "Masdar from كَتَبَ",
+       "explanationId": "كِتَابَةٌ menunjukkan kegiatan menulis tanpa menyebut waktunya.",
+       "explanationEn": "كِتَابَةٌ shows the act of writing without specifying its time.",
+       "exampleAr": "كِتَابَةُ الدَّرْسِ مُفِيدَةٌ",
+       "exampleLatin": "Kitābatu d-darsi mufīdatun",
+       "exampleId": "Menulis pelajaran itu bermanfaat",
+       "exampleEn": "Writing the lesson is useful"
+      },
+      {
+       "titleId": "Masdar Form II",
+       "titleEn": "Masdar of Form II",
+       "explanationId": "Masdar عَلَّمَ adalah تَعْلِيمٌ, yaitu kegiatan mengajar.",
+       "explanationEn": "The masdar of عَلَّمَ is تَعْلِيمٌ, the act of teaching.",
+       "exampleAr": "التَّعْلِيمُ مُهِمٌّ",
+       "exampleLatin": "At-taʿlīmu muhimm",
+       "exampleId": "Pendidikan itu penting",
+       "exampleEn": "Education is important"
+      }
+     ],
+     "patterns": [
+      {
+       "root": "ك ت ب",
+       "rootLatin": "k-t-b",
+       "wazan": "فِعَالَةٌ",
+       "wazanLatin": "fiʿālatun",
+       "formId": "Masdar",
+       "formEn": "Verbal noun",
+       "meaningId": "penulisan",
+       "meaningEn": "writing",
+       "exampleAr": "كِتَابَةٌ",
+       "exampleLatin": "kitābatun"
+      },
+      {
+       "root": "ع ل م",
+       "rootLatin": "ʿ-l-m",
+       "wazan": "تَفْعِيلٌ",
+       "wazanLatin": "tafʿīlun",
+       "formId": "Masdar Form II",
+       "formEn": "Form II verbal noun",
+       "meaningId": "pengajaran",
+       "meaningEn": "teaching",
+       "exampleAr": "تَعْلِيمٌ",
+       "exampleLatin": "taʿlīmun"
+      }
+     ],
+     "conjugations": [],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Masdar dari كَتَبَ adalah...",
+       "promptEn": "The masdar of كَتَبَ is...",
+       "promptAr": "كَتَبَ → ____",
+       "promptLatin": "Kataba → ____",
+       "optionsId": [
+        "كَاتِبٌ",
+        "مَكْتُوبٌ",
+        "كِتَابَةٌ",
+        "مَكْتَبٌ"
+       ],
+       "optionsEn": [
+        "كَاتِبٌ",
+        "مَكْتُوبٌ",
+        "كِتَابَةٌ",
+        "مَكْتَبٌ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "تَعْلِيمٌ adalah masdar dari...",
+       "promptEn": "تَعْلِيمٌ is the masdar of...",
+       "promptAr": "تَعْلِيمٌ",
+       "promptLatin": "Taʿlīmun",
+       "optionsId": [
+        "عَلِمَ",
+        "عَلَّمَ",
+        "تَعَلَّمَ",
+        "أَعْلَمَ"
+       ],
+       "optionsEn": [
+        "عَلِمَ",
+        "عَلَّمَ",
+        "تَعَلَّمَ",
+        "أَعْلَمَ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Masdar menunjukkan...",
+       "promptEn": "A masdar shows...",
+       "promptAr": "الْمَصْدَرُ",
+       "promptLatin": "Al-maṣdaru",
+       "optionsId": [
+        "pelaku",
+        "waktu lampau",
+        "pekerjaan tanpa waktu",
+        "perintah"
+       ],
+       "optionsEn": [
+        "the doer",
+        "past time",
+        "an action without time",
+        "a command"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Pola تَعْلِيمٌ adalah...",
+       "promptEn": "The pattern of تَعْلِيمٌ is...",
+       "promptAr": "تَعْلِيمٌ",
+       "promptLatin": "Taʿlīmun",
+       "optionsId": [
+        "فِعَالَةٌ",
+        "تَفْعِيلٌ",
+        "مَفْعُولٌ",
+        "فَاعِلٌ"
+       ],
+       "optionsEn": [
+        "فِعَالَةٌ",
+        "تَفْعِيلٌ",
+        "مَفْعُولٌ",
+        "فَاعِلٌ"
+       ],
+       "answerIndex": 1
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
