@@ -87,20 +87,18 @@ object ProgressReportImage {
         val value = paint(40f, BRAND, bold = true)
 
         canvas.drawText(strings.statsReadingTitle, x, top + 54f, body)
-        var y = drawWrappedText(
-            canvas,
-            strings.statsReadingSummary.format(
-                report.practicedAyahs,
-                report.totalAyahs,
-                coveragePercent(report),
-                report.goodJuz,
-            ),
+        var y = top + 106f
+        canvas.drawText(
+            strings.statsReportPracticed.format(report.practicedAyahs, report.totalAyahs),
             x,
-            top + 106f,
-            maxWidth,
+            y,
             muted,
         )
-        y += 18f
+        y += 36f
+        canvas.drawText(strings.statsReportCoverage.format(coveragePercent(report)), x, y, muted)
+        y += 36f
+        canvas.drawText(strings.statsReportGoodJuz.format(report.goodJuz), x, y, muted)
+        y += 28f
         canvas.drawText(
             strings.homeReadingPages.format(
                 report.goodPages,

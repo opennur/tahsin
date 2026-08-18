@@ -82,6 +82,9 @@ data class AdditionalStrings(
     val msgSpeechRetry: String,
     val msgAudioRetry: String,
     val statsShareReport: String,
+    val statsReportPracticed: String,
+    val statsReportCoverage: String,
+    val statsReportGoodJuz: String,
 )
 
 /**
@@ -369,6 +372,9 @@ class Strings(
     val msgSpeechRetry get() = additional.msgSpeechRetry
     val msgAudioRetry get() = additional.msgAudioRetry
     val statsShareReport get() = additional.statsShareReport
+    val statsReportPracticed get() = additional.statsReportPracticed
+    val statsReportCoverage get() = additional.statsReportCoverage
+    val statsReportGoodJuz get() = additional.statsReportGoodJuz
     val settingLearningPlan get() = learning.settingLearningPlan
     val statsPlanLine get() = learning.statsPlanLine
     val menuMemorization get() = learning.menuMemorization
@@ -708,6 +714,9 @@ object AppStrings {
             msgSpeechRetry = "Pengenalan suara gagal. Periksa izin atau koneksi, lalu coba lagi.",
             msgAudioRetry = "Audio gagal diputar. Periksa koneksi lalu coba lagi.",
             statsShareReport = "Bagikan ringkasan sebagai gambar",
+            statsReportPracticed = "%d/%d ayat dilatih",
+            statsReportCoverage = "%d%% cakupan",
+            statsReportGoodJuz = "%d juz baik",
         ),
         learning = LearningStrings(
             settingLearningPlan = "Ubah rencana belajar",
@@ -1045,6 +1054,9 @@ object AppStrings {
             msgSpeechRetry = "Speech recognition failed. Check permission or connection, then try again.",
             msgAudioRetry = "Audio playback failed. Check your connection and try again.",
             statsShareReport = "Share summary as image",
+            statsReportPracticed = "%d/%d ayahs practiced",
+            statsReportCoverage = "%d%% coverage",
+            statsReportGoodJuz = "%d good juz",
         ),
         learning = LearningStrings(
             settingLearningPlan = "Edit learning plan",
