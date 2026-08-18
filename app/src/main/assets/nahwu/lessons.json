@@ -1,0 +1,914 @@
+{
+ "schemaVersion": 1,
+ "generatedBy": "tools/build_nahwu.py",
+ "levels": [
+  {
+   "id": 1,
+   "titleId": "Level 1 — Dasar Kalimat",
+   "titleEn": "Level 1 — Sentence Basics",
+   "titleAr": "المُسْتَوَى الأَوَّلُ",
+   "lessons": [
+    {
+     "id": "1-1",
+     "titleId": "Kalimah dan Tiga Jenis Kata",
+     "titleEn": "Kalimah and the Three Word Types",
+     "titleAr": "الْكَلِمَةُ وَأَقْسَامُهَا",
+     "introId": "Dalam Nahwu, kalimah adalah kata yang memiliki makna. Kalimah terbagi menjadi isim, fi'il, dan harf.",
+     "introEn": "In Nahwu, a kalimah is a word with meaning. It is divided into noun, verb, and particle.",
+     "rules": [
+      {
+       "titleId": "Isim — kata benda atau nama",
+       "titleEn": "Isim — a noun or name",
+       "explanationId": "Isim menunjukkan benda, orang, tempat, atau sifat dan tidak terikat waktu.",
+       "explanationEn": "An isim points to a thing, person, place, or quality and is not tied to a time.",
+       "exampleAr": "هٰذَا كِتَابٌ",
+       "exampleLatin": "Hādhā kitābun",
+       "exampleId": "Ini sebuah buku",
+       "exampleEn": "This is a book"
+      },
+      {
+       "titleId": "Fi'il dan harf",
+       "titleEn": "Fi'il and harf",
+       "explanationId": "Fi'il menunjukkan pekerjaan yang terkait waktu. Harf menghubungkan makna kata lain.",
+       "explanationEn": "A fi'il shows an action connected to time. A harf connects the meaning of other words.",
+       "exampleAr": "يَكْتُبُ الطَّالِبُ فِي الدَّفْتَرِ",
+       "exampleLatin": "Yaktubu ṭ-ṭālibu fī d-daftari",
+       "exampleId": "Siswa menulis di buku tulis",
+       "exampleEn": "The student writes in the notebook"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Kata هُوَ termasuk jenis apa?",
+       "promptEn": "What type of word is هُوَ?",
+       "promptAr": "هُوَ",
+       "promptLatin": "Huwa",
+       "optionsId": [
+        "Isim",
+        "Fi'il",
+        "Harf",
+        "Jumlah"
+       ],
+       "optionsEn": [
+        "Noun",
+        "Verb",
+        "Particle",
+        "Sentence"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kata يَذْهَبُ termasuk jenis apa?",
+       "promptEn": "What type of word is يَذْهَبُ?",
+       "promptAr": "يَذْهَبُ",
+       "promptLatin": "Yadhhabu",
+       "optionsId": [
+        "Isim",
+        "Fi'il",
+        "Harf",
+        "Sifat"
+       ],
+       "optionsEn": [
+        "Noun",
+        "Verb",
+        "Particle",
+        "Adjective"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Kata فِي termasuk jenis apa?",
+       "promptEn": "What type of word is فِي?",
+       "promptAr": "فِي الْبَيْتِ",
+       "promptLatin": "Fī l-bayti",
+       "optionsId": [
+        "Isim",
+        "Fi'il",
+        "Harf",
+        "Mubtada'"
+       ],
+       "optionsEn": [
+        "Noun",
+        "Verb",
+        "Particle",
+        "Subject"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Siswa menulis di buku.",
+       "promptEn": "Arrange the sentence: The student writes in the book.",
+       "words": [
+        {
+         "ar": "يَكْتُبُ",
+         "latin": "yaktubu"
+        },
+        {
+         "ar": "الطَّالِبُ",
+         "latin": "aṭ-ṭālibu"
+        },
+        {
+         "ar": "فِي",
+         "latin": "fī"
+        },
+        {
+         "ar": "الْكِتَابِ",
+         "latin": "al-kitābi"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "1-2",
+     "titleId": "Ma'rifah dan Nakirah",
+     "titleEn": "Definite and Indefinite Nouns",
+     "titleAr": "الْمَعْرِفَةُ وَالنَّكِرَةُ",
+     "introId": "Isim ma'rifah menunjuk sesuatu yang tertentu. Isim nakirah menunjuk sesuatu yang belum tertentu.",
+     "introEn": "A definite noun points to something specific. An indefinite noun points to something not yet specific.",
+     "rules": [
+      {
+       "titleId": "Alif lam menunjukkan ma'rifah",
+       "titleEn": "Alif lam marks definiteness",
+       "explanationId": "Kata الْكِتَابُ berarti buku yang tertentu, sedangkan كِتَابٌ berarti sebuah buku.",
+       "explanationEn": "الْكِتَابُ means the specific book, while كِتَابٌ means a book.",
+       "exampleAr": "هٰذَا الْكِتَابُ مُفِيدٌ",
+       "exampleLatin": "Hādhā l-kitābu mufīdun",
+       "exampleId": "Buku ini bermanfaat",
+       "exampleEn": "This book is useful"
+      },
+      {
+       "titleId": "Tanwin adalah tanda nakirah",
+       "titleEn": "Tanwin marks indefiniteness",
+       "explanationId": "Tanwin pada akhir isim, seperti كِتَابٌ, biasanya menunjukkan makna belum tertentu.",
+       "explanationEn": "Tanwin at the end of a noun, such as كِتَابٌ, usually marks an indefinite meaning.",
+       "exampleAr": "عِنْدِي كِتَابٌ",
+       "exampleLatin": "ʿIndī kitābun",
+       "exampleId": "Aku mempunyai sebuah buku",
+       "exampleEn": "I have a book"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Mana yang berarti 'buku itu'?",
+       "promptEn": "Which one means 'the book'?",
+       "promptAr": "____ كِتَابٌ",
+       "promptLatin": "____ kitābun",
+       "optionsId": [
+        "كِتَابٌ",
+        "الْكِتَابُ",
+        "كِتَابًا",
+        "كِتَابٍ"
+       ],
+       "optionsEn": [
+        "a book",
+        "the book",
+        "a book (object)",
+        "a book (after a preposition)"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Kata كِتَابٌ termasuk...",
+       "promptEn": "The word كِتَابٌ is...",
+       "promptAr": "كِتَابٌ",
+       "promptLatin": "Kitābun",
+       "optionsId": [
+        "Ma'rifah",
+        "Nakirah",
+        "Fi'il",
+        "Harf"
+       ],
+       "optionsEn": [
+        "Definite",
+        "Indefinite",
+        "Verb",
+        "Particle"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: هٰذَا ____ مُفِيدٌ",
+       "promptEn": "Complete: This ____ is useful",
+       "promptAr": "هٰذَا ____ مُفِيدٌ",
+       "promptLatin": "Hādhā ____ mufīdun",
+       "optionsId": [
+        "كِتَابٌ",
+        "الْكِتَابُ",
+        "كِتَابًا",
+        "كِتَابٍ"
+       ],
+       "optionsEn": [
+        "a book",
+        "the book",
+        "a book (object)",
+        "a book (after a preposition)"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Aku mempunyai sebuah buku.",
+       "promptEn": "Arrange the sentence: I have a book.",
+       "words": [
+        {
+         "ar": "عِنْدِي",
+         "latin": "ʿindī"
+        },
+        {
+         "ar": "كِتَابٌ",
+         "latin": "kitābun"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "1-3",
+     "titleId": "Jumlah Ismiyyah",
+     "titleEn": "The Nominal Sentence",
+     "titleAr": "الْجُمْلَةُ الِاسْمِيَّةُ",
+     "introId": "Jumlah ismiyyah dimulai dengan isim. Dua unsur dasarnya adalah mubtada' dan khabar.",
+     "introEn": "A nominal sentence begins with a noun. Its two basic parts are the mubtada' and khabar.",
+     "rules": [
+      {
+       "titleId": "Mubtada' adalah pokok pembicaraan",
+       "titleEn": "Mubtada' is the topic",
+       "explanationId": "Mubtada' biasanya berada di awal jumlah ismiyyah dan menjadi pokok yang dibicarakan.",
+       "explanationEn": "The mubtada' usually comes first in a nominal sentence and is its topic.",
+       "exampleAr": "الطَّالِبُ مُجْتَهِدٌ",
+       "exampleLatin": "Aṭ-ṭālibu mujtahidun",
+       "exampleId": "Siswa itu rajin",
+       "exampleEn": "The student is diligent"
+      },
+      {
+       "titleId": "Khabar memberi informasi",
+       "titleEn": "Khabar gives information",
+       "explanationId": "Khabar memberi informasi tentang mubtada' dan biasanya mengikuti mubtada' dalam keadaan marfu'.",
+       "explanationEn": "The khabar gives information about the mubtada' and usually follows it in the nominative case.",
+       "exampleAr": "الْبَيْتُ كَبِيرٌ",
+       "exampleLatin": "Al-baytu kabīrun",
+       "exampleId": "Rumah itu besar",
+       "exampleEn": "The house is big"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Apa mubtada' dalam الْبَيْتُ كَبِيرٌ?",
+       "promptEn": "What is the mubtada' in الْبَيْتُ كَبِيرٌ?",
+       "promptAr": "الْبَيْتُ كَبِيرٌ",
+       "promptLatin": "Al-baytu kabīrun",
+       "optionsId": [
+        "الْبَيْتُ",
+        "كَبِيرٌ",
+        "كَبِيرًا",
+        "فِي"
+       ],
+       "optionsEn": [
+        "الْبَيْتُ",
+        "كَبِيرٌ",
+        "كَبِيرًا",
+        "فِي"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Apa khabar dalam الطَّالِبُ مُجْتَهِدٌ?",
+       "promptEn": "What is the khabar in الطَّالِبُ مُجْتَهِدٌ?",
+       "promptAr": "الطَّالِبُ مُجْتَهِدٌ",
+       "promptLatin": "Aṭ-ṭālibu mujtahidun",
+       "optionsId": [
+        "الطَّالِبُ",
+        "مُجْتَهِدٌ",
+        "الطَّالِبَ",
+        "مِنْ"
+       ],
+       "optionsEn": [
+        "الطَّالِبُ",
+        "مُجْتَهِدٌ",
+        "الطَّالِبَ",
+        "مِنْ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Arti الْبَيْتُ كَبِيرٌ adalah...",
+       "promptEn": "The meaning of الْبَيْتُ كَبِيرٌ is...",
+       "promptAr": "الْبَيْتُ كَبِيرٌ",
+       "promptLatin": "Al-baytu kabīrun",
+       "optionsId": [
+        "Rumah itu besar",
+        "Rumah itu kecil",
+        "Aku melihat rumah",
+        "Di dalam rumah"
+       ],
+       "optionsEn": [
+        "The house is big",
+        "The house is small",
+        "I see a house",
+        "Inside the house"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Rumah itu besar.",
+       "promptEn": "Arrange the sentence: The house is big.",
+       "words": [
+        {
+         "ar": "الْبَيْتُ",
+         "latin": "al-baytu"
+        },
+        {
+         "ar": "كَبِيرٌ",
+         "latin": "kabīrun"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "1-4",
+     "titleId": "Jumlah Fi'liyyah dan Fa'il",
+     "titleEn": "The Verbal Sentence and Subject",
+     "titleAr": "الْجُمْلَةُ الْفِعْلِيَّةُ وَالْفَاعِلُ",
+     "introId": "Jumlah fi'liyyah dimulai dengan fi'il. Fa'il adalah pelaku pekerjaan.",
+     "introEn": "A verbal sentence begins with a verb. The fa'il is the doer of the action.",
+     "rules": [
+      {
+       "titleId": "Fi'il berada di awal",
+       "titleEn": "The verb comes first",
+       "explanationId": "Dalam pola dasar jumlah fi'liyyah, fi'il disebut sebelum fa'il.",
+       "explanationEn": "In the basic verbal-sentence pattern, the verb is mentioned before the fa'il.",
+       "exampleAr": "ذَهَبَ الطَّالِبُ",
+       "exampleLatin": "Dhahaba ṭ-ṭālibu",
+       "exampleId": "Siswa itu pergi",
+       "exampleEn": "The student went"
+      },
+      {
+       "titleId": "Fa'il adalah pelaku",
+       "titleEn": "Fa'il is the doer",
+       "explanationId": "Fa'il menjawab pertanyaan siapa yang melakukan pekerjaan dan berstatus marfu'.",
+       "explanationEn": "The fa'il answers who performed the action and is in the nominative case.",
+       "exampleAr": "كَتَبَ أَحْمَدُ الدَّرْسَ",
+       "exampleLatin": "Kataba Aḥmadu d-darsa",
+       "exampleId": "Ahmad menulis pelajaran",
+       "exampleEn": "Ahmad wrote the lesson"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Apa fa'il dalam جَلَسَ الْوَلَدُ?",
+       "promptEn": "What is the fa'il in جَلَسَ الْوَلَدُ?",
+       "promptAr": "جَلَسَ الْوَلَدُ",
+       "promptLatin": "Jalasa l-waladu",
+       "optionsId": [
+        "جَلَسَ",
+        "الْوَلَدُ",
+        "الْوَلَدَ",
+        "فِي"
+       ],
+       "optionsEn": [
+        "جَلَسَ",
+        "الْوَلَدُ",
+        "الْوَلَدَ",
+        "فِي"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Kalimat mana yang merupakan jumlah fi'liyyah?",
+       "promptEn": "Which sentence is a verbal sentence?",
+       "promptAr": "اخْتَرِ الْجُمْلَةَ الْفِعْلِيَّةَ",
+       "promptLatin": "Ikhtari l-jumlah",
+       "optionsId": [
+        "الْجَوُّ جَمِيلٌ",
+        "ذَهَبَ عَلِيٌّ",
+        "الْبَيْتُ كَبِيرٌ",
+        "الطَّالِبُ نَشِيطٌ"
+       ],
+       "optionsEn": [
+        "The weather is nice",
+        "Ali went",
+        "The house is big",
+        "The student is active"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Fa'il biasanya berstatus...",
+       "promptEn": "The fa'il is usually in the...",
+       "promptAr": "الْفَاعِلُ مَرْفُوعٌ",
+       "promptLatin": "Al-fāʿilu marfūʿun",
+       "optionsId": [
+        "Marfu'",
+        "Manshub",
+        "Majrur",
+        "Mabni"
+       ],
+       "optionsEn": [
+        "Nominative",
+        "Accusative",
+        "Genitive",
+        "Fixed form"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Ahmad menulis pelajaran.",
+       "promptEn": "Arrange the sentence: Ahmad wrote the lesson.",
+       "words": [
+        {
+         "ar": "كَتَبَ",
+         "latin": "kataba"
+        },
+        {
+         "ar": "أَحْمَدُ",
+         "latin": "Aḥmadu"
+        },
+        {
+         "ar": "الدَّرْسَ",
+         "latin": "ad-darsa"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "titleId": "Level 2 — Unsur Kalimat",
+   "titleEn": "Level 2 — Sentence Elements",
+   "titleAr": "المُسْتَوَى الثَّانِي",
+   "lessons": [
+    {
+     "id": "2-1",
+     "titleId": "Maf'ul Bih",
+     "titleEn": "The Direct Object",
+     "titleAr": "الْمَفْعُولُ بِهِ",
+     "introId": "Maf'ul bih adalah sesuatu yang dikenai pekerjaan. Ia biasanya berstatus manshub.",
+     "introEn": "The maf'ul bih is what receives the action. It is usually in the accusative case.",
+     "rules": [
+      {
+       "titleId": "Maf'ul bih menerima pekerjaan",
+       "titleEn": "Maf'ul bih receives the action",
+       "explanationId": "Tanyakan 'apa yang dikerjakan?' untuk menemukan maf'ul bih.",
+       "explanationEn": "Ask 'what was acted upon?' to find the maf'ul bih.",
+       "exampleAr": "قَرَأَ الطَّالِبُ الْكِتَابَ",
+       "exampleLatin": "Qara'a ṭ-ṭālibu l-kitāba",
+       "exampleId": "Siswa membaca buku itu",
+       "exampleEn": "The student read the book"
+      },
+      {
+       "titleId": "Tanda fathah pada maf'ul",
+       "titleEn": "Fathah on the maf'ul",
+       "explanationId": "Isim mufrad sebagai maf'ul bih biasanya berakhir fathah, seperti الْكِتَابَ.",
+       "explanationEn": "A singular noun as maf'ul bih usually ends with fathah, such as الْكِتَابَ.",
+       "exampleAr": "شَرِبَ الْوَلَدُ الْمَاءَ",
+       "exampleLatin": "Shariba l-waladu l-mā'a",
+       "exampleId": "Anak itu minum air",
+       "exampleEn": "The child drank the water"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Apa maf'ul bih dalam قَرَأَ الطَّالِبُ الْكِتَابَ?",
+       "promptEn": "What is the maf'ul bih in قَرَأَ الطَّالِبُ الْكِتَابَ?",
+       "promptAr": "قَرَأَ الطَّالِبُ الْكِتَابَ",
+       "promptLatin": "Qara'a ṭ-ṭālibu l-kitāba",
+       "optionsId": [
+        "قَرَأَ",
+        "الطَّالِبُ",
+        "الْكِتَابَ",
+        "الطَّالِبِ"
+       ],
+       "optionsEn": [
+        "قَرَأَ",
+        "الطَّالِبُ",
+        "الْكِتَابَ",
+        "الطَّالِبِ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Maf'ul bih biasanya berstatus...",
+       "promptEn": "The maf'ul bih is usually in the...",
+       "promptAr": "الْمَفْعُولُ بِهِ",
+       "promptLatin": "Al-mafʿūlu bihi",
+       "optionsId": [
+        "Marfu'",
+        "Manshub",
+        "Majrur",
+        "Majzum"
+       ],
+       "optionsEn": [
+        "Nominative",
+        "Accusative",
+        "Genitive",
+        "Jussive"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: شَرِبَ الْوَلَدُ ____",
+       "promptEn": "Complete: The child drank ____",
+       "promptAr": "شَرِبَ الْوَلَدُ ____",
+       "promptLatin": "Shariba l-waladu ____",
+       "optionsId": [
+        "الْمَاءُ",
+        "الْمَاءَ",
+        "الْمَاءِ",
+        "مَاءٌ"
+       ],
+       "optionsEn": [
+        "الْمَاءُ",
+        "الْمَاءَ",
+        "الْمَاءِ",
+        "مَاءٌ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Siswa membaca buku itu.",
+       "promptEn": "Arrange the sentence: The student read the book.",
+       "words": [
+        {
+         "ar": "قَرَأَ",
+         "latin": "qara'a"
+        },
+        {
+         "ar": "الطَّالِبُ",
+         "latin": "aṭ-ṭālibu"
+        },
+        {
+         "ar": "الْكِتَابَ",
+         "latin": "al-kitāba"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "2-2",
+     "titleId": "Harf Jar dan Isim Majrur",
+     "titleEn": "Prepositions and Genitive Nouns",
+     "titleAr": "حُرُوفُ الْجَرِّ وَالِاسْمُ الْمَجْرُورُ",
+     "introId": "Harf jar membuat isim setelahnya menjadi majrur. Tanda yang sering terlihat adalah kasrah.",
+     "introEn": "A preposition makes the noun after it genitive. The common visible sign is kasrah.",
+     "rules": [
+      {
+       "titleId": "Harf jar menghubungkan kata",
+       "titleEn": "A preposition connects words",
+       "explanationId": "فِي berarti di dalam, مِنْ berarti dari, dan إِلَى berarti menuju.",
+       "explanationEn": "فِي means in, مِنْ means from, and إِلَى means to.",
+       "exampleAr": "فِي الْمَسْجِدِ",
+       "exampleLatin": "Fī l-masjidi",
+       "exampleId": "Di dalam masjid",
+       "exampleEn": "In the mosque"
+      },
+      {
+       "titleId": "Isim setelah jar menjadi majrur",
+       "titleEn": "The noun after a preposition is genitive",
+       "explanationId": "Perhatikan kasrah pada الْمَسْجِدِ setelah فِي.",
+       "explanationEn": "Notice the kasrah on الْمَسْجِدِ after فِي.",
+       "exampleAr": "ذَهَبْتُ إِلَى الْمَدْرَسَةِ",
+       "exampleLatin": "Dhahabtu ilā l-madrasati",
+       "exampleId": "Aku pergi ke sekolah",
+       "exampleEn": "I went to the school"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Kata setelah فِي harus berstatus...",
+       "promptEn": "The word after فِي must be...",
+       "promptAr": "فِي الْبَيْتِ",
+       "promptLatin": "Fī l-bayti",
+       "optionsId": [
+        "Marfu'",
+        "Manshub",
+        "Majrur",
+        "Majzum"
+       ],
+       "optionsEn": [
+        "Nominative",
+        "Accusative",
+        "Genitive",
+        "Jussive"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Mana bentuk yang benar setelah إِلَى?",
+       "promptEn": "Which form is correct after إِلَى?",
+       "promptAr": "إِلَى ____",
+       "promptLatin": "Ilā ____",
+       "optionsId": [
+        "الْمَدْرَسَةُ",
+        "الْمَدْرَسَةَ",
+        "الْمَدْرَسَةِ",
+        "مَدْرَسَةٌ"
+       ],
+       "optionsEn": [
+        "الْمَدْرَسَةُ",
+        "الْمَدْرَسَةَ",
+        "الْمَدْرَسَةِ",
+        "مَدْرَسَةٌ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Arti مِنَ الْبَيْتِ adalah...",
+       "promptEn": "The meaning of مِنَ الْبَيْتِ is...",
+       "promptAr": "مِنَ الْبَيْتِ",
+       "promptLatin": "Mina l-bayti",
+       "optionsId": [
+        "Ke rumah",
+        "Dari rumah",
+        "Di rumah",
+        "Rumah itu"
+       ],
+       "optionsEn": [
+        "To the house",
+        "From the house",
+        "In the house",
+        "The house"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Aku pergi ke sekolah.",
+       "promptEn": "Arrange the sentence: I went to school.",
+       "words": [
+        {
+         "ar": "ذَهَبْتُ",
+         "latin": "dhahabtu"
+        },
+        {
+         "ar": "إِلَى",
+         "latin": "ilā"
+        },
+        {
+         "ar": "الْمَدْرَسَةِ",
+         "latin": "al-madrasati"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "titleId": "Level 3 — Keserasian dan I'rab",
+   "titleEn": "Level 3 — Agreement and Case Endings",
+   "titleAr": "المُسْتَوَى الثَّالِثُ",
+   "lessons": [
+    {
+     "id": "3-1",
+     "titleId": "Na'at dan Man'ut",
+     "titleEn": "Adjectives and Nouns",
+     "titleAr": "النَّعْتُ وَالْمَنْعُوتُ",
+     "introId": "Na'at adalah sifat, sedangkan man'ut adalah kata yang disifati. Keduanya mengikuti keserasian tertentu.",
+     "introEn": "The na'at is an adjective and the man'ut is the noun it describes. They follow a pattern of agreement.",
+     "rules": [
+      {
+       "titleId": "Sifat mengikuti kata benda",
+       "titleEn": "The adjective follows the noun",
+       "explanationId": "Na'at mengikuti man'ut dalam ma'rifah dan nakirah serta jenis kelamin.",
+       "explanationEn": "The na'at agrees with the man'ut in definiteness, indefiniteness, and gender.",
+       "exampleAr": "بَيْتٌ كَبِيرٌ",
+       "exampleLatin": "Baytun kabīrun",
+       "exampleId": "Sebuah rumah besar",
+       "exampleEn": "A big house"
+      },
+      {
+       "titleId": "Akhiran mengikuti posisi",
+       "titleEn": "Endings follow the grammatical position",
+       "explanationId": "Na'at juga mengikuti man'ut dalam keadaan marfu', manshub, atau majrur.",
+       "explanationEn": "The na'at also follows the man'ut in nominative, accusative, or genitive case.",
+       "exampleAr": "رَأَيْتُ بَيْتًا كَبِيرًا",
+       "exampleLatin": "Ra'aytu baytan kabīran",
+       "exampleId": "Aku melihat rumah besar",
+       "exampleEn": "I saw a big house"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: بَيْتٌ ____",
+       "promptEn": "Complete: بَيْتٌ ____",
+       "promptAr": "بَيْتٌ ____",
+       "promptLatin": "Baytun ____",
+       "optionsId": [
+        "كَبِيرٌ",
+        "كَبِيرًا",
+        "كَبِيرٍ",
+        "كَبِيرَةٌ"
+       ],
+       "optionsEn": [
+        "كَبِيرٌ",
+        "كَبِيرًا",
+        "كَبِيرٍ",
+        "كَبِيرَةٌ"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: رَأَيْتُ سَيَّارَةً ____",
+       "promptEn": "Complete: I saw a ____ car",
+       "promptAr": "رَأَيْتُ سَيَّارَةً ____",
+       "promptLatin": "Ra'aytu sayyāratan ____",
+       "optionsId": [
+        "جَدِيدٌ",
+        "جَدِيدًا",
+        "جَدِيدٍ",
+        "جَدِيدَةً"
+       ],
+       "optionsEn": [
+        "جَدِيدٌ",
+        "جَدِيدًا",
+        "جَدِيدٍ",
+        "جَدِيدَةً"
+       ],
+       "answerIndex": 3
+      },
+      {
+       "type": "choice",
+       "promptId": "Na'at mengikuti man'ut dalam...",
+       "promptEn": "The na'at agrees with the man'ut in...",
+       "promptAr": "النَّعْتُ يَتْبَعُ الْمَنْعُوتَ",
+       "promptLatin": "An-naʿtu yatbaʿu l-manʿūta",
+       "optionsId": [
+        "Ma'rifah saja",
+        "Jenis kelamin saja",
+        "Beberapa keadaan",
+        "Tidak ada"
+       ],
+       "optionsEn": [
+        "Definiteness only",
+        "Gender only",
+        "Several features",
+        "Nothing"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Sebuah rumah besar.",
+       "promptEn": "Arrange the phrase: A big house.",
+       "words": [
+        {
+         "ar": "بَيْتٌ",
+         "latin": "baytun"
+        },
+        {
+         "ar": "كَبِيرٌ",
+         "latin": "kabīrun"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "3-2",
+     "titleId": "Tanda I'rab Dasar",
+     "titleEn": "Basic Case Endings",
+     "titleAr": "عَلَامَاتُ الْإِعْرَابِ الْأَسَاسِيَّةُ",
+     "introId": "I'rab adalah perubahan akhir kata sesuai kedudukannya. Tanda dasar yang dipelajari adalah dhammah, fathah, dan kasrah.",
+     "introEn": "I'rab is the change at the end of a word according to its role. The basic signs are dammah, fathah, and kasrah.",
+     "rules": [
+      {
+       "titleId": "Dhammah untuk marfu'",
+       "titleEn": "Dammah marks the nominative",
+       "explanationId": "Fa'il dan mubtada' yang berupa isim tunggal biasanya memakai dhammah.",
+       "explanationEn": "A singular fa'il and mubtada' usually take dammah.",
+       "exampleAr": "جَاءَ الطَّالِبُ",
+       "exampleLatin": "Jā'a ṭ-ṭālibu",
+       "exampleId": "Siswa itu datang",
+       "exampleEn": "The student came"
+      },
+      {
+       "titleId": "Fathah dan kasrah",
+       "titleEn": "Fathah and kasrah",
+       "explanationId": "Maf'ul bih biasanya memakai fathah, sedangkan isim setelah harf jar memakai kasrah.",
+       "explanationEn": "The maf'ul bih usually takes fathah, while a noun after a preposition takes kasrah.",
+       "exampleAr": "رَأَيْتُ الطَّالِبَ فِي الْفَصْلِ",
+       "exampleLatin": "Ra'aytu ṭ-ṭāliba fī l-faṣli",
+       "exampleId": "Aku melihat siswa itu di kelas",
+       "exampleEn": "I saw the student in the classroom"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Tanda dasar marfu' adalah...",
+       "promptEn": "The basic sign of the nominative is...",
+       "promptAr": "الْمَرْفُوعُ",
+       "promptLatin": "Al-marfūʿu",
+       "optionsId": [
+        "Dhammah",
+        "Fathah",
+        "Kasrah",
+        "Sukun"
+       ],
+       "optionsEn": [
+        "Dammah",
+        "Fathah",
+        "Kasrah",
+        "Sukun"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Pilih bentuk fa'il yang benar: جَاءَ ____",
+       "promptEn": "Choose the correct fa'il: ____ came",
+       "promptAr": "جَاءَ ____",
+       "promptLatin": "Jā'a ____",
+       "optionsId": [
+        "الطَّالِبَ",
+        "الطَّالِبِ",
+        "الطَّالِبُ",
+        "الطَّالِبْ"
+       ],
+       "optionsEn": [
+        "الطَّالِبَ",
+        "الطَّالِبِ",
+        "الطَّالِبُ",
+        "الطَّالِبْ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Pilih bentuk setelah فِي: فِي ____",
+       "promptEn": "Choose the form after فِي: in the...",
+       "promptAr": "فِي ____",
+       "promptLatin": "Fī ____",
+       "optionsId": [
+        "الْفَصْلُ",
+        "الْفَصْلَ",
+        "الْفَصْلِ",
+        "الْفَصْلْ"
+       ],
+       "optionsEn": [
+        "الْفَصْلُ",
+        "الْفَصْلَ",
+        "الْفَصْلِ",
+        "الْفَصْلْ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Aku melihat siswa itu di kelas.",
+       "promptEn": "Arrange: I saw the student in the classroom.",
+       "words": [
+        {
+         "ar": "رَأَيْتُ",
+         "latin": "ra'aytu"
+        },
+        {
+         "ar": "الطَّالِبَ",
+         "latin": "aṭ-ṭāliba"
+        },
+        {
+         "ar": "فِي",
+         "latin": "fī"
+        },
+        {
+         "ar": "الْفَصْلِ",
+         "latin": "al-faṣli"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

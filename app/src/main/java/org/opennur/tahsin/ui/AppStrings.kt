@@ -25,6 +25,7 @@ data class LearningStrings(
     val taskVocabulary: String,
     val taskUnderstand: String,
     val taskArabic: String,
+    val taskNahwu: String,
     val taskMemorization: String,
     val onboardingTitle: String,
     val onboardingSubtitle: String,
@@ -74,6 +75,27 @@ data class LearningStrings(
     val memorizationTargetSurah: String,
     val memorizationTargetJuz: String,
     val memorizationApply: String,
+    val statsNahwuLine: String,
+    val menuNahwu: String,
+    val nahwuSubtitle: String,
+    val nahwuLoading: String,
+    val nahwuEmpty: String,
+    val nahwuStart: String,
+    val nahwuBestScore: String,
+    val nahwuSessionsPlayed: String,
+    val nahwuMaterialTitle: String,
+    val nahwuLessonIntro: String,
+    val nahwuExercisesTitle: String,
+    val nahwuProgressLabel: String,
+    val nahwuCheck: String,
+    val nahwuNext: String,
+    val nahwuCorrect: String,
+    val nahwuWrong: String,
+    val nahwuResultTitle: String,
+    val nahwuScore: String,
+    val nahwuRestart: String,
+    val nahwuBackHome: String,
+    val nahwuCompleted: String,
 )
 
 /** Teks fitur tambahan agar konstruktor [Strings] tetap di bawah batas JVM. */
@@ -394,6 +416,7 @@ class Strings(
     val taskVocabulary get() = learning.taskVocabulary
     val taskUnderstand get() = learning.taskUnderstand
     val taskArabic get() = learning.taskArabic
+    val taskNahwu get() = learning.taskNahwu
     val taskMemorization get() = learning.taskMemorization
     val onboardingTitle get() = learning.onboardingTitle
     val onboardingSubtitle get() = learning.onboardingSubtitle
@@ -441,6 +464,27 @@ class Strings(
     val memorizationTargetSurah get() = learning.memorizationTargetSurah
     val memorizationTargetJuz get() = learning.memorizationTargetJuz
     val memorizationApply get() = learning.memorizationApply
+    val statsNahwuLine get() = learning.statsNahwuLine
+    val menuNahwu get() = learning.menuNahwu
+    val nahwuSubtitle get() = learning.nahwuSubtitle
+    val nahwuLoading get() = learning.nahwuLoading
+    val nahwuEmpty get() = learning.nahwuEmpty
+    val nahwuStart get() = learning.nahwuStart
+    val nahwuBestScore get() = learning.nahwuBestScore
+    val nahwuSessionsPlayed get() = learning.nahwuSessionsPlayed
+    val nahwuMaterialTitle get() = learning.nahwuMaterialTitle
+    val nahwuLessonIntro get() = learning.nahwuLessonIntro
+    val nahwuExercisesTitle get() = learning.nahwuExercisesTitle
+    val nahwuProgressLabel get() = learning.nahwuProgressLabel
+    val nahwuCheck get() = learning.nahwuCheck
+    val nahwuNext get() = learning.nahwuNext
+    val nahwuCorrect get() = learning.nahwuCorrect
+    val nahwuWrong get() = learning.nahwuWrong
+    val nahwuResultTitle get() = learning.nahwuResultTitle
+    val nahwuScore get() = learning.nahwuScore
+    val nahwuRestart get() = learning.nahwuRestart
+    val nahwuBackHome get() = learning.nahwuBackHome
+    val nahwuCompleted get() = learning.nahwuCompleted
 }
 
 object AppStrings {
@@ -738,6 +782,7 @@ object AppStrings {
             taskVocabulary = "Ulangi kosakata Qur'an",
             taskUnderstand = "Pelajari coherence Al-Qur'an",
             taskArabic = "Latihan pelajaran bahasa Arab",
+            taskNahwu = "Pelajari satu pelajaran Nahwu",
             taskMemorization = "Latihan hafalan dengan mushaf",
             onboardingTitle = "Mulai perjalanan belajarmu",
             onboardingSubtitle = "Pilih arah utama. Kamu tetap bisa membuka semua fitur kapan saja.",
@@ -786,6 +831,27 @@ object AppStrings {
             memorizationTargetSurah = "Surah",
             memorizationTargetJuz = "Juz",
             memorizationApply = "Terapkan",
+            statsNahwuLine = "Nahwu: %d sesi • skor terbaik %d/%d",
+            menuNahwu = "📚 Belajar Nahwu",
+            nahwuSubtitle = "Pelajari dasar tata bahasa Arab secara bertahap dengan contoh dan latihan.",
+            nahwuLoading = "Memuat materi Nahwu…",
+            nahwuEmpty = "Belum ada materi Nahwu.",
+            nahwuStart = "🎮 Mulai Latihan",
+            nahwuBestScore = "Skor terbaik: %d/%d",
+            nahwuSessionsPlayed = "Sesi dimainkan: %d",
+            nahwuMaterialTitle = "📖 Materi Nahwu",
+            nahwuLessonIntro = "Penjelasan",
+            nahwuExercisesTitle = "Latihan Nahwu",
+            nahwuProgressLabel = "Soal %d/%d",
+            nahwuCheck = "✓ Periksa",
+            nahwuNext = "Lanjut →",
+            nahwuCorrect = "✓ Benar!",
+            nahwuWrong = "✗ Belum tepat.",
+            nahwuResultTitle = "Sesi Nahwu selesai!",
+            nahwuScore = "Skor: %d/%d",
+            nahwuRestart = "🔄 Sesi Baru",
+            nahwuBackHome = "← Kembali",
+            nahwuCompleted = "✓ Pelajaran selesai",
         ),
     )
 
@@ -1078,6 +1144,7 @@ object AppStrings {
             taskVocabulary = "Review Qur'anic vocabulary",
             taskUnderstand = "Study Qur'an coherence",
             taskArabic = "Practice an Arabic lesson",
+            taskNahwu = "Study one Nahwu lesson",
             taskMemorization = "Practice memorization with the mushaf",
             onboardingTitle = "Start your learning journey",
             onboardingSubtitle = "Choose a primary direction. You can still open every feature at any time.",
@@ -1126,6 +1193,27 @@ object AppStrings {
             memorizationTargetSurah = "Surah",
             memorizationTargetJuz = "Juz",
             memorizationApply = "Apply",
+            statsNahwuLine = "Nahwu: %d sessions • best score %d/%d",
+            menuNahwu = "📚 Learn Nahwu",
+            nahwuSubtitle = "Learn the foundations of Arabic grammar step by step with examples and practice.",
+            nahwuLoading = "Loading Nahwu lessons…",
+            nahwuEmpty = "No Nahwu material yet.",
+            nahwuStart = "🎮 Start Practice",
+            nahwuBestScore = "Best score: %d/%d",
+            nahwuSessionsPlayed = "Sessions played: %d",
+            nahwuMaterialTitle = "📖 Nahwu Material",
+            nahwuLessonIntro = "Explanation",
+            nahwuExercisesTitle = "Nahwu Practice",
+            nahwuProgressLabel = "Question %d/%d",
+            nahwuCheck = "✓ Check",
+            nahwuNext = "Next →",
+            nahwuCorrect = "✓ Correct!",
+            nahwuWrong = "✗ Not quite.",
+            nahwuResultTitle = "Nahwu session complete!",
+            nahwuScore = "Score: %d/%d",
+            nahwuRestart = "🔄 New Session",
+            nahwuBackHome = "← Back",
+            nahwuCompleted = "✓ Lesson complete",
         ),
     )
 

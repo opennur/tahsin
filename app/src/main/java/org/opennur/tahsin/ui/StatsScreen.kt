@@ -240,6 +240,14 @@ fun StatsScreen(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         BreakdownLine(strings.statsVocabLine.format(state.wordsMastered))
+                        Spacer(modifier = Modifier.height(6.dp))
+                        BreakdownLine(
+                            strings.statsNahwuLine.format(
+                                state.nahwuRounds,
+                                state.nahwuBest,
+                                org.opennur.tahsin.data.nahwu.NahwuEngine.SESSION_SIZE,
+                            ),
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

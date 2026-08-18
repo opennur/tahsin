@@ -35,6 +35,7 @@ class BackupManager internal constructor(
             "vocab-stats.json",
             "dreambig-progress.json",
             "lughoh-progress.json",
+            "nahwu-progress.json",
             "learning-plan.json",
             "memorization.json",
         )

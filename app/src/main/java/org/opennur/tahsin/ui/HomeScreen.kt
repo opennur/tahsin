@@ -59,6 +59,7 @@ data class HomeLearningActions(
     val onOpenQuiz: () -> Unit,
     val onOpenAyatQuiz: () -> Unit,
     val onOpenLughoh: () -> Unit,
+    val onOpenNahwu: () -> Unit,
     val onOpenDreamBig: () -> Unit,
 )
 
@@ -291,11 +292,17 @@ private fun HomeLearningMenu(strings: Strings, actions: HomeLearningActions) {
             modifier = Modifier.weight(1f),
         )
         HomeMenuCard(
-            text = strings.menuDreamBig,
-            onClick = actions.onOpenDreamBig,
+            text = strings.menuNahwu,
+            onClick = actions.onOpenNahwu,
             modifier = Modifier.weight(1f),
         )
     }
+    Spacer(modifier = Modifier.height(12.dp))
+    HomeMenuCard(
+        text = strings.menuDreamBig,
+        onClick = actions.onOpenDreamBig,
+        modifier = Modifier.fillMaxWidth(),
+    )
     Spacer(modifier = Modifier.height(12.dp))
 }
 
@@ -445,6 +452,7 @@ private fun taskLabel(type: LearningTaskType, strings: Strings): String = when (
     LearningTaskType.VOCABULARY -> strings.taskVocabulary
     LearningTaskType.UNDERSTAND -> strings.taskUnderstand
     LearningTaskType.ARABIC -> strings.taskArabic
+    LearningTaskType.NAHWU -> strings.taskNahwu
     LearningTaskType.MEMORIZATION -> strings.taskMemorization
 }
 

@@ -61,6 +61,7 @@ object Gamification {
     const val XP_MEMORIZATION_REVIEW = 5 // ayat hafalan berhasil diingat
     const val XP_DREAM_BIG_ROUND = 15 // ronde Dream BIG selesai
     const val XP_LUGHOH_SESSION = 10  // sesi Belajar Arab selesai
+    const val XP_NAHWU_SESSION = 10  // sesi Belajar Nahwu selesai
 
     /** Target XP harian (daily goal) — dicapai dengan aktivitas rutin. */
     const val DAILY_GOAL_XP = 50

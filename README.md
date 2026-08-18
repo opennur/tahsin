@@ -92,12 +92,16 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   terbatas** — 10 soal diacak dari seluruh kosakata terkurasi setiap ronde;
   rekor **skor, streak, dan jumlah ronde** tersimpan. Tanpa level/unlock,
   bisa terus dimainkan.
-- 📚 **Belajar Arab** (menu Belajar Arab): kursus Bahasa Arab untuk pemula ala
+ - 📚 **Belajar Arab** (menu Belajar Arab): kursus Bahasa Arab untuk pemula ala
   metodologi Durusul Lughoh — **15 pelajaran orisinal** (3 level: perkenalan &
   kehidupan sehari-hari, aktivitas, kehidupan sosial) berisi dialog, kosakata,
   tata bahasa. Latihan berupa **sesi acak tak terbatas** (8 soal dari seluruh
   pelajaran, urutan opsi diacak) dengan rekor skor; materi tetap bisa dibaca
-  lewat browser level/pelajaran. Konten 100% orisinal (tanpa salinan kitab).
+   lewat browser level/pelajaran. Konten 100% orisinal (tanpa salinan kitab).
+ - 📘 **Belajar Nahwu** (menu Belajar Nahwu): kursus tata bahasa Arab pemula
+   yang berdiri sendiri — 8 pelajaran bertahap tentang jenis kata, jumlah,
+   fa'il, maf'ul, jar, na'at, dan i'rab; lengkap dengan contoh, latihan susun
+   kalimat, progres tersimpan, XP, rencana harian, dan Statistik.
 - 🎮 **XP, Level & Streak**: setiap aktivitas belajar memberi XP — bacaan
   Tahsin (skor ≥70: 5 XP, ≥90: 10 XP), jawaban benar kuis (2 XP), kata
   kosakata baru dikuasai (10 XP), ronde Dream BIG (15 XP), sesi Belajar Arab
