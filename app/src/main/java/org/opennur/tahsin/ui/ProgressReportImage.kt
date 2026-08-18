@@ -44,7 +44,7 @@ object ProgressReportImage {
             drawReadingCard(canvas, left, cardTop, cardWidth, report, strings)
             drawSummaryCard(canvas, rightCardLeft, cardTop, cardWidth, report, strings)
 
-            val footer = paint(22f, MUTED)
+            val footer = paint(30f, MUTED)
             canvas.drawText(
                 strings.homeLevelLine.format(Gamification.levelFor(report.xp), report.xp),
                 MARGIN,
@@ -98,7 +98,7 @@ object ProgressReportImage {
         canvas.drawText(strings.statsReportCoverage.format(coveragePercent(report)), x, y, muted)
         y += 36f
         canvas.drawText(strings.statsReportGoodJuz.format(report.goodJuz), x, y, muted)
-        y += 28f
+        y += 48f
         canvas.drawText(
             strings.homeReadingPages.format(
                 report.goodPages,
