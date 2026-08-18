@@ -14,7 +14,9 @@ import org.opennur.tahsin.util.OfflineProgressReport
 /** Render laporan progres ringkas sebagai PNG untuk dibagikan. */
 object ProgressReportImage {
     private const val WIDTH = 1080
-    private const val HEIGHT = 980
+    private const val HEIGHT = 900
+    private const val MARGIN = 64f
+    private const val GAP = 28f
     private const val BRAND = 0xFF2D7D6B.toInt()
     private const val TEXT = 0xFF1A1A1A.toInt()
     private const val MUTED = 0xFF5A5A5A.toInt()
@@ -28,103 +30,154 @@ object ProgressReportImage {
         try {
             val canvas = Canvas(bitmap)
             canvas.drawColor(BACKGROUND)
-            val title = paint(44f, BRAND, bold = true)
-            val body = paint(30f, TEXT)
-            val muted = paint(25f, MUTED)
-            val value = paint(42f, BRAND, bold = true)
-            val center = paint(28f, TEXT, bold = true, align = Paint.Align.CENTER)
+            drawHeader(canvas, report, strings)
 
-            canvas.drawText(strings.appTitle, 54f, 78f, title)
-            canvas.drawText(strings.statsTitle, 54f, 120f, body)
-            canvas.drawText(
-                DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
-                    .format(Date(report.generatedAt)),
-                54f,
-                158f,
-                muted,
-            )
+            val cardTop = 220f
+            val cardBottom = 760f
+            val left = MARGIN
+            val right = WIDTH - MARGIN
+            val cardWidth = (right - left - GAP) / 2f
+            val rightCardLeft = left + cardWidth + GAP
 
-            card(canvas, 54f, 200f, 472f, 350f)
-            card(canvas, 554f, 200f, 1026f, 350f)
-            canvas.drawText(
-                strings.statsReadingTitle,
-                82f,
-                245f,
-                body,
-            )
-            canvas.drawText(
-                strings.statsReadingSummary.format(
-                    report.practicedAyahs,
-                    report.totalAyahs,
-                    if (report.totalAyahs == 0) 0 else report.practicedAyahs * 100 / report.totalAyahs,
-                    report.goodJuz,
-                ),
-                82f,
-                302f,
-                muted,
-            )
-            canvas.drawText(
-                strings.homeReadingPages.format(
-                    report.goodPages,
-                    report.goodPages + report.reviewPages + report.untouchedPages,
-                ),
-                82f,
-                360f,
-                value,
-            )
-            progressBar(canvas, 82f, 405f, 444f, report.practicedAyahs, report.totalAyahs)
-            canvas.drawText(strings.statsDueTitle, 82f, 490f, muted)
-            canvas.drawText("${report.dueAyahs}", 82f, 530f, value)
+            card(canvas, left, cardTop, left + cardWidth, cardBottom)
+            card(canvas, rightCardLeft, cardTop, right, cardBottom)
+            drawReadingCard(canvas, left, cardTop, cardWidth, report, strings)
+            drawSummaryCard(canvas, rightCardLeft, cardTop, cardWidth, report, strings)
 
-            canvas.drawText(strings.statsTotalSessions, 594f, 270f, muted)
-            canvas.drawText("${report.totalSessions}", 594f, 320f, value)
-            canvas.drawText(strings.statsBestScoreLabel, 594f, 390f, muted)
-            canvas.drawText("${report.bestScorePct}%", 594f, 440f, value)
-            canvas.drawText(strings.homeStreakLine.format(report.streak), 594f, 505f, body)
-
-            canvas.drawText(strings.statsReadingTitle, 54f, 630f, title)
-            val rows = listOf(
-                strings.statsReadingSummary.format(
-                    report.practicedAyahs,
-                    report.totalAyahs,
-                    if (report.totalAyahs == 0) 0 else report.practicedAyahs * 100 / report.totalAyahs,
-                    report.goodJuz,
-                ),
-                strings.homeReadingPages.format(
-                    report.goodPages,
-                    report.goodPages + report.reviewPages + report.untouchedPages,
-                ),
-                strings.statsDueTitle + ": ${report.dueAyahs}",
-            )
-            rows.forEachIndexed { index, row ->
-                canvas.drawText(row, 54f, (690 + index * 48).toFloat(), body)
-            }
+            val footer = paint(22f, MUTED)
             canvas.drawText(
                 strings.homeLevelLine.format(Gamification.levelFor(report.xp), report.xp),
-                54f,
-                860f,
-                muted,
+                MARGIN,
+                835f,
+                footer,
             )
-            canvas.drawText(strings.statsShareReport, WIDTH - 54f, 920f, center)
+        } finally {
             file.outputStream().use { output ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
             }
-        } finally {
             bitmap.recycle()
         }
         return file
+    }
+
+    private fun drawHeader(canvas: Canvas, report: OfflineProgressReport, strings: Strings) {
+        canvas.drawText(strings.appTitle, MARGIN, 78f, paint(46f, BRAND, bold = true))
+        canvas.drawText(strings.statsTitle, MARGIN, 124f, paint(30f, TEXT))
+        canvas.drawText(
+            DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
+                .format(Date(report.generatedAt)),
+            MARGIN,
+            164f,
+            paint(24f, MUTED),
+        )
+    }
+
+    private fun drawReadingCard(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        width: Float,
+        report: OfflineProgressReport,
+        strings: Strings,
+    ) {
+        val x = left + 32f
+        val maxWidth = width - 64f
+        val body = paint(28f, TEXT)
+        val muted = paint(25f, MUTED)
+        val value = paint(40f, BRAND, bold = true)
+
+        canvas.drawText(strings.statsReadingTitle, x, top + 54f, body)
+        var y = drawWrappedText(
+            canvas,
+            strings.statsReadingSummary.format(
+                report.practicedAyahs,
+                report.totalAyahs,
+                coveragePercent(report),
+                report.goodJuz,
+            ),
+            x,
+            top + 106f,
+            maxWidth,
+            muted,
+        )
+        y += 18f
+        canvas.drawText(
+            strings.homeReadingPages.format(
+                report.goodPages,
+                report.goodPages + report.reviewPages + report.untouchedPages,
+            ),
+            x,
+            y,
+            value,
+        )
+        progressBar(canvas, x, y + 34f, x + maxWidth, report.practicedAyahs, report.totalAyahs)
+        canvas.drawText(strings.statsDueTitle, x, y + 102f, muted)
+        canvas.drawText("${report.dueAyahs}", x, y + 148f, value)
+    }
+
+    private fun drawSummaryCard(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        width: Float,
+        report: OfflineProgressReport,
+        strings: Strings,
+    ) {
+        val x = left + 32f
+        val value = paint(46f, BRAND, bold = true)
+        val muted = paint(25f, MUTED)
+        val body = paint(28f, TEXT)
+
+        canvas.drawText(strings.statsTotalSessions, x, top + 58f, muted)
+        canvas.drawText("${report.totalSessions}", x, top + 112f, value)
+        canvas.drawText(strings.statsBestScoreLabel, x, top + 190f, muted)
+        canvas.drawText("${report.bestScorePct}%", x, top + 244f, value)
+        drawWrappedText(
+            canvas,
+            strings.homeStreakLine.format(report.streak),
+            x,
+            top + 326f,
+            width - 64f,
+            body,
+        )
+    }
+
+    private fun coveragePercent(report: OfflineProgressReport): Int =
+        if (report.totalAyahs == 0) 0 else report.practicedAyahs * 100 / report.totalAyahs
+
+    private fun drawWrappedText(
+        canvas: Canvas,
+        text: String,
+        x: Float,
+        firstBaseline: Float,
+        maxWidth: Float,
+        paint: Paint,
+    ): Float {
+        val words = text.split(" ")
+        var line = StringBuilder()
+        var baseline = firstBaseline
+        words.forEach { word ->
+            val candidate = if (line.isEmpty()) word else "$line $word"
+            if (line.isNotEmpty() && paint.measureText(candidate) > maxWidth) {
+                canvas.drawText(line.toString(), x, baseline, paint)
+                baseline += paint.textSize * 1.35f
+                line = StringBuilder(word)
+            } else {
+                line = StringBuilder(candidate)
+            }
+        }
+        if (line.isNotEmpty()) canvas.drawText(line.toString(), x, baseline, paint)
+        return baseline
     }
 
     private fun paint(
         size: Float,
         color: Int,
         bold: Boolean = false,
-        align: Paint.Align = Paint.Align.LEFT,
     ) = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textSize = size
         this.color = color
         typeface = if (bold) android.graphics.Typeface.DEFAULT_BOLD else android.graphics.Typeface.DEFAULT
-        textAlign = align
     }
 
     private fun card(canvas: Canvas, left: Float, top: Float, right: Float, bottom: Float) {
@@ -141,6 +194,11 @@ object ProgressReportImage {
     ) {
         canvas.drawRoundRect(RectF(left, top, right, top + 18f), 9f, 9f, paint(1f, TRACK))
         val fraction = if (total <= 0) 0f else (done.toFloat() / total).coerceIn(0f, 1f)
-        canvas.drawRoundRect(RectF(left, top, left + (right - left) * fraction, top + 18f), 9f, 9f, paint(1f, BRAND))
+        canvas.drawRoundRect(
+            RectF(left, top, left + (right - left) * fraction, top + 18f),
+            9f,
+            9f,
+            paint(1f, BRAND),
+        )
     }
 }
