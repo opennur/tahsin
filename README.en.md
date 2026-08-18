@@ -88,12 +88,16 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   rounds — 10 questions shuffled from the whole curated vocabulary every round;
   best **score, streak, and rounds played** are persisted. No levels/unlocks,
   keep playing.
-- 📚 **Learn Arabic** (Learn Arabic menu): a beginner Arabic course in the
+ - 📚 **Learn Arabic** (Learn Arabic menu): a beginner Arabic course in the
   Durusul Lughoh style — **15 original lessons** (3 levels: introductions &
   daily life, activities, social life) with dialogue, vocabulary, and grammar.
   Practice is an **endless random session** (8 questions drawn from all lessons,
   shuffled options) with a best-score record; the material can still be browsed
-  via the level/lesson browser. 100% original content (no copied book material).
+    via the level/lesson browser. 100% original content (no copied book material).
+ - 📘 **Learn Nahwu** (Learn Nahwu menu): a separate beginner Arabic grammar
+   course — 8 progressive lessons on word types, sentences, fa'il, maf'ul,
+   prepositions, adjectives, and case endings, with examples, sentence-order
+   practice, persisted progress, XP, daily-plan, and Statistics integration.
 - 🎮 **XP, Level & Streak**: every learning activity earns XP — Tahsin
   recitation (score ≥70: 5 XP, ≥90: 10 XP), correct quiz answers (2 XP),
   newly mastered vocabulary words (10 XP), Dream BIG rounds (15 XP), Learn

@@ -217,6 +217,7 @@ tasks.register<JacocoReport>("jacocoCoreReport") {
                 "org/opennur/tahsin/util/GamificationEvents*",
                 "org/opennur/tahsin/util/GamificationStore*",
                 "org/opennur/tahsin/util/LughohProgressStore*",
+                "org/opennur/tahsin/util/NahwuProgressStore*",
                 "org/opennur/tahsin/util/ReadingHistoryStore*",
                 "org/opennur/tahsin/util/ReadingProgress*",
                 "org/opennur/tahsin/util/ReadingStats*",

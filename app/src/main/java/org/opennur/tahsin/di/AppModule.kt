@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.opennur.tahsin.data.lughoh.LughohRepository
+import org.opennur.tahsin.data.nahwu.NahwuRepository
 import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.data.vocab.VocabularyRepository
@@ -20,6 +21,7 @@ import org.opennur.tahsin.util.FontStore
 import org.opennur.tahsin.util.GamificationStore
 import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.LughohProgressStore
+import org.opennur.tahsin.util.NahwuProgressStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SettingsBackupAdapter
@@ -105,6 +107,11 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideNahwuRepository(@ApplicationContext context: Context): NahwuRepository =
+        NahwuRepository(context)
+
+    @Provides
+    @Singleton
     fun provideFontStore(@ApplicationContext context: Context): FontStore = FontStore(context)
 
     // ---- Store persistensi (pola Gson + filesDir, lihat tiap kelas) ----
@@ -136,6 +143,11 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideNahwuProgressStore(@ApplicationContext context: Context): NahwuProgressStore =
+        NahwuProgressStore.fromContext(context)
+
+    @Provides
+    @Singleton
     fun provideGamificationStore(@ApplicationContext context: Context): GamificationStore =
         GamificationStore.fromContext(context)
 
@@ -146,11 +158,13 @@ object AppModule {
 
     @Provides
     @Singleton
+    @Suppress("LongParameterList")
     fun provideStatsStores(
         readingStats: ReadingStatsStore,
         vocabularyStats: VocabularyStatsStore,
         dreamBig: DreamBigProgressStore,
         lughoh: LughohProgressStore,
+        nahwu: NahwuProgressStore,
         gamification: GamificationStore,
         readingHistory: ReadingHistoryStore,
         learningPlan: LearningPlanStore,
@@ -159,6 +173,7 @@ object AppModule {
         vocabularyStats = vocabularyStats,
         dreamBig = dreamBig,
         lughoh = lughoh,
+        nahwu = nahwu,
         gamification = gamification,
         readingHistory = readingHistory,
         learningPlan = learningPlan,

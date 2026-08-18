@@ -24,6 +24,7 @@ enum class LearningTaskType(val key: String) {
     VOCABULARY("vocabulary"),
     UNDERSTAND("understand"),
     ARABIC("arabic"),
+    NAHWU("nahwu"),
     MEMORIZATION("memorization"),
     ;
 
@@ -77,8 +78,8 @@ object LearningPlanEngine {
         )
         LearningGoal.ARABIC -> listOf(
             LearningTaskType.ARABIC,
+            LearningTaskType.NAHWU,
             LearningTaskType.VOCABULARY,
-            LearningTaskType.UNDERSTAND,
         )
     }
 

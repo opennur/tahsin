@@ -40,8 +40,8 @@ class LearningPlanTest {
         ).inOrder()
         assertThat(LearningPlanEngine.taskTypesFor(LearningGoal.ARABIC)).containsExactly(
             LearningTaskType.ARABIC,
+            LearningTaskType.NAHWU,
             LearningTaskType.VOCABULARY,
-            LearningTaskType.UNDERSTAND,
         ).inOrder()
     }
 

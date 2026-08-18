@@ -6,6 +6,7 @@ data class StatsStores(
     val vocabularyStats: VocabularyStatsStore,
     val dreamBig: DreamBigProgressStore,
     val lughoh: LughohProgressStore,
+    val nahwu: NahwuProgressStore? = null,
     val gamification: GamificationStore,
     val readingHistory: ReadingHistoryStore,
     val learningPlan: LearningPlanStore,

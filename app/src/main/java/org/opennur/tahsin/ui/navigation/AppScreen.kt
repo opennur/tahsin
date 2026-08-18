@@ -18,6 +18,7 @@ sealed interface AppScreen {
     data object AudioManager : AppScreen
     data object DreamBig : AppScreen
     data object Lughoh : AppScreen
+    data object Nahwu : AppScreen
     data object AyatQuiz : AppScreen
     data object Badges : AppScreen
     data object Coherence : AppScreen
@@ -40,6 +41,7 @@ sealed interface AppScreen {
             "AudioManager" -> AudioManager
             "DreamBig" -> DreamBig
             "Lughoh" -> Lughoh
+            "Nahwu" -> Nahwu
             "AyatQuiz" -> AyatQuiz
             "Badges" -> Badges
             "Coherence" -> Coherence
