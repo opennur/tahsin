@@ -12,8 +12,7 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 
 > ⚠️ **Honest limitations** — this app is a practice aid, **not a substitute for a teacher**.
 > The page-based mushaf uses the EXACT Madani pagination (the ayahs per page match a
-> printed mushaf). Two display modes are available: **Exact 15 lines** with locked
-> Uthmani Madani geometry, or **Accessible/Reflow** for larger text and TalkBack.
+> printed mushaf) and uses **Accessible/Reflow** rendering for larger text and TalkBack.
 > STT (speech-to-text) only reads the *text* of what you say: it can catch skipped
 > words, wrong word order, or wrong letters, but it **cannot judge makhraj
 > (articulation) or vowel length**. Tajwid detection is rule-based (a "rule map"
@@ -48,8 +47,7 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   font-size slider (100–250%)** lets readers enlarge the mushaf text; **tap a word
   → tooltip with its meaning, root, and tajwid rules** from curated vocabulary
    and morphology data; wide (tablet) screens are capped at 640dp and centered.
-   Exact mode uses the bundled Uthmani font; Accessible/Reflow mode supports large
-   text and accessibility semantics.
+   The bundled Uthmani font is used throughout, with accessibility semantics.
 - 🎙️ **Real-time scoring**: words turn green (correct) / red (wrong) / yellow
   (currently being read) as you recite into the microphone (SpeechRecognizer `ar-SA`).
 - 📊 **Aggregate statistics across all challenges** (persistent): the
@@ -62,7 +60,7 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   pages, good juz, and ayahs ready for murajaah.
 - 📈 **Progress by surah and juz**: Statistics breaks down practiced ayahs,
    good scores, mushaf coverage, and due murajaah reviews.
-- 📤 **Offline progress report**: Statistics can share an anonymous JSON report;
+- 📤 **Offline progress report**: Statistics can share a compact summary image;
    user audio and speech transcripts are not included.
 - 🗺️ **Khatam Map**: a 604-page and 30-juz map with untouched, review-needed,
   and good statuses; tap a page or juz to open the exact location.

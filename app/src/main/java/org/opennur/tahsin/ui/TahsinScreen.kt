@@ -9,7 +9,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -85,7 +84,6 @@ import org.opennur.tahsin.data.quran.Basmalah
 import org.opennur.tahsin.data.quran.ComposedPage
 import org.opennur.tahsin.data.quran.MushafAyah
 import org.opennur.tahsin.data.quran.MushafPageComposer
-import org.opennur.tahsin.data.quran.MushafLayoutManifest
 import org.opennur.tahsin.data.quran.SajdahSigns
 import org.opennur.tahsin.data.tajwid.RuleCategory
 import org.opennur.tahsin.data.tajwid.TajwidColorizer
@@ -98,7 +96,6 @@ import org.opennur.tahsin.theme.AyahTypography
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.DownloadProgress
 import org.opennur.tahsin.util.FontScales
-import org.opennur.tahsin.util.MushafRenderMode
 import org.opennur.tahsin.ui.components.AyahButton
 import org.opennur.tahsin.ui.components.AyahSlider
 import org.opennur.tahsin.ui.components.AyahButtonSize
@@ -349,43 +346,32 @@ private fun TahsinContent(
             )
         }
 
-        // ---- Ukuran huruf: exact mengunci geometri, accessible mengikuti user ----
-        if (state.mushafRenderMode == MushafRenderMode.EXACT) {
-            AyahText(
-                strings.mushafExactNotice,
-                style = AyahTypography.Caption.copy(color = AyahColors.Primary),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-                    .semantics { contentDescription = strings.mushafExactNotice },
+        // ---- Kontrol ukuran huruf aksesibel ----
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AyahText("A−", style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary))
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahSlider(
+                value = state.fontScale,
+                onValueChange = actions.onSetFontScale,
+                modifier = Modifier.weight(1f),
+                valueRange = FontScales.MIN..FontScales.MAX,
             )
-        } else {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AyahText("A−", style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary))
-                Spacer(modifier = Modifier.width(8.dp))
-                AyahSlider(
-                    value = state.fontScale,
-                    onValueChange = actions.onSetFontScale,
-                    modifier = Modifier.weight(1f),
-                    valueRange = FontScales.MIN..FontScales.MAX,
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                AyahText("A+", style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary))
-                Spacer(modifier = Modifier.width(10.dp))
-                AyahText(
-                    "${(state.fontScale * 100).roundToInt()}%",
-                    style = AyahTypography.Caption.copy(
-                        color = AyahColors.Primary,
-                        fontWeight = FontWeight.SemiBold,
-                    ),
-                    modifier = Modifier.width(44.dp),
-                )
-            }
+            Spacer(modifier = Modifier.width(8.dp))
+            AyahText("A+", style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary))
+            Spacer(modifier = Modifier.width(10.dp))
+            AyahText(
+                "${(state.fontScale * 100).roundToInt()}%",
+                style = AyahTypography.Caption.copy(
+                    color = AyahColors.Primary,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                modifier = Modifier.width(44.dp),
+            )
         }
 
         // ---- Ringkasan hasil latihan terakhir ----
@@ -530,13 +516,13 @@ private fun MushafPageView(
         it.surah == state.surahNumber && it.number == state.ayahIndex + 1
     } == true
 
-    val pageModifier = if (state.mushafRenderMode == MushafRenderMode.EXACT) {
-        Modifier.fillMaxSize().padding(horizontal = 14.dp)
-    } else {
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp)
-    }.semantics {
+    val pageModifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())
+        .padding(horizontal = 14.dp)
+        .semantics {
         contentDescription = "${strings.tahsinPage} ${AyahNumbering.toArabicIndic(pageIndex + 1)}"
-    }
+        }
     Column(modifier = pageModifier) {
         Spacer(modifier = Modifier.height(6.dp))
 
@@ -557,20 +543,7 @@ private fun MushafPageView(
             // ---- Isi halaman: teks ayat MENGALIR per surah (RTL menyambung
             //      seperti mushaf cetak) — bukan satu ayat per baris ----
             val groups = remember(composed) { composed.ayahs.groupBy { it.surah } }
-            if (state.mushafRenderMode == MushafRenderMode.EXACT) {
-                SurahFlowBlock(
-                    ayahs = composed.ayahs,
-                    state = state,
-                    strings = strings,
-                    actions = SurahFlowActions(
-                        onSelectAyah = actions.onSelectAyah,
-                        onSelectWord = actions.onSelectWord,
-                        onPlaySelectedWord = actions.onPlaySelectedWord,
-                        onStopSelectedWord = actions.onStopSelectedWord,
-                    ),
-                    exactMode = true,
-                )
-            } else groups.forEach { (surahNumber, groupAyahs) ->
+            groups.forEach { (surahNumber, groupAyahs) ->
                 if (surahNumber != composed.ayahs.first().surah) {
                     // Surah baru mulai di tengah halaman (umum di juz 30):
                     // pembatas + nama surah, ala mushaf cetak.
@@ -795,15 +768,8 @@ private fun SurahFlowBlock(
     state: TahsinUiState.Ready,
     strings: Strings,
     actions: SurahFlowActions,
-    exactMode: Boolean = false,
 ) {
-    val flow = remember(ayahs, exactMode, state.surahs) {
-        buildFlowMeta(
-            ayahs = ayahs,
-            includePageDecorations = exactMode,
-            surahNames = state.surahs.associate { it.number to it.nameArabic },
-        )
-    }
+    val flow = remember(ayahs) { buildFlowMeta(ayahs) }
     // Umpan haptik halus saat kata dipilih (dibaca di komposable scope).
     val haptics = LocalHapticFeedback.current
     val activeIdx = ayahs.indexOfFirst {
@@ -844,34 +810,19 @@ private fun SurahFlowBlock(
     val blockReserve = 28.dp + if (ayahs.any { it.isSajdah }) 30.dp else 0.dp
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val exactScale = (maxWidth.value / state.layoutManifest.tablet.widthDp)
-                .coerceIn(0.55f, 1f)
-            val fontSize = if (exactMode) 14f * exactScale else 14f * state.fontScale
-            val lineHeight = if (exactMode) {
-                state.layoutManifest.tablet.lineHeightSp * exactScale
-            } else {
-                fontSize * 2.2f
-            }
+        Box(modifier = Modifier.fillMaxWidth()) {
             BasicText(
                 text = annotated,
                 onTextLayout = { textLayout = it },
                 style = AyahTypography.ArabicWord.copy(
                     color = AyahColors.TextPrimary,
-                    fontSize = fontSize.sp,
-                    lineHeight = lineHeight.sp,
+                    fontSize = (14 * state.fontScale).sp,
+                    lineHeight = (14 * state.fontScale * 2.2f).sp,
                     textAlign = TextAlign.Start,
                     fontFamily = state.arabicFontFamily,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .then(
-                        if (exactMode) {
-                            Modifier.height((lineHeight * MushafLayoutManifest.EXPECTED_LINES).dp)
-                        } else {
-                            Modifier
-                        },
-                    )
                     .padding(end = blockReserve)
                     // Highlight ayat aktif DI BAWAH teks (tanpa clip) — harakat/
                     // tanda waqaf yang overflow tidak terpotong.
@@ -928,7 +879,6 @@ private fun SurahFlowBlock(
                             }
                         }
                      },
-                maxLines = if (exactMode) MushafLayoutManifest.EXPECTED_LINES else Int.MAX_VALUE,
             )
             // Tooltip kata terpilih (hanya ayat aktif) — koordinat sama dengan teks.
             if (activeIdx >= 0) {
@@ -1396,11 +1346,7 @@ private data class FlowMeta(
     val wordsByAyah: List<List<String>>,
 )
 
-private fun buildFlowMeta(
-    ayahs: List<MushafAyah>,
-    includePageDecorations: Boolean = false,
-    surahNames: Map<Int, String> = emptyMap(),
-): FlowMeta {
+private fun buildFlowMeta(ayahs: List<MushafAyah>): FlowMeta {
     val sb = StringBuilder()
     val ayahStart = IntArray(ayahs.size)
     val ayahEnd = IntArray(ayahs.size)
@@ -1408,13 +1354,6 @@ private fun buildFlowMeta(
     val wordStarts = ArrayList<IntArray>(ayahs.size)
     val wordsByAyah = ArrayList<List<String>>(ayahs.size)
     ayahs.forEachIndexed { i, entry ->
-        if (includePageDecorations && (i == 0 || ayahs[i - 1].surah != entry.surah)) {
-            if (i > 0) sb.append("\n")
-            surahNames[entry.surah]?.let { sb.append(it).append("\n") }
-        }
-        if (includePageDecorations && entry.hasBasmalah) {
-            sb.append(Basmalah.TEXT).append("\n")
-        }
         ayahStart[i] = sb.length
         val tokens = org.opennur.tahsin.data.quran.Ayah(entry.number, entry.text).words
         wordsByAyah.add(tokens)

@@ -15,7 +15,6 @@ import org.opennur.tahsin.data.quran.Ayah
 import org.opennur.tahsin.data.quran.ComposedPage
 import org.opennur.tahsin.data.quran.MushafPageComposer
 import org.opennur.tahsin.data.quran.MushafPagination
-import org.opennur.tahsin.data.quran.MushafLayoutManifest
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.data.quran.AssetQuranRepository
 import org.opennur.tahsin.data.quran.Surah
@@ -51,7 +50,6 @@ import org.opennur.tahsin.util.PlaySource
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.Reciter
 import org.opennur.tahsin.util.SettingsStore
-import org.opennur.tahsin.util.MushafRenderMode
 import org.opennur.tahsin.util.TahsinAudioPlayer
 import org.opennur.tahsin.widget.StreakReminderAlarm
 import androidx.compose.ui.text.font.FontFamily
@@ -78,8 +76,6 @@ sealed interface TahsinUiState {
         val surahs: List<Surah> = emptyList(),
         /** Paginasi mushaf Madani (604 halaman) — dari assets/quran/pages.json. */
         val pagination: MushafPagination = MushafPagination(0, 0, emptyList(), emptyList()),
-        /** Geometri halaman exact dari assets/quran/mushaf-layout.json. */
-        val layoutManifest: MushafLayoutManifest = MushafLayoutManifest.DEFAULT,
         /** Halaman aktif 0-based — navigasi seperti membalik halaman mushaf. */
         val pageIndex: Int = 0,
         val pageCount: Int = 1,
@@ -117,8 +113,6 @@ sealed interface TahsinUiState {
         val darkMode: Boolean = false,
         /** Pewarnaan huruf tajwid di mushaf (gaya mushaf tajwid). */
         val tajwidColor: Boolean = true,
-        /** Mode exact 15 baris atau reflow untuk aksesibilitas. */
-        val mushafRenderMode: MushafRenderMode = MushafRenderMode.ACCESSIBLE,
         /** Mode pemutaran audio: ayat ini saja / lanjut terus / ulang terus. */
         val audioMode: AudioPlaybackMode = AudioPlaybackMode.AYAH,
         /** Qari' (perawi) audio ayat aktif. */
@@ -186,7 +180,6 @@ data class SettingsUiState(
     val language: AppLanguage = AppLanguage.ID,
     val darkMode: Boolean = false,
     val tajwidColor: Boolean = true,
-    val mushafRenderMode: MushafRenderMode = MushafRenderMode.ACCESSIBLE,
     val showTranslation: Boolean = false,
     val reciter: Reciter = Reciter.MINSHAWY,
     val audioSpeed: Float = 1.0f,
@@ -247,7 +240,6 @@ class TahsinViewModel @Inject constructor(
             language = currentLanguage(),
             darkMode = settings.darkMode,
             tajwidColor = settings.tajwidColor,
-            mushafRenderMode = settings.mushafRenderMode,
             showTranslation = settings.showTranslation,
             reciter = settings.reciter,
             audioSpeed = settings.audioSpeed,
@@ -311,18 +303,12 @@ class TahsinViewModel @Inject constructor(
         _uiState.value = TahsinUiState.Loading
         _uiState.value = try {
             val pagination = repository.pagination()
-            val layoutManifest = runCatching {
-                app.assets.open("quran/mushaf-layout.json").bufferedReader().use { reader ->
-                    MushafLayoutManifest.parse(reader.readText())
-                }
-            }.getOrDefault(MushafLayoutManifest.DEFAULT)
             val pageCount = pagination.pageCount.coerceAtLeast(1)
             val startPage = ((pagination.pageOf(settings.surahNumber, settings.ayahIndex + 1) ?: 1) - 1)
                 .coerceIn(0, pageCount - 1)
             TahsinUiState.Ready(
                 surahs = repository.surahList(),
                 pagination = pagination,
-                layoutManifest = layoutManifest,
                 pageIndex = startPage,
                 pageCount = pageCount,
                 surahNumber = settings.surahNumber,
@@ -334,7 +320,6 @@ class TahsinViewModel @Inject constructor(
                 arabicFontFamily = fontStore.loadFamily(ArabicFont.UTSMANI),
                 darkMode = settings.darkMode,
                 tajwidColor = settings.tajwidColor,
-                mushafRenderMode = settings.mushafRenderMode,
                 audioMode = currentAudioMode(),
                 reciter = settings.reciter,
                 audioSpeed = settings.audioSpeed,
@@ -1096,11 +1081,6 @@ class TahsinViewModel @Inject constructor(
         updateReady { it.copy(tajwidColor = next) }
     }
 
-    fun setMushafRenderMode(mode: MushafRenderMode) {
-        settings.mushafRenderMode = mode
-        updateReady { it.copy(mushafRenderMode = mode) }
-    }
-
     // ---- audio: unduh per surah (progress di footer, multi-surah) ----
 
     fun playAyah() {
@@ -1464,7 +1444,6 @@ class TahsinViewModel @Inject constructor(
             language = s.language,
             darkMode = s.darkMode,
             tajwidColor = s.tajwidColor,
-            mushafRenderMode = s.mushafRenderMode,
             showTranslation = s.showTranslation,
             reciter = s.reciter,
             audioSpeed = s.audioSpeed,

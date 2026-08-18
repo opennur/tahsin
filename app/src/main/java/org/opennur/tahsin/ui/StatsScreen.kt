@@ -39,6 +39,7 @@ import org.opennur.tahsin.ui.components.GoalProgressBar
 import org.opennur.tahsin.util.Achievements
 import org.opennur.tahsin.util.ReadingHistoryEntry
 import org.opennur.tahsin.util.RelativeTime
+import org.opennur.tahsin.util.OfflineProgressReport
 import java.time.LocalDate
 
 /**
@@ -52,7 +53,7 @@ fun StatsScreen(
     onBack: () -> Unit,
     onOpenAyah: (Int, Int) -> Unit = { _, _ -> },
     onOpenPetaKhatam: () -> Unit = {},
-    onShareReport: (String) -> Unit = {},
+    onShareReport: (OfflineProgressReport) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val viewModel: StatsViewModel = viewModel()
@@ -92,7 +93,7 @@ fun StatsScreen(
                 text = strings.statsShareReport,
                 variant = AyahButtonVariant.Outline,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onShareReport(viewModel.exportOfflineReport()) },
+                onClick = { onShareReport(viewModel.progressReport()) },
             )
 
             Spacer(modifier = Modifier.height(16.dp))

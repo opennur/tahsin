@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.content.FileProvider
 import org.opennur.tahsin.data.learning.LearningTaskType
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTheme
@@ -32,6 +33,7 @@ import org.opennur.tahsin.ui.MemorizationScreen
 import org.opennur.tahsin.ui.OnboardingScreen
 import org.opennur.tahsin.ui.OpenTarget
 import org.opennur.tahsin.ui.PetaKhatamScreen
+import org.opennur.tahsin.ui.ProgressReportImage
 import org.opennur.tahsin.ui.SearchScreen
 import org.opennur.tahsin.ui.SettingsActions
 import org.opennur.tahsin.ui.SettingsAppearanceActions
@@ -48,7 +50,7 @@ import org.opennur.tahsin.ui.components.CelebrationDialog
 import org.opennur.tahsin.ui.components.DownloadNoticeDialog
 import org.opennur.tahsin.ui.navigation.AppScreen
 import org.opennur.tahsin.util.GamificationEvents
-import org.opennur.tahsin.util.MushafRenderMode
+import org.opennur.tahsin.util.OfflineProgressReport
 
 @Composable
 @Suppress("LongMethod", "CyclomaticComplexMethod")
@@ -180,13 +182,24 @@ fun MainActivityContent(
                     onBack = { pop() },
                     onOpenAyah = onOpenAyah,
                     onOpenPetaKhatam = { push(AppScreen.PetaKhatam) },
-                    onShareReport = { report ->
+                    onShareReport = { report: OfflineProgressReport ->
                         runCatching {
+                            val imageFile = ProgressReportImage.write(
+                                file = java.io.File(context.cacheDir, "shared/progress-report.png"),
+                                report = report,
+                                strings = AppStrings.of(settingsState.language),
+                            )
+                            val uri = FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.fileprovider",
+                                imageFile,
+                            )
                             context.startActivity(
                                 Intent.createChooser(
                                     Intent(Intent.ACTION_SEND).apply {
-                                        type = "application/json"
-                                        putExtra(Intent.EXTRA_TEXT, report)
+                                        type = "image/png"
+                                        putExtra(Intent.EXTRA_STREAM, uri)
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                     },
                                     AppStrings.of(settingsState.language).statsShareReport,
                                 ),
@@ -234,7 +247,6 @@ fun MainActivityContent(
                             onToggleTajwidColor = tahsinViewModel::toggleTajwidColor,
                             onToggleTranslation = tahsinViewModel::toggleTranslation,
                             onToggleDarkMode = tahsinViewModel::toggleDarkMode,
-                            onSetMushafRenderMode = tahsinViewModel::setMushafRenderMode,
                             onSetLanguage = tahsinViewModel::setLanguage,
                             onEditLearningPlan = { showLearningSetup = true },
                         ),
