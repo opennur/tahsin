@@ -45,6 +45,7 @@ data class MemorizationUiState(
     val transcript: String = "",
     val alignedWords: List<AlignedWord> = emptyList(),
     val sttScore: Int? = null,
+    val sttError: String? = null,
     // Target selection
     val targetMode: String = "surah",  // "surah" or "juz"
     val selectedSurah: Int = 1,
@@ -155,6 +156,10 @@ class MemorizationViewModel @Inject constructor(
             _state.value = s.copy(listening = false)
             scoreStt()
         } else {
+            if (!speech.isAvailable()) {
+                _state.value = s.copy(sttError = AppStrings.of(s.language).msgSpeechUnavailable)
+                return
+            }
             val words = s.ayah?.words ?: return
             if (words.isEmpty()) return
             startListeningSession(words)
@@ -167,6 +172,7 @@ class MemorizationViewModel @Inject constructor(
             transcript = "",
             alignedWords = emptyList(),
             sttScore = null,
+            sttError = null,
         )
         speech.start(object : ArabicSpeechRecognizer.Listener {
             override fun onPartial(text: String) {
@@ -186,7 +192,10 @@ class MemorizationViewModel @Inject constructor(
                 scoreStt()
             }
             override fun onError(error: Int) {
-                _state.value = _state.value.copy(listening = false)
+                _state.value = _state.value.copy(
+                    listening = false,
+                    sttError = AppStrings.of(_state.value.language).msgSpeechRetry,
+                )
             }
             override fun onListeningChanged(listening: Boolean) {
                 _state.value = _state.value.copy(listening = listening)
@@ -212,6 +221,7 @@ class MemorizationViewModel @Inject constructor(
             transcript = "",
             alignedWords = emptyList(),
             sttScore = null,
+            sttError = null,
         )
     }
 

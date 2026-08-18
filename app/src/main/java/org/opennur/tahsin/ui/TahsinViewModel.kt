@@ -651,6 +651,10 @@ class TahsinViewModel @Inject constructor(
             stopRecitation()
             return
         }
+        if (!speech.isAvailable()) {
+            showMessage(AppStrings.of(currentLanguage()).msgSpeechUnavailable)
+            return
+        }
         pendingAutoPlay = false // inisiatif manual membatalkan rantai audio tertunda
         val ayah = s.ayah ?: return
         val words = ayah.words
@@ -750,7 +754,7 @@ class TahsinViewModel @Inject constructor(
                     return@launch
                 }
             }
-            stopRecitation(AppStrings.of(currentLanguage()).msgMushafLoadFailed)
+            stopRecitation(AppStrings.of(currentLanguage()).msgSpeechRetry)
         }
     }
 
@@ -1234,9 +1238,10 @@ class TahsinViewModel @Inject constructor(
             }
             audioPlayer.playAyah(s.surahNumber, ayah.number, ayah.text) {
                 audioPlayer.speak(ayah.text)
-                if (!audioPlayer.isArabicTtsAvailable()) {
-                    showMessage(AppStrings.of(currentLanguage()).msgAudioUnavailable)
-                }
+                val strings = AppStrings.of(currentLanguage())
+                showMessage(
+                    if (audioPlayer.isArabicTtsAvailable()) strings.msgAudioRetry else strings.msgAudioUnavailable,
+                )
             }
         }
     }
@@ -1270,9 +1275,10 @@ class TahsinViewModel @Inject constructor(
                 // Fallback (TTS) — tidak ada status pemutaran media.
                 updateReady { it.copy(isWordPlaying = false) }
                 audioPlayer.speak(word)
-                if (!audioPlayer.isArabicTtsAvailable()) {
-                    showMessage(AppStrings.of(currentLanguage()).msgWordUnavailable)
-                }
+                val strings = AppStrings.of(currentLanguage())
+                showMessage(
+                    if (audioPlayer.isArabicTtsAvailable()) strings.msgAudioRetry else strings.msgWordUnavailable,
+                )
             }
         }
     }
@@ -1291,6 +1297,12 @@ class TahsinViewModel @Inject constructor(
         } else {
             playAyah()
         }
+    }
+
+    /** Ulangi audio ayat aktif setelah kegagalan cache, jaringan, atau player. */
+    fun retryAudio() {
+        playGeneration++
+        playAyah()
     }
 
     /** Tutup popup keterangan unduhan. */
@@ -1332,7 +1344,7 @@ class TahsinViewModel @Inject constructor(
                             surahDone = 0,
                             surahTotal = surah.ayahs.size + surah.ayahs.sumOf { it.words.size },
                         ) }
-                        downloader.downloadSurah(surah) { d, t ->
+                        val stats = downloader.downloadSurah(surah) { d, t ->
                             done++
                             updateReady { it.copy(downloadDone = done) }
                             DownloadProgress.update { it.copy(surahDone = d, surahTotal = t) }
@@ -1340,13 +1352,22 @@ class TahsinViewModel @Inject constructor(
                                 DownloadService.updateProgress(done, total)
                             }
                         }
+                        if (stats.ok < stats.total) {
+                            failed++
+                            DownloadProgress.fail(AppStrings.of(currentLanguage()).msgDownloadFailed)
+                        }
                     }
                 }.onFailure { error ->
                     if (error is CancellationException) throw error
                     failed++
+                    DownloadProgress.fail(AppStrings.of(currentLanguage()).msgDownloadFailed)
                 }
             }
-            DownloadProgress.reset()
+            if (failed > 0) {
+                DownloadProgress.fail(AppStrings.of(currentLanguage()).msgDownloadFailed)
+            } else {
+                DownloadProgress.reset()
+            }
             updateReady { it.copy(
                 isDownloading = false,
                 isDownloadingAll = false,

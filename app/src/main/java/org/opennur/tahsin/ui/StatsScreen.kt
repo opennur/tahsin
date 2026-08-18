@@ -39,6 +39,7 @@ import org.opennur.tahsin.ui.components.GoalProgressBar
 import org.opennur.tahsin.util.Achievements
 import org.opennur.tahsin.util.ReadingHistoryEntry
 import org.opennur.tahsin.util.RelativeTime
+import org.opennur.tahsin.util.OfflineProgressReport
 import java.time.LocalDate
 
 /**
@@ -47,10 +48,12 @@ import java.time.LocalDate
  * ronde, dan kata dikuasai, plus rincian ringkas per fitur.
  */
 @Composable
+@Suppress("LongMethod")
 fun StatsScreen(
     onBack: () -> Unit,
     onOpenAyah: (Int, Int) -> Unit = { _, _ -> },
     onOpenPetaKhatam: () -> Unit = {},
+    onShareReport: (OfflineProgressReport) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val viewModel: StatsViewModel = viewModel()
@@ -84,6 +87,13 @@ fun StatsScreen(
             AyahText(
                 strings.statsSubtitle,
                 style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            AyahButton(
+                text = strings.statsShareReport,
+                variant = AyahButtonVariant.Outline,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onShareReport(viewModel.progressReport()) },
             )
 
             Spacer(modifier = Modifier.height(16.dp))

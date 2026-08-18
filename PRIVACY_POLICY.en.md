@@ -21,6 +21,8 @@ profiling purposes.
 - Cache of downloaded surah data.
 - Pending audio-download metadata and temporary `.mp3.part` files used for
   crash-safe resume.
+- An offline progress summary image is generated only when the user explicitly
+  shares it; it contains anonymous aggregates and no audio or speech transcript.
 
 The app has no accounts, no login, and sends no data to developer servers.
 

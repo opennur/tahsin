@@ -56,6 +56,10 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -122,6 +126,7 @@ private data class TahsinContentActions(
     val onToggleBookmark: () -> Unit,
     val onDismissMessage: () -> Unit,
     val onToggleAudioPlayback: () -> Unit,
+    val onRetryAudio: () -> Unit,
     val onOpenSearch: () -> Unit,
     val onOpenSettings: () -> Unit,
     val onBack: () -> Unit,
@@ -135,6 +140,7 @@ private data class MushafPageActions(
     val onPlaySelectedWord: () -> Unit,
     val onStopSelectedWord: () -> Unit,
     val onDismissMessage: () -> Unit,
+    val onRetryAudio: () -> Unit,
 )
 
 /** Callbacks untuk [SurahFlowBlock]. */
@@ -239,6 +245,7 @@ fun TahsinScreen(
                 onToggleBookmark = viewModel::toggleBookmark,
                 onDismissMessage = viewModel::clearMessage,
                 onToggleAudioPlayback = viewModel::toggleAudioPlayback,
+                onRetryAudio = viewModel::retryAudio,
                 onOpenSearch = onOpenSearch,
                 onOpenSettings = onOpenSettings,
                 onBack = onBack,
@@ -339,17 +346,14 @@ private fun TahsinContent(
             )
         }
 
-        // ---- Kontrol ukuran huruf (slider presisi) ----
+        // ---- Kontrol ukuran huruf aksesibel ----
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AyahText(
-                "A−",
-                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-            )
+            AyahText("A−", style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary))
             Spacer(modifier = Modifier.width(8.dp))
             AyahSlider(
                 value = state.fontScale,
@@ -358,10 +362,7 @@ private fun TahsinContent(
                 valueRange = FontScales.MIN..FontScales.MAX,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            AyahText(
-                "A+",
-                style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary),
-            )
+            AyahText("A+", style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary))
             Spacer(modifier = Modifier.width(10.dp))
             AyahText(
                 "${(state.fontScale * 100).roundToInt()}%",
@@ -401,6 +402,7 @@ private fun TahsinContent(
                     onPlaySelectedWord = actions.onPlaySelectedWord,
                     onStopSelectedWord = actions.onStopSelectedWord,
                     onDismissMessage = actions.onDismissMessage,
+                    onRetryAudio = actions.onRetryAudio,
                 ),
             )
         }
@@ -421,7 +423,11 @@ private fun TahsinContent(
                 .padding(horizontal = 20.dp, vertical = 10.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                MicButton(listening = state.listening, onClick = actions.onMicClick)
+                MicButton(
+                    listening = state.listening,
+                    onClick = actions.onMicClick,
+                    contentDescription = if (state.listening) strings.stop else strings.micHint,
+                )
                 Spacer(modifier = Modifier.width(14.dp))
                 AyahText(
                     if (state.listening) strings.listeningHint else strings.micHint,
@@ -500,8 +506,9 @@ private fun MushafPageView(
     strings: Strings,
     actions: MushafPageActions,
 ) {
-    val composed = remember(state.surahs, state.pagination, pageIndex) {
-        composePage(state, pageIndex)
+    val contents = remember(state.surahs) { state.surahs.associateBy { it.number } }
+    val composed = remember(contents, state.pagination, pageIndex) {
+        MushafPageComposer.composePage(state.pagination, pageIndex + 1, contents)
     }
     val isCurrentPage = pageIndex == state.pageIndex
     val ayah = state.ayah
@@ -509,12 +516,14 @@ private fun MushafPageView(
         it.surah == state.surahNumber && it.number == state.ayahIndex + 1
     } == true
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 14.dp),
-    ) {
+    val pageModifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())
+        .padding(horizontal = 14.dp)
+        .semantics {
+        contentDescription = "${strings.tahsinPage} ${AyahNumbering.toArabicIndic(pageIndex + 1)}"
+        }
+    Column(modifier = pageModifier) {
         Spacer(modifier = Modifier.height(6.dp))
 
         // ---- Band header ala mushaf Madani ----
@@ -629,7 +638,20 @@ private fun MushafPageView(
                 state.message?.let { msg ->
                     Spacer(modifier = Modifier.height(8.dp))
                     AyahCard(modifier = Modifier.fillMaxWidth(), onClick = actions.onDismissMessage) {
-                        AyahText(msg, style = AyahTypography.Body2, color = AyahColors.Error)
+                        Column {
+                            AyahText(msg, style = AyahTypography.Body2, color = AyahColors.Error)
+                            if (msg == strings.msgAudioRetry ||
+                                msg == strings.msgAudioUnavailable ||
+                                msg == strings.msgWordUnavailable
+                            ) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                AyahButton(
+                                    text = strings.msgAudioRetry,
+                                    variant = AyahButtonVariant.Outline,
+                                    onClick = actions.onRetryAudio,
+                                )
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -740,6 +762,7 @@ private fun BasmalahRow(fontFamily: FontFamily) {
  *  digambar DI BAWAH teks per baris, jadi harakat/tanda waqaf yang overflow
  *  tidak terpotong. */
 @Composable
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 private fun SurahFlowBlock(
     ayahs: List<MushafAyah>,
     state: TahsinUiState.Ready,
@@ -752,7 +775,9 @@ private fun SurahFlowBlock(
     val activeIdx = ayahs.indexOfFirst {
         it.surah == state.surahNumber && it.number == state.ayahIndex + 1
     }
-    val statusByIndex = if (activeIdx >= 0) state.alignedWords.associateBy { it.index } else emptyMap()
+    val statusByIndex = remember(activeIdx, state.alignedWords) {
+        if (activeIdx >= 0) state.alignedWords.associateBy { it.index } else emptyMap()
+    }
     val selectedIndex = if (activeIdx >= 0) state.selectedWordIndex else null
     val spansByWord = remember(flow) {
         flow.wordsByAyah.mapIndexed { i, tokens ->
@@ -853,7 +878,7 @@ private fun SurahFlowBlock(
                                 }
                             }
                         }
-                    },
+                     },
             )
             // Tooltip kata terpilih (hanya ayat aktif) — koordinat sama dengan teks.
             if (activeIdx >= 0) {
@@ -1148,14 +1173,22 @@ private fun audioModeSymbol(mode: AudioPlaybackMode): String = when (mode) {
 }
 
 @Composable
-private fun MicButton(listening: Boolean, onClick: () -> Unit) {
+private fun MicButton(
+    listening: Boolean,
+    onClick: () -> Unit,
+    contentDescription: String,
+) {
     val base = if (listening) AyahColors.Error else AyahColors.Primary
     Box(
         modifier = Modifier
             .size(56.dp)
             .background(base, CircleShape)
             .border(4.dp, base.copy(alpha = 0.15f), CircleShape)
-            .clickable(onClick = onClick),
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics {
+                this.contentDescription = contentDescription
+                this.role = Role.Button
+            },
         contentAlignment = Alignment.Center,
     ) {
         AyahText(

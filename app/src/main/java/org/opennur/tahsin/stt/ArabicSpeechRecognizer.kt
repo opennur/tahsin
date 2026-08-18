@@ -18,6 +18,8 @@ import android.speech.SpeechRecognizer
  */
 class ArabicSpeechRecognizer(context: Context) {
 
+    private val appContext = context.applicationContext
+
     interface Listener {
         fun onPartial(text: String)
         fun onResult(text: String)
@@ -26,12 +28,20 @@ class ArabicSpeechRecognizer(context: Context) {
     }
 
     private val speech: SpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(
-        context.applicationContext,
+        appContext,
     )
     private var listener: Listener? = null
 
+    /** True bila perangkat memiliki engine pengenalan suara yang bisa dipakai. */
+    fun isAvailable(): Boolean = SpeechRecognizer.isRecognitionAvailable(appContext)
+
     fun start(l: Listener) {
         listener = l
+        if (!isAvailable()) {
+            l.onListeningChanged(false)
+            l.onError(SpeechRecognizer.ERROR_CLIENT)
+            return
+        }
         l.onListeningChanged(true)
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -77,7 +87,11 @@ class ArabicSpeechRecognizer(context: Context) {
             override fun onEvent(eventType: Int, params: Bundle?) {}
         })
 
-        speech.startListening(intent)
+        runCatching { speech.startListening(intent) }
+            .onFailure {
+                l.onListeningChanged(false)
+                l.onError(SpeechRecognizer.ERROR_CLIENT)
+            }
     }
 
     fun stop() {
@@ -87,5 +101,6 @@ class ArabicSpeechRecognizer(context: Context) {
 
     fun destroy() {
         runCatching { speech.destroy() }
+        listener = null
     }
 }

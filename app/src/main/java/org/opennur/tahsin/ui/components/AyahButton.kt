@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +46,7 @@ enum class AyahButtonSize {
  * - Varian: Primary, Secondary (gold), Outline (garis), Ghost (halus).
  */
 @Composable
+@Suppress("LongParameterList")
 fun AyahButton(
     text: String,
     onClick: () -> Unit,
@@ -52,6 +55,7 @@ fun AyahButton(
     enabled: Boolean = true,
     size: AyahButtonSize = AyahButtonSize.Default,
     textStyle: TextStyle? = null,
+    contentDescription: String? = null,
 ) {
     val minHeight = if (size == AyahButtonSize.Small) 32.dp else 40.dp
     val hPadding = if (size == AyahButtonSize.Small) 12.dp else 16.dp
@@ -98,6 +102,13 @@ fun AyahButton(
             )
             .then(if (border != null) Modifier.border(border, AyahShapes.Button) else Modifier)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .then(
+                if (contentDescription != null) {
+                    Modifier.semantics { this.contentDescription = contentDescription }
+                } else {
+                    Modifier
+                },
+            )
             .padding(horizontal = hPadding, vertical = vPadding),
         contentAlignment = Alignment.Center,
     ) {

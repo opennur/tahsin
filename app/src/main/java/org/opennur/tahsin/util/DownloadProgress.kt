@@ -13,6 +13,8 @@ data class DownloadProgressState(
     val surahDone: Int = 0,
     /** Total file (ayat + kata) surah yang sedang diunduh. */
     val surahTotal: Int = 0,
+    /** Error yang perlu ditampilkan dengan aksi retry. */
+    val errorMessage: String? = null,
 )
 
 /** Store status unduhan (application-scope, tanpa Android API). */
@@ -27,5 +29,9 @@ object DownloadProgress {
 
     fun reset() {
         _state.value = DownloadProgressState()
+    }
+
+    fun fail(message: String) {
+        _state.value = _state.value.copy(isDownloading = false, errorMessage = message)
     }
 }
