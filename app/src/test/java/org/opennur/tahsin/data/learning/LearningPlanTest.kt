@@ -22,7 +22,7 @@ class LearningPlanTest {
     }
 
     @Test
-    fun `each learning goal gets a distinct three step plan`() {
+    fun `each learning goal gets its configured plan`() {
         assertThat(LearningPlanEngine.taskTypesFor(LearningGoal.RECITATION)).containsExactly(
             LearningTaskType.RECITE,
             LearningTaskType.TAJWID,
@@ -41,6 +41,7 @@ class LearningPlanTest {
         assertThat(LearningPlanEngine.taskTypesFor(LearningGoal.ARABIC)).containsExactly(
             LearningTaskType.ARABIC,
             LearningTaskType.NAHWU,
+            LearningTaskType.SHOROF,
             LearningTaskType.VOCABULARY,
         ).inOrder()
     }

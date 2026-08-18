@@ -98,6 +98,9 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
    course — 8 progressive lessons on word types, sentences, fa'il, maf'ul,
    prepositions, adjectives, and case endings, with examples, sentence-order
    practice, persisted progress, XP, daily-plan, and Statistics integration.
+ - 📘 **Learn Shorof** (Learn Shorof menu): a beginner Arabic morphology course
+   covering roots, wazans, verb forms, derived nouns, and conjugation tables,
+   with examples, practice, persisted progress, XP, daily-plan, and Statistics integration.
 - 🎮 **XP, Level & Streak**: every learning activity earns XP — Tahsin
   recitation (score ≥70: 5 XP, ≥90: 10 XP), correct quiz answers (2 XP),
   newly mastered vocabulary words (10 XP), Dream BIG rounds (15 XP), Learn

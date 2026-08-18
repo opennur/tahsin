@@ -96,6 +96,28 @@ data class LearningStrings(
     val nahwuRestart: String,
     val nahwuBackHome: String,
     val nahwuCompleted: String,
+    val statsShorofLine: String,
+    val taskShorof: String,
+    val menuShorof: String,
+    val shorofSubtitle: String,
+    val shorofLoading: String,
+    val shorofEmpty: String,
+    val shorofStart: String,
+    val shorofBestScore: String,
+    val shorofSessionsPlayed: String,
+    val shorofMaterialTitle: String,
+    val shorofLessonIntro: String,
+    val shorofPatternTitle: String,
+    val shorofConjugationTitle: String,
+    val shorofExercisesTitle: String,
+    val shorofProgressLabel: String,
+    val shorofCorrect: String,
+    val shorofWrong: String,
+    val shorofNext: String,
+    val shorofResultTitle: String,
+    val shorofScore: String,
+    val shorofRestart: String,
+    val shorofBackHome: String,
 )
 
 /** Teks fitur tambahan agar konstruktor [Strings] tetap di bawah batas JVM. */
@@ -485,6 +507,28 @@ class Strings(
     val nahwuRestart get() = learning.nahwuRestart
     val nahwuBackHome get() = learning.nahwuBackHome
     val nahwuCompleted get() = learning.nahwuCompleted
+    val statsShorofLine get() = learning.statsShorofLine
+    val taskShorof get() = learning.taskShorof
+    val menuShorof get() = learning.menuShorof
+    val shorofSubtitle get() = learning.shorofSubtitle
+    val shorofLoading get() = learning.shorofLoading
+    val shorofEmpty get() = learning.shorofEmpty
+    val shorofStart get() = learning.shorofStart
+    val shorofBestScore get() = learning.shorofBestScore
+    val shorofSessionsPlayed get() = learning.shorofSessionsPlayed
+    val shorofMaterialTitle get() = learning.shorofMaterialTitle
+    val shorofLessonIntro get() = learning.shorofLessonIntro
+    val shorofPatternTitle get() = learning.shorofPatternTitle
+    val shorofConjugationTitle get() = learning.shorofConjugationTitle
+    val shorofExercisesTitle get() = learning.shorofExercisesTitle
+    val shorofProgressLabel get() = learning.shorofProgressLabel
+    val shorofCorrect get() = learning.shorofCorrect
+    val shorofWrong get() = learning.shorofWrong
+    val shorofNext get() = learning.shorofNext
+    val shorofResultTitle get() = learning.shorofResultTitle
+    val shorofScore get() = learning.shorofScore
+    val shorofRestart get() = learning.shorofRestart
+    val shorofBackHome get() = learning.shorofBackHome
 }
 
 object AppStrings {
@@ -852,6 +896,28 @@ object AppStrings {
             nahwuRestart = "🔄 Sesi Baru",
             nahwuBackHome = "← Kembali",
             nahwuCompleted = "✓ Pelajaran selesai",
+            statsShorofLine = "Shorof: %d sesi • skor terbaik %d/%d",
+            taskShorof = "Pelajari satu pelajaran Shorof",
+            menuShorof = "📘 Belajar Shorof",
+            shorofSubtitle = "Pelajari akar kata, wazan, dan tasrif secara bertahap dengan contoh dan latihan.",
+            shorofLoading = "Memuat materi Shorof…",
+            shorofEmpty = "Belum ada materi Shorof.",
+            shorofStart = "🎮 Mulai Latihan",
+            shorofBestScore = "Skor terbaik: %d/%d",
+            shorofSessionsPlayed = "Sesi dimainkan: %d",
+            shorofMaterialTitle = "📖 Materi Shorof",
+            shorofLessonIntro = "Penjelasan",
+            shorofPatternTitle = "Pola dan Wazan",
+            shorofConjugationTitle = "Contoh Tasrif",
+            shorofExercisesTitle = "Latihan Shorof",
+            shorofProgressLabel = "Soal %d/%d",
+            shorofCorrect = "✓ Benar!",
+            shorofWrong = "✗ Belum tepat.",
+            shorofNext = "Lanjut →",
+            shorofResultTitle = "Sesi Shorof selesai!",
+            shorofScore = "Skor: %d/%d",
+            shorofRestart = "🔄 Sesi Baru",
+            shorofBackHome = "← Kembali",
         ),
     )
 
@@ -1214,6 +1280,28 @@ object AppStrings {
             nahwuRestart = "🔄 New Session",
             nahwuBackHome = "← Back",
             nahwuCompleted = "✓ Lesson complete",
+            statsShorofLine = "Shorof: %d sessions • best score %d/%d",
+            taskShorof = "Study one Shorof lesson",
+            menuShorof = "📘 Learn Shorof",
+            shorofSubtitle = "Learn roots, wazans, and conjugation step by step with examples and practice.",
+            shorofLoading = "Loading Shorof lessons…",
+            shorofEmpty = "No Shorof material yet.",
+            shorofStart = "🎮 Start Practice",
+            shorofBestScore = "Best score: %d/%d",
+            shorofSessionsPlayed = "Sessions played: %d",
+            shorofMaterialTitle = "📖 Shorof Material",
+            shorofLessonIntro = "Explanation",
+            shorofPatternTitle = "Patterns and Wazans",
+            shorofConjugationTitle = "Conjugation Examples",
+            shorofExercisesTitle = "Shorof Practice",
+            shorofProgressLabel = "Question %d/%d",
+            shorofCorrect = "✓ Correct!",
+            shorofWrong = "✗ Not quite.",
+            shorofNext = "Next →",
+            shorofResultTitle = "Shorof session complete!",
+            shorofScore = "Score: %d/%d",
+            shorofRestart = "🔄 New Session",
+            shorofBackHome = "← Back",
         ),
     )
 

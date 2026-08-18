@@ -9,6 +9,7 @@ import org.opennur.tahsin.data.learning.LearningGoal
 import org.opennur.tahsin.data.learning.LearningPlanEngine
 import org.opennur.tahsin.data.lughoh.LughohEngine
 import org.opennur.tahsin.data.nahwu.NahwuEngine
+import org.opennur.tahsin.data.shorof.ShorofEngine
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.Gamification
@@ -45,6 +46,8 @@ data class StatsState(
     val lughohBest: Int = 0,
     val nahwuRounds: Int = 0,
     val nahwuBest: Int = 0,
+    val shorofRounds: Int = 0,
+    val shorofBest: Int = 0,
     // Ringkasan ekonomi game
     val xp: Int = 0,
     val level: Int = 1,
@@ -65,7 +68,7 @@ data class StatsState(
 
 /**
  * Statistik keseluruhan: agregasi semua challenge — Tahsin (baca Al-Qur'an),
- * Dream BIG (ronde kosakata), Belajar Arab (sesi latihan), Nahwu,
+ * Dream BIG (ronde kosakata), Belajar Arab (sesi latihan), Nahwu, Shorof,
  * Kosakata
  * (kata yang dikuasai), serta progres rencana harian. Sumber: store persisten
  * masing-masing fitur.
@@ -89,6 +92,7 @@ class StatsViewModel @Inject constructor(
             val dream = stores.dreamBig.read()
             val lughoh = stores.lughoh.read()
             val nahwu = stores.nahwu?.read()
+            val shorof = stores.shorof?.read()
             val gamification = stores.gamification.read()
             val today = java.time.LocalDate.now().toEpochDay()
             val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
@@ -108,6 +112,7 @@ class StatsViewModel @Inject constructor(
             val dreamBestPct = dream.bestScore * 100 / DreamBigGame.QUESTIONS_PER_ROUND
             val lughohBestPct = lughoh.bestScore * 100 / LughohEngine.SESSION_SIZE
             val nahwuBestPct = (nahwu?.bestScore ?: 0) * 100 / NahwuEngine.SESSION_SIZE
+            val shorofBestPct = (shorof?.bestScore ?: 0) * 100 / ShorofEngine.SESSION_SIZE
             val wordsMastered = vocab.cards.values.count { it.correctCount > 0 }
             val history = stores.readingHistory.load()
             val surahList = repository.surahList()
@@ -125,9 +130,10 @@ class StatsViewModel @Inject constructor(
                 isLoading = false,
                 language = language,
                 totalSessions = tahsinAttempts + dream.roundsPlayed + lughoh.roundsPlayed +
-                    (nahwu?.sessionsPlayed ?: 0),
-                totalRounds = dream.roundsPlayed + lughoh.roundsPlayed + (nahwu?.sessionsPlayed ?: 0),
-                bestScorePct = maxOf(tahsinBestPct, dreamBestPct, lughohBestPct, nahwuBestPct),
+                    (nahwu?.sessionsPlayed ?: 0) + (shorof?.sessionsPlayed ?: 0),
+                totalRounds = dream.roundsPlayed + lughoh.roundsPlayed +
+                    (nahwu?.sessionsPlayed ?: 0) + (shorof?.sessionsPlayed ?: 0),
+                bestScorePct = maxOf(tahsinBestPct, dreamBestPct, lughohBestPct, nahwuBestPct, shorofBestPct),
                 wordsMastered = wordsMastered,
                 tahsinAttempts = tahsinAttempts,
                 dreamBigRounds = dream.roundsPlayed,
@@ -136,6 +142,8 @@ class StatsViewModel @Inject constructor(
                 lughohBest = lughoh.bestScore,
                 nahwuRounds = nahwu?.sessionsPlayed ?: 0,
                 nahwuBest = nahwu?.bestScore ?: 0,
+                shorofRounds = shorof?.sessionsPlayed ?: 0,
+                shorofBest = shorof?.bestScore ?: 0,
                 xp = gamification.xp,
                 level = Gamification.levelFor(gamification.xp),
                 streak = gamification.streak,
