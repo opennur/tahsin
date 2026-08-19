@@ -2,10 +2,14 @@
 
 ## Status
 
-**Pending qualified-expert sign-off.** The current engine is deterministic text
-annotation, not a fatwa, teacher, or audio tajwid assessor. No release should
-describe these annotations as independently certified until the review table
-below has been completed.
+**Pending qualified-expert sign-off.** The current engine provides deterministic
+text annotations; it is not a fatwa, a teacher, or an audio tajwid assessor. Do
+not describe these annotations as independently certified until the review table
+below is complete.
+
+The Home screen and guided daily plan only help users find and complete learning
+activities. They do not change the engine's scope or turn text-derived rules
+into audio-based tajwid assessment.
 
 ## Scope
 

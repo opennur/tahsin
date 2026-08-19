@@ -1,6 +1,6 @@
 # Privacy Policy — Tahsin Quran
 
-Last updated: 2026-08-15
+Last updated: 2026-08-19
 
 ## Summary
 
@@ -14,7 +14,8 @@ profiling purposes.
 **None.** All app data is stored **locally on your device**:
 
 - Learning stats, XP, level, streak, and progress;
-- Learning goal, daily plan completion, and memorization review metadata;
+- Learning goal, daily time target, daily plan completion, and memorization
+  review metadata;
 - Favorite ayah bookmarks;
 - Settings (reciter, speed, language, font size, etc.);
 - Downloaded reciter audio;

@@ -1,4 +1,4 @@
-# Rilis ke Google Play Store
+# Rilis ke Google Play
 
 Checklist lengkap untuk merilis **Tahsin Quran** (`org.opennur.tahsin`) ke Google
 Play. Versi baseline rilis pertama: `versionCode = 1`, `versionName = "1.0.0"`.
@@ -18,7 +18,7 @@ Play. Versi baseline rilis pertama: `versionCode = 1`, `versionName = "1.0.0"`.
 | Full description | ID + EN — ringkas README.md / README.en.md (fitur, offline-first, cakupan kata). |
 | Icon 512×512 | dari adaptive icon; pastikan tepi tidak transparan di Play. |
 | Feature graphic 1024×500 | opsional, disarankan. |
-| Screenshot (min. 2, sarankan 8) | Tahsin (mushaf), penilaian STT, Kosakata, Kuis Tajwid, Belajar Arab, Dream BIG, Kuis Ayat, Keajaiban & Ayat Favorit. |
+| Screenshot (min. 2, sarankan 8) | Beranda dan Rencana Hari Ini, Tahsin (mushaf), penilaian STT, Kosakata, Kuis Tajwid, Belajar Arab, Dream BIG, Kuis Ayat, Studi Coherence, dan Ayat Favorit. |
 | Kategori | Education (primary). |
 | Kontak | email developer; website opsional. |
 
@@ -77,20 +77,37 @@ Play. Versi baseline rilis pertama: `versionCode = 1`, `versionName = "1.0.0"`.
 - **Iklan & pembelian**: tidak ada, tidak ada.
 - **Target audience**: Everyone.
 
-## 4. Track rilis
+## 4. Gate konten dan kualitas pengajaran
+
+Sebelum mengunggah AAB:
+
+- Jalankan `python3 tools/validate_quran_content.py` dan
+  `python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian`;
+  seluruh 6.236 ayat dan field yang tampil ke pengguna harus lolos pemeriksaan
+  resmi Kemenag/LPMQ.
+- Tinjau diff dan hanya perbarui `tools/quran-canonical-manifest.json` setelah
+  validasi bersih.
+- Pastikan ledger hak terjemahan dan audio di
+  [docs/CONTENT_PROVENANCE.en.md](docs/CONTENT_PROVENANCE.en.md) sudah lengkap,
+  termasuk atribusi atau izin tertulis dari setiap penyedia.
+- Jangan nyatakan rilis siap selama ada baris di
+  [docs/TAJWID_REVIEW.md](docs/TAJWID_REVIEW.md) yang masih menunggu sign-off
+  dari ahli berkualifikasi.
+
+## 5. Track rilis
 
 1. **Internal testing** → upload AAB, tambah email tester, undang, validasi.
 2. **Closed testing** (opsional) → beta terbatas.
 3. **Production** → isi release notes ("What's new", ID + EN), Submit.
 4. Review Google: 1–7 hari untuk akun baru; pantau email konsol.
 
-## 5. Pasca rilis
+## 6. Pasca rilis
 
 - Pantau **Vitals** (crash/ANR) di Play Console.
 - Setiap rilis baru: `versionCode` **naik +1** (jangan pernah turun), `versionName`
   versi semantik (1.0.1, 1.1.0, …).
 - Tetap jalankan gate sebelum rilis:
 
-  ```bash
-  ./gradlew testDebugUnitTest assembleDebug jacocoCoreReport --no-daemon
-  ```
+```bash
+./gradlew testDebugUnitTest assembleDebug jacocoCoreReport detekt lintDebug --no-daemon
+```

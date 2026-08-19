@@ -23,17 +23,18 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
 
 ## Golden rules
 
-1. **100% coverage gate.** All correctness-critical logic — `data/**` + pure
-   `util/**` + `stt/TranscriptAligner` — must be covered **100% line AND
-   branch** (JaCoCo). Before a PR:
+1. **100% coverage gate.** All correctness-critical logic in the configured
+   JaCoCo scope — `data/**`, pure utility code, and `stt/TranscriptAligner` —
+   must be covered **100% line AND branch**. Before a PR:
 
    ```bash
    ./gradlew testDebugUnitTest assembleDebug jacocoCoreReport --no-daemon
    ```
 
    `jacocoCoreReport` MUST be green at **100.00% line + 100.00% branch**
-   (report: `app/build/reports/jacoco/core/index.html`). The full exclusion
-   list lives in `app/build.gradle.kts` (repositories, `SettingsStore`,
+   (report: `app/build/reports/jacoco/core/index.html`). For a quick list of
+   uncovered lines or branches, run `python3 tools/jacoco_gaps.py`. The full
+   exclusion list lives in `app/build.gradle.kts` (repositories, `SettingsStore`,
    `FontStore`, `TahsinAudioPlayer`, `AudioDownloader`, `DownloadService`,
    `GamificationHub`, `ArabicSpeechRecognizer`, `ui/**`, `widget/**`,
    `theme/**`, `MainActivity`, synthetic `$default`).
@@ -93,7 +94,14 @@ bash tools/fetch_font.sh                # Uthmani font (Amiri, SIL OFL 1.1)
       replacement is the audio playback mode `AudioPlaybackMode { AYAH,
       CONTINUOUS, REPEAT }`.
 
-7. **Tajwid review.** Rule-engine changes require a regression test and an entry
+7. **Daily plans and guided flows.** Home keeps every feature card visible; the
+   daily plan only prioritizes the next action. A 5-minute target contains one
+   task, 15 minutes contains two, and anything above 15 minutes uses the full
+   sequence. Do not mark a task complete when the user merely presses Back:
+   completion must come from a real activity milestone, and guided flows return
+   to Home after that milestone is reached.
+
+8. **Tajwid review.** Rule-engine changes require a regression test and an entry
    in `docs/TAJWID_REVIEW.md`. User-facing claims remain limited until a
    qualified expert signs off on the relevant rule family.
 
@@ -154,7 +162,8 @@ Practical rules:
    Required: BUILD SUCCESSFUL, all tests green, **CORE LINE 100.00%** and
    **CORE BRANCH 100.00%**.
 4. If you touched data/UI that changes behavior or content, update
-   `README.md` + `README.en.md` (and this CONTRIBUTING if the rules change).
+   `README.md` + `README.en.md` (and the corresponding language-pair documents
+   when they exist).
 5. Open a PR with a short description: what changed, why, and the gate result.
 
 ## Reporting bugs

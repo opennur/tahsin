@@ -1,60 +1,61 @@
-# Keamanan & Performa — Fondasi
+# Security and Performance Foundations
 
-Dokumen ini merangkum fondasi keamanan & performa yang aktif di repositori,
-plus cara menjalankan audit keamanan eksternal (MobSF & SecDroid).
+This document summarizes the security and performance safeguards currently
+enabled in the repository, along with the external audit steps for MobSF and
+SecDroid.
 
-## Yang sudah aktif di aplikasi
+## Active safeguards
 
-| Area | Implementasi | Lokasi |
+| Area | Implementation | Location |
 |---|---|---|
-| Network security | Semua trafik **HTTPS** saja (`cleartextTrafficPermitted=false`), trust anchor sistem saja (tanpa CA custom) | `app/src/main/res/xml/network_security_config.xml` + `AndroidManifest.xml` |
-| Backup data | `allowBackup=false` + aturan exclude penuh untuk cloud backup & device-to-device (data pribadi: riwayat baca, bookmark, progres tidak ikut backup) | `app/src/main/res/xml/data_extraction_rules.xml`, `backup_rules.xml` |
-| Obfuscation/ukuran | **R8 untuk release DIMATIKAN TOTAL** (`isMinifyEnabled=false` + `isShrinkResources=false`) — build release ber-R8 terbukti crash saat launch di perangkat (debug aman); root cause belum didiagnosis. Tanpa R8, APK lebih besar (~9.6 MB) tapi stabil. Keep rules di `proguard-rules.pro` dipertahankan (dormant) untuk re-enable setelah didiagnosis | `app/build.gradle.kts`, `app/proguard-rules.pro` |
-| Penyimpanan preferensi | **Preferences DataStore** menggantikan SharedPreferences (baca konsisten, tulis serial + atomik, migrasi otomatis key lama) | `util/DataStores.kt`, `util/PreferencesStore.kt`, `util/SettingsStore.kt`, `util/AyahOfTheDayManager.kt` |
-| Penyimpanan data besar | JSON + `filesDir` dengan tulis atomik (tmp → rename) — tanpa database eksternal, data tetap di internal storage | `util/*Store.kt` |
-| Audio download safety | File audio ditulis ke `.mp3.part`, dilanjutkan dengan HTTP Range, divalidasi panjangnya, lalu dipromosikan lewat rename atomik; antrean surah disimpan di `pending-downloads.json` | `util/AudioDownloader.kt`, `ui/TahsinViewModel.kt` |
-| Audio | Hanya URL HTTPS (`everyayah.com`, `audio.qurancdn.com`) | `util/AudioUrls.kt` |
+| Network security | **HTTPS only** (`cleartextTrafficPermitted=false`) with system trust anchors and no custom CA | `app/src/main/res/xml/network_security_config.xml` + `AndroidManifest.xml` |
+| User-data backup | `allowBackup=false` plus complete cloud and device-to-device exclusion rules; reading history, bookmarks, and progress stay out of system backups | `app/src/main/res/xml/data_extraction_rules.xml`, `backup_rules.xml` |
+| Obfuscation and size | **R8 is fully disabled for release** (`isMinifyEnabled=false` + `isShrinkResources=false`). Release builds previously crashed at launch on a device; the root cause is still under investigation. Without R8 the APK is larger (about 9.6 MB) but stable. Keep rules in `proguard-rules.pro` remain dormant until the issue is understood. | `app/build.gradle.kts`, `app/proguard-rules.pro` |
+| Preferences | **Preferences DataStore** replaces SharedPreferences, with consistent reads, serialized atomic writes, and automatic migration of legacy keys | `util/DataStores.kt`, `util/PreferencesStore.kt`, `util/SettingsStore.kt`, `util/AyahOfTheDayManager.kt` |
+| Larger local data | JSON files under `filesDir` with atomic temp-file writes; no external database is used | `util/*Store.kt` |
+| Audio download safety | Audio is written to `.mp3.part`, resumed with HTTP Range, length-validated, and promoted with an atomic rename. Pending surahs are stored in `pending-downloads.json`. | `util/AudioDownloader.kt`, `ui/TahsinViewModel.kt` |
+| Audio endpoints | Only HTTPS URLs are accepted (`everyayah.com`, `audio.qurancdn.com`) | `util/AudioUrls.kt` |
 
-## Audit keamanan otomatis — MobSF (CI)
+## Automated security audit: MobSF
 
-Workflow `.github/workflows/security.yml` menjalankan **MobSF** (Mobile Security
-Framework) terhadap APK release:
+The `.github/workflows/security.yml` workflow runs **MobSF** (Mobile Security
+Framework) against the release APK:
 
-- Dipicu otomatis saat **push tag `v*`** atau manual via
-  **Actions → "Security — MobSF scan" → Run workflow**.
-- Hasil: laporan (PDF + JSON) diunduh sebagai artifact `mobsf-report`.
+- It runs automatically for a **`v*` tag**, or manually through
+  **Actions → Security — MobSF scan → Run workflow**.
+- PDF and JSON reports are uploaded as the `mobsf-report` artifact.
 
-MobSF memeriksa: manifest/izin berlebihan, komponen yang bisa diekspor,
-penyimpanan tidak aman, hardcoded secret, TLS/cleartext, WebView, dll.
-Laporan di `mobsf-report/` berisi skor & temuan per kategori.
+MobSF checks the manifest, permissions, exported components, insecure storage,
+hardcoded secrets, TLS and cleartext settings, WebViews, and related risks. The
+report in `mobsf-report/` contains the score and findings for each category.
 
-> Catatan: image Docker MobSF besar (±3–4 GB) dan scan ±5–10 menit, jadi
-> sengaja TIDAK dijalankan per-PR. Untuk audit lokal:
-> `docker run -p 8000:8000 opensecurity/mobsf:latest` → buka
-> `http://localhost:8000`, upload APK hasil `./gradlew assembleRelease`.
+> The MobSF Docker image is large (about 3–4 GB) and a scan takes roughly
+> 5–10 minutes, so it intentionally does not run on every PR. For a local audit:
+> `docker run -p 8000:8000 opensecurity/mobsf:latest`, then open
+> `http://localhost:8000` and upload the APK from `./gradlew assembleRelease`.
 
-## Audit on-device — SecDroid
+## On-device audit: SecDroid
 
-**SecDroid** (scanner keamanan Android yang berjalan di perangkat) dipakai
-sebagai langkah QA manual sebelum rilis:
+**SecDroid** is an Android security scanner used as a manual QA step before a
+release:
 
-1. Instal SecDroid (F-Droid/APK) di perangkat uji.
-2. Instal APK release hasil `./gradlew assembleRelease`.
-3. Jalankan scan penuh di SecDroid, periksa temuan yang relevan (izin,
-   komponen terekspos, penyimpanan).
+1. Install SecDroid from F-Droid or its APK on a test device.
+2. Install the release APK produced by `./gradlew assembleRelease`.
+3. Run a full scan and review permissions, exported components, and storage.
 
-## Checklist pra-rilis
+## Pre-release checklist
 
-- [ ] `./gradlew testDebugUnitTest detekt lintDebug assembleRelease` hijau
-- [ ] `python3 tools/validate_quran_content.py` — 6.236 ayat cocok setelah
-  pembersihan dengan sumber resmi Kemenag/LPMQ dan manifest ditinjau
-- [ ] `python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian` — field Arab,
-  karakter, kutip, dan urutan ayat bersih
-- [ ] Hak/atribusi semua terjemahan dan audio sudah dicatat di
-  `docs/CONTENT_PROVENANCE.en.md`
-- [ ] `docs/TAJWID_REVIEW.md` sudah mendapat sign-off ahli berkualifikasi
-- [ ] MobSF (CI tag rilis) tidak punya temuan severity **high** yang baru
-- [ ] SecDroid: tidak ada komponen terekspos yang tidak disengaja
-  (`android:exported` sudah diatur eksplisit di semua komponen)
-- [ ] APK release diuji di perangkat nyata (migrasi DataStore dari
-  SharedPreferences lama diverifikasi sekali di perangkat lama)
+- [ ] `./gradlew testDebugUnitTest assembleDebug jacocoCoreReport detekt lintDebug --no-daemon` is green.
+- [ ] `python3 tools/validate_quran_content.py` confirms all 6,236 ayahs after
+      cleanup against the official Kemenag/LPMQ source, and the manifest has
+      been reviewed.
+- [ ] `python3 tools/validate_quran_fields.py --ignore-latin --ignore-indonesian`
+      confirms clean Arabic fields, characters, quotation marks, and ayah order.
+- [ ] Translation rights and audio attribution are recorded in
+      `docs/CONTENT_PROVENANCE.en.md`.
+- [ ] `docs/TAJWID_REVIEW.md` has qualified-expert sign-off.
+- [ ] The MobSF release scan has no new high-severity findings.
+- [ ] SecDroid finds no accidentally exported components (`android:exported` is
+      explicit on every component).
+- [ ] The release APK has been tested on a real device, including one-time
+      migration from legacy SharedPreferences to DataStore.

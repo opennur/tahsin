@@ -1,11 +1,11 @@
 # Content Provenance and Licensing
 
-Last reviewed: 2026-08-15
+Last reviewed: 2026-08-19
 
-This document records where shipped and downloaded content comes from. Public
-availability of a URL is not treated as proof that the content is freely
-redistributable. A release that changes a source or adds a new reciter must
-update this ledger and retain the source terms or written permission.
+This document records where shipped and downloaded content comes from. A public
+URL is not, by itself, proof that content may be redistributed freely. Any
+release that changes a source or adds a reciter must update this ledger and
+retain the relevant terms or written permission.
 
 ## Quranic Text
 
@@ -56,7 +56,7 @@ or all audio also removes pending download metadata and temporary files.
 | Content | Source | License/status |
 |---|---|---|
 | Amiri/Uthmani font | [Google Fonts: Amiri](https://fonts.google.com/specimen/Amiri) | SIL Open Font License 1.1; retain the license notice. |
-| Vocabulary, Learn Arabic, Nahwu, Shorof lessons, quizzes, and app explanations | OpenNur-authored project content | GPLv3 with the project, unless a file states otherwise. |
+| Vocabulary, Learn Arabic, Nahwu, Shorof lessons, quizzes, app explanations, and guided-plan copy | OpenNur-authored project content | GPLv3 with the project, unless a file states otherwise. |
 | Madani pagination metadata | [alquran.cloud metadata API](https://alquran.cloud/api) | Metadata source attribution is retained in `tools/build_pages.py`; verify upstream terms before separate redistribution. |
 
 ## Release Gate
@@ -67,3 +67,5 @@ or all audio also removes pending download metadata and temporary files.
 - [ ] Each reciter and word-audio provider has recorded terms and attribution.
 - [ ] Tajwid rules have qualified-expert sign-off in `TAJWID_REVIEW.md`.
 - [ ] App privacy and store disclosures match the actual sources and permissions.
+- [ ] Home, guided-plan, and completion wording matches the behavior shipped in
+      the app and is present in both ID and EN strings.

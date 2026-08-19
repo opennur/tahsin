@@ -3,7 +3,7 @@
 ## Project Shape
 
 - This is a single Android module, `:app`; the application ID is `org.opennur.tahsin`.
-- Use `CONTRIBUTING.en.md` for the full contribution/test rules and `README.en.md` for build/content details; scripts and CI are the executable source of truth.
+- Use `CONTRIBUTING.en.md` for contribution and test rules and `README.en.md` for build/content details; scripts and CI remain the executable source of truth.
 - `MainActivity` is the single Compose entry point and owns the saveable screen stack; `TahsinApplication` and `di/AppModule.kt` own Hilt setup.
 - Quran data flows through `AssetQuranRepository`: bundled assets first, `filesDir/quran` cache second, network fallback last. Tests must not depend on the network.
 - Core parsing and feature logic lives under `data/**`, pure persistence/search helpers under `util/**`, speech alignment under `stt/**`, and screens/ViewModels under `ui/**`.
@@ -34,6 +34,7 @@
 - Mushaf navigation uses `pageIndex` 0..603. `surahNumber`/`ayahIndex` identify the active STT practice ayah, not the current navigation mode.
 - Render surah text as the existing flowing `SurahFlowBlock`; do not revert to one ayah per row or bring back the removed flow-playback mode.
 - Verse-end and sajdah markers are drawn by the renderer; do not add `۝`/`ࣖ` glyphs, which render as boxes in the runtime font. Draw the active highlight behind text so harakah and waqf signs are not clipped.
+- Keep every feature card visible on Home. The Today plan is a prioritization layer: 5 minutes selects one task, 15 minutes selects two, and longer targets use the full sequence. Guided completion must come from a real activity milestone; Back must not mark a task complete, and successful guided flows return to Home.
 - Every user-facing string belongs in `ui/AppStrings.kt` with matching Indonesian and English fields/values; feature ViewModels must refresh language after settings changes rather than caching it only in `init`.
 - ViewModels are Hilt `@HiltViewModel` classes with injected constructors; use `di/AppModule.kt` for application-context singletons and construct ViewModels directly in JVM tests, not through Hilt test setup unless the test boots the real app.
 - Hilt uses kapt, not KSP, because the development environment requires linux-arm64 support. Release R8/minification remains disabled because it previously caused a launch crash; do not enable it casually.

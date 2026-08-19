@@ -21,15 +21,21 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
 
 ## Features
 
-- 🧭 **Main menu** (home screen): every feature is opened from a menu card —
+- 🧭 **A scannable Home screen**: every feature remains available as a card
+  that opens directly —
   **Tahsin**, **Vocabulary**, **Memorization**, **Tajweed Quiz**, **Statistics**, **Dream BIG**,
   **Learn Arabic**, **Ayah Quiz**, **Achievements**, **Coherence Study**,
   **Favorite Ayahs**, and **Settings**. The app also provides a first-run
-  **Today plan** and **Memorization & Murajaah** track.
+  **Today plan** and **Memorization & Murajaah** track. The Today plan card
+  highlights the next action without hiding the rest of the app.
   (Ayah search & Audio Manager moved: 🔍 in the Tahsin header, 🎵 in Settings.)
 - 🧭 **Guided learning plan**: on first launch, choose a focus (recitation,
-  understanding, memorization, or Arabic) and a daily time target. Home then
-  shows three deterministic tasks for the day and records completion locally.
+  understanding, memorization, or Arabic) and a daily time target. A 5-minute
+  target shows one task, 15 minutes shows two, and anything above 15 minutes
+  shows the full sequence. Home highlights the first unfinished task while
+  keeping the rest of the plan visible in a compact list. A task is marked
+  complete only after its activity is actually completed; going back does not
+  complete it, and guided flows return to Home after completion.
 - 🧠 **Memorization & Murajaah**: an offline spaced-review queue begins with the
   bundled Al-Fatihah ayahs. Reveal an ayah, mark it remembered or needing review,
   and open it directly in Tahsin. This is a practice aid, not teacher-level
@@ -155,7 +161,8 @@ Tajweed Quiz, the **Dream BIG** game (arcade), the **Learn Arabic** course
   screen has a back (←) button at the top left.
 - 💾 **Data export/import**: reading progress, bookmarks, XP, learning plan,
   memorization, vocabulary, and settings can be exported as JSON and restored
-  from Settings.
+  from Settings. Malformed backup entries are reported safely instead of
+  crashing the app.
 - 🗓️ **"Ayah of the Day" widget + notification** — one ayah that changes daily
   (deterministic per date, offline from the bundled assets). The home-screen
   widget is compact: translation only; the notification shows Arabic + translation.
@@ -200,7 +207,7 @@ The same ayah for every user throughout the day, automatically changing tomorrow
 
 ```
 app/src/main/java/org/opennur/tahsin/
-├── data/learning/  # Daily learning plan + spaced memorization rules
+├── data/learning/  # Duration-based daily plan + spaced memorization rules
 ├── data/quran/     # Surah/Ayah models + QuranRepository (asset bundle → cache →
 │                   #   equran.id) + MUSHAF: MushafPages (Madani pagination, 604
 │                   #   pages ← assets/quran/pages.json), MushafPage +
@@ -395,6 +402,7 @@ Every piece of logic that decides **text & harakah accuracy** is tested to
 
 ```bash
 ./gradlew jacocoCoreReport --no-daemon
+python3 tools/jacoco_gaps.py
 # Report: app/build/reports/jacoco/core/ (XML + HTML)
 ```
 
