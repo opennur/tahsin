@@ -79,4 +79,5 @@ data class ShorofChoiceExercise(
 data class ShorofSessionExercise(
     val lessonId: String,
     val exercise: ShorofExercise,
+    val questionId: String = "",
 )

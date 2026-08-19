@@ -132,6 +132,86 @@
         "to help"
        ],
        "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "عَلِمَ",
+       "promptLatin": "ʿalima",
+       "optionsId": [
+        "ع ل م",
+        "ك ت ب",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "ʿ-l-m",
+        "k-t-b",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "عَلِمَ",
+       "promptLatin": "ʿalima",
+       "optionsId": [
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ",
+        "فَعَّلَ"
+       ],
+       "optionsEn": [
+        "faʿala",
+        "yafʿulu",
+        "ufʿul",
+        "faʿʿala"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "عَلِمَ",
+       "promptLatin": "ʿalima",
+       "optionsId": [
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan",
+        "Perintah"
+       ],
+       "optionsEn": [
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb",
+        "Imperative"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "عَلِمَ",
+       "promptLatin": "ʿalima",
+       "optionsId": [
+        "mengetahui",
+        "menulis",
+        "tulislah",
+        "mengajarkan"
+       ],
+       "optionsEn": [
+        "to know",
+        "to write",
+        "write",
+        "to teach"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -281,6 +361,86 @@
         "I wrote"
        ],
        "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "كَتَبَ",
+       "promptLatin": "kataba",
+       "optionsId": [
+        "ك ت ب",
+        "ع ل م",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "k-t-b",
+        "ʿ-l-m",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "كَتَبَ",
+       "promptLatin": "kataba",
+       "optionsId": [
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ",
+        "فَعَّلَ"
+       ],
+       "optionsEn": [
+        "faʿala",
+        "yafʿulu",
+        "ufʿul",
+        "faʿʿala"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "كَتَبَ",
+       "promptLatin": "kataba",
+       "optionsId": [
+        "Fi'il lampau",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il sedang/akan",
+        "Perintah"
+       ],
+       "optionsEn": [
+        "Past-tense verb",
+        "Basic triliteral verb",
+        "Present or future verb",
+        "Imperative"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "كَتَبَ",
+       "promptLatin": "kataba",
+       "optionsId": [
+        "menulis",
+        "mengetahui",
+        "tulislah",
+        "mengajarkan"
+       ],
+       "optionsEn": [
+        "to write",
+        "to know",
+        "write",
+        "to teach"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -406,6 +566,86 @@
         "I write",
         "he writes",
         "you write"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "يَكْتُبُ",
+       "promptLatin": "yaktubu",
+       "optionsId": [
+        "ك ت ب",
+        "ع ل م",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "k-t-b",
+        "ʿ-l-m",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "يَكْتُبُ",
+       "promptLatin": "yaktubu",
+       "optionsId": [
+        "يَفْعُلُ",
+        "فَعَلَ",
+        "اُفْعُلْ",
+        "فَعَّلَ"
+       ],
+       "optionsEn": [
+        "yafʿulu",
+        "faʿala",
+        "ufʿul",
+        "faʿʿala"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "يَكْتُبُ",
+       "promptLatin": "yaktubu",
+       "optionsId": [
+        "Fi'il sedang/akan",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Perintah"
+       ],
+       "optionsEn": [
+        "Present or future verb",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Imperative"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "يَكْتُبُ",
+       "promptLatin": "yaktubu",
+       "optionsId": [
+        "menulis",
+        "mengetahui",
+        "tulislah",
+        "mengajarkan"
+       ],
+       "optionsEn": [
+        "to write",
+        "to know",
+        "write",
+        "to teach"
        ],
        "answerIndex": 0
       }
@@ -543,6 +783,86 @@
         "دِرَاسَةٌ"
        ],
        "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "اُكْتُبْ",
+       "promptLatin": "uktub",
+       "optionsId": [
+        "ك ت ب",
+        "ع ل م",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "k-t-b",
+        "ʿ-l-m",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "اُكْتُبْ",
+       "promptLatin": "uktub",
+       "optionsId": [
+        "اُفْعُلْ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "فَعَّلَ"
+       ],
+       "optionsEn": [
+        "ufʿul",
+        "faʿala",
+        "yafʿulu",
+        "faʿʿala"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "اُكْتُبْ",
+       "promptLatin": "uktub",
+       "optionsId": [
+        "Perintah",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Imperative",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "اُكْتُبْ",
+       "promptLatin": "uktub",
+       "optionsId": [
+        "tulislah",
+        "mengetahui",
+        "menulis",
+        "mengajarkan"
+       ],
+       "optionsEn": [
+        "write",
+        "to know",
+        "to write",
+        "to teach"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -670,6 +990,86 @@
         "كَاسَرَ"
        ],
        "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "عَلَّمَ",
+       "promptLatin": "ʿallama",
+       "optionsId": [
+        "ع ل م",
+        "ك ت ب",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "ʿ-l-m",
+        "k-t-b",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "عَلَّمَ",
+       "promptLatin": "ʿallama",
+       "optionsId": [
+        "فَعَّلَ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ"
+       ],
+       "optionsEn": [
+        "faʿʿala",
+        "faʿala",
+        "yafʿulu",
+        "ufʿul"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "عَلَّمَ",
+       "promptLatin": "ʿallama",
+       "optionsId": [
+        "Form II",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Form II",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "عَلَّمَ",
+       "promptLatin": "ʿallama",
+       "optionsId": [
+        "mengajarkan",
+        "mengetahui",
+        "menulis",
+        "tulislah"
+       ],
+       "optionsEn": [
+        "to teach",
+        "to know",
+        "to write",
+        "write"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -807,6 +1207,166 @@
         "a doubled middle letter",
         "alif after the first letter",
         "tanwin"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "سَاعَدَ",
+       "promptLatin": "sāʿada",
+       "optionsId": [
+        "ص ع د",
+        "ع ل م",
+        "ك ت ب",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "ṣ-ʿ-d",
+        "ʿ-l-m",
+        "k-t-b",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "سَاعَدَ",
+       "promptLatin": "sāʿada",
+       "optionsId": [
+        "فَاعَلَ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ"
+       ],
+       "optionsEn": [
+        "fāʿala",
+        "faʿala",
+        "yafʿulu",
+        "ufʿul"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "سَاعَدَ",
+       "promptLatin": "sāʿada",
+       "optionsId": [
+        "Form III",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Form III",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "سَاعَدَ",
+       "promptLatin": "sāʿada",
+       "optionsId": [
+        "saling menaikkan",
+        "mengetahui",
+        "menulis",
+        "tulislah"
+       ],
+       "optionsEn": [
+        "to deal with",
+        "to know",
+        "to write",
+        "write"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "أَكْرَمَ",
+       "promptLatin": "akrama",
+       "optionsId": [
+        "ك ر م",
+        "ع ل م",
+        "ك ت ب",
+        "ص ع د"
+       ],
+       "optionsEn": [
+        "k-r-m",
+        "ʿ-l-m",
+        "k-t-b",
+        "ṣ-ʿ-d"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "أَكْرَمَ",
+       "promptLatin": "akrama",
+       "optionsId": [
+        "أَفْعَلَ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ"
+       ],
+       "optionsEn": [
+        "afʿala",
+        "faʿala",
+        "yafʿulu",
+        "ufʿul"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "أَكْرَمَ",
+       "promptLatin": "akrama",
+       "optionsId": [
+        "Form IV",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Form IV",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "أَكْرَمَ",
+       "promptLatin": "akrama",
+       "optionsId": [
+        "memuliakan",
+        "mengetahui",
+        "menulis",
+        "tulislah"
+       ],
+       "optionsEn": [
+        "to honor",
+        "to know",
+        "to write",
+        "write"
        ],
        "answerIndex": 0
       }
@@ -956,6 +1516,166 @@
         "أَفْعَلُ"
        ],
        "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "كَاتِبٌ",
+       "promptLatin": "kātibun",
+       "optionsId": [
+        "ك ت ب",
+        "ع ل م",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "k-t-b",
+        "ʿ-l-m",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "كَاتِبٌ",
+       "promptLatin": "kātibun",
+       "optionsId": [
+        "فَاعِلٌ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ"
+       ],
+       "optionsEn": [
+        "fāʿilun",
+        "faʿala",
+        "yafʿulu",
+        "ufʿul"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "كَاتِبٌ",
+       "promptLatin": "kātibun",
+       "optionsId": [
+        "Isim fa'il",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Active participle",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "كَاتِبٌ",
+       "promptLatin": "kātibun",
+       "optionsId": [
+        "penulis",
+        "mengetahui",
+        "menulis",
+        "tulislah"
+       ],
+       "optionsEn": [
+        "writer",
+        "to know",
+        "to write",
+        "write"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "مَكْتُوبٌ",
+       "promptLatin": "maktūbun",
+       "optionsId": [
+        "ك ت ب",
+        "ع ل م",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "k-t-b",
+        "ʿ-l-m",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "مَكْتُوبٌ",
+       "promptLatin": "maktūbun",
+       "optionsId": [
+        "مَفْعُولٌ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ"
+       ],
+       "optionsEn": [
+        "mafʿūlun",
+        "faʿala",
+        "yafʿulu",
+        "ufʿul"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "مَكْتُوبٌ",
+       "promptLatin": "maktūbun",
+       "optionsId": [
+        "Isim maf'ul",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Passive participle",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "مَكْتُوبٌ",
+       "promptLatin": "maktūbun",
+       "optionsId": [
+        "yang ditulis",
+        "mengetahui",
+        "menulis",
+        "tulislah"
+       ],
+       "optionsEn": [
+        "written",
+        "to know",
+        "to write",
+        "write"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -1095,6 +1815,166 @@
         "فَاعِلٌ"
        ],
        "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "كِتَابَةٌ",
+       "promptLatin": "kitābatun",
+       "optionsId": [
+        "ك ت ب",
+        "ع ل م",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "k-t-b",
+        "ʿ-l-m",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "كِتَابَةٌ",
+       "promptLatin": "kitābatun",
+       "optionsId": [
+        "فِعَالَةٌ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ"
+       ],
+       "optionsEn": [
+        "fiʿālatun",
+        "faʿala",
+        "yafʿulu",
+        "ufʿul"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "كِتَابَةٌ",
+       "promptLatin": "kitābatun",
+       "optionsId": [
+        "Masdar",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Verbal noun",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "كِتَابَةٌ",
+       "promptLatin": "kitābatun",
+       "optionsId": [
+        "penulisan",
+        "mengetahui",
+        "menulis",
+        "tulislah"
+       ],
+       "optionsEn": [
+        "writing",
+        "to know",
+        "to write",
+        "write"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Akar kata dari contoh ini?",
+       "promptEn": "What is the root of this example?",
+       "promptAr": "تَعْلِيمٌ",
+       "promptLatin": "taʿlīmun",
+       "optionsId": [
+        "ع ل م",
+        "ك ت ب",
+        "ص ع د",
+        "ك ر م"
+       ],
+       "optionsEn": [
+        "ʿ-l-m",
+        "k-t-b",
+        "ṣ-ʿ-d",
+        "k-r-m"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Wazan apa yang dipakai?",
+       "promptEn": "Which wazan is used?",
+       "promptAr": "تَعْلِيمٌ",
+       "promptLatin": "taʿlīmun",
+       "optionsId": [
+        "تَفْعِيلٌ",
+        "فَعَلَ",
+        "يَفْعُلُ",
+        "اُفْعُلْ"
+       ],
+       "optionsEn": [
+        "tafʿīlun",
+        "faʿala",
+        "yafʿulu",
+        "ufʿul"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Bentuk ini termasuk...",
+       "promptEn": "This form is...",
+       "promptAr": "تَعْلِيمٌ",
+       "promptLatin": "taʿlīmun",
+       "optionsId": [
+        "Masdar Form II",
+        "Fi'il tsulatsi mujarrad",
+        "Fi'il lampau",
+        "Fi'il sedang/akan"
+       ],
+       "optionsEn": [
+        "Form II verbal noun",
+        "Basic triliteral verb",
+        "Past-tense verb",
+        "Present or future verb"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Makna pola ini adalah...",
+       "promptEn": "The meaning of this pattern is...",
+       "promptAr": "تَعْلِيمٌ",
+       "promptLatin": "taʿlīmun",
+       "optionsId": [
+        "pengajaran",
+        "mengetahui",
+        "menulis",
+        "tulislah"
+       ],
+       "optionsEn": [
+        "teaching",
+        "to know",
+        "to write",
+        "write"
+       ],
+       "answerIndex": 0
       }
      ]
     }

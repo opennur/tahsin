@@ -19,6 +19,8 @@ import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.LughohStats
 import org.opennur.tahsin.util.SettingsStore
+import org.opennur.tahsin.util.QuestionExposureStore
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -61,6 +63,7 @@ data class LughohUiState(
     val lesson: LughohLesson? = null,
     // Sesi tadribat acak
     val session: List<Exercise> = emptyList(),
+    val questionIds: List<String> = emptyList(),
     val exerciseIndex: Int = 0,
     val selected: String? = null,
     val correct: Boolean? = null,
@@ -100,6 +103,7 @@ class LughohViewModel @Inject constructor(
 
     private val progressMutex = Mutex()
     private val random = Random.Default
+    private val questionHistory = QuestionExposureStore.fromContext(app)
 
     /** Sesi mentah (tanpa resolusi bahasa) — untuk re-resolusi saat bahasa ganti. */
     private var rawSession: List<Exercise> = emptyList()
@@ -148,7 +152,21 @@ class LughohViewModel @Inject constructor(
     fun startRandomExercises() {
         val s = _state.value
         val allLessons = catalog.levels.flatMap { it.lessons }
-        rawSession = LughohEngine.buildRandomSession(allLessons, LughohEngine.SESSION_SIZE, random)
+        val selectedIds = questionHistory.reserve(
+            FEATURE,
+            LughohEngine.allQuestionIds(allLessons),
+            LughohEngine.SESSION_SIZE,
+            LocalDate.now().toEpochDay(),
+            random,
+        )
+        val sessionWithIds = LughohEngine.buildRandomSessionWithIds(
+            allLessons,
+            LughohEngine.SESSION_SIZE,
+            random,
+            selectedIds.toSet(),
+        )
+        rawSession = sessionWithIds.map { it.second }
+        val sessionQuestionIds = sessionWithIds.map { it.first }
         // Resolusi bahasa: opsi/prompt mengikuti bahasa aktif (ID atau EN).
         val session = rawSession.map { it.forLanguage(s.language, random) }
         if (session.isEmpty()) return
@@ -157,6 +175,7 @@ class LughohViewModel @Inject constructor(
             it.copy(
                 mode = LughohMode.EXERCISES,
                 session = session,
+                questionIds = sessionQuestionIds,
                 exerciseIndex = 0,
                 selected = null,
                 correct = null,
@@ -178,6 +197,9 @@ class LughohViewModel @Inject constructor(
         if (ex is RearrangeExercise) return
         if (s.selected != null) return
         val correct = LughohEngine.isChoiceCorrect(ex, option)
+        s.questionIds.getOrNull(s.exerciseIndex)?.let { id ->
+            questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
+        }
         _state.update {
             it.copy(
                 selected = option,
@@ -211,6 +233,9 @@ class LughohViewModel @Inject constructor(
         if (s.rearrangeTapped.size != ex.words.size) return
         val tappedChips = s.rearrangeTapped.map { s.rearrangeShown[it] }
         val correct = LughohEngine.isRearrangeCorrect(ex, tappedChips)
+        s.questionIds.getOrNull(s.exerciseIndex)?.let { id ->
+            questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
+        }
         _state.update {
             it.copy(
                 correct = correct,
@@ -324,4 +349,8 @@ class LughohViewModel @Inject constructor(
                 },
             )
         }
+
+    private companion object {
+        const val FEATURE = "lughoh"
+    }
 }

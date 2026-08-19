@@ -22,11 +22,29 @@ object LughohEngine {
         lessons: List<LughohLesson>,
         count: Int,
         random: Random = Random.Default,
+        allowedIds: Set<String>? = null,
     ): List<Exercise> {
-        val all = lessons.flatMap { it.tadribat }
-        if (all.isEmpty()) return emptyList()
-        return all.shuffled(random).take(count).map { shuffleOptions(it, random) }
+        return buildRandomSessionWithIds(lessons, count, random, allowedIds).map { it.second }
     }
+
+    fun buildRandomSessionWithIds(
+        lessons: List<LughohLesson>,
+        count: Int,
+        random: Random = Random.Default,
+        allowedIds: Set<String>? = null,
+    ): List<Pair<String, Exercise>> {
+        val all = lessons.flatMap { lesson ->
+            lesson.tadribat.mapIndexed { index, exercise -> questionId(lesson.id, index) to exercise }
+        }.filter { allowedIds == null || it.first in allowedIds }
+        if (all.isEmpty()) return emptyList()
+        return all.shuffled(random).take(count).map { it.first to shuffleOptions(it.second, random) }
+    }
+
+    fun allQuestionIds(lessons: List<LughohLesson>): List<String> = lessons.flatMap { lesson ->
+        lesson.tadribat.indices.map { index -> questionId(lesson.id, index) }
+    }
+
+    fun questionId(lessonId: String, index: Int): String = "$lessonId:$index"
 
     /** Salin latihan pilihan ganda dengan urutan opsi diacak (jawaban tetap). */
     fun shuffleOptions(exercise: Exercise, random: Random): Exercise = when (exercise) {

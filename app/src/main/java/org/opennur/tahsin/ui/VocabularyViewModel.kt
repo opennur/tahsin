@@ -17,6 +17,8 @@ import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.SettingsStore
 import org.opennur.tahsin.util.TahsinAudioPlayer
 import org.opennur.tahsin.util.VocabularyStatsStore
+import org.opennur.tahsin.util.QuestionExposureStore
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,7 +80,10 @@ class VocabularyViewModel @Inject constructor(
     private val random = Random(System.currentTimeMillis())
     private var entries: List<VocabEntry> = emptyList()
     private var quizQueue: List<VocabEntry> = emptyList()
+    private var quizDirections: List<Boolean> = emptyList()
     private var quizIndex = 0
+    private var currentQuizId: String? = null
+    private val questionHistory = QuestionExposureStore.fromContext(app)
 
     /** Serialisasi baca-ubah-tulis store (jawaban cepat ganda tidak boleh balapan). */
     private val storeMutex = Mutex()
@@ -215,7 +220,21 @@ class VocabularyViewModel @Inject constructor(
     /** Mulai kuis dari sesi kartu (acak); kalau kosong, pakai 5 kata teratas. */
     private fun startQuiz() {
         val s = _state.value
-        quizQueue = (s.session.ifEmpty { entries.take(5) }).shuffled(random)
+        val ids = entries.flatMap { entry -> listOf("${entry.key}|f", "${entry.key}|r") }
+        val selectedIds = questionHistory.reserve(
+            FEATURE,
+            ids,
+            5,
+            LocalDate.now().toEpochDay(),
+            random,
+        )
+        val parsed = selectedIds.mapNotNull { id ->
+            val separator = id.lastIndexOf('|')
+            val entry = entries.firstOrNull { it.key == id.substring(0, separator) }
+            entry?.let { it to (id.substring(separator + 1) == "r") }
+        }
+        quizQueue = parsed.map { it.first }
+        quizDirections = parsed.map { it.second }
         quizIndex = 0
         _state.update {
             it.copy(mode = VocabMode.QUIZ, question = null, selected = null, quizCorrect = 0, quizTotal = 0, quizDone = false)
@@ -231,7 +250,10 @@ class VocabularyViewModel @Inject constructor(
             return
         }
         // Mode depan/balik acak; skip kalau kolam pengecoh kurang.
-        val reverse = random.nextBoolean()
+        val reverse = quizDirections.getOrNull(quizIndex) ?: random.nextBoolean()
+        currentQuizId = quizQueue.getOrNull(quizIndex)?.let { entry ->
+            "${entry.key}|${if (reverse) "r" else "f"}"
+        }
         val q = VocabularyEngine.makeQuiz(entries, target, s.language, reverse = reverse, random = random)
         if (q == null) {
             quizIndex++
@@ -247,6 +269,9 @@ class VocabularyViewModel @Inject constructor(
         val q = s.question ?: return
         if (s.selected != null) return
         val correct = q.options[q.correctIndex] == option
+        currentQuizId?.let { id ->
+            questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
+        }
         _state.update {
             it.copy(
                 selected = option,
@@ -270,5 +295,9 @@ class VocabularyViewModel @Inject constructor(
 
     fun dismissMessage() {
         _state.update { it.copy(message = null) }
+    }
+
+    private companion object {
+        const val FEATURE = "vocabulary"
     }
 }

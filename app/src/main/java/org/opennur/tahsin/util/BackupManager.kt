@@ -37,6 +37,7 @@ class BackupManager internal constructor(
             "lughoh-progress.json",
             "nahwu-progress.json",
             "shorof-progress.json",
+            "question-history.json",
             "learning-plan.json",
             "memorization.json",
         )

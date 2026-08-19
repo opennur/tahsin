@@ -11,10 +11,21 @@ object NahwuEngine {
         lessons: List<NahwuLesson>,
         count: Int,
         random: Random = Random.Default,
+        allowedIds: Set<String>? = null,
     ): List<NahwuSessionExercise> = lessons
-        .flatMap { lesson -> lesson.exercises.map { NahwuSessionExercise(lesson.id, it) } }
+        .flatMap { lesson -> lesson.exercises.mapIndexed { index, exercise ->
+            val id = questionId(lesson.id, index)
+            NahwuSessionExercise(lesson.id, exercise, id)
+        } }
+        .filter { allowedIds == null || it.questionId in allowedIds }
         .shuffled(random)
         .take(count)
+
+    fun allQuestionIds(lessons: List<NahwuLesson>): List<String> = lessons.flatMap { lesson ->
+        lesson.exercises.indices.map { index -> questionId(lesson.id, index) }
+    }
+
+    fun questionId(lessonId: String, index: Int): String = "$lessonId:$index"
 
     fun shuffleWords(exercise: NahwuRearrangeExercise, random: Random = Random.Default): List<NahwuWord> {
         if (exercise.words.size < 2) return exercise.words

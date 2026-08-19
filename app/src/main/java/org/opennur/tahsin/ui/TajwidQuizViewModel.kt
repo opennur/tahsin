@@ -8,12 +8,15 @@ import javax.inject.Inject
 import org.opennur.tahsin.data.quran.QuranRepository
 import org.opennur.tahsin.data.tajwid.QuizQuestion
 import org.opennur.tahsin.data.tajwid.TajwidQuiz
+import org.opennur.tahsin.data.tajwid.TajwidEngine
 import org.opennur.tahsin.util.AppLanguage
 import org.opennur.tahsin.util.ArabicNormalizer
 import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.SearchableAyah
 import org.opennur.tahsin.util.SettingsStore
+import org.opennur.tahsin.util.QuestionExposureStore
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,10 +57,13 @@ class TajwidQuizViewModel @Inject constructor(
     val state: StateFlow<TajwidQuizState> = _state.asStateFlow()
 
     private var index: List<SearchableAyah>? = null
+    private var questionIds: List<String>? = null
     private val random = Random(System.currentTimeMillis())
+    private val questionHistory = QuestionExposureStore.fromContext(app)
 
     /** Ayat sumber soal aktif — untuk menerjemahkan ulang saat bahasa berganti. */
     private var currentEntry: SearchableAyah? = null
+    private var currentQuestionId: String? = null
 
     init {
         val names = repository.surahList().associate { it.number to it.nameLatin }
@@ -70,20 +76,37 @@ class TajwidQuizViewModel @Inject constructor(
     /** Siapkan soal berikutnya (acak, dari seluruh mushaf). */
     fun next() {
         viewModelScope.launch {
+            currentQuestionId = null
             _state.update { it.copy(loading = true) }
             val idx = ensureIndex()
             var question: QuizQuestion? = null
             var entry: SearchableAyah? = null
             if (idx.isNotEmpty()) {
-                // Coba beberapa ayat sampai dapat kata yang punya hukum.
-                repeat(MAX_ATTEMPTS) {
-                    if (question != null) return@repeat
-                    val e = idx[random.nextInt(idx.size)]
-                    val words = ArabicNormalizer.splitWords(e.arabic)
-                    val q = TajwidQuiz.pickWord(words, random)
-                    if (q != null) {
-                        question = q
+                val ids = ensureQuestionIds(idx)
+                val selected = questionHistory.reserve(
+                    FEATURE,
+                    ids,
+                    1,
+                    LocalDate.now().toEpochDay(),
+                    random,
+                ).firstOrNull()
+                if (selected != null) {
+                    val ruleSeparator = selected.lastIndexOf(':')
+                    val parts = selected.substring(0, ruleSeparator).split(':')
+                    val e = idx.firstOrNull {
+                        it.surahNumber == parts.getOrNull(0)?.toIntOrNull() &&
+                            it.ayahNumber == parts.getOrNull(1)?.toIntOrNull()
+                    }
+                    val wordIndex = parts.getOrNull(2)?.toIntOrNull()
+                    if (e != null && wordIndex != null) {
+                        question = TajwidQuiz.pickWordAt(
+                            ArabicNormalizer.splitWords(e.arabic),
+                            wordIndex,
+                            random,
+                            selected.substring(ruleSeparator + 1),
+                        )
                         entry = e
+                        currentQuestionId = selected
                     }
                 }
             }
@@ -129,6 +152,9 @@ class TajwidQuizViewModel @Inject constructor(
         val q = s.question ?: return
         if (s.selected != null) return
         val correct = TajwidQuiz.isCorrect(option, q)
+        currentQuestionId?.let { id ->
+            questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
+        }
         _state.update {
             it.copy(
                 selected = option,
@@ -150,7 +176,21 @@ class TajwidQuizViewModel @Inject constructor(
         return idx
     }
 
+    private fun ensureQuestionIds(idx: List<SearchableAyah>): List<String> {
+        questionIds?.let { return it }
+        return idx.flatMap { e ->
+            val words = ArabicNormalizer.splitWords(e.arabic)
+            words.indices.flatMap { wordIndex ->
+                TajwidEngine.analyzeWord(
+                    words[wordIndex],
+                    words.getOrNull(wordIndex - 1),
+                    words.getOrNull(wordIndex + 1),
+                ).map { rule -> "${e.surahNumber}:${e.ayahNumber}:$wordIndex:${rule.name}" }
+            }
+        }.also { questionIds = it }
+    }
+
     companion object {
-        private const val MAX_ATTEMPTS = 20
+        private const val FEATURE = "tajwid"
     }
 }

@@ -55,6 +55,7 @@ class ShorofModelsTest {
         assertEquals(listOf(lesson), level.lessons)
         assertEquals(exercise, session.exercise)
         assertEquals("1-1", session.lessonId)
+        assertEquals("", session.questionId)
         assertEquals("Pilih", exercise.promptId)
         assertEquals("Choose", exercise.promptEn)
         assertEquals("كَتَبَ", exercise.promptAr)
