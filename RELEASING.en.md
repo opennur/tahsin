@@ -18,7 +18,7 @@ Play. First-release baseline: `versionCode = 1`, `versionName = "1.0.0"`.
 | Full description | EN + ID — condense README.en.md / README.md (features, offline-first, word coverage). |
 | Icon 512×512 | from the adaptive icon; keep edges non-transparent in Play. |
 | Feature graphic 1024×500 | optional, recommended. |
-| Screenshots (min. 2, recommend 8) | Tahsin (mushaf), STT scoring, Vocabulary, Tajweed Quiz, Learn Arabic, Dream BIG, Ayah Quiz, Wonders & Favorite Ayahs. |
+| Screenshots (min. 2, recommend 8) | Home and Today plan, Tahsin (mushaf), STT scoring, Vocabulary, Tajweed Quiz, Learn Arabic, Dream BIG, Ayah Quiz, Coherence Study, and Favorite Ayahs. |
 | Category | Education (primary). |
 | Contact | developer email; website optional. |
 
@@ -105,6 +105,6 @@ Before uploading an AAB:
   with semantic versioning (1.0.1, 1.1.0, …).
 - Always run the gate before releasing:
 
-  ```bash
-  ./gradlew testDebugUnitTest assembleDebug jacocoCoreReport --no-daemon
-  ```
+```bash
+./gradlew testDebugUnitTest assembleDebug jacocoCoreReport detekt lintDebug --no-daemon
+```

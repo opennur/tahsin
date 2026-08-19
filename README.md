@@ -1,8 +1,8 @@
 # Tahsin Quran
 
-> 🌐 **English version:** [README.en.md](README.en.md)
+> 🌐 **Baca dalam bahasa Inggris:** [README.en.md](README.en.md)
 
-Aplikasi Android untuk **muroja'ah & latihan baca Al-Qur'an**: mushaf halaman
+Aplikasi Android untuk **murajaah dan latihan membaca Al-Qur'an**: mushaf halaman
 ala mushaf Madani (teks ayat mengalir menyambung dari kanan ke kiri), penilaian
 bacaan real-time lewat mikrofon, pewarnaan huruf tajwid, audio qari per ayat +
 per kata, dan **mode pemutaran audio** (satu ayat / lanjut terus / ulang terus)
@@ -23,16 +23,22 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
 
 ## Fitur
 
-- 🧭 **Menu utama** (layar beranda): semua fitur dibuka lewat kartu menu —
+- 🧭 **Beranda yang mudah dipindai**: semua fitur tetap tersedia sebagai kartu
+  yang bisa dibuka langsung —
   **Tahsin**, **Kosakata**, **Hafalan**, **Kuis Tajwid**, **Statistik**, **Dream BIG**,
   **Belajar Arab**, **Kuis Ayat**, **Penghargaan**, **Studi Coherence**,
   **Ayat Favorit**, dan **Pengaturan**. Ada juga **Rencana Hari Ini** dan
-  jalur **Hafalan & Muraja'ah**.
+  jalur **Hafalan & Muraja'ah**. Kartu **Rencana Hari Ini** menonjolkan satu
+  langkah berikutnya tanpa menyembunyikan fitur lain.
   (Pencarian ayat & Kelola Audio dipindah: 🔍 di header Tahsin, 🎵 di
   Pengaturan.)
 - 🧭 **Rencana belajar terpandu**: saat pertama dibuka, pilih fokus (bacaan,
-  pemahaman, hafalan, atau Bahasa Arab) dan target waktu harian. Beranda lalu
-  menampilkan tiga tugas deterministik dan menyimpan penyelesaiannya secara lokal.
+  pemahaman, hafalan, atau Bahasa Arab) dan target waktu harian. Target 5 menit
+  menampilkan satu tugas, 15 menit menampilkan dua tugas, dan target di atas 15
+  menit menampilkan rangkaian lengkap. Beranda menyoroti tugas pertama yang
+  belum selesai dan tetap menampilkan daftar ringkas seluruh rencana. Tugas hanya
+  ditandai selesai setelah aktivitasnya benar-benar selesai; tombol kembali tidak
+  menyelesaikan tugas, dan alur terpandu kembali ke Beranda setelah selesai.
 - 🧠 **Hafalan & Muraja'ah**: antrean pengulangan berjeda yang offline, dimulai
   dari ayat-ayat Al-Fatihah yang sudah di-bundle. Buka ayat, tandai ingat atau
   perlu diulang, lalu buka langsung di Tahsin. Ini alat bantu latihan, bukan
@@ -157,7 +163,8 @@ Lughoh), **Kuis Ayat**, dan **Penghargaan** (XP + badge).
   layar punya tombol kembali (←) di kiri atas.
 - 💾 **Ekspor/impor data**: progres bacaan, bookmark, XP, rencana belajar,
   hafalan, kosakata, dan setelan dapat diekspor sebagai JSON lalu dipulihkan
-  dari Pengaturan.
+  dari Pengaturan. Backup yang rusak dilaporkan dengan aman tanpa membuat
+  aplikasi berhenti.
 - 🗓️ **Widget + notifikasi "Ayah of the Day"** — satu ayat berganti setiap hari
   (deterministik per tanggal, offline dari bundel aset). Widget home screen
   ringkas: terjemahan saja; notifikasi menampilkan teks Arab + terjemahan.
@@ -211,7 +218,7 @@ app/src/main/java/org/opennur/tahsin/
 │                   #   + TajwidQuiz (kuis "hukum apa pada kata ini?")
 ├── data/vocab/     # VocabularyEngine (SRS + quiz) + Repository/Parser
 │                   #   (1.200 kata terkurasi → assets/quran/vocab.json)
-├── data/learning/  # Rencana belajar harian + aturan pengulangan hafalan
+├── data/learning/  # Rencana belajar harian berbasis durasi + aturan hafalan
 ├── data/dreambig/  # DreamBigGame (ronde arcade); Models/Parser/Repository
 │                   #   lama (era level/transkrip) = dead code yang dipertahankan
 ├── data/lughoh/    # LughohModels/Parser/Repository/Engine (15 pelajaran orisinal
@@ -398,6 +405,7 @@ Seluruh logika yang menentukan **akurasi teks & harakat** diuji sampai
 
 ```bash
 ./gradlew jacocoCoreReport --no-daemon
+python3 tools/jacoco_gaps.py
 # Laporan: app/build/reports/jacoco/core/ (XML + HTML)
 ```
 

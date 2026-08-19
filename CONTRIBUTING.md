@@ -4,7 +4,7 @@ Terima kasih sudah ingin berkontribusi ke **Tahsin Quran**! Repo ini menyentuh
 kitab suci Al-Qur'an — **satu harakat yang salah pun fatal**. Karena itu ada
 beberapa aturan yang tidak bisa ditawar (lihat [Aturan emas](#aturan-emas)).
 
-> 🌐 **English version:** [CONTRIBUTING.en.md](CONTRIBUTING.en.md)
+> 🌐 **Baca dalam bahasa Inggris:** [CONTRIBUTING.en.md](CONTRIBUTING.en.md)
 
 ## Menyiapkan lingkungan
 
@@ -23,16 +23,17 @@ bash tools/fetch_font.sh                # font Utsmani (Amiri, SIL OFL 1.1)
 
 ## Aturan emas
 
-1. **Gate cakupan 100%.** Semua logika inti kebenaran — `data/**` + `util/**`
-   murni + `stt/TranscriptAligner` — harus tercakup **100% line DAN branch**
-   (JaCoCo). Sebelum PR:
+1. **Gate cakupan 100%.** Semua logika inti kebenaran dalam scope JaCoCo —
+   `data/**`, util murni, dan `stt/TranscriptAligner` — harus tercakup **100%
+   line DAN branch**. Sebelum PR:
 
    ```bash
    ./gradlew testDebugUnitTest assembleDebug jacocoCoreReport --no-daemon
    ```
 
    `jacocoCoreReport` WAJIB hijau di **100.00% line + 100.00% branch** (laporan:
-   `app/build/reports/jacoco/core/index.html`). Daftar pengecualian lengkap ada
+   `app/build/reports/jacoco/core/index.html`). Untuk pemeriksaan cepat daftar
+   gap, jalankan `python3 tools/jacoco_gaps.py`. Daftar pengecualian lengkap ada
    di `app/build.gradle.kts` (repository, `SettingsStore`, `FontStore`,
    `TahsinAudioPlayer`, `AudioDownloader`, `DownloadService`,
    `GamificationHub`, `ArabicSpeechRecognizer`, `ui/**`, `widget/**`,
@@ -79,6 +80,17 @@ bash tools/fetch_font.sh                # font Utsmani (Amiri, SIL OFL 1.1)
      pakai `Modifier.clip(...).background(...)` yang memotong harakat/waqaf.
    - **Mode flow sudah dihapus permanen** — jangan kembalikan. Penggantinya:
      mode pemutaran audio `AudioPlaybackMode { AYAH, CONTINUOUS, REPEAT }`.
+
+7. **Rencana harian dan guided flow.** Home tetap menampilkan semua kartu fitur;
+   rencana harian hanya memberi prioritas pada langkah berikutnya. Target 5
+   menit memuat satu tugas, 15 menit dua tugas, dan target di atas 15 menit
+   memuat rangkaian lengkap. Jangan menandai tugas selesai saat pengguna hanya
+   menekan Back: completion harus berasal dari milestone aktivitas yang nyata,
+   dan alur terpandu kembali ke Home setelah milestone itu tercapai.
+
+8. **Review tajwid.** Perubahan rule engine wajib memiliki regression test dan
+   catatan di `docs/TAJWID_REVIEW.md`. Klaim yang tampil ke pengguna harus tetap
+   terbatas sampai ahli berkualifikasi memberikan sign-off.
 
 ## Test-Driven Development (TDD)
 

@@ -1,6 +1,6 @@
 # Kebijakan Privasi — Tahsin Quran
 
-Terakhir diperbarui: 2026-08-15
+Terakhir diperbarui: 2026-08-19
 
 ## Ringkasan
 
@@ -14,15 +14,16 @@ ketiga untuk tujuan iklan, analitik, atau profil pengguna.
 **Tidak ada.** Seluruh data aplikasi tersimpan **lokal di perangkat**:
 
 - Statistik belajar, XP, level, streak, dan progres;
-- Fokus belajar, penyelesaian rencana harian, dan metadata pengulangan hafalan;
+- Fokus belajar, target waktu harian, penyelesaian rencana harian, dan metadata
+  pengulangan hafalan;
 - Bookmark ayat favorit;
 - Pengaturan (qari', kecepatan, bahasa, ukuran huruf, dll.);
 - Audio qari' yang diunduh;
 - Cache data surah yang pernah diunduh.
 - Metadata antrean unduhan audio dan file sementara `.mp3.part` untuk
   pemulihan setelah aplikasi mati.
-- Gambar ringkasan progres hanya dibuat saat pengguna menekan tombol bagikan; gambar
-  berisi agregat anonim dan tidak berisi audio atau transcript suara.
+- Gambar ringkasan progres hanya dibuat saat pengguna menekan tombol bagikan;
+  gambar berisi agregat anonim dan tidak berisi audio atau transkrip suara.
 
 Aplikasi tidak membuat akun, tidak meminta login, dan tidak mengirim data ke
 server milik pengembang.
