@@ -134,12 +134,12 @@ object ShorofParser {
         val answerIndex: Int? = null,
     ) {
         fun toExercise(): ShorofExercise? {
-            if (type != "choice") return null
+            if (type != "choice" && type != "conjugation") return null
             val id = optionsId.orEmpty()
             val en = optionsEn.orEmpty()
             val answer = answerIndex ?: return null
             if (id.size < 3 || id.size != en.size || answer !in id.indices) return null
-            return ShorofChoiceExercise(
+            val base = ShorofChoiceExercise(
                 promptId = promptId.orEmpty(),
                 promptEn = promptEn.orEmpty(),
                 promptAr = promptAr.orEmpty(),
@@ -148,6 +148,15 @@ object ShorofParser {
                 optionsEn = en,
                 answerIndex = answer,
             )
+            return if (type == "conjugation") ShorofConjugationExercise(
+                promptId = base.promptId,
+                promptEn = base.promptEn,
+                promptAr = base.promptAr,
+                promptLatin = base.promptLatin,
+                optionsId = base.optionsId,
+                optionsEn = base.optionsEn,
+                answerIndex = base.answerIndex,
+            ) else base
         }
     }
 }

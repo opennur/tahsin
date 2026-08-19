@@ -607,6 +607,153 @@
        "answerIndex": 0
       }
      ]
+    },
+    {
+     "id": "1-5",
+     "titleId": "Isim Syifah",
+     "titleEn": "The Adjective Predicate",
+     "titleAr": "الِاسْمُ الصِّفَةُ",
+     "introId": "Isim syifah adalah kata sifat yang menjadi predikat dalam jumlah ismiyyah. Ia mengikuti isim yang mendahului dalam ma'rifah, nakirah, dan i'rab.",
+     "introEn": "An isim syifah is an adjective that serves as the predicate in a nominal sentence. It agrees with the preceding noun in definiteness, indefiniteness, and case.",
+     "rules": [
+      {
+       "titleId": "Isim syifah berfungsi sebagai khabar",
+       "titleEn": "Isim syifah functions as khabar",
+       "explanationId": "Dalam الْمُعَلِّمُ نَشِيطٌ, kata نَشِيطٌ adalah isim syifah yang menjadi khabar.",
+       "explanationEn": "In الْمُعَلِّمُ نَشِيطٌ, the word نَشِيطٌ is an isim syifah serving as khabar.",
+       "exampleAr": "الْمُعَلِّمُ نَشِيطٌ",
+       "exampleLatin": "Al-muʿallimu nashīṭun",
+       "exampleId": "Guru itu rajin",
+       "exampleEn": "The teacher is diligent"
+      },
+      {
+       "titleId": "Isim syifah mengikuti man'ut",
+       "titleEn": "Isim syifah follows the noun",
+       "explanationId": "Isim syifah harus sesuai dengan isim sebelumnya dalam semua keadaan.",
+       "explanationEn": "The isim syifah must agree with the preceding noun in all cases.",
+       "exampleAr": "رَأَيْتُ الطَّالِبَ نَشِيطًا",
+       "exampleLatin": "Ra'aytu ṭ-ṭāliba nashīṭan",
+       "exampleId": "Aku melihat siswa itu rajin",
+       "exampleEn": "I saw the diligent student"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Isim syifah dalam الْمُعَلِّمُ كَرِيمٌ adalah...",
+       "promptEn": "The isim syifah in الْمُعَلِّمُ كَرِيمٌ is...",
+       "promptAr": "الْمُعَلِّمُ كَرِيمٌ",
+       "promptLatin": "Al-muʿallimu karīmun",
+       "optionsId": [
+        "الْمُعَلِّمُ",
+        "كَرِيمٌ",
+        "كَرِيمًا",
+        "كَرِيمِ"
+       ],
+       "optionsEn": [
+        "الْمُعَلِّمُ",
+        "كَرِيمٌ",
+        "كَرِيمًا",
+        "كَرِيمِ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: الطَّالِبُ ____ مُجْتَهِدٌ",
+       "promptEn": "Complete: The student is diligent",
+       "promptAr": "الطَّالِبُ ____ مُجْتَهِدٌ",
+       "promptLatin": "Aṭ-ṭālibu ____ mujtahidun",
+       "optionsId": [
+        "كَانَ",
+        "مِنْ",
+        "هُوَ",
+        "—"
+       ],
+       "optionsEn": [
+        "كَانَ",
+        "مِنْ",
+        "هُوَ",
+        "—"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Isim syifah mengikuti man'ut dalam...",
+       "promptEn": "The isim syifah agrees with the noun in...",
+       "promptAr": "الِاسْمُ الصِّفَةُ",
+       "promptLatin": "Al-ismu ṣ-ṣifatu",
+       "optionsId": [
+        "Ma'rifah dan nakirah saja",
+        "Ma'rifah, nakirah, dan i'rab",
+        "Jenis kelamin saja",
+        "Tidak ada keserasian"
+       ],
+       "optionsEn": [
+        "Definiteness only",
+        "Definiteness, indefiniteness, and case",
+        "Gender only",
+        "No agreement"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Guru itu rajin.",
+       "promptEn": "Arrange: The teacher is diligent.",
+       "words": [
+        {
+         "ar": "الْمُعَلِّمُ",
+         "latin": "al-muʿallimu"
+        },
+        {
+         "ar": "نَشِيطٌ",
+         "latin": "nashīṭun"
+        }
+       ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "الْمُعَلِّمُ نَشِيطٌ",
+       "promptLatin": "Al-muʿallimu nashīṭun",
+       "optionsId": [
+        "Isim syifah berfungsi sebagai khabar",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Isim syifah functions as khabar",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "رَأَيْتُ الطَّالِبَ نَشِيطًا",
+       "promptLatin": "Ra'aytu ṭ-ṭāliba nashīṭan",
+       "optionsId": [
+        "Isim syifah mengikuti man'ut",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Isim syifah follows the noun",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      }
+     ]
     }
    ]
   },
@@ -917,6 +1064,308 @@
        "answerIndex": 0
       }
      ]
+    },
+    {
+     "id": "2-3",
+     "titleId": "Isim Zharf",
+     "titleEn": "Adverbs",
+     "titleAr": "اِسْمُ الزَّمَانِ وَالْمَكَانِ",
+     "introId": "Isim zharf adalah kata keterangan waktu atau tempat. Biasanya berstatus manshub dan berada setelah fi'il atau fi'il mudhari'.",
+     "introEn": "An isim zharf is an adverb of time or place. It is usually in the accusative case and comes after a past or present tense verb.",
+     "rules": [
+      {
+       "titleId": "Isim zharf manshub setelah fi'il",
+       "titleEn": "Adverb is manshub after a verb",
+       "explanationId": "Isim zharf seperti الْيَوْمَ dan هُنَا biasanya berstatus manshub.",
+       "explanationEn": "Adverbs like الْيَوْمَ and هُنَا are usually in the accusative case.",
+       "exampleAr": "جَلَسَ الطَّالِبُ الْيَوْمَ",
+       "exampleLatin": "Jalasa ṭ-ṭālibu l-yawma",
+       "exampleId": "Siswa itu duduk hari ini",
+       "exampleEn": "The student sat today"
+      },
+      {
+       "titleId": "Isim zharf tempat",
+       "titleEn": "Adverb of place",
+       "explanationId": "هُنَا berarti di sini, وَهُنَاكَ berarti di sana.",
+       "explanationEn": "هُنَا means here, and وَهُنَاكَ means there.",
+       "exampleAr": "ذَهَبَ عَلِيٌّ هُنَاكَ",
+       "exampleLatin": "Dhahaba ʿAliyyun hunāka",
+       "exampleId": "Ali pergi ke sana",
+       "exampleEn": "Ali went there"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Isim zharf dalam جَلَسَ الْوَلَدُ الْيَوْمَ adalah...",
+       "promptEn": "The adverb in جَلَسَ الْوَلَدُ الْيَوْمَ is...",
+       "promptAr": "جَلَسَ الْوَلَدُ الْيَوْمَ",
+       "promptLatin": "Jalasa l-waladu l-yawma",
+       "optionsId": [
+        "جَلَسَ",
+        "الْوَلَدُ",
+        "الْيَوْمَ",
+        "فِي"
+       ],
+       "optionsEn": [
+        "جَلَسَ",
+        "الْوَلَدُ",
+        "الْيَوْمَ",
+        "فِي"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Isim zharf biasanya berstatus...",
+       "promptEn": "An adverb is usually in the...",
+       "promptAr": "اِسْمُ الزَّمَانِ",
+       "promptLatin": "Ismu z-zamāni",
+       "optionsId": [
+        "Marfu'",
+        "Manshub",
+        "Majrur",
+        "Mabni"
+       ],
+       "optionsEn": [
+        "Nominative",
+        "Accusative",
+        "Genitive",
+        "Fixed form"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: ذَهَبَ عَلِيٌّ ____",
+       "promptEn": "Complete: Ali went ____",
+       "promptAr": "ذَهَبَ عَلِيٌّ ____",
+       "promptLatin": "Dhahaba ʿAliyyun ____",
+       "optionsId": [
+        "هُنَا",
+        "هُنَاكَ",
+        "هَلُمَّ",
+        "هُوَ"
+       ],
+       "optionsEn": [
+        "هُنَا",
+        "هُنَاكَ",
+        "هَلُمَّ",
+        "هُوَ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Siswa itu duduk hari ini.",
+       "promptEn": "Arrange: The student sat today.",
+       "words": [
+        {
+         "ar": "جَلَسَ",
+         "latin": "jalasa"
+        },
+        {
+         "ar": "الطَّالِبُ",
+         "latin": "aṭ-ṭālibu"
+        },
+        {
+         "ar": "الْيَوْمَ",
+         "latin": "al-yawma"
+        }
+       ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "جَلَسَ الطَّالِبُ الْيَوْمَ",
+       "promptLatin": "Jalasa ṭ-ṭālibu l-yawma",
+       "optionsId": [
+        "Isim zharf manshub setelah fi'il",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Adverb is manshub after a verb",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "ذَهَبَ عَلِيٌّ هُنَاكَ",
+       "promptLatin": "Dhahaba ʿAliyyun hunāka",
+       "optionsId": [
+        "Isim zharf tempat",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Adverb of place",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      }
+     ]
+    },
+    {
+     "id": "2-4",
+     "titleId": "Hal",
+     "titleEn": "The Circumstantial",
+     "titleAr": "الْحَالُ",
+     "introId": "Hal adalah isim manshub yang menjelaskan keadaan maf'ul bih atau fa'il. Ia biasanya berupa isim nakirah.",
+     "introEn": "The hal is an accusative noun that describes the state of the maf'ul bih or fa'il. It is usually an indefinite noun.",
+     "rules": [
+      {
+       "titleId": "Hal menjelaskan keadaan",
+       "titleEn": "Hal describes the state",
+       "explanationId": "Hal menjawab pertanyaan 'bagaimana keadaannya?'",
+       "explanationEn": "The hal answers the question 'what is its state?'",
+       "exampleAr": "خَرَجَ الطَّالِبُ مُبْتَسِمًا",
+       "exampleLatin": "Kharaja ṭ-ṭālibu mubtasiman",
+       "exampleId": "Siswa itu keluar sambil tersenyum",
+       "exampleEn": "The student went out smiling"
+      },
+      {
+       "titleId": "Hal harus nakirah",
+       "titleEn": "Hal must be indefinite",
+       "explanationId": "Hal biasanya berupa isim mufrad nakirah dengan tanwin.",
+       "explanationEn": "The hal is usually an indefinite singular noun with tanwin.",
+       "exampleAr": "جَلَسَ الْوَلَدُ قَاعِدًا",
+       "exampleLatin": "Jalasa l-waladu qāʿidan",
+       "exampleId": "Anak itu duduk dengan posisi duduk",
+       "exampleEn": "The child sat in a sitting position"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Hal dalam خَرَجَ الطَّالِبُ مُبْتَسِمًا adalah...",
+       "promptEn": "The hal in خَرَجَ الطَّالِبُ مُبْتَسِمًا is...",
+       "promptAr": "خَرَجَ الطَّالِبُ مُبْتَسِمًا",
+       "promptLatin": "Kharaja ṭ-ṭālibu mubtasiman",
+       "optionsId": [
+        "خَرَجَ",
+        "الطَّالِبُ",
+        "مُبْتَسِمًا",
+        "مُبْتَسِمٌ"
+       ],
+       "optionsEn": [
+        "خَرَجَ",
+        "الطَّالِبُ",
+        "مُبْتَسِمًا",
+        "مُبْتَسِمٌ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Hal biasanya berstatus...",
+       "promptEn": "The hal is usually in the...",
+       "promptAr": "الْحَالُ",
+       "promptLatin": "Al-ḥālu",
+       "optionsId": [
+        "Marfu'",
+        "Manshub",
+        "Majrur",
+        "Majzum"
+       ],
+       "optionsEn": [
+        "Nominative",
+        "Accusative",
+        "Genitive",
+        "Jussive"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Hal harus berupa isim...",
+       "promptEn": "The hal must be an indefinite...",
+       "promptAr": "الْحَالُ نَكِيرَةٌ",
+       "promptLatin": "Al-ḥālu nakīratun",
+       "optionsId": [
+        "Mufrad ma'rifah",
+        "Nakirah",
+        "Jamak",
+        "Mudhaf"
+       ],
+       "optionsEn": [
+        "Definite singular",
+        "Indefinite",
+        "Plural",
+        "Possessed"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Siswa itu keluar sambil tersenyum.",
+       "promptEn": "Arrange: The student went out smiling.",
+       "words": [
+        {
+         "ar": "خَرَجَ",
+         "latin": "kharaja"
+        },
+        {
+         "ar": "الطَّالِبُ",
+         "latin": "aṭ-ṭālibu"
+        },
+        {
+         "ar": "مُبْتَسِمًا",
+         "latin": "mubtasiman"
+        }
+       ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "خَرَجَ الطَّالِبُ مُبْتَسِمًا",
+       "promptLatin": "Kharaja ṭ-ṭālibu mubtasiman",
+       "optionsId": [
+        "Hal menjelaskan keadaan",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Hal describes the state",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "جَلَسَ الْوَلَدُ قَاعِدًا",
+       "promptLatin": "Jalasa l-waladu qāʿidan",
+       "optionsId": [
+        "Hal harus nakirah",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Hal must be indefinite",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      }
+     ]
     }
    ]
   },
@@ -1220,6 +1669,304 @@
        ],
        "optionsEn": [
         "Fathah and kasrah",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      }
+     ]
+    },
+    {
+     "id": "3-3",
+     "titleId": "Isim Kawshif",
+     "titleEn": "The Declensive Adjective",
+     "titleAr": "الِاسْمُ الْكَافِي وَالشَّافِي",
+     "introId": "Isim kawshif berfungsi seperti isim syifah, yaitu menjadi predikat yang menjelaskan sifat isim sebelumnya. Ia juga mengikuti keserasian.",
+     "introEn": "An isim kawshif functions like an isim syifah, serving as a predicate describing the quality of the preceding noun. It also follows agreement rules.",
+     "rules": [
+      {
+       "titleId": "Isim kawshif sebagai khabar",
+       "titleEn": "Isim kawshif as khabar",
+       "explanationId": "Isim kawshif seperti عَالِمٌ dan فَعِيلٌ berfungsi sebagai khabar yang menjelaskan sifat.",
+       "explanationEn": "An isim kawshif like عَالِمٌ and فَعِيلٌ serves as khabar describing a quality.",
+       "exampleAr": "الرَّجُلُ عَالِمٌ",
+       "exampleLatin": "Ar-rajulu ʿālimun",
+       "exampleId": "Laki-laki itu seorang yang berilmu",
+       "exampleEn": "The man is a knowledgeable person"
+      },
+      {
+       "titleId": "Keserasian isim kawshif",
+       "titleEn": "Agreement of isim kawshif",
+       "explanationId": "Isim kawshif mengikuti isim sebelumnya dalam ma'rifah dan nakirah, sama seperti na'at.",
+       "explanationEn": "The isim kawshif agrees with the preceding noun in definiteness and indefiniteness, just like a na'at.",
+       "exampleAr": "رَأَيْتُ رَجُلًا عَالِمًا",
+       "exampleLatin": "Ra'aytu rajulan ʿāliman",
+       "exampleId": "Aku melihat seorang laki-laki yang berilmu",
+       "exampleEn": "I saw a knowledgeable man"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Isim kawshif dalam الرَّجُلُ عَالِمٌ adalah...",
+       "promptEn": "The isim kawshif in الرَّجُلُ عَالِمٌ is...",
+       "promptAr": "الرَّجُلُ عَالِمٌ",
+       "promptLatin": "Ar-rajulu ʿālimun",
+       "optionsId": [
+        "الرَّجُلُ",
+        "عَالِمٌ",
+        "عَالِمًا",
+        "فِي"
+       ],
+       "optionsEn": [
+        "الرَّجُلُ",
+        "عَالِمٌ",
+        "عَالِمًا",
+        "فِي"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Lengkapi: رَأَيْتُ طَالِبًا ____",
+       "promptEn": "Complete: I saw a knowledgeable student",
+       "promptAr": "رَأَيْتُ طَالِبًا ____",
+       "promptLatin": "Ra'aytu ṭāliban ____",
+       "optionsId": [
+        "عَالِمٌ",
+        "عَالِمًا",
+        "عَالِمِ",
+        "عَالِمَةٌ"
+       ],
+       "optionsEn": [
+        "عَالِمٌ",
+        "عَالِمًا",
+        "عَالِمِ",
+        "عَالِمَةٌ"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Isim kawshif mengikuti isim sebelumnya dalam...",
+       "promptEn": "The isim kawshif agrees with the noun in...",
+       "promptAr": "اِسْمُ الْكَافِي",
+       "promptLatin": "Ismu l-kāfī",
+       "optionsId": [
+        "Ma'rifah dan nakirah",
+        "Waktu saja",
+        "Lokasi saja",
+        "Tidak ada"
+       ],
+       "optionsEn": [
+        "Definiteness and indefiniteness",
+        "Time only",
+        "Location only",
+        "Nothing"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Laki-laki itu seorang yang berilmu.",
+       "promptEn": "Arrange: The man is a knowledgeable person.",
+       "words": [
+        {
+         "ar": "الرَّجُلُ",
+         "latin": "ar-rajulu"
+        },
+        {
+         "ar": "عَالِمٌ",
+         "latin": "ʿālimun"
+        }
+       ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "الرَّجُلُ عَالِمٌ",
+       "promptLatin": "Ar-rajulu ʿālimun",
+       "optionsId": [
+        "Isim kawshif sebagai khabar",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Isim kawshif as khabar",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "رَأَيْتُ رَجُلًا عَالِمًا",
+       "promptLatin": "Ra'aytu rajulan ʿāliman",
+       "optionsId": [
+        "Keserasian isim kawshif",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Agreement of isim kawshif",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      }
+     ]
+    },
+    {
+     "id": "3-4",
+     "titleId": "Tamyiz",
+     "titleEn": "Specification",
+     "titleAr": "التَّمْيِيزُ",
+     "introId": "Tamyiz adalah isim manshub yang menjelaskan isim yang tidak jelas maknanya, seperti jumlah atau bilangan. Ia menjawab pertanyaan 'apa?' atau 'berapa?'.",
+     "introEn": "The tamyiz is an accusative noun that clarifies an unclear noun, such as a quantity or number. It answers 'what?' or 'how many?'.",
+     "rules": [
+      {
+       "titleId": "Tamyiz jumlah",
+       "titleEn": "Specification of quantity",
+       "explanationId": "Tamyiz menjelaskan jumlah yang tidak jelas, seperti عَشَرَةُ كُتُبٍ.",
+       "explanationEn": "Tamyiz clarifies an unclear quantity, such as عَشَرَةُ كُتُبٍ.",
+       "exampleAr": "عِنْدِي عَشَرَةُ كُتُبٍ",
+       "exampleLatin": "ʿIndī ʿasharatu kutubin",
+       "exampleId": "Aku mempunyai sepuluh buku",
+       "exampleEn": "I have ten books"
+      },
+      {
+       "titleId": "Tamyiz bilangan",
+       "titleEn": "Specification of number",
+       "explanationId": "Tamyiz berstatus manshub karena menjelaskan bilangan yang tidak lengkap.",
+       "explanationEn": "Tamyiz is manshub because it clarifies an incomplete number.",
+       "exampleAr": "مِائَةُ دِرْهَمٍ",
+       "exampleLatin": "Mi'atu dirhamin",
+       "exampleId": "Seratus dirham",
+       "exampleEn": "A hundred dirhams"
+      }
+     ],
+     "exercises": [
+      {
+       "type": "choice",
+       "promptId": "Tamyiz dalam عِنْدِي خَمْسَةُ أَقْلَامٍ adalah...",
+       "promptEn": "The tamyiz in عِنْدِي خَمْسَةُ أَقْلَامٍ is...",
+       "promptAr": "عِنْدِي خَمْسَةُ أَقْلَامٍ",
+       "promptLatin": "ʿIndī khamsatu aqlāmin",
+       "optionsId": [
+        "عِنْدِي",
+        "خَمْسَةُ",
+        "أَقْلَامٍ",
+        "خَمْسَةٌ"
+       ],
+       "optionsEn": [
+        "عِنْدِي",
+        "خَمْسَةُ",
+        "أَقْلَامٍ",
+        "خَمْسَةٌ"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "choice",
+       "promptId": "Tamyiz biasanya berstatus...",
+       "promptEn": "Tamyiz is usually in the...",
+       "promptAr": "التَّمْيِيزُ",
+       "promptLatin": "At-tamyīzu",
+       "optionsId": [
+        "Marfu'",
+        "Manshub",
+        "Majrur",
+        "Majzum"
+       ],
+       "optionsEn": [
+        "Nominative",
+        "Accusative",
+        "Genitive",
+        "Jussive"
+       ],
+       "answerIndex": 1
+      },
+      {
+       "type": "choice",
+       "promptId": "Tamyiz menjawab pertanyaan...",
+       "promptEn": "Tamyiz answers the question...",
+       "promptAr": "التَّمْيِيزُ",
+       "promptLatin": "At-tamyīzu",
+       "optionsId": [
+        "Siapa?",
+        "Di mana?",
+        "Berapa? atau Apa?",
+        "Kapan?"
+       ],
+       "optionsEn": [
+        "Who?",
+        "Where?",
+        "How many? or What?",
+        "When?"
+       ],
+       "answerIndex": 2
+      },
+      {
+       "type": "rearrange",
+       "promptId": "Susun kalimat: Aku mempunyai sepuluh buku.",
+       "promptEn": "Arrange: I have ten books.",
+       "words": [
+        {
+         "ar": "عِنْدِي",
+         "latin": "ʿindī"
+        },
+        {
+         "ar": "عَشَرَةُ",
+         "latin": "ʿasharatu"
+        },
+        {
+         "ar": "كُتُبٍ",
+         "latin": "kutubin"
+        }
+       ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "عِنْدِي عَشَرَةُ كُتُبٍ",
+       "promptLatin": "ʿIndī ʿasharatu kutubin",
+       "optionsId": [
+        "Tamyiz jumlah",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Specification of quantity",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "مِائَةُ دِرْهَمٍ",
+       "promptLatin": "Mi'atu dirhamin",
+       "optionsId": [
+        "Tamyiz bilangan",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Specification of number",
         "Isim — a noun or name",
         "Fi'il and harf",
         "Alif lam marks definiteness"

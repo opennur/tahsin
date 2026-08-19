@@ -74,6 +74,10 @@ def validate():
                 if signature in seen_exercises:
                     ERRORS.append(f"{p}: soal duplikat")
                 seen_exercises.add(signature)
+                etype = exercise.get("type")
+                if etype not in ("choice", "conjugation"):
+                    ERRORS.append(f"{p}: tipe tidak dikenal '{etype}'")
+                    continue
                 for key in ("promptId", "promptEn"):
                     required(exercise.get(key), f"{p}.{key}")
                 arabic(exercise.get("promptAr"), f"{p}.promptAr")

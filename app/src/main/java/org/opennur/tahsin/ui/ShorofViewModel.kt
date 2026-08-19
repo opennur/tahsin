@@ -17,6 +17,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.opennur.tahsin.data.shorof.ShorofCatalog
 import org.opennur.tahsin.data.shorof.ShorofChoiceExercise
+import org.opennur.tahsin.data.shorof.ShorofConjugationExercise
 import org.opennur.tahsin.data.shorof.ShorofEngine
 import org.opennur.tahsin.data.shorof.ShorofExercise
 import org.opennur.tahsin.data.shorof.ShorofLesson
@@ -138,9 +139,13 @@ class ShorofViewModel @Inject constructor(
 
     fun answerChoice(index: Int) {
         val state = _state.value
-        val exercise = state.exercise as? ShorofChoiceExercise ?: return
+        val exercise = state.exercise
         if (state.selected != null) return
-        val correct = ShorofEngine.isChoiceCorrect(exercise, index)
+        val correct = when (exercise) {
+            is ShorofChoiceExercise -> ShorofEngine.isChoiceCorrect(exercise, index)
+            is ShorofConjugationExercise -> ShorofEngine.isConjugationCorrect(exercise, index)
+            else -> false
+        }
         _state.value.session.getOrNull(_state.value.exerciseIndex)?.questionId?.let { id ->
             questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
         }

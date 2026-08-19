@@ -40,6 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.opennur.tahsin.data.shorof.ShorofChoiceExercise
 import org.opennur.tahsin.data.shorof.ShorofConjugation
+import org.opennur.tahsin.data.shorof.ShorofConjugationExercise
+import org.opennur.tahsin.data.shorof.ShorofExercise
 import org.opennur.tahsin.data.shorof.ShorofLesson
 import org.opennur.tahsin.data.shorof.ShorofPattern
 import org.opennur.tahsin.data.shorof.ShorofRule
@@ -315,10 +317,20 @@ private fun ShorofExercises(
             ShorofResult(state, strings, onRestart, onBack)
             return
         }
-        val exercise = state.exercise as? ShorofChoiceExercise ?: run {
+        val exercise = state.exercise
+        val optionsPair = exercise?.let { ex ->
+            when (ex) {
+                is ShorofChoiceExercise -> ex.optionsId to (ex.optionsEn to ex.answerIndex)
+                is ShorofConjugationExercise -> ex.optionsId to (ex.optionsEn to ex.answerIndex)
+                else -> null
+            }
+        }
+        if (optionsPair == null) {
             AyahText(strings.shorofEmpty, style = AyahTypography.Body1.copy(color = AyahColors.TextSecondary))
             return
         }
+        val (optionsId, optionsEnAndAnswer) = optionsPair
+        val (optionsEn, answerIndex) = optionsEnAndAnswer
         Spacer(modifier = Modifier.height(12.dp))
         AyahText(strings.shorofProgressLabel.format(state.exerciseIndex + 1, state.total), style = AyahTypography.Caption.copy(color = AyahColors.TextSecondary))
         Spacer(modifier = Modifier.height(8.dp))
@@ -328,9 +340,9 @@ private fun ShorofExercises(
             AyahText(exercise.promptAr, style = AyahTypography.ArabicWord.copy(fontFamily = arabicFamily, fontSize = 22.sp, color = AyahColors.TextPrimary))
             AyahText(exercise.promptLatin, style = AyahTypography.Body2.copy(fontStyle = FontStyle.Italic, color = AyahColors.TextSecondary))
             Spacer(modifier = Modifier.height(12.dp))
-            val options = if (state.language == AppLanguage.EN) exercise.optionsEn else exercise.optionsId
+            val options = if (state.language == AppLanguage.EN) optionsEn else optionsId
             options.forEachIndexed { index, option ->
-                ShorofOption(option, state.selected != null, index == exercise.answerIndex, index == state.selected) { onAnswer(index) }
+                ShorofOption(option, state.selected != null, index == answerIndex, index == state.selected) { onAnswer(index) }
                 Spacer(modifier = Modifier.height(8.dp))
             }
             if (state.correct != null) {

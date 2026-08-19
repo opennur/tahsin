@@ -1,5 +1,6 @@
 package org.opennur.tahsin.data.shorof
 
+import org.opennur.tahsin.util.ArabicNormalizer
 import kotlin.random.Random
 
 /** Logika murni pemilihan dan penilaian latihan Shorof. */
@@ -28,4 +29,10 @@ object ShorofEngine {
 
     fun isChoiceCorrect(exercise: ShorofChoiceExercise, selectedIndex: Int): Boolean =
         selectedIndex == exercise.answerIndex
+
+    fun isConjugationCorrect(exercise: ShorofConjugationExercise, selectedIndex: Int): Boolean =
+        selectedIndex == exercise.answerIndex
+
+    fun conjugationAnswer(exercise: ShorofConjugationExercise): String =
+        exercise.optionsId[exercise.answerIndex]
 }
