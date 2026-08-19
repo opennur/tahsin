@@ -86,16 +86,25 @@ fun MainActivityContent(
             if (stack.size <= 1) return
             stack = stack.dropLast(1)
             if (stack.size == 1) {
-                activeTaskKey?.let { key ->
-                    // Tahsin hanya selesai setelah ada hasil final; keluar tanpa
-                    // membaca tidak boleh menghapus tugas dari rencana harian.
-                    if (key != LearningTaskType.RECITE.key) {
-                        LearningTaskType.fromKey(key)?.let(learningPlanViewModel::complete)
-                    }
-                }
+                // Keluar dengan back membatalkan guided task. Completion hanya
+                // datang dari milestone nyata di layar fitur masing-masing.
                 activeTaskKey = null
             }
         }
+
+        fun completeGuidedTask(type: LearningTaskType) {
+            if (activeTaskKey != type.key) return
+            learningPlanViewModel.complete(type)
+            activeTaskKey = null
+            stack = listOf(AppScreen.Home)
+        }
+
+        fun guidedCompletion(type: LearningTaskType): (() -> Unit)? =
+            if (activeTaskKey == type.key) {
+                { completeGuidedTask(type) }
+            } else {
+                null
+            }
 
         fun openLearningTask(type: LearningTaskType) {
             activeTaskKey = type.key
@@ -108,16 +117,6 @@ fun MainActivityContent(
                 LearningTaskType.ARABIC -> push(AppScreen.Lughoh)
                 LearningTaskType.NAHWU -> push(AppScreen.Nahwu)
                 LearningTaskType.SHOROF -> push(AppScreen.Shorof)
-            }
-        }
-
-        // Hasil final Tahsin adalah sumber kebenaran penyelesaian tugas RECITE.
-        LaunchedEffect(tahsinViewModel, activeTaskKey) {
-            tahsinViewModel.results.collect {
-                if (activeTaskKey == LearningTaskType.RECITE.key) {
-                    learningPlanViewModel.complete(LearningTaskType.RECITE)
-                    activeTaskKey = null
-                }
             }
         }
 
@@ -164,6 +163,7 @@ fun MainActivityContent(
                             onOpenSettings = { push(AppScreen.Settings) },
                         ),
                         onOpenTask = ::openLearningTask,
+                        onOpenAyah = onOpenAyah,
                     ),
                     learningPlan = learningPlanState,
                     settings = settingsState,
@@ -173,16 +173,19 @@ fun MainActivityContent(
                     onOpenSearch = { push(AppScreen.Search) },
                     onOpenSettings = { push(AppScreen.Settings) },
                     onBack = { pop() },
+                    onGuidedComplete = guidedCompletion(LearningTaskType.RECITE),
                     target = target,
                     onTargetConsumed = onTargetConsumed,
                 )
                 AppScreen.Vocab -> VocabularyScreen(
                     onBack = { pop() },
                     onOpenAyah = onOpenAyah,
+                    onGuidedComplete = guidedCompletion(LearningTaskType.VOCABULARY),
                 )
                 AppScreen.Memorization -> MemorizationScreen(
                     onBack = { pop() },
                     onOpenAyah = onOpenAyah,
+                    onGuidedComplete = guidedCompletion(LearningTaskType.MEMORIZATION),
                 )
                 AppScreen.Stats -> StatsScreen(
                     onBack = { pop() },
@@ -228,15 +231,27 @@ fun MainActivityContent(
                     onBack = { pop() },
                     onOpenAyah = onOpenAyah,
                 )
-                AppScreen.Quiz -> TajwidQuizScreen(onBack = { pop() })
+                AppScreen.Quiz -> TajwidQuizScreen(
+                    onBack = { pop() },
+                    onGuidedComplete = guidedCompletion(LearningTaskType.TAJWID),
+                )
                 AppScreen.AudioManager -> AudioManagerScreen(
                     onBack = { pop() },
                     onDownloadAll = tahsinViewModel::downloadAllAudio,
                 )
                 AppScreen.DreamBig -> DreamBigScreen(onBack = { pop() })
-                AppScreen.Lughoh -> LughohScreen(onBack = { pop() })
-                AppScreen.Nahwu -> NahwuScreen(onBack = { pop() })
-                AppScreen.Shorof -> ShorofScreen(onBack = { pop() })
+                AppScreen.Lughoh -> LughohScreen(
+                    onBack = { pop() },
+                    onGuidedComplete = guidedCompletion(LearningTaskType.ARABIC),
+                )
+                AppScreen.Nahwu -> NahwuScreen(
+                    onBack = { pop() },
+                    onGuidedComplete = guidedCompletion(LearningTaskType.NAHWU),
+                )
+                AppScreen.Shorof -> ShorofScreen(
+                    onBack = { pop() },
+                    onGuidedComplete = guidedCompletion(LearningTaskType.SHOROF),
+                )
                 AppScreen.AyatQuiz -> AyatQuizScreen(onBack = { pop() })
                 AppScreen.Badges -> BadgesScreen(onBack = { pop() })
                 AppScreen.Favorites -> FavoritesScreen(
@@ -246,6 +261,7 @@ fun MainActivityContent(
                 AppScreen.Coherence -> CoherenceScreen(
                     onBack = { pop() },
                     language = settingsState.language,
+                    onGuidedComplete = guidedCompletion(LearningTaskType.UNDERSTAND),
                 )
                 AppScreen.Settings -> SettingsScreen(
                     onBack = { pop() },

@@ -59,6 +59,7 @@ import org.opennur.tahsin.util.FontStore
 @Composable
 fun ShorofScreen(
     onBack: () -> Unit,
+    onGuidedComplete: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -93,6 +94,7 @@ fun ShorofScreen(
                 onAnswer = viewModel::answerChoice,
                 onNext = viewModel::next,
                 onRestart = viewModel::restart,
+                onGuidedComplete = onGuidedComplete,
             )
         }
     }
@@ -303,6 +305,7 @@ private fun ShorofExercises(
     onAnswer: (Int) -> Unit,
     onNext: () -> Unit,
     onRestart: () -> Unit,
+    onGuidedComplete: (() -> Unit)?,
 ) {
     Column(
         modifier = Modifier
@@ -314,7 +317,13 @@ private fun ShorofExercises(
         Spacer(modifier = Modifier.height(16.dp))
         ShorofHeader(strings.shorofExercisesTitle, onBack)
         if (state.exercisesDone) {
-            ShorofResult(state, strings, onRestart, onBack)
+            ShorofResult(
+                state = state,
+                strings = strings,
+                onRestart = onRestart,
+                onBack = onGuidedComplete ?: onBack,
+                backLabel = if (onGuidedComplete == null) strings.shorofBackHome else strings.guidedReturnHome,
+            )
             return
         }
         val exercise = state.exercise
@@ -382,7 +391,13 @@ private fun ShorofOption(text: String, answered: Boolean, correct: Boolean, sele
 }
 
 @Composable
-private fun ShorofResult(state: ShorofUiState, strings: Strings, onRestart: () -> Unit, onBack: () -> Unit) {
+private fun ShorofResult(
+    state: ShorofUiState,
+    strings: Strings,
+    onRestart: () -> Unit,
+    onBack: () -> Unit,
+    backLabel: String,
+) {
     Spacer(modifier = Modifier.height(24.dp))
     AyahCard {
         AyahText(strings.shorofResultTitle, style = AyahTypography.Heading2)
@@ -393,7 +408,7 @@ private fun ShorofResult(state: ShorofUiState, strings: Strings, onRestart: () -
         Spacer(modifier = Modifier.height(14.dp))
         AyahButton(text = strings.shorofRestart, onClick = onRestart, variant = AyahButtonVariant.Outline, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(text = strings.shorofBackHome, onClick = onBack, modifier = Modifier.fillMaxWidth())
+        AyahButton(text = backLabel, onClick = onBack, modifier = Modifier.fillMaxWidth())
     }
 }
 

@@ -142,4 +142,21 @@ class TajwidQuizTest {
         val options = TajwidQuiz.buildOptions("مرحبا")
         assertNotNull(options)
     }
+
+    @Test
+    fun `pickWordAt mendukung target eksplisit dan indeks invalid`() {
+        val words = listOf("\u0625\u0646\u0651\u064E\u0627")
+        val explicit = TajwidQuiz.pickWordAt(
+            words = words,
+            index = 0,
+            targetRuleName = "Ghunnah (Mushaddad)",
+        )
+        assertNotNull(explicit)
+        assertEquals("Ghunnah (Mushaddad)", explicit!!.targetRule.name)
+
+        val fallback = TajwidQuiz.pickWordAt(words, 0, targetRuleName = "Tidak ada")
+        assertNotNull(fallback)
+        assertTrue(TajwidQuiz.pickWordAt(words, 99) == null)
+        assertTrue(TajwidQuiz.pickWordAt(listOf("مِنْ"), 0) == null)
+    }
 }

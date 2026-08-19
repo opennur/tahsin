@@ -115,5 +115,107 @@ class QuestionLedgerTest {
         val targetDir = File(dir, "target-dir").apply { mkdirs() }
         File(targetDir, "placeholder").writeText("x")
         QuestionExposureStore(targetDir).reserve("quiz", listOf("a"), 1, 1, Random(1))
+
+        val fallbackFile = File(dir, "fallback.json")
+        QuestionExposureStore(fallbackFile, rename = { _, _ -> false })
+            .reserve("quiz", listOf("a"), 1, 1, Random(1))
+        assertTrue(fallbackFile.exists())
+
+        QuestionExposureStore(File(dir, "default-random.json"))
+            .reserve("quiz", listOf("a"), 1, 1)
+    }
+
+    @Test
+    fun `reserve handles partial pools empty selection and newer exposure cycle`() {
+        val partial = QuestionLedger.reserve(
+            feature = "quiz",
+            ids = listOf("a", "b"),
+            state = QuestionLedgerState(),
+            count = 1,
+            today = 5,
+            random = Random(1),
+        ).first
+        assertEquals(0, partial.cycles["quiz"])
+
+        val empty = QuestionLedger.reserve(
+            feature = "quiz",
+            ids = emptyList(),
+            state = QuestionLedgerState(),
+            count = 1,
+            today = 5,
+            random = Random(1),
+        ).first
+        assertEquals(0, empty.cycles["quiz"])
+
+        val newer = QuestionLedgerState(
+            cycles = mapOf("quiz" to 2),
+            exposures = mapOf(
+                QuestionKey("quiz", "a").storageKey to QuestionExposure(cycle = 3),
+            ),
+        )
+        val reserved = QuestionLedger.reserve("quiz", listOf("a"), newer, 1, 5, Random(1)).first
+        assertEquals(3, reserved.exposures[QuestionKey("quiz", "a").storageKey]?.cycle)
+        assertEquals(3, reserved.cycles["quiz"])
+    }
+
+    @Test
+    fun `select fallback handles due fresh and previously seen combinations`() {
+        val dueFreshSeen = QuestionLedgerState(
+            cycles = mapOf("quiz" to 1),
+            exposures = mapOf(
+                QuestionKey("quiz", "a").storageKey to QuestionExposure(
+                    cycle = 0,
+                    lastCorrect = false,
+                    nextReviewDay = 1,
+                ),
+                QuestionKey("quiz", "b").storageKey to QuestionExposure(cycle = 0),
+                QuestionKey("quiz", "c").storageKey to QuestionExposure(cycle = 1),
+            ),
+        )
+        assertEquals(
+            3,
+            QuestionLedger.select(
+                feature = "quiz",
+                ids = listOf("a", "b", "c"),
+                state = dueFreshSeen,
+                count = 4,
+                today = 2,
+                random = Random(1),
+            ).size,
+        )
+
+        val differentFresh = QuestionLedgerState(
+            cycles = mapOf("quiz" to 0),
+            exposures = mapOf(
+                QuestionKey("quiz", "a").storageKey to QuestionExposure(cycle = 1),
+                QuestionKey("quiz", "b").storageKey to QuestionExposure(cycle = 2),
+            ),
+        )
+        assertEquals(
+            1,
+            QuestionLedger.select("quiz", listOf("a", "b"), differentFresh, 1, 2, Random(1)).size,
+        )
+    }
+
+    @Test
+    fun `reserve evaluates current and future exposure for unselected ids`() {
+        val currentAndFuture = QuestionLedgerState(
+            cycles = mapOf("quiz" to 1),
+            exposures = mapOf(
+                QuestionKey("quiz", "a").storageKey to QuestionExposure(cycle = 1),
+                QuestionKey("quiz", "b").storageKey to QuestionExposure(cycle = 2),
+                QuestionKey("quiz", "c").storageKey to QuestionExposure(cycle = 3),
+            ),
+        )
+        val result = QuestionLedger.reserve(
+            "quiz",
+            listOf("a", "b", "c"),
+            currentAndFuture,
+            1,
+            2,
+            Random(1),
+        )
+        assertEquals(1, result.second.size)
+        assertEquals(1, result.first.cycles["quiz"])
     }
 }

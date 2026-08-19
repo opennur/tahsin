@@ -119,7 +119,10 @@ object QuestionLedger {
 }
 
 /** File-backed ledger shared by every quiz and challenge. */
-class QuestionExposureStore internal constructor(private val file: File) {
+class QuestionExposureStore internal constructor(
+    private val file: File,
+    private val rename: (File, File) -> Boolean = { source, target -> source.renameTo(target) },
+) {
     companion object {
         private val LOCK = Any()
         fun fromContext(context: Context): QuestionExposureStore =
@@ -156,8 +159,8 @@ class QuestionExposureStore internal constructor(private val file: File) {
         runCatching {
             val temp = File(file.parentFile, "${file.name}.tmp")
             temp.writeText(gson.toJson(state))
-            if (!temp.renameTo(file)) {
-                file.writeText(gson.toJson(state))
+            if (!rename(temp, file)) {
+                runCatching { file.writeText(gson.toJson(state)) }
                 temp.delete()
             }
         }

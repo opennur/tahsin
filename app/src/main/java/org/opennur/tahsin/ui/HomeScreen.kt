@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
@@ -25,14 +26,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.opennur.tahsin.data.learning.DailyLearningPlan
 import org.opennur.tahsin.data.learning.LearningGoal
+import org.opennur.tahsin.data.learning.LearningTask
 import org.opennur.tahsin.data.learning.LearningTaskType
 import org.opennur.tahsin.theme.AyahColors
 import org.opennur.tahsin.theme.AyahTypography
@@ -44,6 +46,7 @@ import org.opennur.tahsin.ui.components.AyahText
 import org.opennur.tahsin.ui.components.CreditLink
 import org.opennur.tahsin.ui.components.GoalProgressBar
 import org.opennur.tahsin.util.Achievements
+import org.opennur.tahsin.util.ReadingHistoryEntry
 import org.opennur.tahsin.util.ReadingProgressSummary
 
 /**
@@ -77,6 +80,7 @@ data class HomeActions(
     val learning: HomeLearningActions,
     val utility: HomeUtilityActions,
     val onOpenTask: (LearningTaskType) -> Unit,
+    val onOpenAyah: (Int, Int) -> Unit,
 )
 
 @Composable
@@ -126,11 +130,18 @@ fun HomeScreen(
                 onOpenTask = actions.onOpenTask,
             )
             Spacer(modifier = Modifier.height(18.dp))
-            AyahText(
-                strings.todayExplore,
-                style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (!stats.isLoading) {
+            stats.history.firstOrNull()?.let { recent ->
+                HomeResumeCard(
+                    entry = recent,
+                    surahName = stats.surahNames[recent.surah] ?: recent.surah.toString(),
+                    strings = strings,
+                    onOpenAyah = actions.onOpenAyah,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
 
         if (!gamification.isLoading) {
@@ -143,12 +154,12 @@ fun HomeScreen(
                 progress = stats.readingProgress,
                 strings = strings,
                 onOpenMap = actions.utility.onOpenPetaKhatam,
+                onOpenReview = actions.learning.onOpenMemorization,
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        HomeLearningMenu(strings, actions.learning)
-        HomeUtilityMenu(strings, actions.utility)
+        HomeFeatureMenus(strings, actions)
 
         Spacer(modifier = Modifier.height(28.dp))
         CreditLink(
@@ -216,6 +227,7 @@ private fun HomeReadingProgressCard(
     progress: ReadingProgressSummary,
     strings: Strings,
     onOpenMap: () -> Unit,
+    onOpenReview: () -> Unit,
 ) {
     AyahCard(modifier = Modifier.fillMaxWidth()) {
         Column {
@@ -247,114 +259,181 @@ private fun HomeReadingProgressCard(
                 size = AyahButtonSize.Small,
                 onClick = onOpenMap,
             )
+            if (progress.dueAyahs > 0) {
+                Spacer(modifier = Modifier.height(8.dp))
+                AyahButton(
+                    text = strings.homeOpenReview,
+                    variant = AyahButtonVariant.Secondary,
+                    size = AyahButtonSize.Small,
+                    onClick = onOpenReview,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun HomeLearningMenu(strings: Strings, actions: HomeLearningActions) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        HomeMenuCard(
-            text = strings.menuTahsin,
-            onClick = actions.onOpenTahsin,
-            highlighted = true,
-            modifier = Modifier.weight(1f),
-        )
-        HomeMenuCard(
-            text = strings.menuVocab,
-            onClick = actions.onOpenVocab,
-            modifier = Modifier.weight(1f),
-        )
+private fun HomeResumeCard(
+    entry: ReadingHistoryEntry,
+    surahName: String,
+    strings: Strings,
+    onOpenAyah: (Int, Int) -> Unit,
+) {
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            AyahText(
+                strings.homeContinueReading,
+                style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            AyahText(
+                strings.homeReadingAyah.format(surahName, entry.ayah),
+                style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            AyahButton(
+                text = strings.homeOpenReading,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onOpenAyah(entry.surah, entry.ayah) },
+            )
+        }
     }
-    Spacer(modifier = Modifier.height(12.dp))
-    HomeMenuCard(
-        text = strings.menuMemorization,
-        onClick = actions.onOpenMemorization,
-        modifier = Modifier.fillMaxWidth(),
-    )
-    Spacer(modifier = Modifier.height(12.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        HomeMenuCard(
-            text = strings.quizTitle,
-            onClick = actions.onOpenQuiz,
-            modifier = Modifier.weight(1f),
-        )
-        HomeMenuCard(
-            text = strings.menuAyatQuiz,
-            onClick = actions.onOpenAyatQuiz,
-            modifier = Modifier.weight(1f),
-        )
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        HomeMenuCard(
-            text = strings.menuLughoh,
-            onClick = actions.onOpenLughoh,
-            modifier = Modifier.weight(1f),
-        )
-        HomeMenuCard(
-            text = strings.menuNahwu,
-            onClick = actions.onOpenNahwu,
-            modifier = Modifier.weight(1f),
-        )
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-    HomeMenuCard(
-        text = strings.menuShorof,
-        onClick = actions.onOpenShorof,
-        modifier = Modifier.fillMaxWidth(),
-    )
-    Spacer(modifier = Modifier.height(12.dp))
-    HomeMenuCard(
-        text = strings.menuDreamBig,
-        onClick = actions.onOpenDreamBig,
-        modifier = Modifier.fillMaxWidth(),
-    )
-    Spacer(modifier = Modifier.height(12.dp))
 }
 
 @Composable
-private fun HomeUtilityMenu(strings: Strings, actions: HomeUtilityActions) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+private fun HomeFeatureMenus(strings: Strings, actions: HomeActions) {
+    HomeLearningFeatureSection(strings, actions.learning)
+    HomePracticeFeatureSection(strings, actions.learning)
+    HomeArabicFeatureSection(strings, actions.learning)
+    HomeToolsFeatureSection(strings, actions.utility)
+}
+
+@Composable
+private fun HomeLearningFeatureSection(strings: Strings, actions: HomeLearningActions) {
+    HomeFeatureSection(strings.homeFeatureLearning) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.menuTahsin,
+                onClick = actions.onOpenTahsin,
+                highlighted = true,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.menuVocab,
+                onClick = actions.onOpenVocab,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
         HomeMenuCard(
-            text = strings.menuStats,
-            onClick = actions.onOpenStats,
-            modifier = Modifier.weight(1f),
-        )
-        HomeMenuCard(
-            text = strings.petaTitle,
-            onClick = actions.onOpenPetaKhatam,
-            modifier = Modifier.weight(1f),
-        )
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        HomeMenuCard(
-            text = strings.menuBadges,
-            onClick = actions.onOpenBadges,
-            modifier = Modifier.weight(1f),
-        )
-        HomeMenuCard(
-            text = strings.menuCoherence,
-            onClick = actions.onOpenCoherence,
-            modifier = Modifier.weight(1f),
-        )
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        HomeMenuCard(
-            text = strings.menuFavorites,
-            onClick = actions.onOpenFavorites,
-            modifier = Modifier.weight(1f),
+            text = strings.menuMemorization,
+            onClick = actions.onOpenMemorization,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
-    Spacer(modifier = Modifier.height(12.dp))
-    HomeMenuCard(
-        text = strings.menuSettings,
-        onClick = actions.onOpenSettings,
-        highlighted = true,
-        modifier = Modifier.fillMaxWidth(),
+}
+
+@Composable
+private fun HomePracticeFeatureSection(strings: Strings, actions: HomeLearningActions) {
+    HomeFeatureSection(strings.homeFeaturePractice) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.quizTitle,
+                onClick = actions.onOpenQuiz,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.menuAyatQuiz,
+                onClick = actions.onOpenAyatQuiz,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        HomeMenuCard(
+            text = strings.menuDreamBig,
+            onClick = actions.onOpenDreamBig,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun HomeArabicFeatureSection(strings: Strings, actions: HomeLearningActions) {
+    HomeFeatureSection(strings.homeFeatureArabic) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.menuLughoh,
+                onClick = actions.onOpenLughoh,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.menuNahwu,
+                onClick = actions.onOpenNahwu,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        HomeMenuCard(
+            text = strings.menuShorof,
+            onClick = actions.onOpenShorof,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun HomeToolsFeatureSection(strings: Strings, actions: HomeUtilityActions) {
+    HomeFeatureSection(strings.homeFeatureTools) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.menuStats,
+                onClick = actions.onOpenStats,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.petaTitle,
+                onClick = actions.onOpenPetaKhatam,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.menuBadges,
+                onClick = actions.onOpenBadges,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.menuFavorites,
+                onClick = actions.onOpenFavorites,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            HomeMenuCard(
+                text = strings.menuCoherence,
+                onClick = actions.onOpenCoherence,
+                modifier = Modifier.weight(1f),
+            )
+            HomeMenuCard(
+                text = strings.menuSettings,
+                onClick = actions.onOpenSettings,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeFeatureSection(title: String, content: @Composable () -> Unit) {
+    AyahText(
+        title,
+        style = AyahTypography.Heading2.copy(color = AyahColors.Primary),
     )
+    Spacer(modifier = Modifier.height(8.dp))
+    content()
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable
@@ -397,6 +476,7 @@ private fun TodayPlanCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
+            val nextTask = plan.nextTask
             if (plan.isComplete) {
                 AyahText(
                     strings.todayComplete,
@@ -405,42 +485,70 @@ private fun TodayPlanCard(
                         fontWeight = FontWeight.SemiBold,
                     ),
                 )
-            } else {
-                plan.tasks.forEach { task ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        AyahText(
-                            if (task.completed) "✓" else "${task.order + 1}",
-                            style = AyahTypography.Body2.copy(
-                                color = if (task.completed) AyahColors.Success else AyahColors.Primary,
-                                fontWeight = FontWeight.Bold,
-                            ),
-                            modifier = Modifier.width(28.dp),
-                        )
-                        AyahText(
-                            taskLabel(task.type, strings),
-                            style = AyahTypography.Body2.copy(
-                                color = if (task.completed) AyahColors.TextSecondary else AyahColors.TextPrimary,
-                            ),
-                            modifier = Modifier.weight(1f),
-                        )
-                        AyahButton(
-                            text = if (task.completed) strings.todayTaskDone else strings.todayTaskStart,
-                            variant = if (task.completed) {
-                                AyahButtonVariant.Ghost
-                            } else {
-                                AyahButtonVariant.Outline
-                            },
-                            size = AyahButtonSize.Small,
-                            enabled = !task.completed,
-                            onClick = { onOpenTask(task.type) },
-                        )
-                    }
-                }
+            } else if (nextTask != null) {
+                AyahText(
+                    strings.homeNextLabel,
+                    style = AyahTypography.Overline.copy(color = AyahColors.Primary),
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                AyahText(
+                    taskLabel(nextTask.type, strings),
+                    style = AyahTypography.Heading2,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                AyahButton(
+                    text = strings.todayTaskStart,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onOpenTask(nextTask.type) },
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                TodayPlanTaskList(plan.tasks, nextTask, strings)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TodayPlanTaskList(
+    tasks: List<LearningTask>,
+    nextTask: LearningTask,
+    strings: Strings,
+) {
+    tasks.forEach { task ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 3.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AyahText(
+                if (task.completed) "✓" else "${task.order + 1}",
+                style = AyahTypography.Body2.copy(
+                    color = if (task.completed) AyahColors.Success else AyahColors.Primary,
+                    fontWeight = FontWeight.Bold,
+                ),
+                modifier = Modifier.width(28.dp),
+            )
+            AyahText(
+                taskLabel(task.type, strings),
+                style = AyahTypography.Body2.copy(
+                    color = if (task.completed) AyahColors.TextSecondary else AyahColors.TextPrimary,
+                ),
+                modifier = Modifier.weight(1f),
+            )
+            if (task.completed) {
+                AyahText(
+                    strings.todayTaskDone,
+                    style = AyahTypography.Caption.copy(color = AyahColors.Success),
+                )
+            } else if (task == nextTask) {
+                AyahText(
+                    strings.todayTaskStart,
+                    style = AyahTypography.Caption.copy(
+                        color = AyahColors.Primary,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                )
             }
         }
     }
@@ -475,10 +583,10 @@ private fun HomeMenuCard(
     val container = if (highlighted) AyahColors.PrimarySoft else AyahColors.SurfaceVariant
     Column(
         modifier = modifier
-            .height(96.dp)
+            .heightIn(min = 96.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(container)
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -490,8 +598,6 @@ private fun HomeMenuCard(
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
             ),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }

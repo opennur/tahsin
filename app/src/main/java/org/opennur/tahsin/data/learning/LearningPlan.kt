@@ -55,44 +55,63 @@ data class DailyLearningPlan(
 
     val isComplete: Boolean
         get() = tasks.isNotEmpty() && completedCount == totalCount
+
+    /** Langkah pertama yang belum selesai, dipakai sebagai CTA utama di Home. */
+    val nextTask: LearningTask?
+        get() = tasks.firstOrNull { !it.completed }
 }
 
 /** Logika murni penyusunan rencana; tidak bergantung Android atau penyimpanan. */
 object LearningPlanEngine {
 
-    /** Urutan aktivitas pendek agar setiap sesi menggabungkan baca, latihan, dan pemahaman. */
-    fun taskTypesFor(goal: LearningGoal): List<LearningTaskType> = when (goal) {
-        LearningGoal.RECITATION -> listOf(
-            LearningTaskType.RECITE,
-            LearningTaskType.TAJWID,
-            LearningTaskType.VOCABULARY,
-        )
-        LearningGoal.UNDERSTANDING -> listOf(
-            LearningTaskType.UNDERSTAND,
-            LearningTaskType.VOCABULARY,
-            LearningTaskType.RECITE,
-        )
-        LearningGoal.MEMORIZATION -> listOf(
-            LearningTaskType.MEMORIZATION,
-            LearningTaskType.RECITE,
-            LearningTaskType.TAJWID,
-        )
-        LearningGoal.ARABIC -> listOf(
-            LearningTaskType.ARABIC,
-            LearningTaskType.NAHWU,
-            LearningTaskType.SHOROF,
-            LearningTaskType.VOCABULARY,
-        )
+    /**
+     * Urutan aktivitas agar setiap sesi menggabungkan baca, latihan, dan pemahaman.
+     *
+     * Default 60 menit mempertahankan rangkaian lengkap untuk pemanggil lama.
+     * Pilihan 5/15 menit mengambil langkah awal saja agar target pendek tidak
+     * tampil sebagai daftar tugas yang mustahil diselesaikan.
+     */
+    fun taskTypesFor(goal: LearningGoal, dailyMinutes: Int = 60): List<LearningTaskType> {
+        val fullPlan = when (goal) {
+            LearningGoal.RECITATION -> listOf(
+                LearningTaskType.RECITE,
+                LearningTaskType.TAJWID,
+                LearningTaskType.VOCABULARY,
+            )
+            LearningGoal.UNDERSTANDING -> listOf(
+                LearningTaskType.UNDERSTAND,
+                LearningTaskType.VOCABULARY,
+                LearningTaskType.RECITE,
+            )
+            LearningGoal.MEMORIZATION -> listOf(
+                LearningTaskType.MEMORIZATION,
+                LearningTaskType.RECITE,
+                LearningTaskType.TAJWID,
+            )
+            LearningGoal.ARABIC -> listOf(
+                LearningTaskType.ARABIC,
+                LearningTaskType.NAHWU,
+                LearningTaskType.SHOROF,
+                LearningTaskType.VOCABULARY,
+            )
+        }
+        val taskCount = when {
+            dailyMinutes <= 5 -> 1
+            dailyMinutes <= 15 -> 2
+            else -> fullPlan.size
+        }
+        return fullPlan.take(taskCount)
     }
 
     fun build(
         day: Long,
         goal: LearningGoal,
         completedKeys: Set<String> = emptySet(),
+        dailyMinutes: Int = 60,
     ): DailyLearningPlan = DailyLearningPlan(
         day = day,
         goal = goal,
-        tasks = taskTypesFor(goal).mapIndexed { index, type ->
+        tasks = taskTypesFor(goal, dailyMinutes).mapIndexed { index, type ->
             LearningTask(
                 type = type,
                 order = index,

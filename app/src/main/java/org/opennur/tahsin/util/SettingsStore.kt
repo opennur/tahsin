@@ -20,6 +20,10 @@ interface SettingsSource {
     /** Primary learning goal; simple fakes can keep the default for unrelated tests. */
     val learningGoalKey: String
         get() = LearningGoal.RECITATION.key
+
+    /** Daily learning target in minutes; simple fakes can keep the 15-minute default. */
+    val dailyMinutes: Int
+        get() = 15
 }
 
 /**
@@ -133,7 +137,7 @@ class SettingsStore(context: Context) : SettingsSource {
         get() = LearningGoal.fromKey(learningGoalKey)
 
     /** Daily target in minutes, constrained to the supported onboarding choices. */
-    var dailyMinutes: Int
+    override var dailyMinutes: Int
         get() = (prefs[Keys.DAILY_MINUTES] ?: 15).coerceIn(5, 60)
         set(value) = store.edit { this[Keys.DAILY_MINUTES] = value.coerceIn(5, 60) }
 

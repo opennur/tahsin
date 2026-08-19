@@ -31,6 +31,10 @@ class ShorofConjugationExerciseTest {
     @Test
     fun `conjugationAnswer mengembalikan jawaban benar`() {
         assertEquals("كَتَبَ", ShorofEngine.conjugationAnswer(exercise))
+        assertEquals("Lengkapi bentuk Madhi untuk هُوَ", exercise.promptId)
+        assertEquals("Complete the past tense form for huwa", exercise.promptEn)
+        assertEquals("huwa", exercise.promptLatin)
+        assertEquals(exercise.optionsId, exercise.optionsEn)
     }
 
     @Test

@@ -28,6 +28,7 @@ data class LearningPlanUiState(
     val plan: DailyLearningPlan = LearningPlanEngine.build(
         day = 0,
         goal = LearningGoal.RECITATION,
+        dailyMinutes = 15,
     ),
 )
 
@@ -88,7 +89,12 @@ class LearningPlanViewModel @Inject constructor(
                 ?: AppLanguage.ID,
             goal = goal,
             dailyMinutes = settings.dailyMinutes,
-            plan = LearningPlanEngine.build(day, goal, completed),
+            plan = LearningPlanEngine.build(
+                day = day,
+                goal = goal,
+                completedKeys = completed,
+                dailyMinutes = settings.dailyMinutes,
+            ),
         )
     }
 }

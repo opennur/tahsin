@@ -38,6 +38,7 @@ import org.opennur.tahsin.util.AppLanguage
 fun CoherenceScreen(
     onBack: () -> Unit,
     language: AppLanguage,
+    onGuidedComplete: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val strings = AppStrings.of(language)
@@ -98,6 +99,11 @@ fun CoherenceScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
+            onGuidedComplete?.let { complete -> GuidedCompletionCard(strings, complete) }
+            if (onGuidedComplete != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             // ---- 7 kelompok + surah per kelompok ----
             CoherenceContent.groups.forEach { group ->
                 AyahText(
@@ -124,6 +130,22 @@ fun CoherenceScreen(
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+}
+
+@Composable
+private fun GuidedCompletionCard(strings: Strings, onComplete: () -> Unit) {
+    AyahCard(modifier = Modifier.fillMaxWidth()) {
+        AyahText(
+            strings.coherenceSubtitle,
+            style = AyahTypography.Body2.copy(color = AyahColors.TextSecondary),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        AyahButton(
+            text = strings.guidedReturnHome,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onComplete,
+        )
     }
 }
 

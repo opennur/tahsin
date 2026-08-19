@@ -20,6 +20,7 @@ class BackupManager internal constructor(
     private val filesDir: File,
     private val settingsSource: SettingsBackupSource,
     private val gson: Gson = Gson(),
+    private val rename: (File, File) -> Boolean = { source, target -> source.renameTo(target) },
 ) {
 
     companion object {
@@ -111,15 +112,18 @@ class BackupManager internal constructor(
                     errors.add("File tidak dikenal: $filename (diabaikan)")
                     continue
                 }
-                val content = element.asString
-                val file = File(filesDir, filename)
                 try {
+                    val content = element.asString
+                    val file = File(filesDir, filename)
                     val tmp = File(filesDir, "$filename.tmp")
                     tmp.writeText(content, Charsets.UTF_8)
-                    if (!tmp.renameTo(file)) {
+                    if (!rename(tmp, file)) {
                         // renameTo bisa gagal di beberapa filesystem; fallback ke copy
-                        file.writeText(content, Charsets.UTF_8)
-                        tmp.delete()
+                        try {
+                            file.writeText(content, Charsets.UTF_8)
+                        } finally {
+                            tmp.delete()
+                        }
                     }
                     imported++
                 } catch (e: Exception) {

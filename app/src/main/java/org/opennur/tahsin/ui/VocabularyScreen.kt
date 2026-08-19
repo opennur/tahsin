@@ -53,9 +53,11 @@ import org.opennur.tahsin.util.FontStore
  * - Kuis: pilihan ganda "arti kata ini?" / "kata mana yang artinya X".
  */
 @Composable
+@Suppress("LongMethod")
 fun VocabularyScreen(
     onBack: () -> Unit,
     onOpenAyah: (surah: Int, ayah: Int) -> Unit,
+    onGuidedComplete: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -64,6 +66,16 @@ fun VocabularyScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val strings = AppStrings.of(state.language)
     val arabicFamily = remember { FontStore(context).loadFamily(ArabicFont.UTSMANI) }
+
+    LaunchedEffect(state.mode, state.loading, state.sessionIndex, state.session.size) {
+        onGuidedComplete?.let { complete ->
+            if (state.mode == VocabMode.CARDS && !state.loading && state.session.isNotEmpty()) {
+                if (state.answeredCount >= state.session.size && state.current == null) {
+                    complete()
+                }
+            }
+        }
+    }
 
     // Hentikan audio kata begitu layar kosa kata ditutup (audio milik instance
     // pemutar sendiri, bukan pemutar layar utama).

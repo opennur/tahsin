@@ -175,6 +175,8 @@ class MorphologyEngineTest {
     fun findRelatedWords_returnsEmptyForUnknownRoot() {
         val related = MorphologyEngine.findRelatedWords("xyz")
         assertThat(related).isEmpty()
+        assertThat(MorphologyEngine.findRelatedWords("من", excludeKey = "من")).isEmpty()
+        assertThat(MorphologyEngine.findRelatedWords("من", excludeKey = "lain")).hasSize(1)
     }
 
     @Test
@@ -196,5 +198,32 @@ class MorphologyEngineTest {
         assertThat(word.meaningId).isNotEmpty()
         assertThat(word.meaningEn).isNotEmpty()
         assertThat(word.frequency).isGreaterThan(0)
+        assertThat(word.exampleSurah).isEqualTo(2)
+        assertThat(word.exampleAyah).isEqualTo(4)
+    }
+
+    @Test
+    fun lookupRoot_handlesMissingRootAndFallbackMeanings() {
+        val noRoot = testEntries.first().copy(
+            key = "بدون",
+            word = "بِدُونِ",
+            root = "",
+        )
+        val fallback = testEntries.first().copy(
+            key = "كتب",
+            word = "كَتَبَ",
+            meaningId = "menulis",
+            meaningEn = "write",
+            root = "كتب",
+            rootMeaningId = "",
+            rootMeaningEn = "",
+        )
+        MorphologyEngine.init(testEntries + noRoot + fallback)
+
+        assertThat(MorphologyEngine.lookupRoot("بِدُونِ")).isNull()
+        val result = MorphologyEngine.lookupRoot("كَتَبَ")
+        assertThat(result).isNotNull()
+        assertThat(result!!.meaningId).isEqualTo("menulis")
+        assertThat(result.meaningEn).isEqualTo("write")
     }
 }
