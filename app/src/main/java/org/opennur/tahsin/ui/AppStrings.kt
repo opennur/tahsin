@@ -16,6 +16,16 @@ data class LearningStrings(
     val todayTaskStart: String,
     val todayTaskDone: String,
     val todayExplore: String,
+    val guidedReturnHome: String,
+    val homeNextLabel: String,
+    val homeContinueReading: String,
+    val homeReadingAyah: String,
+    val homeOpenReading: String,
+    val homeOpenReview: String,
+    val homeFeatureLearning: String,
+    val homeFeaturePractice: String,
+    val homeFeatureArabic: String,
+    val homeFeatureTools: String,
     val goalRecitation: String,
     val goalUnderstanding: String,
     val goalMemorization: String,
@@ -429,6 +439,16 @@ class Strings(
     val todayTaskStart get() = learning.todayTaskStart
     val todayTaskDone get() = learning.todayTaskDone
     val todayExplore get() = learning.todayExplore
+    val guidedReturnHome get() = learning.guidedReturnHome
+    val homeNextLabel get() = learning.homeNextLabel
+    val homeContinueReading get() = learning.homeContinueReading
+    val homeReadingAyah get() = learning.homeReadingAyah
+    val homeOpenReading get() = learning.homeOpenReading
+    val homeOpenReview get() = learning.homeOpenReview
+    val homeFeatureLearning get() = learning.homeFeatureLearning
+    val homeFeaturePractice get() = learning.homeFeaturePractice
+    val homeFeatureArabic get() = learning.homeFeatureArabic
+    val homeFeatureTools get() = learning.homeFeatureTools
     val goalRecitation get() = learning.goalRecitation
     val goalUnderstanding get() = learning.goalUnderstanding
     val goalMemorization get() = learning.goalMemorization
@@ -541,7 +561,7 @@ object AppStrings {
     val Indonesian = Strings(
         appTitle = "Tahsin Qur'an",
         subtitle = "Setiap kata dicek langsung.",
-        homeSubtitle = "Pilih menu untuk mulai belajar.",
+        homeSubtitle = "Ikuti satu langkah hari ini, lalu lanjutkan sesuai ritmemu.",
         menuTahsin = "🕌 Tahsin",
         menuSettings = "⚙️ Pengaturan",
         legendCorrect = "benar",
@@ -812,11 +832,21 @@ object AppStrings {
             menuMemorization = "🧠 Hafalan & Muraja'ah",
             todayTitle = "Rencana hari ini",
             todaySubtitle = "%d menit yang terarah, sedikit demi sedikit.",
-            todayProgress = "%d/%d aktivitas selesai",
+            todayProgress = "%d/%d langkah selesai",
             todayComplete = "Rencana hari ini selesai ✓",
             todayTaskStart = "Mulai",
             todayTaskDone = "Selesai",
-            todayExplore = "Jelajahi semua fitur",
+            todayExplore = "Semua fitur",
+            guidedReturnHome = "Kembali ke Beranda",
+            homeNextLabel = "Langkah berikutnya",
+            homeContinueReading = "Lanjutkan membaca",
+            homeReadingAyah = "%s · ayat %d",
+            homeOpenReading = "Buka mushaf",
+            homeOpenReview = "Mulai murajaah",
+            homeFeatureLearning = "Mulai belajar",
+            homeFeaturePractice = "Latihan tambahan",
+            homeFeatureArabic = "Bahasa Arab",
+            homeFeatureTools = "Progres & alat",
             goalRecitation = "🕌 Memperbaiki bacaan",
             goalUnderstanding = "📖 Memahami makna",
             goalMemorization = "🧠 Menghafal dan muraja'ah",
@@ -924,7 +954,7 @@ object AppStrings {
     val English = Strings(
         appTitle = "Tahsin Qur'an",
         subtitle = "Every word is checked live.",
-        homeSubtitle = "Choose a menu to start learning.",
+        homeSubtitle = "Take one step today, then continue at your own pace.",
         menuTahsin = "🕌 Tahsin",
         menuSettings = "⚙️ Settings",
         legendCorrect = "correct",
@@ -1196,11 +1226,21 @@ object AppStrings {
             menuMemorization = "🧠 Memorization & Murajaah",
             todayTitle = "Today's plan",
             todaySubtitle = "%d focused minutes, one step at a time.",
-            todayProgress = "%d/%d activities complete",
+            todayProgress = "%d/%d steps complete",
             todayComplete = "Today's plan complete ✓",
             todayTaskStart = "Start",
             todayTaskDone = "Done",
-            todayExplore = "Explore all features",
+            todayExplore = "All features",
+            guidedReturnHome = "Back to Home",
+            homeNextLabel = "Next step",
+            homeContinueReading = "Continue reading",
+            homeReadingAyah = "%s · ayah %d",
+            homeOpenReading = "Open mushaf",
+            homeOpenReview = "Start murajaah",
+            homeFeatureLearning = "Start learning",
+            homeFeaturePractice = "Extra practice",
+            homeFeatureArabic = "Arabic",
+            homeFeatureTools = "Progress & tools",
             goalRecitation = "🕌 Improve recitation",
             goalUnderstanding = "📖 Understand meaning",
             goalMemorization = "🧠 Memorize and review",

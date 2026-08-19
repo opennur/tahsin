@@ -60,6 +60,16 @@ class DownloadProgressTest {
     }
 
     @Test
+    fun `fail menghentikan unduhan dan menyimpan pesan`() {
+        DownloadProgress.update { it.copy(isDownloading = true, surahDone = 2) }
+        DownloadProgress.fail("jaringan gagal")
+
+        val state = DownloadProgress.state.value
+        assertFalse(state.isDownloading)
+        assertEquals("jaringan gagal", state.errorMessage)
+    }
+
+    @Test
     fun `stateFlow mengumumkan perubahan nilai`() = runBlocking {
         val seen = mutableListOf<DownloadProgressState>()
         val job = launch { DownloadProgress.state.collect { seen += it } }

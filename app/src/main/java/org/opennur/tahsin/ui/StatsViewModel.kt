@@ -98,7 +98,9 @@ class StatsViewModel @Inject constructor(
             val language = AppLanguage.entries.firstOrNull { it.code == settings.languageCode }
                 ?: AppLanguage.ID
             val goal = LearningGoal.fromKey(settings.learningGoalKey)
-            val planKeys = LearningPlanEngine.taskTypesFor(goal).map { it.key }.toSet()
+            val planKeys = LearningPlanEngine.taskTypesFor(goal, settings.dailyMinutes)
+                .map { it.key }
+                .toSet()
             val planSnapshot = stores.learningPlan.read()
             val planCompleted = if (planSnapshot.day == today && planSnapshot.goalKey == goal.key) {
                 planSnapshot.completedKeys.count { it in planKeys }

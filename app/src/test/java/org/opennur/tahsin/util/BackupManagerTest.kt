@@ -179,6 +179,76 @@ class BackupManagerTest {
         assertThat(fakeSettings.restoredJson).isNull()
     }
 
+    @Test
+    fun import_withoutStores_doesNotFail() {
+        val json = """
+            {"schemaVersion":1,"app":"org.opennur.tahsin","exportedAt":"2026-01-01T00:00:00Z"}
+        """.trimIndent()
+        val result = manager.import(json)
+        assertThat(result.success).isTrue()
+        assertThat(result.importedStores).isEqualTo(0)
+    }
+
+    @Test
+    fun import_missingMetadata_returnsError() {
+        val missingVersion = manager.import("{\"app\":\"org.opennur.tahsin\",\"stores\":{}}")
+        assertThat(missingVersion.success).isFalse()
+
+        val missingApp = manager.import("{\"schemaVersion\":1,\"stores\":{}}")
+        assertThat(missingApp.success).isFalse()
+    }
+
+    @Test
+    fun import_invalidStoreContent_addsError() {
+        val json = """
+            {"schemaVersion":1,"app":"org.opennur.tahsin","stores":{"bookmarks.json":{"not":"text"}}}
+        """.trimIndent()
+        val result = manager.import(json)
+        assertThat(result.success).isFalse()
+        assertThat(result.errors.single()).contains("Gagal menulis bookmarks.json")
+    }
+
+    @Test
+    fun import_directoryTarget_exercisesWriteFallback() {
+        java.io.File(dir, "bookmarks.json").mkdirs()
+        val result = manager.import(buildBackupJson(mapOf("bookmarks.json" to "[]")))
+        assertThat(result.success).isFalse()
+        assertThat(result.errors.single()).contains("Gagal menulis bookmarks.json")
+    }
+
+    @Test
+    fun import_fallbackCopy_succeedsWhenRenameFails() {
+        val fallbackManager = BackupManager(
+            filesDir = dir,
+            settingsSource = fakeSettings,
+            rename = { _, _ -> false },
+        )
+        val result = fallbackManager.import(buildBackupJson(mapOf("bookmarks.json" to "[]")))
+        assertThat(result.success).isTrue()
+        assertThat(result.importedStores).isEqualTo(1)
+        assertThat(java.io.File(dir, "bookmarks.json").readText()).isEqualTo("[]")
+    }
+
+    @Test
+    fun import_nullSettings_isIgnored() {
+        val result = manager.import(buildBackupJson(emptyMap(), settings = "null"))
+        assertThat(result.success).isTrue()
+        assertThat(fakeSettings.restoredJson).isNull()
+
+        val rawNull = manager.import(
+            """{"schemaVersion":1,"app":"org.opennur.tahsin","stores":{},"settings":null}""",
+        )
+        assertThat(rawNull.success).isTrue()
+    }
+
+    @Test
+    fun import_settingsFailure_addsError() {
+        fakeSettings.throwOnRestore = true
+        val result = manager.import(buildBackupJson(emptyMap(), settings = "{\"dark_mode\":true}"))
+        assertThat(result.success).isFalse()
+        assertThat(result.errors.single()).contains("Gagal memulihkan setelan")
+    }
+
     // ---- STORE_FILENAMES ----
 
     @Test
@@ -222,7 +292,11 @@ class BackupManagerTest {
 private class FakeSettingsBackupSource : SettingsBackupSource {
     var snapshot: String? = null
     var restoredJson: String? = null
+    var throwOnRestore: Boolean = false
 
     override fun snapshotJson(): String? = snapshot
-    override fun restoreJson(json: String) { restoredJson = json }
+    override fun restoreJson(json: String) {
+        if (throwOnRestore) error("restore failed")
+        restoredJson = json
+    }
 }

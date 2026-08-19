@@ -56,6 +56,7 @@ import org.opennur.tahsin.util.FontStore
 @Composable
 fun NahwuScreen(
     onBack: () -> Unit,
+    onGuidedComplete: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -94,6 +95,7 @@ fun NahwuScreen(
                 onCheckWords = viewModel::checkWords,
                 onNext = viewModel::next,
                 onRestart = viewModel::restart,
+                onGuidedComplete = onGuidedComplete,
             )
         }
     }
@@ -250,6 +252,7 @@ private fun NahwuExercises(
     onCheckWords: () -> Unit,
     onNext: () -> Unit,
     onRestart: () -> Unit,
+    onGuidedComplete: (() -> Unit)?,
 ) {
     Column(
         modifier = Modifier
@@ -261,7 +264,13 @@ private fun NahwuExercises(
         Spacer(modifier = Modifier.height(16.dp))
         Header(title = strings.nahwuExercisesTitle, onBack = onBack)
         if (state.exercisesDone) {
-            NahwuResult(state, strings, onRestart, onBack)
+            NahwuResult(
+                state = state,
+                strings = strings,
+                onRestart = onRestart,
+                onBack = onGuidedComplete ?: onBack,
+                backLabel = if (onGuidedComplete == null) strings.nahwuBackHome else strings.guidedReturnHome,
+            )
             return
         }
         val exercise = state.exercise ?: run {
@@ -402,6 +411,7 @@ private fun NahwuResult(
     strings: Strings,
     onRestart: () -> Unit,
     onBack: () -> Unit,
+    backLabel: String,
 ) {
     Spacer(modifier = Modifier.height(24.dp))
     AyahCard {
@@ -413,7 +423,7 @@ private fun NahwuResult(
         Spacer(modifier = Modifier.height(14.dp))
         AyahButton(text = strings.nahwuRestart, onClick = onRestart, variant = AyahButtonVariant.Outline, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
-        AyahButton(text = strings.nahwuBackHome, onClick = onBack, modifier = Modifier.fillMaxWidth())
+        AyahButton(text = backLabel, onClick = onBack, modifier = Modifier.fillMaxWidth())
     }
 }
 

@@ -93,10 +93,11 @@ object MorphologyEngine {
         root: String,
         excludeKey: String = "",
     ): List<RelatedWord> {
-        return rootIndex[root]
-            ?.filter { it.key != excludeKey }
-            ?.sortedByDescending { it.freq }
-            ?.map { entry ->
+        val entries = rootIndex[root] ?: return emptyList()
+        return entries
+            .filter { it.key != excludeKey }
+            .sortedByDescending { it.freq }
+            .map { entry ->
                 RelatedWord(
                     word = entry.word,
                     key = entry.key,
@@ -107,7 +108,6 @@ object MorphologyEngine {
                     exampleAyah = entry.example.ayah,
                 )
             }
-            ?: emptyList()
     }
 
     /**

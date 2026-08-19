@@ -55,6 +55,7 @@ class LearningPlanTest {
         )
 
         assertThat(plan.day).isEqualTo(42)
+        assertThat(plan.goal).isEqualTo(LearningGoal.RECITATION)
         assertThat(plan.completedCount).isEqualTo(1)
         assertThat(plan.totalCount).isEqualTo(3)
         assertThat(plan.isComplete).isFalse()
@@ -68,6 +69,9 @@ class LearningPlanTest {
         assertThat(
             DailyLearningPlan(day = 1, goal = LearningGoal.RECITATION, tasks = emptyList()).isComplete,
         ).isFalse()
+        assertThat(
+            DailyLearningPlan(day = 1, goal = LearningGoal.RECITATION, tasks = emptyList()).nextTask,
+        ).isNull()
 
         val plan = LearningPlanEngine.build(
             day = 1,
@@ -76,5 +80,29 @@ class LearningPlanTest {
         )
         assertThat(plan.isComplete).isTrue()
         assertThat(plan.completedCount).isEqualTo(plan.totalCount)
+        assertThat(plan.nextTask).isNull()
+    }
+
+    @Test
+    fun `daily minutes limit the plan and next task follows completion`() {
+        assertThat(LearningPlanEngine.taskTypesFor(LearningGoal.RECITATION, dailyMinutes = 5))
+            .containsExactly(LearningTaskType.RECITE)
+        assertThat(LearningPlanEngine.taskTypesFor(LearningGoal.RECITATION, dailyMinutes = 15))
+            .containsExactly(LearningTaskType.RECITE, LearningTaskType.TAJWID)
+            .inOrder()
+        assertThat(LearningPlanEngine.taskTypesFor(LearningGoal.ARABIC, dailyMinutes = 30))
+            .hasSize(4)
+        assertThat(
+            LearningPlanEngine.build(day = 1, goal = LearningGoal.RECITATION, dailyMinutes = 5)
+                .tasks.first().completed,
+        ).isFalse()
+
+        val plan = LearningPlanEngine.build(
+            day = 1,
+            goal = LearningGoal.RECITATION,
+            completedKeys = setOf(LearningTaskType.RECITE.key),
+            dailyMinutes = 15,
+        )
+        assertThat(plan.nextTask?.type).isEqualTo(LearningTaskType.TAJWID)
     }
 }

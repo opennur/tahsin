@@ -52,6 +52,7 @@ import org.opennur.tahsin.ui.components.SimpleDropdown
 fun MemorizationScreen(
     onBack: () -> Unit,
     onOpenAyah: (Int, Int) -> Unit,
+    onGuidedComplete: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: MemorizationViewModel = viewModel()
@@ -112,6 +113,7 @@ fun MemorizationScreen(
                     if (state.hasMicPermission) viewModel.toggleMic()
                     else micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                 },
+                onGuidedComplete = onGuidedComplete,
             )
         }
         Spacer(modifier = Modifier.height(24.dp))
@@ -193,6 +195,7 @@ private fun MemorizationReadyContent(
     viewModel: MemorizationViewModel,
     onOpenAyah: (Int, Int) -> Unit,
     onMicClick: () -> Unit,
+    onGuidedComplete: (() -> Unit)?,
 ) {
     val card = state.card ?: return
     val ayah = state.ayah ?: return
@@ -215,7 +218,17 @@ private fun MemorizationReadyContent(
     // ---- Remember / Review buttons ----
     if (state.revealed && state.sttScore == null) {
         Spacer(modifier = Modifier.height(12.dp))
-        MemorizationAnswerButtons(strings, viewModel::needReview, viewModel::remember)
+        MemorizationAnswerButtons(
+            strings = strings,
+            onReview = {
+                viewModel.needReview()
+                onGuidedComplete?.invoke()
+            },
+            onRemember = {
+                viewModel.remember()
+                onGuidedComplete?.invoke()
+            },
+        )
     }
     Spacer(modifier = Modifier.height(10.dp))
     AyahButton(

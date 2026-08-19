@@ -131,6 +131,7 @@ private data class TahsinContentActions(
     val onOpenSettings: () -> Unit,
     val onBack: () -> Unit,
     val onDismissResult: () -> Unit,
+    val onCompleteGuided: (() -> Unit)?,
 )
 
 /** Callbacks untuk [MushafPageView]. */
@@ -170,6 +171,7 @@ private data class FlowAnnotatedParams(
  * ayat → jadikan ayat aktif, latihan STT inline (warna kata + umpan balik).
  */
 @Composable
+@Suppress("LongParameterList")
 fun TahsinScreen(
     /** ViewModel bersama (dibuat di MainActivity, scope activity). */
     viewModel: TahsinViewModel,
@@ -179,6 +181,8 @@ fun TahsinScreen(
     onOpenSettings: () -> Unit = {},
     /** Kembali ke layar sebelumnya (tombol ← di header). */
     onBack: () -> Unit = {},
+    /** Selesaikan task harian setelah hasil latihan ditinjau. */
+    onGuidedComplete: (() -> Unit)? = null,
     /** Target buka dari widget/notifikasi "Ayah of the Day" (surah, ayat 1-based). */
     target: OpenTarget? = null,
     /** Dipanggil setelah [target] dikirim ke ViewModel — target hanya dipakai sekali. */
@@ -250,6 +254,7 @@ fun TahsinScreen(
                 onOpenSettings = onOpenSettings,
                 onBack = onBack,
                 onDismissResult = viewModel::dismissResult,
+                onCompleteGuided = onGuidedComplete,
             ),
             modifier = modifier,
         )
@@ -380,6 +385,7 @@ private fun TahsinContent(
                 result = result,
                 strings = strings,
                 onDismiss = actions.onDismissResult,
+                onGuidedComplete = actions.onCompleteGuided,
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -460,6 +466,7 @@ private fun TahsinResultCard(
     result: TahsinResult,
     strings: Strings,
     onDismiss: () -> Unit,
+    onGuidedComplete: (() -> Unit)?,
 ) {
     val days = (result.reviewDueDay - LocalDate.now().toEpochDay()).coerceAtLeast(0L)
     AyahCard(modifier = Modifier.fillMaxWidth(), onClick = onDismiss) {
@@ -486,6 +493,14 @@ private fun TahsinResultCard(
             strings.tahsinResultNextReview.format(days),
             style = AyahTypography.Caption.copy(color = AyahColors.Primary),
         )
+        onGuidedComplete?.let { complete ->
+            Spacer(modifier = Modifier.height(10.dp))
+            AyahButton(
+                text = strings.guidedReturnHome,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = complete,
+            )
+        }
     }
 }
 

@@ -101,4 +101,43 @@ class AyatQuizTest {
         assertNotNull(q)
         assertTrue(q!!.options.none { it.isBlank() })
     }
+
+    @Test
+    fun `makeQuestion - target index eksplisit dipakai bila valid`() {
+        val q = AyatQuiz.makeQuestion(
+            surahNumber = 3,
+            ayahNumber = 5,
+            words = listOf("أ", "ب", "ج", "د"),
+            pool = listOf("ه", "و", "ز"),
+            targetIndex = 2,
+            random = Random(1),
+        )
+        assertNotNull(q)
+        assertEquals("ج", q!!.correctWord)
+        assertEquals(listOf("أ", "ب", AyatQuiz.BLANK, "د"), q.blankedText.split(" "))
+    }
+
+    @Test
+    fun `makeQuestion - target index di luar tengah kembali ke pilihan acak`() {
+        val q = AyatQuiz.makeQuestion(
+            surahNumber = 3,
+            ayahNumber = 5,
+            words = listOf("أ", "ب", "ج", "د"),
+            pool = listOf("ه", "و", "ز"),
+            targetIndex = 0,
+            random = Random(1),
+        )
+        assertNotNull(q)
+        assertTrue(q!!.blankedText.split(" ").drop(1).dropLast(1).contains(AyatQuiz.BLANK))
+
+        val lastIndex = AyatQuiz.makeQuestion(
+            surahNumber = 3,
+            ayahNumber = 5,
+            words = listOf("أ", "ب", "ج", "د"),
+            pool = listOf("ه", "و", "ز"),
+            targetIndex = 3,
+            random = Random(1),
+        )
+        assertNotNull(lastIndex)
+    }
 }

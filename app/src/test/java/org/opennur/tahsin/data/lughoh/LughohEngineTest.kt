@@ -168,4 +168,38 @@ class LughohEngineTest {
     fun `acak opsi - latihan menyusun kata tidak diubah`() {
         assertEquals(rearrange, LughohEngine.shuffleOptions(rearrange, Random(5)))
     }
+
+    @Test
+    fun `sesi dengan id dan daftar id mencakup filter`() {
+        val lessons = listOf(lessonOf("L1", fillBlank, translate, rearrange))
+        assertEquals(listOf("L1:0", "L1:1", "L1:2"), LughohEngine.allQuestionIds(lessons))
+
+        val selected = LughohEngine.buildRandomSessionWithIds(
+            lessons = lessons,
+            count = 2,
+            allowedIds = setOf("L1:1"),
+            random = Random(1),
+        )
+        assertEquals(1, selected.size)
+        assertEquals("L1:1", selected.single().first)
+        assertTrue(
+            LughohEngine.buildRandomSessionWithIds(
+                lessons = lessons,
+                count = 2,
+                allowedIds = setOf("missing"),
+                random = Random(1),
+            ).isEmpty(),
+        )
+    }
+
+    @Test
+    fun `sesi dengan id memakai argumen random default`() {
+        assertEquals(
+            2,
+            LughohEngine.buildRandomSessionWithIds(
+                listOf(lessonOf("L1", fillBlank, translate)),
+                count = 2,
+            ).size,
+        )
+    }
 }

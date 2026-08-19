@@ -158,6 +158,6 @@ class StatsViewModelTest {
         val state = awaitState(v.state)
 
         assertEquals(1, state.dailyPlanCompleted)
-        assertEquals(3, state.dailyPlanTotal)
+        assertEquals(2, state.dailyPlanTotal)
     }
 }

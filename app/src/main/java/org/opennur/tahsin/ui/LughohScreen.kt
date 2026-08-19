@@ -67,6 +67,7 @@ import org.opennur.tahsin.util.FontStore
 @Composable
 fun LughohScreen(
     onBack: () -> Unit,
+    onGuidedComplete: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -108,6 +109,7 @@ fun LughohScreen(
                 onNext = viewModel::next,
                 onRestart = viewModel::restartExercises,
                 onBackToHome = viewModel::backToHome,
+                onGuidedComplete = onGuidedComplete,
                 arabicFamily = arabicFamily,
             )
         }
@@ -489,6 +491,7 @@ private fun GrammarCard(rule: GrammarRule, language: AppLanguage, arabicFamily: 
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
+@Suppress("LongParameterList", "LongMethod", "CyclomaticComplexMethod")
 private fun LughohExercisesView(
     state: LughohUiState,
     strings: Strings,
@@ -499,6 +502,7 @@ private fun LughohExercisesView(
     onNext: () -> Unit,
     onRestart: () -> Unit,
     onBackToHome: () -> Unit,
+    onGuidedComplete: (() -> Unit)?,
     arabicFamily: FontFamily,
 ) {
     Column(
@@ -522,7 +526,13 @@ private fun LughohExercisesView(
         }
 
         if (state.exercisesDone) {
-            ExerciseResult(state = state, strings = strings, onRestart = onRestart, onBackToHome = onBackToHome)
+            ExerciseResult(
+                state = state,
+                strings = strings,
+                onRestart = onRestart,
+                onBackToHome = onGuidedComplete ?: onBackToHome,
+                backLabel = if (onGuidedComplete == null) strings.lughohBackToHome else strings.guidedReturnHome,
+            )
             return
         }
 
@@ -843,6 +853,7 @@ private fun ExerciseResult(
     strings: Strings,
     onRestart: () -> Unit,
     onBackToHome: () -> Unit,
+    backLabel: String,
 ) {
     Spacer(modifier = Modifier.height(24.dp))
     AyahCard {
@@ -869,7 +880,7 @@ private fun ExerciseResult(
         )
         Spacer(modifier = Modifier.height(8.dp))
         AyahButton(
-            text = strings.lughohBackToHome,
+            text = backLabel,
             onClick = onBackToHome,
             modifier = Modifier.fillMaxWidth(),
         )

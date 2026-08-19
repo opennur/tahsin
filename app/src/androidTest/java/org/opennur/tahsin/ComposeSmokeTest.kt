@@ -8,6 +8,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.opennur.tahsin.ui.LearningPlanUiState
 
 /**
  * Smoke tests: memastikan Composable utama bisa dikomposisi tanpa crash.
@@ -37,19 +38,26 @@ class ComposeSmokeTest {
                     learning = org.opennur.tahsin.ui.HomeLearningActions(
                         onOpenTahsin = noOp,
                         onOpenVocab = noOp,
+                        onOpenMemorization = noOp,
+                        onOpenQuiz = noOp,
                         onOpenDreamBig = noOp,
                         onOpenLughoh = noOp,
-                        onOpenAyahQuiz = noOp,
-                        onOpenSurahQuiz = noOp,
-                        onOpenCoherence = noOp,
+                        onOpenNahwu = noOp,
+                        onOpenShorof = noOp,
+                        onOpenAyatQuiz = noOp,
                     ),
                     utility = org.opennur.tahsin.ui.HomeUtilityActions(
                         onOpenStats = noOp,
+                        onOpenPetaKhatam = noOp,
                         onOpenBadges = noOp,
+                        onOpenCoherence = noOp,
+                        onOpenFavorites = noOp,
                         onOpenSettings = noOp,
                     ),
+                    onOpenTask = {},
+                    onOpenAyah = { _, _ -> },
                 ),
-                learningPlan = org.opennur.tahsin.util.LearningPlanUiState(),
+                learningPlan = LearningPlanUiState(),
                 settings = org.opennur.tahsin.ui.SettingsUiState(),
             )
         }

@@ -16,6 +16,83 @@ class MemorizationEngineTest {
     }
 
     @Test
+    fun `starting cards for juz handles missing starts and boundaries`() {
+        assertThat(
+            MemorizationEngine.startingCardsForJuz(
+                juz = 99,
+                juzStarts = listOf(MemorizationEngine.JuzStartRef(1, 2, 1)),
+                surahAyahCounts = mapOf(2 to 3),
+            ),
+        ).isEmpty()
+        assertThat(
+            MemorizationEngine.startingCardsForJuz(
+                juz = 1,
+                juzStarts = listOf(
+                    MemorizationEngine.JuzStartRef(1, 5, 1),
+                    MemorizationEngine.JuzStartRef(2, 4, 1),
+                ),
+                surahAyahCounts = mapOf(4 to 2, 5 to 2),
+            ),
+        ).isEmpty()
+
+        val sameSurahEnd = MemorizationEngine.startingCardsForJuz(
+            juz = 1,
+            juzStarts = listOf(
+                MemorizationEngine.JuzStartRef(1, 2, 3),
+                MemorizationEngine.JuzStartRef(2, 2, 6),
+            ),
+            surahAyahCounts = mapOf(2 to 5),
+        )
+        assertThat(sameSurahEnd).containsExactly(
+            MemorizationCard(2, 3),
+            MemorizationCard(2, 4),
+            MemorizationCard(2, 5),
+        ).inOrder()
+
+        val midSurahEnd = MemorizationEngine.startingCardsForJuz(
+            juz = 1,
+            juzStarts = listOf(
+                MemorizationEngine.JuzStartRef(1, 2, 3),
+                MemorizationEngine.JuzStartRef(2, 4, 2),
+            ),
+            surahAyahCounts = mapOf(2 to 4, 3 to 3, 4 to 4),
+        )
+        assertThat(midSurahEnd).containsExactly(
+            MemorizationCard(2, 3),
+            MemorizationCard(2, 4),
+            MemorizationCard(3, 1),
+            MemorizationCard(3, 2),
+            MemorizationCard(3, 3),
+            MemorizationCard(4, 1),
+        ).inOrder()
+
+        val boundaryEnd = MemorizationEngine.startingCardsForJuz(
+            juz = 1,
+            juzStarts = listOf(
+                MemorizationEngine.JuzStartRef(1, 2, 1),
+                MemorizationEngine.JuzStartRef(2, 4, 1),
+            ),
+            surahAyahCounts = mapOf(2 to 2, 3 to 2, 4 to 3),
+        )
+        assertThat(boundaryEnd).containsExactly(
+            MemorizationCard(2, 1),
+            MemorizationCard(2, 2),
+            MemorizationCard(3, 1),
+            MemorizationCard(3, 2),
+        ).inOrder()
+
+        val finalJuz = MemorizationEngine.startingCardsForJuz(
+            juz = 30,
+            juzStarts = listOf(MemorizationEngine.JuzStartRef(30, 112, 2)),
+            surahAyahCounts = mapOf(114 to 2),
+        )
+        assertThat(finalJuz).containsExactly(
+            MemorizationCard(114, 1),
+            MemorizationCard(114, 2),
+        ).inOrder()
+    }
+
+    @Test
     fun `due and selection prefer due then earliest scheduled card`() {
         val future = MemorizationCard(1, 2, dueDay = 20)
         val dueLaterAyah = MemorizationCard(1, 3, dueDay = 5)

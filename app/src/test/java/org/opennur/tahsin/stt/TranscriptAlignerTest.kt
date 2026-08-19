@@ -209,5 +209,6 @@ class TranscriptAlignerTest {
         assertEquals("a", TranscriptAligner.appendTranscript("a", ""))
         assertEquals("b", TranscriptAligner.appendTranscript("", "b"))
         assertEquals("a b", TranscriptAligner.appendTranscript("a", "b"))
+        assertTrue(!TranscriptAligner.reachesEnd(emptyList()))
     }
 }

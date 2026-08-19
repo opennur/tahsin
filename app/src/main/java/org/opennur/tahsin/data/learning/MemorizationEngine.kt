@@ -41,17 +41,10 @@ object MemorizationEngine {
         val end = juzStarts.firstOrNull { it.juz == juz + 1 }
 
         val cards = mutableListOf<MemorizationCard>()
-        for (surah in start.surah..(end?.surah?.minus(1) ?: 114)) {
+        for (surah in start.surah..(end?.surah ?: 114)) {
             val ayahCount = surahAyahCounts[surah] ?: continue
             val fromAyah = if (surah == start.surah) start.ayah else 1
-            val toAyah = if (end != null && surah == end.surah - 1 && end.ayah > 1) {
-                // Juz ends mid-surah
-                if (surah == start.surah) ayahCount else end.ayah - 1
-            } else if (end == null && surah == 114) {
-                ayahCount
-            } else {
-                ayahCount
-            }
+            val toAyah = if (end != null && surah == end.surah) end.ayah - 1 else ayahCount
             for (ayah in fromAyah..toAyah) {
                 cards.add(MemorizationCard(surah = surah, ayah = ayah))
             }

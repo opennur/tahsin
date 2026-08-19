@@ -47,6 +47,7 @@ import org.opennur.tahsin.util.FontStore
 @Composable
 fun TajwidQuizScreen(
     onBack: () -> Unit,
+    onGuidedComplete: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -102,7 +103,8 @@ fun TajwidQuizScreen(
                     strings = strings,
                     fontFamily = arabicFamily,
                     onAnswer = viewModel::answer,
-                    onNext = viewModel::next,
+                    onNext = onGuidedComplete ?: viewModel::next,
+                    nextLabel = if (onGuidedComplete == null) strings.quizNext else strings.guidedReturnHome,
                 )
             }
 
@@ -113,6 +115,7 @@ fun TajwidQuizScreen(
 
 /** Kartu satu soal + opsi + umpan balik. */
 @Composable
+@Suppress("LongParameterList", "LongMethod")
 private fun QuestionCard(
     question: QuizQuestion,
     selected: String?,
@@ -123,6 +126,7 @@ private fun QuestionCard(
     fontFamily: FontFamily,
     onAnswer: (String) -> Unit,
     onNext: () -> Unit,
+    nextLabel: String,
 ) {
     val answered = selected != null
     val isCorrectPick = answered && TajwidQuiz.isCorrect(selected!!, question)
@@ -231,7 +235,7 @@ private fun QuestionCard(
         }
         Spacer(modifier = Modifier.height(12.dp))
         AyahButton(
-            text = strings.quizNext,
+            text = nextLabel,
             variant = AyahButtonVariant.Primary,
             onClick = onNext,
             modifier = Modifier.fillMaxWidth(),
