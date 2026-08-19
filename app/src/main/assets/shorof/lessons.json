@@ -441,6 +441,186 @@
         "to teach"
        ],
        "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Madhi (lampau) untuk هُوَ",
+       "promptEn": "Complete the past tense form for huwa",
+       "promptAr": "هُوَ",
+       "promptLatin": "huwa",
+       "optionsId": [
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "كَتَبُوا",
+        "—"
+       ],
+       "optionsEn": [
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "كَتَبُوا",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Mudhari' (sedang/akan) untuk هُوَ",
+       "promptEn": "Complete the present tense form for huwa",
+       "promptAr": "هُوَ",
+       "promptLatin": "huwa",
+       "optionsId": [
+        "يَكْتُبُ",
+        "تَكْتُبُ",
+        "يَكْتُبُونَ",
+        "—"
+       ],
+       "optionsEn": [
+        "يَكْتُبُ",
+        "تَكْتُبُ",
+        "يَكْتُبُونَ",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Amr (perintah) untuk هُوَ",
+       "promptEn": "Complete the imperative form for huwa",
+       "promptAr": "هُوَ",
+       "promptLatin": "huwa",
+       "optionsId": [
+        "اُكْتُبْ",
+        "اُكْتُبِي",
+        "اُكْتُبُوا",
+        "—"
+       ],
+       "optionsEn": [
+        "اُكْتُبْ",
+        "اُكْتُبِي",
+        "اُكْتُبُوا",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Madhi (lampau) untuk هِيَ",
+       "promptEn": "Complete the past tense form for hiya",
+       "promptAr": "هِيَ",
+       "promptLatin": "hiya",
+       "optionsId": [
+        "كَتَبَتْ",
+        "كَتَبَ",
+        "كَتَبُوا",
+        "—"
+       ],
+       "optionsEn": [
+        "كَتَبَتْ",
+        "كَتَبَ",
+        "كَتَبُوا",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Mudhari' (sedang/akan) untuk هِيَ",
+       "promptEn": "Complete the present tense form for hiya",
+       "promptAr": "هِيَ",
+       "promptLatin": "hiya",
+       "optionsId": [
+        "تَكْتُبُ",
+        "يَكْتُبُ",
+        "يَكْتُبُونَ",
+        "—"
+       ],
+       "optionsEn": [
+        "تَكْتُبُ",
+        "يَكْتُبُ",
+        "يَكْتُبُونَ",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Amr (perintah) untuk هِيَ",
+       "promptEn": "Complete the imperative form for hiya",
+       "promptAr": "هِيَ",
+       "promptLatin": "hiya",
+       "optionsId": [
+        "اُكْتُبِي",
+        "اُكْتُبْ",
+        "اُكْتُبُوا",
+        "—"
+       ],
+       "optionsEn": [
+        "اُكْتُبِي",
+        "اُكْتُبْ",
+        "اُكْتُبُوا",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Madhi (lampau) untuk هُمْ",
+       "promptEn": "Complete the past tense form for hum",
+       "promptAr": "هُمْ",
+       "promptLatin": "hum",
+       "optionsId": [
+        "كَتَبُوا",
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "—"
+       ],
+       "optionsEn": [
+        "كَتَبُوا",
+        "كَتَبَ",
+        "كَتَبَتْ",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Mudhari' (sedang/akan) untuk هُمْ",
+       "promptEn": "Complete the present tense form for hum",
+       "promptAr": "هُمْ",
+       "promptLatin": "hum",
+       "optionsId": [
+        "يَكْتُبُونَ",
+        "يَكْتُبُ",
+        "تَكْتُبُ",
+        "—"
+       ],
+       "optionsEn": [
+        "يَكْتُبُونَ",
+        "يَكْتُبُ",
+        "تَكْتُبُ",
+        "—"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "conjugation",
+       "promptId": "Lengkapi bentuk Amr (perintah) untuk هُمْ",
+       "promptEn": "Complete the imperative form for hum",
+       "promptAr": "هُمْ",
+       "promptLatin": "hum",
+       "optionsId": [
+        "اُكْتُبُوا",
+        "اُكْتُبْ",
+        "اُكْتُبِي",
+        "—"
+       ],
+       "optionsEn": [
+        "اُكْتُبُوا",
+        "اُكْتُبْ",
+        "اُكْتُبِي",
+        "—"
+       ],
+       "answerIndex": 0
       }
      ]
     },

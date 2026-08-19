@@ -36,6 +36,14 @@ def pattern(root, root_latin, wazan, wazan_latin, form_id, form_en, meaning_id, 
     }
 
 
+def conjugation_ex(prompt_id, prompt_en, prompt_ar, prompt_latin, options_id, options_en, answer):
+    return {
+        "type": "conjugation", "promptId": prompt_id, "promptEn": prompt_en,
+        "promptAr": prompt_ar, "promptLatin": prompt_latin,
+        "optionsId": options_id, "optionsEn": options_en, "answerIndex": answer,
+    }
+
+
 LEVELS = [
     {
         "id": 1, "titleId": "Level 1 — Akar dan Tasrif Dasar",
@@ -252,3 +260,45 @@ for _level in LEVELS:
                     _pattern["exampleAr"], _pattern["exampleLatin"], _meaning_id, _meaning_en, 0,
                 ),
             ])
+
+
+# Generate conjugation exercises from the tasrif tables.
+_all_conjugations = []
+for _level in LEVELS:
+    for _lesson in _level["lessons"]:
+        _all_conjugations.extend(_lesson.get("conjugations", []))
+
+_form_labels = [
+    ("past", "Madhi (lampau)", "Past tense"),
+    ("present", "Mudhari' (sedang/akan)", "Present tense"),
+    ("imperative", "Amr (perintah)", "Imperative"),
+]
+
+for _level in LEVELS:
+    for _lesson in _level["lessons"]:
+        _conjs = _lesson.get("conjugations", [])
+        if len(_conjs) < 2:
+            continue
+        for _conj in _conjs:
+            for _form_key, _label_id, _label_en in _form_labels:
+                _correct = _conj[_form_key]
+                if not _correct:
+                    continue
+                _distractors_id = list(dict.fromkeys(
+                    c[_form_key] for c in _all_conjugations if c[_form_key] != _correct
+                ))[:3]
+                _distractors_en = _distractors_id[:]
+                while len(_distractors_id) < 3:
+                    _distractors_id.append("—")
+                    _distractors_en.append("—")
+                _opts_id = [_correct] + _distractors_id[:3]
+                _opts_en = [_correct] + _distractors_en[:3]
+                _lesson["exercises"].append(conjugation_ex(
+                    f"Lengkapi bentuk { _label_id } untuk { _conj['pronounAr'] }",
+                    f"Complete the { _label_en.lower() } form for { _conj['pronounLatin'] }",
+                    _conj["pronounAr"],
+                    _conj["pronounLatin"],
+                    _opts_id,
+                    _opts_en,
+                    0,
+                ))

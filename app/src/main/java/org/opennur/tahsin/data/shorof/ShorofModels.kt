@@ -76,6 +76,16 @@ data class ShorofChoiceExercise(
     val answerIndex: Int,
 ) : ShorofExercise
 
+data class ShorofConjugationExercise(
+    override val promptId: String,
+    override val promptEn: String,
+    override val promptAr: String,
+    override val promptLatin: String,
+    val optionsId: List<String>,
+    val optionsEn: List<String>,
+    val answerIndex: Int,
+) : ShorofExercise
+
 data class ShorofSessionExercise(
     val lessonId: String,
     val exercise: ShorofExercise,
