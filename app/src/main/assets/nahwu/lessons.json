@@ -120,6 +120,46 @@
          "latin": "al-kitābi"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "هٰذَا كِتَابٌ",
+       "promptLatin": "Hādhā kitābun",
+       "optionsId": [
+        "Isim — kata benda atau nama",
+        "Alif lam menunjukkan ma'rifah",
+        "Tanwin adalah tanda nakirah",
+        "Mubtada' adalah pokok pembicaraan"
+       ],
+       "optionsEn": [
+        "Isim — a noun or name",
+        "Alif lam marks definiteness",
+        "Tanwin marks indefiniteness",
+        "Mubtada' is the topic"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "يَكْتُبُ الطَّالِبُ فِي الدَّفْتَرِ",
+       "promptLatin": "Yaktubu ṭ-ṭālibu fī d-daftari",
+       "optionsId": [
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah",
+        "Tanwin adalah tanda nakirah",
+        "Mubtada' adalah pokok pembicaraan"
+       ],
+       "optionsEn": [
+        "Fi'il and harf",
+        "Alif lam marks definiteness",
+        "Tanwin marks indefiniteness",
+        "Mubtada' is the topic"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -227,6 +267,46 @@
          "latin": "kitābun"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "هٰذَا الْكِتَابُ مُفِيدٌ",
+       "promptLatin": "Hādhā l-kitābu mufīdun",
+       "optionsId": [
+        "Alif lam menunjukkan ma'rifah",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Mubtada' adalah pokok pembicaraan"
+       ],
+       "optionsEn": [
+        "Alif lam marks definiteness",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Mubtada' is the topic"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "عِنْدِي كِتَابٌ",
+       "promptLatin": "ʿIndī kitābun",
+       "optionsId": [
+        "Tanwin adalah tanda nakirah",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Mubtada' adalah pokok pembicaraan"
+       ],
+       "optionsEn": [
+        "Tanwin marks indefiniteness",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Mubtada' is the topic"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -334,6 +414,46 @@
          "latin": "kabīrun"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "الطَّالِبُ مُجْتَهِدٌ",
+       "promptLatin": "Aṭ-ṭālibu mujtahidun",
+       "optionsId": [
+        "Mubtada' adalah pokok pembicaraan",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Mubtada' is the topic",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "الْبَيْتُ كَبِيرٌ",
+       "promptLatin": "Al-baytu kabīrun",
+       "optionsId": [
+        "Khabar memberi informasi",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Khabar gives information",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -445,6 +565,46 @@
          "latin": "ad-darsa"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "ذَهَبَ الطَّالِبُ",
+       "promptLatin": "Dhahaba ṭ-ṭālibu",
+       "optionsId": [
+        "Fi'il berada di awal",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "The verb comes first",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "كَتَبَ أَحْمَدُ الدَّرْسَ",
+       "promptLatin": "Kataba Aḥmadu d-darsa",
+       "optionsId": [
+        "Fa'il adalah pelaku",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Fa'il is the doer",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
       }
      ]
     }
@@ -564,6 +724,46 @@
          "latin": "al-kitāba"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "قَرَأَ الطَّالِبُ الْكِتَابَ",
+       "promptLatin": "Qara'a ṭ-ṭālibu l-kitāba",
+       "optionsId": [
+        "Maf'ul bih menerima pekerjaan",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Maf'ul bih receives the action",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "شَرِبَ الْوَلَدُ الْمَاءَ",
+       "promptLatin": "Shariba l-waladu l-mā'a",
+       "optionsId": [
+        "Tanda fathah pada maf'ul",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Fathah on the maf'ul",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -675,6 +875,46 @@
          "latin": "al-madrasati"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "فِي الْمَسْجِدِ",
+       "promptLatin": "Fī l-masjidi",
+       "optionsId": [
+        "Harf jar menghubungkan kata",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "A preposition connects words",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "ذَهَبْتُ إِلَى الْمَدْرَسَةِ",
+       "promptLatin": "Dhahabtu ilā l-madrasati",
+       "optionsId": [
+        "Isim setelah jar menjadi majrur",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "The noun after a preposition is genitive",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
       }
      ]
     }
@@ -790,6 +1030,46 @@
          "latin": "kabīrun"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "بَيْتٌ كَبِيرٌ",
+       "promptLatin": "Baytun kabīrun",
+       "optionsId": [
+        "Sifat mengikuti kata benda",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "The adjective follows the noun",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "رَأَيْتُ بَيْتًا كَبِيرًا",
+       "promptLatin": "Ra'aytu baytan kabīran",
+       "optionsId": [
+        "Akhiran mengikuti posisi",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Endings follow the grammatical position",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
       }
      ]
     },
@@ -905,6 +1185,46 @@
          "latin": "al-faṣli"
         }
        ]
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 1 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 1 in this lesson?",
+       "promptAr": "جَاءَ الطَّالِبُ",
+       "promptLatin": "Jā'a ṭ-ṭālibu",
+       "optionsId": [
+        "Dhammah untuk marfu'",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Dammah marks the nominative",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
+      },
+      {
+       "type": "choice",
+       "promptId": "Kaidah apa yang sesuai dengan contoh 2 pada pelajaran ini?",
+       "promptEn": "Which rule matches example 2 in this lesson?",
+       "promptAr": "رَأَيْتُ الطَّالِبَ فِي الْفَصْلِ",
+       "promptLatin": "Ra'aytu ṭ-ṭāliba fī l-faṣli",
+       "optionsId": [
+        "Fathah dan kasrah",
+        "Isim — kata benda atau nama",
+        "Fi'il dan harf",
+        "Alif lam menunjukkan ma'rifah"
+       ],
+       "optionsEn": [
+        "Fathah and kasrah",
+        "Isim — a noun or name",
+        "Fi'il and harf",
+        "Alif lam marks definiteness"
+       ],
+       "answerIndex": 0
       }
      ]
     }

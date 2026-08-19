@@ -67,8 +67,13 @@ def validate():
                     latin(row.get(key), f"{p}.{key}") if key == "pronounLatin" else arabic(row.get(key), f"{p}.{key}")
             if len(lesson.get("exercises", [])) < 4:
                 ERRORS.append(f"{path}: minimal empat latihan")
+            seen_exercises = set()
             for i, exercise in enumerate(lesson.get("exercises", [])):
                 p = f"{path}.exercises[{i}]"
+                signature = json.dumps(exercise, ensure_ascii=False, sort_keys=True)
+                if signature in seen_exercises:
+                    ERRORS.append(f"{p}: soal duplikat")
+                seen_exercises.add(signature)
                 for key in ("promptId", "promptEn"):
                     required(exercise.get(key), f"{p}.{key}")
                 arabic(exercise.get("promptAr"), f"{p}.promptAr")

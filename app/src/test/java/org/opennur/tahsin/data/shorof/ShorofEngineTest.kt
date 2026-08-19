@@ -29,5 +29,9 @@ class ShorofEngineTest {
         assertTrue(session.all { it.lessonId in lessons.map(ShorofLesson::id) })
         assertTrue(ShorofEngine.buildSession(emptyList(), 8).isEmpty())
         assertEquals(2, ShorofEngine.buildSession(listOf(lesson("one", exercise, exercise)), 99).size)
+        val one = lesson("one", exercise)
+        assertEquals(listOf("one:0"), ShorofEngine.allQuestionIds(listOf(one)))
+        assertEquals(1, ShorofEngine.buildSession(listOf(one), 8, Random(1), setOf("one:0")).size)
+        assertTrue(ShorofEngine.buildSession(listOf(one), 8, Random(1), setOf("missing")).isEmpty())
     }
 }

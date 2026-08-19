@@ -30,6 +30,8 @@ import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.NahwuStats
 import org.opennur.tahsin.util.NahwuProgressStore
+import org.opennur.tahsin.util.QuestionExposureStore
+import java.time.LocalDate
 import org.opennur.tahsin.util.SettingsStore
 
 enum class NahwuMode { HOME, LESSON, EXERCISES }
@@ -87,6 +89,7 @@ class NahwuViewModel @Inject constructor(
     val state: StateFlow<NahwuUiState> = _state.asStateFlow()
     private val progressMutex = Mutex()
     private val random = Random.Default
+    private val questionHistory = QuestionExposureStore.fromContext(app)
     private var catalog = NahwuCatalog(0, emptyList())
     private var stats = NahwuStats()
 
@@ -120,7 +123,15 @@ class NahwuViewModel @Inject constructor(
     fun backToHome() = _state.update { it.copy(mode = NahwuMode.HOME, lesson = null) }
 
     fun startExercises() {
-        val session = NahwuEngine.buildSession(allLessons(), NahwuEngine.SESSION_SIZE, random)
+        val lessons = allLessons()
+        val selectedIds = questionHistory.reserve(
+            FEATURE,
+            NahwuEngine.allQuestionIds(lessons),
+            NahwuEngine.SESSION_SIZE,
+            LocalDate.now().toEpochDay(),
+            random,
+        )
+        val session = NahwuEngine.buildSession(lessons, NahwuEngine.SESSION_SIZE, random, selectedIds.toSet())
         if (session.isEmpty()) return
         val first = session.first().exercise
         _state.update {
@@ -144,6 +155,9 @@ class NahwuViewModel @Inject constructor(
         val exercise = state.exercise as? NahwuChoiceExercise ?: return
         if (state.selected != null) return
         val correct = NahwuEngine.isChoiceCorrect(exercise, index)
+        _state.value.session.getOrNull(_state.value.exerciseIndex)?.questionId?.let { id ->
+            questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
+        }
         _state.update {
             it.copy(selected = index, correct = correct, score = it.score + if (correct) 1 else 0)
         }
@@ -244,4 +258,8 @@ class NahwuViewModel @Inject constructor(
                 },
             )
         }
+
+    private companion object {
+        const val FEATURE = "nahwu"
+    }
 }

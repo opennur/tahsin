@@ -48,6 +48,9 @@ class NahwuEngineTest {
         assertTrue(session.all { it.lessonId in lessons.map(NahwuLesson::id) })
         assertEquals(0, NahwuEngine.buildSession(emptyList(), 8).size)
         assertEquals(2, NahwuEngine.buildSession(listOf(lesson("one", choice, rearrange)), 99).size)
+        val one = lesson("one", choice, rearrange)
+        assertEquals(listOf("one:0", "one:1"), NahwuEngine.allQuestionIds(listOf(one)))
+        assertEquals(1, NahwuEngine.buildSession(listOf(one), 8, Random(1), setOf("one:1")).size)
     }
 
     @Test

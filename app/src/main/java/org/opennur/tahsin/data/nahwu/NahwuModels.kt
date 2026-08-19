@@ -65,4 +65,5 @@ data class NahwuRearrangeExercise(
 data class NahwuSessionExercise(
     val lessonId: String,
     val exercise: NahwuExercise,
+    val questionId: String = "",
 )

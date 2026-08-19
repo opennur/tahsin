@@ -8,6 +8,7 @@ data class StatsStores(
     val lughoh: LughohProgressStore,
     val nahwu: NahwuProgressStore? = null,
     val shorof: ShorofProgressStore? = null,
+    val questionHistory: QuestionExposureStore? = null,
     val gamification: GamificationStore,
     val readingHistory: ReadingHistoryStore,
     val learningPlan: LearningPlanStore,

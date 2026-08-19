@@ -24,6 +24,7 @@ import org.opennur.tahsin.util.LearningPlanStore
 import org.opennur.tahsin.util.LughohProgressStore
 import org.opennur.tahsin.util.NahwuProgressStore
 import org.opennur.tahsin.util.ShorofProgressStore
+import org.opennur.tahsin.util.QuestionExposureStore
 import org.opennur.tahsin.util.ReadingHistoryStore
 import org.opennur.tahsin.util.ReadingStatsStore
 import org.opennur.tahsin.util.SettingsBackupAdapter
@@ -160,6 +161,11 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideQuestionExposureStore(@ApplicationContext context: Context): QuestionExposureStore =
+        QuestionExposureStore.fromContext(context)
+
+    @Provides
+    @Singleton
     fun provideGamificationStore(@ApplicationContext context: Context): GamificationStore =
         GamificationStore.fromContext(context)
 
@@ -178,6 +184,7 @@ object AppModule {
         lughoh: LughohProgressStore,
         nahwu: NahwuProgressStore,
         shorof: ShorofProgressStore,
+        questionHistory: QuestionExposureStore,
         gamification: GamificationStore,
         readingHistory: ReadingHistoryStore,
         learningPlan: LearningPlanStore,
@@ -188,6 +195,7 @@ object AppModule {
         lughoh = lughoh,
         nahwu = nahwu,
         shorof = shorof,
+        questionHistory = questionHistory,
         gamification = gamification,
         readingHistory = readingHistory,
         learningPlan = learningPlan,

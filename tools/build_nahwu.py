@@ -61,8 +61,13 @@ def validate():
                 latin(rule.get("exampleLatin"), f"{rp}.exampleLatin")
             if len(lesson.get("exercises", [])) < 4:
                 ERRORS.append(f"{lp}: minimal empat latihan")
+            seen_exercises = set()
             for index, exercise in enumerate(lesson.get("exercises", [])):
                 ep = f"{lp}.exercises[{index}]"
+                signature = json.dumps(exercise, ensure_ascii=False, sort_keys=True)
+                if signature in seen_exercises:
+                    ERRORS.append(f"{ep}: soal duplikat")
+                seen_exercises.add(signature)
                 required(exercise.get("promptId"), f"{ep}.promptId")
                 required(exercise.get("promptEn"), f"{ep}.promptEn")
                 if exercise.get("type") == "choice":

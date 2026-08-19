@@ -58,6 +58,7 @@ class NahwuModelsTest {
         assertEquals("Arrange", rearrange.promptEn)
         assertEquals(listOf(word), rearrange.words)
         assertEquals(choice, sessionChoice.exercise)
+        assertEquals("", sessionChoice.questionId)
         assertEquals(rearrange, sessionRearrange.exercise)
     }
 }

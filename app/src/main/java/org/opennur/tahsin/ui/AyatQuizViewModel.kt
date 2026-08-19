@@ -16,6 +16,8 @@ import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.SearchableAyah
 import org.opennur.tahsin.util.SettingsStore
+import org.opennur.tahsin.util.QuestionExposureStore
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,10 +66,14 @@ class AyatQuizViewModel @Inject constructor(
     private var index: List<SearchableAyah>? = null
     /** Kolam kata per surah (untuk pengecoh Lengkapi Ayat). */
     private var wordsBySurah: Map<Int, List<String>>? = null
+    private var completeQuestionIds: List<String>? = null
+    private var surahQuestionIds: List<String>? = null
     private val random = Random(System.currentTimeMillis())
+    private val questionHistory = QuestionExposureStore.fromContext(app)
 
     /** Ayat sumber soal aktif — untuk menerjemahkan ulang saat bahasa berganti. */
     private var currentEntry: SearchableAyah? = null
+    private var currentQuestionId: String? = null
 
     init {
         val names = repository.surahList().associate { it.number to it.nameLatin }
@@ -87,6 +93,7 @@ class AyatQuizViewModel @Inject constructor(
     /** Siapkan soal berikutnya (acak, dari seluruh mushaf). */
     fun next() {
         viewModelScope.launch {
+            currentQuestionId = null
             _state.update { it.copy(loading = true) }
             val idx = ensureIndex()
             val wordsBySurah = ensureWordsBySurah()
@@ -95,36 +102,46 @@ class AyatQuizViewModel @Inject constructor(
             var surah: SurahQuizQuestion? = null
             var entry: SearchableAyah? = null
             if (idx.isNotEmpty()) {
-                // Coba beberapa ayat sampai dapat soal yang valid.
-                repeat(MAX_ATTEMPTS) {
-                    if (complete != null || surah != null) return@repeat
-                    val e = idx[random.nextInt(idx.size)]
-                    when (mode) {
-                        AyatQuizMode.COMPLETE -> {
-                            val q = AyatQuiz.makeQuestion(
-                                surahNumber = e.surahNumber,
-                                ayahNumber = e.ayahNumber,
-                                words = ArabicNormalizer.splitWords(e.arabic),
-                                pool = wordsBySurah[e.surahNumber].orEmpty(),
-                                random = random,
-                            )
-                            if (q != null) {
-                                complete = q
-                                entry = e
+                val ids = ensureQuestionIds(idx, mode)
+                val selected = questionHistory.reserve(
+                    FEATURE_PREFIX + mode.name.lowercase(),
+                    ids,
+                    1,
+                    LocalDate.now().toEpochDay(),
+                    random,
+                ).firstOrNull()
+                if (selected != null) {
+                    val parts = selected.split(":")
+                    val e = idx.firstOrNull {
+                        it.surahNumber == parts.getOrNull(1)?.toIntOrNull() &&
+                            it.ayahNumber == parts.getOrNull(2)?.toIntOrNull()
+                    }
+                    if (e != null) {
+                        when (mode) {
+                            AyatQuizMode.COMPLETE -> {
+                                val words = ArabicNormalizer.splitWords(e.arabic)
+                                complete = AyatQuiz.makeQuestion(
+                                    surahNumber = e.surahNumber,
+                                    ayahNumber = e.ayahNumber,
+                                    words = words,
+                                    pool = wordsBySurah[e.surahNumber].orEmpty(),
+                                    random = random,
+                                    targetIndex = parts.getOrNull(3)?.toIntOrNull(),
+                                )
+                            }
+                            AyatQuizMode.SURAH -> {
+                                surah = SurahQuiz.makeQuestion(
+                                    surahNumber = e.surahNumber,
+                                    ayahNumber = e.ayahNumber,
+                                    arabic = e.arabic,
+                                    surahNames = _state.value.surahNames.toList(),
+                                    random = random,
+                                )
                             }
                         }
-                        AyatQuizMode.SURAH -> {
-                            val q = SurahQuiz.makeQuestion(
-                                surahNumber = e.surahNumber,
-                                ayahNumber = e.ayahNumber,
-                                arabic = e.arabic,
-                                surahNames = _state.value.surahNames.toList(),
-                                random = random,
-                            )
-                            if (q != null) {
-                                surah = q
-                                entry = e
-                            }
+                        if (complete != null || surah != null) {
+                            entry = e
+                            currentQuestionId = selected
                         }
                     }
                 }
@@ -180,6 +197,14 @@ class AyatQuizViewModel @Inject constructor(
                 SurahQuiz.isCorrect(option, q)
             }
         }
+        currentQuestionId?.let { id ->
+            questionHistory.record(
+                FEATURE_PREFIX + s.mode.name.lowercase(),
+                id,
+                correct,
+                LocalDate.now().toEpochDay(),
+            )
+        }
         _state.update {
             it.copy(
                 selected = option,
@@ -212,7 +237,18 @@ class AyatQuizViewModel @Inject constructor(
         return map
     }
 
+    private fun ensureQuestionIds(idx: List<SearchableAyah>, mode: AyatQuizMode): List<String> = when (mode) {
+        AyatQuizMode.COMPLETE -> completeQuestionIds ?: idx.flatMap { e ->
+            val words = ArabicNormalizer.splitWords(e.arabic)
+            words.indices.filter { it in 1 until words.lastIndex }
+                .map { "complete:${e.surahNumber}:${e.ayahNumber}:$it" }
+        }.also { completeQuestionIds = it }
+        AyatQuizMode.SURAH -> surahQuestionIds ?: idx.map { e ->
+            "surah:${e.surahNumber}:${e.ayahNumber}"
+        }.also { surahQuestionIds = it }
+    }
+
     companion object {
-        private const val MAX_ATTEMPTS = 20
+        private const val FEATURE_PREFIX = "ayat-"
     }
 }

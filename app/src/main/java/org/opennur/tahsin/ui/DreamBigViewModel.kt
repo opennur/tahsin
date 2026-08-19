@@ -15,6 +15,8 @@ import org.opennur.tahsin.util.DreamBigStats
 import org.opennur.tahsin.util.Gamification
 import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.SettingsStore
+import org.opennur.tahsin.util.QuestionExposureStore
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,6 +77,7 @@ class DreamBigViewModel @Inject constructor(
     val state: StateFlow<DreamBigUiState> = _state.asStateFlow()
 
     private val progressMutex = Mutex()
+    private val questionHistory = QuestionExposureStore.fromContext(app)
 
     /** Kosakata terkurasi (kolam soal). */
     private var vocabEntries: List<VocabEntry> = emptyList()
@@ -87,6 +90,7 @@ class DreamBigViewModel @Inject constructor(
 
     /** Sasaran ronde aktif (language-neutral) — untuk regenerasi saat bahasa berganti. */
     private var roundTargets: List<VocabEntry> = emptyList()
+    private var roundQuestionIds: List<String> = emptyList()
 
     init {
         viewModelScope.launch {
@@ -112,20 +116,22 @@ class DreamBigViewModel @Inject constructor(
         val pool = vocabEntries
         if (pool.size < 4) return // kolam terlalu kecil untuk pengecoh
         val random = Random.Default
-        val targets = DreamBigGame.pickTargets(pool, DreamBigGame.QUESTIONS_PER_ROUND, random)
-        val questions = targets.mapNotNull { target ->
-            DreamBigGame.question(
-                pool = pool,
-                target = target,
-                lang = s.language,
-                reverse = random.nextBoolean(),
-                random = random,
-            )
-        }
+        val ids = pool.flatMap { entry -> listOf("${entry.key}|f", "${entry.key}|r") }
+        val selectedIds = questionHistory.reserve(
+            FEATURE,
+            ids,
+            DreamBigGame.QUESTIONS_PER_ROUND,
+            LocalDate.now().toEpochDay(),
+            random,
+        )
+        val generated = selectedIds.mapNotNull { id -> questionForId(id, s.language, random) }
+        val questions = generated.map { it.second }
+        val targets = generated.map { it.first }
         if (questions.isEmpty()) return
 
         roundQuestions = questions
         roundTargets = targets
+        roundQuestionIds = generated.map { it.third }
         _state.update {
             it.copy(
                 mode = DreamBigMode.QUIZ,
@@ -147,6 +153,9 @@ class DreamBigViewModel @Inject constructor(
         val q = s.quiz ?: return
         if (q.selected != null) return
         val correct = q.question.options[q.question.correctIndex] == option
+        roundQuestionIds.getOrNull(q.index)?.let { id ->
+            questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
+        }
         val score = q.score + if (correct) 1 else 0
         val streak = if (correct) q.streak + 1 else 0
         _state.update {
@@ -237,15 +246,8 @@ class DreamBigViewModel @Inject constructor(
     private fun regenerateRound(lang: AppLanguage) {
         val s = _state.value
         val quiz = s.quiz ?: return
-        val questions = roundTargets.mapNotNull { target ->
-            DreamBigGame.question(
-                pool = vocabEntries,
-                target = target,
-                lang = lang,
-                reverse = Random.Default.nextBoolean(),
-                random = Random.Default,
-            )
-        }
+        val generated = roundQuestionIds.mapNotNull { id -> questionForId(id, lang, Random.Default) }
+        val questions = generated.map { it.second }
         if (questions.size != roundTargets.size) return // kolam berubah → biarkan apa adanya
         roundQuestions = questions
         _state.update {
@@ -256,5 +258,23 @@ class DreamBigViewModel @Inject constructor(
     /** Kembali ke layar awal (skor terbaik tetap tersimpan). */
     fun backToHome() {
         _state.update { it.copy(mode = DreamBigMode.HOME, quiz = null) }
+    }
+
+    private fun questionForId(
+        id: String,
+        language: AppLanguage,
+        random: Random,
+    ): Triple<VocabEntry, VocabQuizQuestion, String>? {
+        val separator = id.lastIndexOf('|')
+        if (separator <= 0) return null
+        val key = id.substring(0, separator)
+        val reverse = id.substring(separator + 1) == "r"
+        val target = vocabEntries.firstOrNull { it.key == key } ?: return null
+        val question = DreamBigGame.question(vocabEntries, target, language, reverse, random) ?: return null
+        return Triple(target, question, id)
+    }
+
+    private companion object {
+        const val FEATURE = "dreambig"
     }
 }

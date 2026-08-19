@@ -37,10 +37,12 @@ object AyatQuiz {
         words: List<String>,
         pool: List<String>,
         random: Random = Random.Default,
+        targetIndex: Int? = null,
     ): AyatQuizQuestion? {
         if (words.size < 3) return null
-        val targetIndex = 1 + random.nextInt(words.size - 2)
-        val correct = words[targetIndex]
+        val chosenIndex = targetIndex?.takeIf { it in 1 until words.lastIndex }
+            ?: (1 + random.nextInt(words.size - 2))
+        val correct = words[chosenIndex]
         val normalizedCorrect = ArabicNormalizer.normalize(correct)
         // Pengecoh: kata lain yang bukan bentuk normalisasi sama dengan target
         // (hindari dua opsi "sama" yang hanya beda harakat → soal ambigu).
@@ -52,7 +54,7 @@ object AyatQuiz {
 
         val distractors = candidates.shuffled(random).take(OPTION_COUNT - 1)
         val context = words.toMutableList()
-        context[targetIndex] = BLANK
+        context[chosenIndex] = BLANK
         return AyatQuizQuestion(
             surahNumber = surahNumber,
             ayahNumber = ayahNumber,

@@ -194,3 +194,40 @@ LEVELS = [
         ],
     },
 ]
+
+
+# Variasi pengenalan kaidah memperbanyak latihan tanpa menyalin soal yang sama:
+# setiap contoh lesson mendapat dua pertanyaan identifikasi dengan pengecoh
+# dari kaidah lesson lain.
+_all_rules = [rule for level in LEVELS for lesson_item in level["lessons"] for rule in lesson_item["rules"]]
+_rule_titles = []
+_rule_titles_en = []
+for _rule in _all_rules:
+    if _rule["titleId"] not in _rule_titles:
+        _rule_titles.append(_rule["titleId"])
+        _rule_titles_en.append(_rule["titleEn"])
+
+for _level in LEVELS:
+    for _lesson in _level["lessons"]:
+        _rules = _lesson["rules"]
+        for _index, _rule in enumerate(_rules):
+            _distractors = [
+                title for title in _rule_titles
+                if title != _rule["titleId"] and title not in [r["titleId"] for r in _rules]
+            ][:3]
+            _distractor_en = [
+                _rule_titles_en[_rule_titles.index(title)] for title in _distractors
+            ]
+            while len(_distractors) < 3:
+                _distractors.append("Kaidah lain")
+                _distractor_en.append("Another rule")
+            _lesson["exercises"].append({
+                "type": "choice",
+                "promptId": f"Kaidah apa yang sesuai dengan contoh {(_index + 1)} pada pelajaran ini?",
+                "promptEn": f"Which rule matches example {(_index + 1)} in this lesson?",
+                "promptAr": _rule["exampleAr"],
+                "promptLatin": _rule["exampleLatin"],
+                "optionsId": [_rule["titleId"]] + _distractors,
+                "optionsEn": [_rule["titleEn"]] + _distractor_en,
+                "answerIndex": 0,
+            })

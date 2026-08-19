@@ -50,11 +50,24 @@ object TajwidQuiz {
         if (candidates.isEmpty()) return null
 
         val idx = candidates[random.nextInt(candidates.size)]
-        val word = words[idx]
-        val prev = words.getOrNull(idx - 1)
-        val next = words.getOrNull(idx + 1)
+        return pickWordAt(words, idx, random)
+    }
+
+    /** Build a deterministic question for a chosen word/rule pair. */
+    fun pickWordAt(
+        words: List<String>,
+        index: Int,
+        random: Random = Random.Default,
+        targetRuleName: String? = null,
+    ): QuizQuestion? {
+        val word = words.getOrNull(index) ?: return null
+        val prev = words.getOrNull(index - 1)
+        val next = words.getOrNull(index + 1)
         val rules = TajwidEngine.analyzeWord(word, prev, next)
-        val target = rules.firstOrNull { it.category !in BORING_CATEGORIES } ?: rules.first()
+        val target = targetRuleName?.let { name -> rules.firstOrNull { it.name == name } }
+            ?: rules.firstOrNull { it.category !in BORING_CATEGORIES }
+            ?: rules.firstOrNull()
+            ?: return null
         // Pengecoh TIDAK boleh memuat hukum lain yang juga benar pada kata ini
         // (mis. "Mad Thabi'i" vs "Mad Aridh" di kata akhir ayat) — biar tak ada
         // dua jawaban yang sama-sama bisa dibela.

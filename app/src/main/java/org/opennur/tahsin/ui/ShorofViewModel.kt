@@ -28,6 +28,8 @@ import org.opennur.tahsin.util.GamificationHub
 import org.opennur.tahsin.util.SettingsStore
 import org.opennur.tahsin.util.ShorofProgressStore
 import org.opennur.tahsin.util.ShorofStats
+import org.opennur.tahsin.util.QuestionExposureStore
+import java.time.LocalDate
 
 enum class ShorofMode { HOME, LESSON, EXERCISES }
 
@@ -76,6 +78,7 @@ class ShorofViewModel @Inject constructor(
     val state: StateFlow<ShorofUiState> = _state.asStateFlow()
     private val progressMutex = Mutex()
     private val random = Random.Default
+    private val questionHistory = QuestionExposureStore.fromContext(app)
     private var catalog = ShorofCatalog(0, emptyList())
     private var stats = ShorofStats()
 
@@ -109,7 +112,15 @@ class ShorofViewModel @Inject constructor(
     fun backToHome() = _state.update { it.copy(mode = ShorofMode.HOME, lesson = null) }
 
     fun startExercises() {
-        val session = ShorofEngine.buildSession(allLessons(), ShorofEngine.SESSION_SIZE, random)
+        val lessons = allLessons()
+        val selectedIds = questionHistory.reserve(
+            FEATURE,
+            ShorofEngine.allQuestionIds(lessons),
+            ShorofEngine.SESSION_SIZE,
+            LocalDate.now().toEpochDay(),
+            random,
+        )
+        val session = ShorofEngine.buildSession(lessons, ShorofEngine.SESSION_SIZE, random, selectedIds.toSet())
         if (session.isEmpty()) return
         _state.update {
             it.copy(
@@ -130,6 +141,9 @@ class ShorofViewModel @Inject constructor(
         val exercise = state.exercise as? ShorofChoiceExercise ?: return
         if (state.selected != null) return
         val correct = ShorofEngine.isChoiceCorrect(exercise, index)
+        _state.value.session.getOrNull(_state.value.exerciseIndex)?.questionId?.let { id ->
+            questionHistory.record(FEATURE, id, correct, LocalDate.now().toEpochDay())
+        }
         _state.update {
             it.copy(selected = index, correct = correct, score = it.score + if (correct) 1 else 0)
         }
@@ -196,4 +210,8 @@ class ShorofViewModel @Inject constructor(
                 },
             )
         }
+
+    private companion object {
+        const val FEATURE = "shorof"
+    }
 }

@@ -183,7 +183,7 @@ class BackupManagerTest {
 
     @Test
     fun storeFileNames_contains9Files() {
-        assertThat(BackupManager.STORE_FILENAMES).hasSize(11)
+        assertThat(BackupManager.STORE_FILENAMES).hasSize(12)
     }
 
     @Test
@@ -192,6 +192,7 @@ class BackupManagerTest {
             "reading-stats.json", "reading_history.json", "bookmarks.json",
             "gamification.json", "vocab-stats.json", "dreambig-progress.json",
             "lughoh-progress.json", "nahwu-progress.json", "shorof-progress.json",
+            "question-history.json",
             "learning-plan.json", "memorization.json",
         )
         assertThat(BackupManager.STORE_FILENAMES.toSet()).isEqualTo(expected)

@@ -188,3 +188,67 @@ LEVELS = [
         ],
     },
 ]
+
+
+# Setiap pola menghasilkan beberapa sudut latihan: akar, wazan, bentuk,
+# makna, dan contoh. Soal tetap merujuk pada data pola yang sama tetapi tidak
+# mengulang prompt/target yang identik.
+_all_patterns = [
+    pattern for level in LEVELS for lesson_item in level["lessons"] for pattern in lesson_item["patterns"]
+]
+
+
+def _options(correct, correct_en, values, values_en):
+    pairs = [(correct, correct_en)]
+    for value, value_en in zip(values, values_en):
+        if value != correct and value not in [item[0] for item in pairs]:
+            pairs.append((value, value_en))
+        if len(pairs) == 4:
+            break
+    while len(pairs) < 4:
+        pairs.append(("Pilihan lain", "Another option"))
+    return [item[0] for item in pairs], [item[1] for item in pairs]
+
+
+_roots = list(dict.fromkeys(item["root"] for item in _all_patterns))
+_roots_latin = list(dict.fromkeys(item["rootLatin"] for item in _all_patterns))
+_wazans = list(dict.fromkeys(item["wazan"] for item in _all_patterns))
+_wazans_latin = list(dict.fromkeys(item["wazanLatin"] for item in _all_patterns))
+_forms = list(dict.fromkeys((item["formId"], item["formEn"]) for item in _all_patterns))
+_meanings = list(dict.fromkeys((item["meaningId"], item["meaningEn"]) for item in _all_patterns))
+
+for _level in LEVELS:
+    for _lesson in _level["lessons"]:
+        for _pattern in _lesson["patterns"]:
+            _root_id, _root_en = _options(
+                _pattern["root"], _pattern["rootLatin"], _roots, _roots_latin,
+            )
+            _wazan_id, _wazan_en = _options(
+                _pattern["wazan"], _pattern["wazanLatin"], _wazans, _wazans_latin,
+            )
+            _form_id, _form_en = _options(
+                _pattern["formId"], _pattern["formEn"],
+                [item[0] for item in _forms], [item[1] for item in _forms],
+            )
+            _meaning_id, _meaning_en = _options(
+                _pattern["meaningId"], _pattern["meaningEn"],
+                [item[0] for item in _meanings], [item[1] for item in _meanings],
+            )
+            _lesson["exercises"].extend([
+                choice(
+                    "Akar kata dari contoh ini?", "What is the root of this example?",
+                    _pattern["exampleAr"], _pattern["exampleLatin"], _root_id, _root_en, 0,
+                ),
+                choice(
+                    "Wazan apa yang dipakai?", "Which wazan is used?",
+                    _pattern["exampleAr"], _pattern["exampleLatin"], _wazan_id, _wazan_en, 0,
+                ),
+                choice(
+                    "Bentuk ini termasuk...", "This form is...",
+                    _pattern["exampleAr"], _pattern["exampleLatin"], _form_id, _form_en, 0,
+                ),
+                choice(
+                    "Makna pola ini adalah...", "The meaning of this pattern is...",
+                    _pattern["exampleAr"], _pattern["exampleLatin"], _meaning_id, _meaning_en, 0,
+                ),
+            ])
